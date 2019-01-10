@@ -15,20 +15,39 @@
       </q-btn>
       <q-toolbar-title class="text-dark">{{board.name}}</q-toolbar-title>
     </q-toolbar>
-    <div class="widgets__wrapper q-px-sm scroll">
-      <div class="row" v-if="board.widgetsIndexes.length">
-        <div class="widgets__item" v-for="index in board.widgetsIndexes" :key="index">
-          <component
-            :is="widgets[index].type"
-            :item="widgets[index]"
-            :index="index"
-            :in-shortcuts="Boolean(board.shortcutsIndexes.includes(index))"
-            @action="(data) => { $emit('action', data) }"
-            @update="editWidgetSettings(index)"
-            @delete="$emit('delete:widget', {widgetId: index, settings: widgets[index]})"
-            @fast-bind="$emit('fast-bind', index)"
-          />
-        </div>
+    <div class="widgets__wrapper scroll">
+      <div style="width: 100%; position: relative;" v-if="board.widgetsIndexes.length">
+        <grid-layout
+          :layout.sync="board.layout"
+          :col-num="colNum"
+          :row-height="rowHeight"
+          :is-draggable="true"
+          :is-resizable="true"
+          :is-mirrored="true"
+          :vertical-compact="false"
+          :margin="[10, 10]"
+          :use-css-transforms="true"
+        >
+            <grid-item v-for="(widgetIndex, index) in board.widgetsIndexes"
+              :key="widgetIndex"
+              :x="board.layout[index].x"
+              :y="board.layout[index].y"
+              :w="board.layout[index].w"
+              :h="board.layout[index].h"
+              :i="board.layout[index].i"
+            >
+              <component
+                :is="widgets[widgetIndex].type"
+                :item="widgets[widgetIndex]"
+                :index="widgetIndex"
+                :in-shortcuts="Boolean(board.shortcutsIndexes.includes(widgetIndex))"
+                @action="(data) => { $emit('action', data) }"
+                @update="editWidgetSettings(widgetIndex)"
+                @delete="$emit('delete:widget', {widgetId: widgetIndex, settings: widgets[widgetIndex]})"
+                @fast-bind="$emit('fast-bind', widgetIndex)"
+              />
+            </grid-item>
+        </grid-layout>
       </div>
       <div v-else class="text-center text-grey-8 q-mt-md" style="font-size: 2rem;">
         <div class="text-bold">The board is empty</div>
@@ -48,10 +67,12 @@
     .widgets__wrapper
       height calc(100% - 50px)
       padding-bottom 82px
+      position relative
 </style>
 
 <script>
 import Settings from './widgets/Settings'
+import VueGridLayout from 'vue-grid-layout'
 import Switcher from './widgets/swither/View'
 import Informer from './widgets/informer/View'
 import Clicker from './widgets/clicker/View'
@@ -63,7 +84,9 @@ export default {
       settingsModel: false,
       currentSettings: undefined,
       editedWidgetId: undefined,
-      editedWidgetTopic: undefined
+      editedWidgetTopic: undefined,
+      colNum: 12,
+      rowHeight: 100
     }
   },
   methods: {
@@ -90,7 +113,12 @@ export default {
     }
   },
   components: {
-    Settings, Switcher, Informer, Clicker
+    Settings,
+    Switcher,
+    Informer,
+    Clicker,
+    GridLayout: VueGridLayout.GridLayout,
+    GridItem: VueGridLayout.GridItem
   }
 }
 </script>

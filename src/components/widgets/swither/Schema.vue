@@ -15,7 +15,9 @@ export default {
     let defaultSettings = {
       trueValue: '1',
       falseValue: '0',
-      save: true
+      save: true,
+      height: 1,
+      width: 2
     }
     return {
       defaultSettings,

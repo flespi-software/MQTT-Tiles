@@ -74,7 +74,15 @@ export default {
   name: 'Settings',
   props: ['value', 'settings'],
   data () {
-    let defaultSettings = { name: 'New widget', color: 'grey', value: null, type: 'switcher', topic: 'path/to/data', settings: {}, status: WIDGET_STATUS_DISABLED }
+    let defaultSettings = {
+      name: 'New widget',
+      color: 'grey',
+      value: null,
+      type: 'switcher',
+      topic: 'path/to/data',
+      settings: {},
+      status: WIDGET_STATUS_DISABLED
+    }
     return {
       defaultSettings,
       currentSettings: this.settings ? merge({}, defaultSettings, this.settings) : merge({}, defaultSettings),

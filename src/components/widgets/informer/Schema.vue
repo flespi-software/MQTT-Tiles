@@ -13,7 +13,9 @@ export default {
   data () {
     let defaultSettings = {
       prefix: '',
-      postfix: ''
+      postfix: '',
+      height: 1,
+      width: 2
     }
     return {
       defaultSettings,

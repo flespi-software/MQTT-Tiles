@@ -15,7 +15,9 @@ export default {
     let defaultSettings = {
       label: '',
       payload: '',
-      save: false
+      save: false,
+      height: 1,
+      width: 3
     }
     return {
       defaultSettings,

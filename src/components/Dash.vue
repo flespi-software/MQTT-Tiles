@@ -79,7 +79,7 @@ export default {
       client: undefined,
       clientStatus: false,
       clientErrors: [],
-      defaultBoard: Object.freeze({ name: 'New board', settings: { edited: true }, shortcutsIndexes: [], widgetsIndexes: [] }),
+      defaultBoard: Object.freeze({ name: 'New board', settings: { edited: true }, shortcutsIndexes: [], widgetsIndexes: [], layout: [] }),
       boards: {},
       widgets: {},
       activeBoardId: undefined
@@ -268,6 +268,31 @@ export default {
         this.subscribe(topics, { qos: 1 })
       }
     },
+    widgetLayoutSetup (width, height) {
+      let board = this.boards[this.activeBoardId],
+        layout = board.layout,
+        {x, y} = freeSpace()
+      function freeSpace () {
+        let max = layout.reduce((max, widget) => {
+          if ((max.y === widget.y && max.x <= widget.x) || max.y < widget.y) {
+            max = widget
+          }
+          return max
+        }, {y: 0, x: 0, h: 0, w: 0})
+        if (max.x + max.w + width <= 12) {
+          return { x: max.x + max.w, y: max.y }
+        } else {
+          return { x: 0, y: max.y + 1 }
+        }
+      }
+      layout.push({
+        h: height,
+        w: width,
+        i: board.widgetsIndexes.length,
+        x,
+        y
+      })
+    },
     checkExistingWidget (settings) {
       let widgets = this.widgets,
         existingWidgets = widgets[settings.topic] || {},
@@ -275,37 +300,40 @@ export default {
         existingsValue = existingWidgetsIds.length ? existingWidgets[existingWidgetsIds[0]].value : false
       return existingsValue
     },
-    addWidget (settings) {
-      let widgets = this.widgets[settings.topic]
+    addWidget (widget) {
+      let widgets = this.widgets[widget.topic]
       if (!widgets) {
-        Vue.set(this.widgets, settings.topic, {})
-        widgets = this.widgets[settings.topic]
+        Vue.set(this.widgets, widget.topic, {})
+        widgets = this.widgets[widget.topic]
       }
-      let currentValue = this.checkExistingWidget(settings)
-      if (!settings.id) {
-        settings.id = uid()
-        this.boards[this.activeBoardId].widgetsIndexes.push(settings.id)
+      let currentValue = this.checkExistingWidget(widget)
+      if (!widget.id) {
+        widget.id = uid()
+        this.widgetLayoutSetup(widget.settings.width, widget.settings.height)
+        this.boards[this.activeBoardId].widgetsIndexes.push(widget.id)
       }
       if (currentValue) {
-        settings.value = currentValue
+        widget.value = currentValue
       } else {
-        this.subscribe(settings.topic, {qos: 1})
+        this.subscribe(widget.topic, {qos: 1})
       }
       if (this.clientStatus) {
-        settings.status = WIDGET_STATUS_ENABLED
+        widget.status = WIDGET_STATUS_ENABLED
       }
-      Vue.set(widgets, settings.id, settings)
+      Vue.set(widgets, widget.id, widget)
     },
     editWidget ({widgetId, settings, topic}) {
       let widgetsByTopic = this.widgets[topic],
         widgetsIdsByTopicIds = Object.keys(widgetsByTopic)
 
-      Vue.delete(widgetsByTopic, widgetId)
-      if (widgetsIdsByTopicIds.length === 1) {
-        this.unsubscribe(topic)
-        Vue.delete(this.widgets, topic)
-      }
       this.addWidget(settings)
+      if (settings.topic !== topic) {
+        Vue.delete(widgetsByTopic, widgetId)
+        if (widgetsIdsByTopicIds.length === 1) {
+          this.unsubscribe(topic)
+          Vue.delete(this.widgets, topic)
+        }
+      }
     },
     deleteWidget ({widgetId, settings}) {
       let widgetsByTopic = this.widgets[settings.topic],
@@ -323,6 +351,7 @@ export default {
         let widgetsIndexes = this.boards[this.activeBoardId].widgetsIndexes,
           widgetIndex = widgetsIndexes.indexOf(widgetId)
         Vue.delete(widgetsIndexes, widgetIndex)
+        Vue.delete(this.boards[this.activeBoardId].layout, widgetIndex)
         if (widgetsByTopicIds.length === 1) {
           this.unsubscribe(settings.topic)
           Vue.delete(this.widgets, settings.topic)

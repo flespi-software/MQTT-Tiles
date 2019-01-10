@@ -10,7 +10,7 @@
     </div>
     <div class="ellipsis q-mt-sm">{{item.name}}</div>
   </div>
-  <q-card v-else inline class="q-ma-sm widget__switcher" style="max-width: 200px;">
+  <q-card v-else inline class="widget__switcher" style="width: 100%; height: 100%;">
     <q-item class="q-py-none q-px-sm" :class="[`bg-${item.color}-7`]">
       <q-item-main class="ellipsis text-white">
         {{item.name}}
@@ -37,13 +37,13 @@
         </q-btn>
       </q-item-side>
     </q-item>
-    <q-card-media :class="[`bg-${item.color}-1`]">
+    <q-card-media :class="[`bg-${item.color}-1`]" style="height: calc(100% - 40px);">
       <q-icon
-        @click.native="actionHandler"
+        @click.native.stop="actionHandler"
         size="3.8rem"
         :color="item.value !== null ? `${item.color}-7` : 'grey-5'"
         :name="value ? 'mdi-toggle-switch-outline' : 'mdi-toggle-switch-off-outline'"
-        style="min-width: 200px; min-height: 60px;"
+        style="width: 100%; height: 100%;"
         :class="[`${value === null ? 'disabled' : 'cursor-pointer'}`]"
       />
     </q-card-media>

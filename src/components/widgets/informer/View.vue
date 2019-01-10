@@ -12,7 +12,7 @@
     </div>
     <div class="ellipsis q-mt-sm">{{item.name}}</div>
   </div>
-  <q-card v-else inline class="q-ma-sm widget__informer">
+  <q-card v-else inline class="widget__informer" style="width: 100%; height: 100%;">
     <q-item class="q-py-none q-px-sm" :class="[`bg-${item.color}-7`]">
       <q-item-main class="ellipsis text-white">
         {{item.name}}
@@ -39,8 +39,8 @@
         </q-btn>
       </q-item-side>
     </q-item>
-    <q-card-media :class="[`bg-${item.color}-1`]">
-      <div style="display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; min-width: 200px; width: 100%; min-height: 60px;" :class="[`text-${item.value !== null ? 'dark' : 'grey-5'}`]">
+    <q-card-media :class="[`bg-${item.color}-1`]" style="height: calc(100% - 40px);">
+      <div style="width: 100%; height: 100%;" :class="[`text-${item.value !== null ? 'dark' : 'grey-5'}`]">
         <span class="informer__payload">
           <span style="font-weight: bold;">{{`${item.settings.prefix}`}}</span>
           {{`${value}`}}
@@ -59,11 +59,12 @@
 <style lang="stylus">
   .informer__payload
     font-size 1.2rem
-    margin 0px 8px
-    max-width 250px
-    white-space nowrap
-    text-overflow ellipsis
-    overflow hidden
+    word-break break-all
+    overflow auto
+    height calc(100% - 15px)
+    width 100%
+    display block
+    padding 2px 4px
 </style>
 
 <script>

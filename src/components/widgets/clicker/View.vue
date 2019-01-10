@@ -13,7 +13,7 @@
     </div>
     <div class="ellipsis q-mt-sm">{{item.name}}</div>
   </div>
-  <q-card v-else inline class="q-ma-sm widget__informer">
+  <q-card v-else inline class="widget__informer" style="width: 100%; height: 100%;">
     <q-item class="q-py-none q-px-sm" :class="[`bg-${item.color}-7`]">
       <q-item-main class="ellipsis text-white">
         {{item.name}}
@@ -40,7 +40,7 @@
         </q-btn>
       </q-item-side>
     </q-item>
-    <q-card-media :class="[`bg-${item.color}-1`]" class="clicker__payload">
+    <q-card-media :class="[`bg-${item.color}-1`]" class="clicker__payload q-px-sm" style="height: calc(100% - 40px);">
       <q-btn
         class="payload__button"
         :disabled="item.status === WIDGET_STATUS_DISABLED"
@@ -59,12 +59,14 @@
     align-items center
     justify-content center
     vertical-align middle
-    min-width 200px
     min-height 60px
     width 100%
     .payload__button
-      max-width 240px
-      margin 0 5px
+      width 100%
+      .q-btn-inner div
+        text-overflow ellipsis
+        overflow hidden
+        width 100%
 </style>
 
 <script>

@@ -1,8 +1,8 @@
 {
-  "name": "dasher",
-  "version": "1.0.0",
+  "name": "mqtttiles",
+  "version": "1.0.1",
   "description": "MQTT Dash board creator",
-  "productName": "Dasher",
+  "productName": "MQTT Tiles",
   "cordovaId": "org.cordova.quasar.app",
   "author": "Siarhei Buntsevich <sebu@gurtam.com>",
   "private": true,
@@ -12,7 +12,8 @@
   },
   "dependencies": {
     "lodash": "^4.17.11",
-    "mqtt": "git+https://github.com/mqttjs/MQTT.js.git"
+    "mqtt": "git+https://github.com/mqttjs/MQTT.js.git",
+    "vue-grid-layout": "^2.3.3"
   },
   "devDependencies": {
     "babel-eslint": "^8.2.1",
@@ -25,7 +26,7 @@
     "eslint-plugin-promise": "^3.7.0",
     "eslint-plugin-standard": "^3.0.1",
     "eslint-plugin-vue": "^4.3.0",
-    "quasar-cli": "^0.17.0",
+    "quasar-cli": "^0.17.23",
     "strip-ansi": "=3.0.1"
   },
   "engines": {

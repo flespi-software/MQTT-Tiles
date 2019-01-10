@@ -10,8 +10,7 @@
       <q-toolbar color="dark">
         <q-btn class="lt-lg" flat rounded icon="mdi-menu" @click="leftDrawerOpen = !leftDrawerOpen"/>
         <q-toolbar-title>
-          Tili-tili Box
-          <div slot="subtitle">You touch my tralala</div>
+          MQTT Tiles
         </q-toolbar-title>
       </q-toolbar>
     </q-layout-header>
