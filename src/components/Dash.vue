@@ -3,19 +3,22 @@
     <board
       v-if="activeBoardId"
       :board="boards[activeBoardId]"
-      :widgets="widgetsList"
+      :widgets="widgets"
+      :values="values"
       @close="clearActiveBoard"
       @add:widget="addWidget"
       @edit:widget="editWidget"
       @delete:widget="deleteWidget"
       @action="actionHandler"
       @fast-bind="fastBindWidgetHandler"
+      @resized="resizeHandler"
       :style="{height: `${clientSettings ? 'calc(100vh - 50px)' : 'calc(100vh - 110px)'}`}"
     />
     <boards
       v-else
       :boards="boards"
-      :widgets="widgetsList"
+      :widgets="widgets"
+      :values="values"
       @add="addBoard"
       @edit="editBoardHandler"
       @delete="deleteBoardHandler"
@@ -24,8 +27,7 @@
       :style="{height: `${clientSettings ? 'calc(100vh - 50px)' : 'calc(100vh - 110px)'}`}"
     />
     <div v-if="!clientSettings" class="bg-red-2 text-red-8 text-center absolute connections--empty">
-      <div class="text-bold q-mt-sm">No active connections</div>
-      <div class="text-red-9" style="font-size: 0.9rem">Select one in the left panel</div>
+      <div class="text-bold q-mt-md">No active connections</div>
     </div>
   </div>
 </template>
@@ -48,17 +50,15 @@ import mqtt from '../plugins/async-mqtt.js'
 import { uid, LocalStorage } from 'quasar'
 import debounce from 'lodash/debounce'
 import cloneDeep from 'lodash/cloneDeep'
+import remove from 'lodash/remove'
 import Vue from 'vue'
 import Board from './Board'
 import Boards from './Boards'
 import { BOARDS_LOCALSTORAGE_NAME, WIDGETS_LOCALSTORAGE_NAME, WIDGET_STATUS_DISABLED, WIDGET_STATUS_ENABLED } from '../constants'
 
 let clearWidgets = function clearWidgets (widgets) {
-    Object.keys(widgets).forEach((topic) => {
-      Object.keys(widgets[topic]).forEach((widgetId) => {
-        widgets[topic][widgetId].value = null
-        widgets[topic][widgetId].status = WIDGET_STATUS_DISABLED
-      })
+    Object.keys(widgets).forEach((widgetId) => {
+      widgets[widgetId].status = WIDGET_STATUS_DISABLED
     })
   },
   saveWidgetsToLocalStorage = debounce((widgets) => {
@@ -69,7 +69,8 @@ let clearWidgets = function clearWidgets (widgets) {
   saveBoardsToLocalStorage = debounce((boards) => {
     boards = cloneDeep(boards)
     LocalStorage.set(BOARDS_LOCALSTORAGE_NAME, boards)
-  }, 500, { trailing: true })
+  }, 500, { trailing: true }),
+  removeFromArrayByValue = (array, value) => remove(array, (el) => { return el === value })
 
 export default {
   name: 'Dash',
@@ -82,18 +83,20 @@ export default {
       defaultBoard: Object.freeze({ name: 'New board', settings: { edited: true }, shortcutsIndexes: [], widgetsIndexes: [], layout: [] }),
       boards: {},
       widgets: {},
+      subscriptions: {},
+      widgetsBySubscription: {},
       activeBoardId: undefined
     }
   },
   computed: {
-    widgetsList () {
-      let topics = this.widgets
-      return Object.keys(topics).reduce((widgets, topic) => {
-        let widgetsByTopic = topics[topic]
-        Object.keys(widgetsByTopic).forEach(widgetId => {
-          widgets[widgetId] = widgetsByTopic[widgetId]
+    values () {
+      return Object.keys(this.widgets).reduce((values, widgetId) => {
+        let value = values[widgetId] = {},
+          widget = this.widgets[widgetId]
+        widget.topics.forEach(topic => {
+          value[topic] = this.subscriptions[topic]
         })
-        return widgets
+        return values
       }, {})
     }
   },
@@ -158,18 +161,8 @@ export default {
         config = this.clearObject(this.clientSettings)
 
       let client = mqtt.connect(config.host, config)
-
       client.on('message', (topic, message, packet) => {
-        let widgets = this.widgets
-        Object.keys(widgets).forEach((widgetsTopic, index) => {
-          let isResolved = this.resolveTopics(topic, widgetsTopic)
-          if (isResolved) {
-            let widgetsIds = Object.keys(this.widgets[widgetsTopic])
-            widgetsIds.forEach(widgetId => {
-              Vue.set(widgets[widgetsTopic][widgetId], 'value', message)
-            })
-          }
-        })
+        this.setValueByTopic(topic, message)
       })
 
       client.on('connect', () => {
@@ -187,6 +180,9 @@ export default {
     },
     createClient () {
       this.initClient()
+    },
+    setValueByTopic (topic, value) {
+      Vue.set(this.subscriptions, topic, value)
     },
     async subscribe () {
       if (this.client) {
@@ -232,20 +228,19 @@ export default {
         ok: true,
         cancel: true
       }).then(() => {
-        /* clear widgets by board */
-        let topics = this.widgets
-        Object.keys(this.widgets).forEach((topic) => {
-          let widgetsByTopic = topics[topic],
-            widgetsByTopicIds = Object.keys(widgetsByTopic)
-          widgetsByTopicIds.forEach(widgetId => {
-            if (this.boards[boardId].widgetsIndexes.includes(widgetId)) {
-              Vue.delete(widgetsByTopic, widgetId)
+        let widgetsIndexes = this.boards[boardId].widgetsIndexes
+        widgetsIndexes.forEach((widgetIndex) => {
+          let topics = this.widgets[widgetIndex].topics
+          topics.forEach((topic) => {
+            let widgetsIndexesBySubscription = this.widgetsBySubscription[topic]
+            removeFromArrayByValue(widgetsIndexesBySubscription, widgetIndex)
+            if (!widgetsIndexesBySubscription.length) {
+              this.unsubscribe(topic)
+              Vue.delete(this.widgetsBySubscription, topic)
+              Vue.delete(this.subscription, topic)
             }
           })
-          if (!Object.keys(widgetsByTopic).length) {
-            this.unsubscribe(topic)
-            Vue.delete(this.widgets, topic)
-          }
+          Vue.delete(this.widgets, widgetIndex)
         })
 
         Vue.delete(this.boards, boardId)
@@ -256,14 +251,23 @@ export default {
       Vue.set(board.settings, 'edited', !board.settings.edited)
     },
     /* widgets logic start */
-    initWidgets () {
-      let topics = Object.keys(this.widgets)
-      topics.forEach(topic => {
-        Object.keys(this.widgets[topic]).forEach(widgetId => {
-          let widget = this.widgets[topic][widgetId]
-          Vue.set(widget, 'status', WIDGET_STATUS_ENABLED)
+    runtimeInitWidgets () {
+      let widgetsIndexes = Object.keys(this.widgets)
+      widgetsIndexes.forEach(widgetIndex => {
+        let topics = this.widgets[widgetIndex].topics
+        topics.forEach(topic => {
+          if (!this.subscriptions[topic]) { this.setValueByTopic(topic, null) }
+          if (!this.widgetsBySubscription[topic]) { this.widgetsBySubscription[topic] = [] }
+          this.widgetsBySubscription[topic].push(widgetIndex)
         })
       })
+    },
+    initWidgets () {
+      let widgetsIndexes = Object.keys(this.widgets)
+      widgetsIndexes.forEach(widgetIndex => {
+        Vue.set(this.widgets[widgetIndex], 'status', WIDGET_STATUS_ENABLED)
+      })
+      let topics = Object.keys(this.subscriptions)
       if (topics.length) {
         this.subscribe(topics, { qos: 1 })
       }
@@ -293,51 +297,51 @@ export default {
         y
       })
     },
-    checkExistingWidget (settings) {
-      let widgets = this.widgets,
-        existingWidgets = widgets[settings.topic] || {},
-        existingWidgetsIds = Object.keys(existingWidgets),
-        existingsValue = existingWidgetsIds.length ? existingWidgets[existingWidgetsIds[0]].value : false
-      return existingsValue
-    },
     addWidget (widget) {
-      let widgets = this.widgets[widget.topic]
-      if (!widgets) {
-        Vue.set(this.widgets, widget.topic, {})
-        widgets = this.widgets[widget.topic]
-      }
-      let currentValue = this.checkExistingWidget(widget)
       if (!widget.id) {
         widget.id = uid()
         this.widgetLayoutSetup(widget.settings.width, widget.settings.height)
         this.boards[this.activeBoardId].widgetsIndexes.push(widget.id)
       }
-      if (currentValue) {
-        widget.value = currentValue
-      } else {
-        this.subscribe(widget.topic, {qos: 1})
-      }
+      widget.topics.forEach(topic => {
+        let hasSubscription = !!this.subscriptions[topic]
+        if (!hasSubscription) {
+          this.widgetsBySubscription[topic] = []
+          this.setValueByTopic(topic, null)
+          this.subscribe(topic, {qos: 1})
+        }
+        this.widgetsBySubscription[topic].push(widget.id)
+      })
       if (this.clientStatus) {
         widget.status = WIDGET_STATUS_ENABLED
       }
-      Vue.set(widgets, widget.id, widget)
+      Vue.set(this.widgets, widget.id, widget)
     },
-    editWidget ({widgetId, settings, topic}) {
-      let widgetsByTopic = this.widgets[topic],
-        widgetsIdsByTopicIds = Object.keys(widgetsByTopic)
-
-      this.addWidget(settings)
-      if (settings.topic !== topic) {
-        Vue.delete(widgetsByTopic, widgetId)
-        if (widgetsIdsByTopicIds.length === 1) {
-          this.unsubscribe(topic)
-          Vue.delete(this.widgets, topic)
-        }
+    editWidget ({widgetId, settings, topics}) {
+      if (!topics.every(topic => settings.topics.includes(topic))) {
+        topics.forEach(oldTopic => {
+          if (settings.topics.includes(oldTopic)) { return false }
+          removeFromArrayByValue(this.widgetsBySubscription[oldTopic], widgetId)
+          if (!this.widgetsBySubscription[oldTopic].length) {
+            this.unsubscribe(oldTopic)
+            Vue.delete(this.subscriptions, oldTopic)
+            Vue.delete(this.widgetsBySubscription, oldTopic)
+          }
+        })
+        settings.topics.forEach(topic => {
+          if (topics.includes(topic)) { return false }
+          let hasSubscription = !!this.subscriptions[topic]
+          if (!hasSubscription) {
+            this.widgetsBySubscription[topic] = []
+            this.setValueByTopic(topic, null)
+            this.subscribe(topic, {qos: 1})
+          }
+          this.widgetsBySubscription[topic].push(widgetId)
+        })
       }
+      Vue.set(this.widgets, widgetId, settings)
     },
     deleteWidget ({widgetId, settings}) {
-      let widgetsByTopic = this.widgets[settings.topic],
-        widgetsByTopicIds = Object.keys(widgetsByTopic)
       this.$q.dialog({
         title: 'Warning',
         message: `Do you really want to delete ${settings.name} widget?`,
@@ -346,16 +350,22 @@ export default {
         cancel: true
       }).then(() => {
         this.removeFromShortcuts(widgetId)
-        Vue.delete(widgetsByTopic, widgetId)
         /* remove from board link index */
         let widgetsIndexes = this.boards[this.activeBoardId].widgetsIndexes,
           widgetIndex = widgetsIndexes.indexOf(widgetId)
         Vue.delete(widgetsIndexes, widgetIndex)
         Vue.delete(this.boards[this.activeBoardId].layout, widgetIndex)
-        if (widgetsByTopicIds.length === 1) {
-          this.unsubscribe(settings.topic)
-          Vue.delete(this.widgets, settings.topic)
-        }
+
+        settings.topics.forEach(topic => {
+          let widgetsBySubscription = this.widgetsBySubscription[topic]
+          removeFromArrayByValue(widgetsBySubscription, widgetId)
+          if (!widgetsBySubscription.length) {
+            this.unsubscribe(topic)
+            Vue.delete(this.subscriptions, topic)
+            Vue.delete(this.widgetsBySubscription, topic)
+          }
+        })
+        Vue.delete(this.widgets, widgetId)
       })
     },
     fastBindWidgetHandler (widgetId) {
@@ -385,6 +395,11 @@ export default {
           Vue.delete(shortcutsIndexes, index)
         }
       })
+    },
+    resizeHandler ({index, height, width}) {
+      let widget = this.widgets[this.boards[this.activeBoardId].widgetsIndexes[index]]
+      Vue.set(widget.settings, 'height', height)
+      Vue.set(widget.settings, 'width', width)
     }
     /* widgets logic end */
   },
@@ -394,6 +409,7 @@ export default {
     if (savedBoards) {
       this.boards = savedBoards
       this.widgets = savedWidgets
+      this.runtimeInitWidgets()
     }
     if (this.clientSettings) { this.createClient() }
   },
@@ -406,6 +422,9 @@ export default {
         return false
       }
       clearWidgets(this.widgets)
+      Object.keys(this.subscriptions).forEach(topic => {
+        this.setValueByTopic(topic, null)
+      })
       this.createClient()
     },
     boards: {

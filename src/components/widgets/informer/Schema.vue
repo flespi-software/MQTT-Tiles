@@ -1,15 +1,20 @@
 <template>
   <div>
-    <q-input color="dark" v-model="currentSettings.prefix" float-label="Prefix"/>
-    <q-input color="dark" v-model="currentSettings.postfix" float-label="Postfix"/>
+    <div class="row">
+      <div class="col-6">
+        <q-input class="q-mr-sm" color="dark" v-model="currentSettings.prefix" float-label="Prefix"/>
+      </div>
+      <div class="col-6">
+        <q-input class="q-ml-sm" color="dark" v-model="currentSettings.postfix" float-label="Postfix"/>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import isEqual from 'lodash/isEqual'
 export default {
   name: 'InformerSchema',
-  props: ['settings'],
+  props: ['widget'],
   data () {
     let defaultSettings = {
       prefix: '',
@@ -19,7 +24,7 @@ export default {
     }
     return {
       defaultSettings,
-      currentSettings: Object.assign({}, defaultSettings, this.settings)
+      currentSettings: Object.assign({}, defaultSettings, this.widget.settings)
     }
   },
   created () {
@@ -28,11 +33,9 @@ export default {
   watch: {
     currentSettings: {
       deep: true,
-      handler (val) { this.$emit('update', val) }
-    },
-    settings (settings) {
-      if (isEqual(settings, this.currentSettings)) { return false }
-      this.currentSettings = Object.assign({}, this.defaultSettings, settings)
+      handler (val) {
+        this.$emit('update', val)
+      }
     }
   }
 }

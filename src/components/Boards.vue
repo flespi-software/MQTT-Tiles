@@ -56,6 +56,7 @@
                     v-if="widgets[board.shortcutsIndexes[index]]"
                     :is="widgets[board.shortcutsIndexes[index]].type"
                     :item="widgets[board.shortcutsIndexes[index]]"
+                    :value="values[board.shortcutsIndexes[index]]"
                     @action="(data) => { $emit('action', data) }"
                     :index="board.shortcutsIndexes[index]"
                     :mini="true"
@@ -95,15 +96,14 @@
 </style>
 
 <script>
-import DefaultMini from './widgets/DefaultMini'
 import Switcher from './widgets/swither/View'
 import Clicker from './widgets/clicker/View'
 import Informer from './widgets/informer/View'
 export default {
   name: 'Boards',
-  props: ['boards', 'widgets'],
+  props: ['boards', 'widgets', 'values'],
   components: {
-    DefaultMini, Switcher, Clicker, Informer
+    Switcher, Clicker, Informer
   }
 }
 </script>

@@ -1,6 +1,7 @@
 <template>
   <div class="dash__board">
     <settings
+      v-if="settingsModel"
       v-model="settingsModel"
       :settings="currentSettings"
       @save="saveSettingsHandler"
@@ -21,7 +22,7 @@
           :layout.sync="board.layout"
           :col-num="colNum"
           :row-height="rowHeight"
-          :is-draggable="true"
+          :is-draggable="isDragable"
           :is-resizable="true"
           :is-mirrored="true"
           :vertical-compact="false"
@@ -35,10 +36,15 @@
               :w="board.layout[index].w"
               :h="board.layout[index].h"
               :i="board.layout[index].i"
+              :minW="widgets[widgetIndex].settings.minWidth || 1"
+              :minH="widgets[widgetIndex].settings.minHeight || 1"
+              dragIgnoreFrom=".widget__content, i, button, a"
+              @resized="resizeHandler"
             >
               <component
                 :is="widgets[widgetIndex].type"
                 :item="widgets[widgetIndex]"
+                :value="values[widgetIndex]"
                 :index="widgetIndex"
                 :in-shortcuts="Boolean(board.shortcutsIndexes.includes(widgetIndex))"
                 @action="(data) => { $emit('action', data) }"
@@ -78,15 +84,16 @@ import Informer from './widgets/informer/View'
 import Clicker from './widgets/clicker/View'
 export default {
   name: 'Board',
-  props: ['board', 'widgets'],
+  props: ['board', 'widgets', 'values'],
   data () {
     return {
       settingsModel: false,
       currentSettings: undefined,
       editedWidgetId: undefined,
-      editedWidgetTopic: undefined,
+      editedWidgetTopics: undefined,
       colNum: 12,
-      rowHeight: 100
+      rowHeight: 100,
+      isDragable: true
     }
   },
   methods: {
@@ -96,11 +103,11 @@ export default {
     hideSettingsHandler () {
       this.currentSettings = undefined
       this.editedWidgetId = undefined
-      this.editedWidgetTopic = undefined
+      this.editedWidgetTopics = undefined
     },
     saveSettingsHandler (settings) {
       if (this.editedWidgetId !== undefined) {
-        this.$emit('edit:widget', {settings, widgetId: this.editedWidgetId, topic: this.editedWidgetTopic})
+        this.$emit('edit:widget', {settings, widgetId: this.editedWidgetId, topics: this.editedWidgetTopics})
       } else {
         this.$emit('add:widget', settings)
       }
@@ -108,8 +115,11 @@ export default {
     editWidgetSettings (widgetId) {
       this.currentSettings = this.widgets[widgetId]
       this.editedWidgetId = widgetId
-      this.editedWidgetTopic = this.currentSettings.topic
+      this.editedWidgetTopics = [...this.currentSettings.topics]
       this.openSettings()
+    },
+    resizeHandler (index, height, width) {
+      this.$emit('resized', { index, height, width })
     }
   },
   components: {

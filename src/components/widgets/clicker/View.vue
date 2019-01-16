@@ -1,13 +1,13 @@
 <template>
   <div v-if="mini" style="text-align: center;" @click.stop="actionHandler">
-    <div style="height: 60px; width: 60px; line-height: 60px; margin: 0 auto; border-radius: 5px;" :class="[`bg-${item.value !== null ? `${item.color}-1` : 'grey-3'}`]">
+    <div style="height: 60px; width: 60px; line-height: 60px; margin: 0 auto; border-radius: 5px;" :class="[`bg-${currentValue !== null ? `${item.color}-1` : 'grey-3'}`]">
       <q-btn
         :disabled="item.status === WIDGET_STATUS_DISABLED"
         size="0.8rem"
         dense
         round
         icon="mdi-send"
-        :color="item.value !== null ? `${item.color}-7` : `${item.color}-4`"
+        :color="currentValue !== null ? `${item.color}-7` : `${item.color}-4`"
       />
       <q-tooltip>Payload{{item.settings.payload ? `: ${item.settings.payload}` : ' is empty'}}</q-tooltip>
     </div>
@@ -20,12 +20,16 @@
         <q-tooltip>{{item.name}}</q-tooltip>
       </q-item-main>
       <q-item-side>
-        <q-btn :icon="inShortcuts ? 'mdi-star' : 'mdi-star-outline'" @click="$emit('fast-bind')" round dense flat :color="inShortcuts ? 'yellow' : 'white'">
+        <q-btn v-if="item.settings.width !== 1" :icon="inShortcuts ? 'mdi-star' : 'mdi-star-outline'" @click="$emit('fast-bind')" round dense flat :color="inShortcuts ? 'yellow' : 'white'">
           <q-tooltip>{{`${inShortcuts ? 'Remove from' : 'Add to'} shortcuts`}}</q-tooltip>
         </q-btn>
         <q-btn round dense flat icon="mdi-dots-vertical" color="white">
           <q-popover anchor="bottom right" self="top right">
             <q-list dense>
+              <q-item v-if="item.settings.width === 1" class="cursor-pointer" v-close-overlay highlight @click.native="$emit('fast-bind')">
+                <q-item-side :icon="inShortcuts ? 'mdi-star' : 'mdi-star-outline'" :color="inShortcuts ? 'yellow-9' : 'dark'"/>
+                <q-item-main :label="`${inShortcuts ? 'Remove from' : 'Add to'} shortcuts`"/>
+              </q-item>
               <q-item class="cursor-pointer" v-close-overlay highlight @click.native="$emit('update')">
                 <q-item-side icon="mdi-settings" />
                 <q-item-main label="Edit"/>
@@ -40,11 +44,11 @@
         </q-btn>
       </q-item-side>
     </q-item>
-    <q-card-media :class="[`bg-${item.color}-1`]" class="clicker__payload q-px-sm" style="height: calc(100% - 40px);">
+    <q-card-media :class="[`bg-${item.color}-1`]" class="widget__content clicker__payload q-px-sm" style="height: calc(100% - 40px);">
       <q-btn
         class="payload__button"
         :disabled="item.status === WIDGET_STATUS_DISABLED"
-        :color="`${item.color}-${item.value === null ? 4 : 7}`"
+        :color="`${item.color}-${currentValue === null ? 4 : 7}`"
         :label="item.settings.label || 'Send'"
         rounded
         @click="actionHandler"
@@ -73,15 +77,20 @@
 import { WIDGET_STATUS_DISABLED } from '../../../constants'
 export default {
   name: 'Clicker',
-  props: ['item', 'index', 'mini', 'in-shortcuts'],
+  props: ['item', 'index', 'mini', 'in-shortcuts', 'value'],
   data () {
     return {
       WIDGET_STATUS_DISABLED
     }
   },
+  computed: {
+    currentValue () {
+      return this.value[this.item.topics[0]]
+    }
+  },
   methods: {
     actionHandler () {
-      let data = {topic: this.item.topic, payload: this.item.settings.payload, settings: {retain: this.item.settings.save}}
+      let data = {topic: this.item.topics[0], payload: this.item.settings.payload, settings: {retain: this.item.settings.save}}
       this.$emit('action', data)
     }
   }

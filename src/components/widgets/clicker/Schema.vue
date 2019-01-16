@@ -7,21 +7,21 @@
 </template>
 
 <script>
-import isEqual from 'lodash/isEqual'
 export default {
   name: 'ClickerSchema',
-  props: ['settings'],
+  props: ['widget'],
   data () {
     let defaultSettings = {
       label: '',
       payload: '',
       save: false,
       height: 1,
-      width: 3
+      width: 3,
+      single: true
     }
     return {
       defaultSettings,
-      currentSettings: Object.assign({}, defaultSettings, this.settings)
+      currentSettings: Object.assign({}, defaultSettings, this.widget.settings)
     }
   },
   created () {
@@ -39,10 +39,6 @@ export default {
         this.$emit('validate', this.validate())
         this.$emit('update', val)
       }
-    },
-    settings (settings) {
-      if (isEqual(settings, this.currentSettings)) { return false }
-      this.currentSettings = Object.assign({}, this.defaultSettings, settings)
     }
   }
 }

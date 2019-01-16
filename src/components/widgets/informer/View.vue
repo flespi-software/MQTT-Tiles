@@ -1,12 +1,12 @@
 <template>
   <div v-if="mini" style="text-align: center;" @click.stop="showTooltip">
-    <div style="height: 60px; width: 60px; line-height: 60px; margin: 0 auto; border-radius: 5px;" :class="[`bg-${item.value !== null ? `${item.color}-1` : 'grey-3'}`]">
+    <div style="height: 60px; width: 60px; line-height: 60px; margin: 0 auto; border-radius: 5px;" :class="[`bg-${firstValue !== null ? `${item.color}-1` : 'grey-3'}`]">
       <div class='ellipsis' :style="{fontSize: `${stringLength > 5 ? 16 : 18}px`}">
-        <span style="font-weight: bold;">{{`${item.settings.prefix}`}}</span>{{`${value}`}}<span style="font-weight: bold;">{{`${item.settings.postfix}`}}</span>
+        <span style="font-weight: bold;">{{`${item.settings.prefix}`}}</span>{{`${firstValue}`}}<span style="font-weight: bold;">{{`${item.settings.postfix}`}}</span>
       </div>
       <q-tooltip ref="tooltip">
         <span style="font-weight: bold;">{{`${item.settings.prefix}`}}</span>
-        {{`${value}`}}
+        {{`${firstValue}`}}
         <span style="font-weight: bold;">{{`${item.settings.postfix}`}}</span>
       </q-tooltip>
     </div>
@@ -19,12 +19,16 @@
         <q-tooltip>{{item.name}}</q-tooltip>
       </q-item-main>
       <q-item-side>
-        <q-btn :icon="inShortcuts ? 'mdi-star' : 'mdi-star-outline'" @click="$emit('fast-bind')" round dense flat :color="inShortcuts ? 'yellow' : 'white'">
+        <q-btn v-if="item.settings.width !== 1" :icon="inShortcuts ? 'mdi-star' : 'mdi-star-outline'" @click="$emit('fast-bind')" round dense flat :color="inShortcuts ? 'yellow' : 'white'">
           <q-tooltip>{{`${inShortcuts ? 'Remove from' : 'Add to'} shortcuts`}}</q-tooltip>
         </q-btn>
         <q-btn round dense flat icon="mdi-dots-vertical" color="white">
           <q-popover anchor="bottom right" self="top right">
             <q-list dense>
+              <q-item v-if="item.settings.width === 1" class="cursor-pointer" v-close-overlay highlight @click.native="$emit('fast-bind')">
+                <q-item-side :icon="inShortcuts ? 'mdi-star' : 'mdi-star-outline'" :color="inShortcuts ? 'yellow-9' : 'dark'"/>
+                <q-item-main :label="`${inShortcuts ? 'Remove from' : 'Add to'} shortcuts`"/>
+              </q-item>
               <q-item class="cursor-pointer" v-close-overlay highlight @click.native="$emit('update')">
                 <q-item-side icon="mdi-settings" />
                 <q-item-main label="Edit"/>
@@ -39,18 +43,20 @@
         </q-btn>
       </q-item-side>
     </q-item>
-    <q-card-media :class="[`bg-${item.color}-1`]" style="height: calc(100% - 40px);">
-      <div style="width: 100%; height: 100%;" :class="[`text-${item.value !== null ? 'dark' : 'grey-5'}`]">
-        <span class="informer__payload">
-          <span style="font-weight: bold;">{{`${item.settings.prefix}`}}</span>
-          {{`${value}`}}
-          <span style="font-weight: bold;">{{`${item.settings.postfix}`}}</span>
-          <q-tooltip>
+    <q-card-media class="widget__content" :class="[`bg-${item.color}-1`]" style="height: calc(100% - 40px);">
+      <div style="width: 100%; height: 100%;">
+        <div class="informer__payload">
+          <div v-for="topic in Object.keys(value)" :key="topic" :class="[`text-${value[topic] !== null ? 'dark' : 'grey-5'}`]">
             <span style="font-weight: bold;">{{`${item.settings.prefix}`}}</span>
-            {{`${value}`}}
+            {{`${value[topic] !== null ? value[topic] : 'N/A'}`}}
             <span style="font-weight: bold;">{{`${item.settings.postfix}`}}</span>
-          </q-tooltip>
-        </span>
+            <q-tooltip>
+              <span style="font-weight: bold;">{{`${item.settings.prefix}`}}</span>
+              {{`${value[topic] !== null ? value[topic] : 'N/A'}`}}
+              <span style="font-weight: bold;">{{`${item.settings.postfix}`}}</span>
+            </q-tooltip>
+          </div>
+        </div>
       </div>
     </q-card-media>
   </q-card>
@@ -65,13 +71,14 @@
     width 100%
     display block
     padding 2px 4px
+    text-align center
 </style>
 
 <script>
 import { WIDGET_STATUS_DISABLED } from '../../../constants'
 export default {
   name: 'Informer',
-  props: ['item', 'index', 'mini', 'in-shortcuts'],
+  props: ['item', 'index', 'mini', 'in-shortcuts', 'value'],
   data () {
     return {
       WIDGET_STATUS_DISABLED
@@ -85,12 +92,13 @@ export default {
     }
   },
   computed: {
-    value () {
-      let value = this.item.value !== null ? this.item.value.toString() : '*Empty*'
+    firstValue () {
+      let value = this.value[Object.keys(this.value)[0]]
+      value = value !== null ? value.toString() : 'N/A'
       return value
     },
     stringLength () {
-      return this.item.settings.prefix.length + this.value.length + this.item.settings.postfix.length
+      return this.item.settings.prefix.length + this.firstValue.length + this.item.settings.postfix.length
     }
   }
 }

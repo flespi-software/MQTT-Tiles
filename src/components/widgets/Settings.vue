@@ -9,7 +9,24 @@
       <div style="margin: 20px;" :style="{ height: $q.platform.is.mobile ? 'calc(100% - 100px)' : '50vh', width: $q.platform.is.mobile ? 'calc(100% - 40px)' : '50vw'}">
         <q-input color="dark"  v-model="currentSettings.name" float-label="Name" :error="!currentSettings.name"/>
         <q-select color="dark" v-model="currentSettings.type" :options="typeOptions" float-label="Type"/>
-        <q-input color="dark"  v-model="currentSettings.topic" float-label="Topic" :error="!currentSettings.topic || !validateTopic(currentSettings.topic)"/>
+        <q-input
+          v-if="!(this.currentSettings.settings.single && this.currentSettings.topics.length > 0) || this.currentSettings.settings.single === undefined"
+          color="dark"
+          v-model="currentTopic"
+          :float-label="currentSettings.topics.includes(currentTopic) ? 'Topic (must be unique)' : 'Topic'"
+          :error="!currentTopic || !validateTopic(currentTopic)"
+          :after="[
+            {
+              icon: 'mdi-plus',
+              handler: addTopicHandler,
+              condition: !!currentTopic && validateTopic(currentTopic) && !currentSettings.topics.includes(currentTopic)
+            }
+          ]"
+        />
+        <div class="q-my-sm" style="font-size: .8rem;">
+          <span class="q-mr-xs q-mt-xs" :class="{'text-red-6':  !currentSettings.topics.length}" style="display: inline-flex; font-size: .9rem; line-height: 26px; vertical-align: bottom;">Topics: <span class="q-ml-xs" v-if="!currentSettings.topics.length">Add at least one topic</span></span>
+          <q-chip class="q-mr-xs q-mt-xs" small v-for="(topic, index) in currentSettings.topics" :key="topic" closable @hide="removeTopicHandler(index)">{{topic}}</q-chip>
+        </div>
         <div class="color-palette">
           <div class="text-grey-6 q-pb-sm color-palette__label">Color</div>
           <div class="row color-palette__wrapper">
@@ -26,8 +43,8 @@
         </div>
         <component
           :is="currentSettings.type"
-          :settings="currentSettings.settings"
-          @update="(settings) => { currentSettings.settings = settings }"
+          :widget="currentSettings"
+          @update="updateSettingsHandler"
           @validate="validateSchemas"
         />
       </div>
@@ -70,6 +87,8 @@ import Switcher from './swither/Schema'
 import Informer from './informer/Schema'
 import Clicker from './clicker/Schema'
 
+const DEFAULT_TOPIC = 'path/to/data'
+
 export default {
   name: 'Settings',
   props: ['value', 'settings'],
@@ -79,7 +98,7 @@ export default {
       color: 'grey',
       value: null,
       type: 'switcher',
-      topic: 'path/to/data',
+      topics: [],
       settings: {},
       status: WIDGET_STATUS_DISABLED
     }
@@ -92,13 +111,14 @@ export default {
         {label: 'Button', value: 'clicker'}
       ],
       colors: ['grey', 'red', 'green', 'orange', 'blue', 'light-blue'],
-      isValideSchema: true
+      isValideSchema: true,
+      currentTopic: DEFAULT_TOPIC
     }
   },
   computed: {
     validateCurrentSettings () {
       return !!this.currentSettings.name &&
-        !!this.currentSettings.topic && this.validateTopic(this.currentSettings.topic)
+        !!this.currentSettings.topics.length
     },
     status: {
       get () { return this.value },
@@ -109,9 +129,6 @@ export default {
     saveSettingsHandler () {
       this.$emit('save', this.currentSettings)
       this.closeHandler()
-      this.$nextTick(() => {
-        this.currentSettings = merge({}, this.defaultSettings)
-      })
     },
     closeHandler () {
       this.$emit('input', false)
@@ -125,6 +142,16 @@ export default {
     },
     validateSchemas (status) {
       this.isValideSchema = status
+    },
+    addTopicHandler () {
+      this.currentSettings.topics.push(this.currentTopic)
+      this.currentTopic = DEFAULT_TOPIC
+    },
+    removeTopicHandler (index) {
+      Vue.delete(this.currentSettings.topics, index)
+    },
+    updateSettingsHandler (settings) {
+      Vue.set(this.currentSettings, 'settings', settings)
     }
   },
   watch: {

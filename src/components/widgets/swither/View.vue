@@ -1,11 +1,11 @@
 <template>
   <div v-if="mini" style="text-align: center;" @click.stop="actionHandler">
-    <div style="height: 60px; width: 60px; line-height: 60px; margin: 0 auto; border-radius: 5px;" :class="[`bg-${item.value !== null ? `${item.color}-1` : 'grey-3'}`]">
+    <div style="height: 60px; width: 60px; line-height: 60px; margin: 0 auto; border-radius: 5px;" :class="[`bg-${currentValue !== null ? `${item.color}-1` : 'grey-3'}`]">
       <q-icon
         size="3rem"
-        :color="item.value !== null ? `${item.color}-7` : 'grey-5'"
-        :name="value ? 'mdi-toggle-switch-outline' : 'mdi-toggle-switch-off-outline'"
-        :class="[`${value === null ? 'disabled' : 'cursor-pointer'}`]"
+        :color="item.currentValue !== null ? `${item.color}-7` : 'grey-5'"
+        :name="currentValue ? 'mdi-toggle-switch-outline' : 'mdi-toggle-switch-off-outline'"
+        :class="[`${currentValue === null ? 'disabled' : !item.settings.actionTopic ? '' : 'cursor-pointer'}`]"
       />
     </div>
     <div class="ellipsis q-mt-sm">{{item.name}}</div>
@@ -17,12 +17,16 @@
         <q-tooltip>{{item.name}}</q-tooltip>
       </q-item-main>
       <q-item-side>
-        <q-btn :icon="inShortcuts ? 'mdi-star' : 'mdi-star-outline'" @click="$emit('fast-bind')" round dense flat :color="inShortcuts ? 'yellow' : 'white'">
+        <q-btn v-if="item.settings.width !== 1" :icon="inShortcuts ? 'mdi-star' : 'mdi-star-outline'" @click="$emit('fast-bind')" round dense flat :color="inShortcuts ? 'yellow' : 'white'">
           <q-tooltip>{{`${inShortcuts ? 'Remove from' : 'Add to'} shortcuts`}}</q-tooltip>
         </q-btn>
         <q-btn round dense flat icon="mdi-dots-vertical" color="white">
           <q-popover anchor="bottom right" self="top right">
             <q-list dense>
+              <q-item v-if="item.settings.width === 1" class="cursor-pointer" v-close-overlay highlight @click.native="$emit('fast-bind')">
+                <q-item-side :icon="inShortcuts ? 'mdi-star' : 'mdi-star-outline'" :color="inShortcuts ? 'yellow-9' : 'dark'"/>
+                <q-item-main :label="`${inShortcuts ? 'Remove from' : 'Add to'} shortcuts`"/>
+              </q-item>
               <q-item class="cursor-pointer" v-close-overlay highlight @click.native="$emit('update')">
                 <q-item-side icon="mdi-settings" />
                 <q-item-main label="Edit"/>
@@ -37,14 +41,14 @@
         </q-btn>
       </q-item-side>
     </q-item>
-    <q-card-media :class="[`bg-${item.color}-1`]" style="height: calc(100% - 40px);">
+    <q-card-media class="widget__content" :class="[`bg-${item.color}-1`]" style="height: calc(100% - 40px);">
       <q-icon
         @click.native.stop="actionHandler"
         size="3.8rem"
-        :color="item.value !== null ? `${item.color}-7` : 'grey-5'"
-        :name="value ? 'mdi-toggle-switch-outline' : 'mdi-toggle-switch-off-outline'"
+        :color="item.currentValue !== null ? `${item.color}-7` : 'grey-5'"
+        :name="currentValue ? 'mdi-toggle-switch-outline' : 'mdi-toggle-switch-off-outline'"
         style="width: 100%; height: 100%;"
-        :class="[`${value === null ? 'disabled' : 'cursor-pointer'}`]"
+        :class="[`${currentValue === null ? 'disabled' : !item.settings.actionTopic ? '' : 'cursor-pointer'}`]"
       />
     </q-card-media>
   </q-card>
@@ -54,31 +58,36 @@
 import { WIDGET_STATUS_DISABLED } from '../../../constants'
 export default {
   name: 'Switcher',
-  props: ['item', 'index', 'mini', 'in-shortcuts'],
+  props: ['item', 'index', 'value', 'mini', 'in-shortcuts'],
   data () {
     return {
       WIDGET_STATUS_DISABLED
     }
   },
   computed: {
-    value () {
-      let value = this.item.value !== null ? this.item.value.toString() : this.item.value
-      return value === this.item.settings.trueValue
-        ? true : value === this.item.settings.falseValue
-          ? false : null
+    currentValue () {
+      return Object.keys(this.value).reduce((result, topic) => {
+        if (result === null) { return result }
+        let value = this.value[topic] !== null ? this.value[topic].toString() : this.value[topic]
+        return value === this.item.settings.trueValue
+          ? result && true : value === this.item.settings.falseValue
+            ? result && false : null
+      }, true)
     }
   },
   methods: {
     getValue () {
-      let value = this.item.value !== null ? this.item.value.toString() : this.item.value
-      return value === this.item.settings.trueValue
-        ? this.item.settings.falseValue : value === this.item.settings.falseValue
-          ? this.item.settings.trueValue : value
-            ? this.item.settings.falseValue : this.item.settings.trueValue
+      return Object.keys(this.value).reduce((result, topic) => {
+        let value = this.value[topic] !== null ? this.value[topic].toString() : this.value[topic]
+        return (value === this.item.settings.trueValue) && (result === this.item.settings.trueValue)
+          ? this.item.settings.falseValue : (value === this.item.settings.falseValue) && (result === this.item.settings.falseValue)
+            ? this.item.settings.trueValue : value
+              ? this.item.settings.falseValue : this.item.settings.trueValue
+      }, this.item.settings.falseValue)
     },
     actionHandler () {
-      if (this.value !== null) {
-        let data = {topic: this.item.topic, payload: this.getValue(), settings: {retain: this.item.settings.save}}
+      if (this.currentValue !== null && !!this.item.settings.actionTopic) {
+        let data = {topic: this.item.settings.actionTopic, payload: this.getValue(), settings: {retain: this.item.settings.save}}
         this.$emit('action', data)
       }
     }
