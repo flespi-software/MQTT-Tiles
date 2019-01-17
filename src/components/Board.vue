@@ -28,6 +28,7 @@
           :vertical-compact="false"
           :margin="[10, 10]"
           :use-css-transforms="true"
+          :responsive="true"
         >
             <grid-item v-for="(widgetIndex, index) in board.widgetsIndexes"
               :key="widgetIndex"

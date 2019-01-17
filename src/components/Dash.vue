@@ -304,7 +304,7 @@ export default {
         this.boards[this.activeBoardId].widgetsIndexes.push(widget.id)
       }
       widget.topics.forEach(topic => {
-        let hasSubscription = !!this.subscriptions[topic]
+        let hasSubscription = this.subscriptions[topic] !== undefined
         if (!hasSubscription) {
           this.widgetsBySubscription[topic] = []
           this.setValueByTopic(topic, null)

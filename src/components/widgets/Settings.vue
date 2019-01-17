@@ -8,7 +8,7 @@
       </q-toolbar>
       <div style="margin: 20px;" :style="{ height: $q.platform.is.mobile ? 'calc(100% - 100px)' : '50vh', width: $q.platform.is.mobile ? 'calc(100% - 40px)' : '50vw'}">
         <q-input color="dark"  v-model="currentSettings.name" float-label="Name" :error="!currentSettings.name"/>
-        <q-select color="dark" v-model="currentSettings.type" :options="typeOptions" float-label="Type"/>
+        <q-select color="dark" v-model="currentSettings.type" :options="typeOptions" float-label="Type" @input="changeTypeHandler"/>
         <q-input
           v-if="!(this.currentSettings.settings.single && this.currentSettings.topics.length > 0) || this.currentSettings.settings.single === undefined"
           color="dark"
@@ -139,6 +139,9 @@ export default {
     },
     setColor (color) {
       Vue.set(this.currentSettings, 'color', color)
+    },
+    changeTypeHandler () {
+      Vue.set(this.currentSettings, 'settings', {})
     },
     validateSchemas (status) {
       this.isValideSchema = status

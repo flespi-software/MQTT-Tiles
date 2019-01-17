@@ -1,6 +1,6 @@
 {
   "name": "mqtttiles",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "description": "MQTT Dash board creator",
   "productName": "MQTT Tiles",
   "cordovaId": "org.cordova.quasar.app",
@@ -13,7 +13,7 @@
   "dependencies": {
     "lodash": "^4.17.11",
     "mqtt": "git+https://github.com/mqttjs/MQTT.js.git",
-    "vue-grid-layout": "^2.3.3"
+    "vue-grid-layout": "git+https://github.com/jbaysolutions/vue-grid-layout.git"
   },
   "devDependencies": {
     "babel-eslint": "^8.2.1",
