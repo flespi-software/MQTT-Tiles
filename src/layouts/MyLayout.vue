@@ -9,8 +9,9 @@
     <q-layout-header>
       <q-toolbar color="dark">
         <q-btn class="lt-lg" flat rounded icon="mdi-menu" @click="leftDrawerOpen = !leftDrawerOpen"/>
-        <q-toolbar-title>
+        <q-toolbar-title style="line-height: 36px;">
           MQTT Tiles
+          <sup style="position: relative; font-size: .9rem; padding-left: 4px">{{version}}</sup>
         </q-toolbar-title>
       </q-toolbar>
     </q-layout-header>
@@ -71,6 +72,7 @@ import { LocalStorage } from 'quasar'
 import debounce from 'lodash/debounce'
 import Vue from 'vue'
 import { CLIENTS_LOCAL_STORAGE_NAME } from '../constants'
+import {version} from '../../package.json'
 
 let saveClientsToLocalStorage = debounce((clients) => {
   LocalStorage.set(CLIENTS_LOCAL_STORAGE_NAME, clients)
@@ -86,7 +88,8 @@ export default {
       clients: {},
       activeClientId: undefined,
       editedClientId: undefined,
-      connected: false
+      connected: false,
+      version
     }
   },
   computed: {
