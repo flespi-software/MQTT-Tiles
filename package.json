@@ -1,0 +1,42 @@
+{
+  "name": "mqtttiles",
+  "version": "1.0.4",
+  "description": "MQTT Dash board creator",
+  "productName": "MQTT Tiles",
+  "cordovaId": "org.cordova.quasar.app",
+  "author": "Siarhei Buntsevich <sebu@gurtam.com>",
+  "private": true,
+  "scripts": {
+    "build": "rm -rf dist && quasar build -m pwa && rm -rf deploy && mkdir deploy && cp -R dist/pwa-mat/* misc LICENSE package.json README.md deploy && node_modules/git-directory-deploy/bin/git-directory-deploy.sh -ddeploy -bgh-pages -rhttps://git.gurtam.net/flespi/frontend/MQTTTiles.git && rm -rf deploy"
+  },
+  "dependencies": {
+    "lodash": "^4.17.11",
+    "mqtt": "git+https://github.com/mqttjs/MQTT.js.git",
+    "vue-grid-layout": "git+https://github.com/jbaysolutions/vue-grid-layout.git"
+  },
+  "devDependencies": {
+    "babel-eslint": "^8.2.1",
+    "eslint": "^4.18.2",
+    "eslint-config-standard": "^11.0.0",
+    "eslint-friendly-formatter": "^4.0.1",
+    "eslint-loader": "^2.0.0",
+    "eslint-plugin-import": "^2.9.0",
+    "eslint-plugin-node": "^6.0.1",
+    "eslint-plugin-promise": "^3.7.0",
+    "eslint-plugin-standard": "^3.0.1",
+    "eslint-plugin-vue": "^4.3.0",
+    "git-directory-deploy": "^1.5.1",
+    "quasar-cli": "^0.17.23",
+    "strip-ansi": "=3.0.1"
+  },
+  "engines": {
+    "node": ">= 8.9.0",
+    "npm": ">= 5.6.0",
+    "yarn": ">= 1.6.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not ie <= 10"
+  ]
+}
