@@ -1,6 +1,6 @@
-const BOARDS_LOCALSTORAGE_NAME = 'mqtt-dash-boards',
-  WIDGETS_LOCALSTORAGE_NAME = 'mqtt-dash-widgets',
-  CLIENTS_LOCAL_STORAGE_NAME = 'dasher-clients',
+const BOARDS_LOCALSTORAGE_NAME = 'mqtt-tiles-boards',
+  WIDGETS_LOCALSTORAGE_NAME = 'mqtt-tiles-widgets',
+  CLIENTS_LOCAL_STORAGE_NAME = 'mqtt-tiles-clients',
   WIDGET_STATUS_DISABLED = 0,
   WIDGET_STATUS_ENABLED = 1
 

@@ -8,7 +8,7 @@
       </q-toolbar>
       <div style="margin: 20px;" :style="{ height: $q.platform.is.mobile ? 'calc(100% - 100px)' : '50vh', width: $q.platform.is.mobile ? 'calc(100% - 40px)' : '50vw'}">
         <q-input color="dark"  v-model="currentSettings.clientName" float-label="MQTT client name" :error="!currentSettings.clientName"/>
-        <q-input color="dark"  v-model="currentSettings.clientId" float-label="Client ID" :error="!currentSettings.clientId" :after="[{icon: 'mdi-refresh', handler () { currentSettings.clientId = `dasher-${Math.random().toString(16).substr(2, 8)}` }}]"/>
+        <q-input color="dark"  v-model="currentSettings.clientId" float-label="Client ID" :error="!currentSettings.clientId" :after="[{icon: 'mdi-refresh', handler () { currentSettings.clientId = `mqtt-tiles-${Math.random().toString(16).substr(2, 8)}` }}]"/>
         <q-input color="dark"  v-model="currentSettings.host" float-label="Host" :error="!currentSettings.host || (currentSettings.host.indexOf('ws:') === 0)" :after="[{icon: 'mdi-alert-outline', handler: hostErrorHandler, error: true}]"/>
         <q-input color="dark"  v-model="currentSettings.keepalive" type="number" float-label="Keep alive"/>
         <q-select color="dark" v-model="currentSettings.protocolVersion" :options="[{label: '3.1.1', value: 4}, {label: '5.0', value: 5}]" float-label="Version of MQTT"/>
@@ -39,7 +39,7 @@ export default {
   data () {
     let defaultSettings = {
       clientName: 'New client',
-      clientId: `dasher-${Math.random().toString(16).substr(2, 8)}`,
+      clientId: `mqtt-tiles-${Math.random().toString(16).substr(2, 8)}`,
       host: 'wss://mqtt.flespi.io',
       keepalive: 60,
       protocolVersion: 5,
@@ -67,7 +67,7 @@ export default {
       this.$emit('save', this.currentSettings)
       this.closeHandler()
       this.$nextTick(() => {
-        this.defaultSettings.clientId = `dasher-${Math.random().toString(16).substr(2, 8)}`
+        this.defaultSettings.clientId = `mqtt-tiles-${Math.random().toString(16).substr(2, 8)}`
         this.currentSettings = merge({}, this.defaultSettings)
       })
     },

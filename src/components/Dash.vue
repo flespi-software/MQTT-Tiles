@@ -237,7 +237,7 @@ export default {
             if (!widgetsIndexesBySubscription.length) {
               this.unsubscribe(topic)
               Vue.delete(this.widgetsBySubscription, topic)
-              Vue.delete(this.subscription, topic)
+              Vue.delete(this.subscriptions, topic)
             }
           })
           Vue.delete(this.widgets, widgetIndex)
@@ -408,6 +408,8 @@ export default {
       savedWidgets = LocalStorage.get.item(WIDGETS_LOCALSTORAGE_NAME)
     if (savedBoards) {
       this.boards = savedBoards
+    }
+    if (savedWidgets) {
       this.widgets = savedWidgets
       this.runtimeInitWidgets()
     }

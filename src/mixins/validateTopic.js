@@ -5,12 +5,14 @@ export default {
 
       for (let i = 0; i < parts.length; i++) {
         if (parts[i] === '+') {
-          continue
+          // continue
+          return false
         }
 
         if (parts[i] === '#') {
           // for Rule #2
-          return i === parts.length - 1
+          // return i === parts.length - 1
+          return false
         }
 
         if (parts[i].indexOf('+') !== -1 || parts[i].indexOf('#') !== -1) {
