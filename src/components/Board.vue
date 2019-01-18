@@ -24,7 +24,7 @@
           :row-height="rowHeight"
           :is-draggable="isDragable"
           :is-resizable="true"
-          :is-mirrored="true"
+          :is-mirrored="false"
           :vertical-compact="false"
           :margin="[10, 10]"
           :use-css-transforms="true"
