@@ -1,7 +1,7 @@
 self.__precacheManifest = [
   {
-    "revision": "8c2ade503b34e31430d6c98aa29a52a3",
-    "url": "fonts/KFOlCnqEu92Fr1MmYUtfBBc-.8c2ade50.woff"
+    "revision": "cf6613d1adf490972c557a8e318e0868",
+    "url": "fonts/KFOlCnqEu92Fr1MmWUlfBBc-.cf6613d1.woff"
   },
   {
     "revision": "b02fa50086204a81d175",
@@ -100,8 +100,8 @@ self.__precacheManifest = [
     "url": "fonts/KFOmCnqEu92Fr1Mu4mxM.bafb105b.woff"
   },
   {
-    "revision": "cf6613d1adf490972c557a8e318e0868",
-    "url": "fonts/KFOlCnqEu92Fr1MmWUlfBBc-.cf6613d1.woff"
+    "revision": "8c2ade503b34e31430d6c98aa29a52a3",
+    "url": "fonts/KFOlCnqEu92Fr1MmYUtfBBc-.8c2ade50.woff"
   },
   {
     "revision": "de8b7431b74642e830af4d4f4b513ec9",
