@@ -1,6 +1,6 @@
 {
   "name": "mqtttiles",
-  "version": "1.0.6",
+  "version": "1.0.8",
   "description": "MQTT Dash board creator",
   "productName": "MQTT Tiles",
   "cordovaId": "org.cordova.quasar.app",

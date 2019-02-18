@@ -7,7 +7,7 @@
       @save="saveSettingsHandler"
       @hide="hideSettingsHandler"
     />
-    <q-btn fab color="dark" @click="openSettings" icon="mdi-plus" class="absolute button--add">
+    <q-btn v-if='!board.settings.blocked' fab color="dark" @click="openSettings" icon="mdi-plus" class="absolute button--add">
       <q-tooltip>Add new widget</q-tooltip>
     </q-btn>
     <q-toolbar color="white">
@@ -15,6 +15,9 @@
         <q-tooltip>Back to boards list</q-tooltip>
       </q-btn>
       <q-toolbar-title class="text-dark">{{board.name}}</q-toolbar-title>
+      <q-btn @click="$emit('block')" :icon="board.settings.blocked ? 'mdi-lock' : 'mdi-lock-open'" color="dark" flat round>
+        <q-tooltip>{{board.settings.blocked ? 'Unlock your board' : 'Lock your board'}}</q-tooltip>
+      </q-btn>
     </q-toolbar>
     <div class="widgets__wrapper scroll">
       <div style="width: 100%; position: relative;" v-if="board.widgetsIndexes.length">
@@ -22,8 +25,8 @@
           :layout.sync="board.layout"
           :col-num="colNum"
           :row-height="rowHeight"
-          :is-draggable="isDragable"
-          :is-resizable="true"
+          :is-draggable="!board.settings.blocked"
+          :is-resizable="!board.settings.blocked"
           :is-mirrored="false"
           :vertical-compact="false"
           :margin="[10, 10]"
@@ -43,11 +46,14 @@
               @resized="resizeHandler"
             >
               <component
+                class="wrapper__items"
+                :class="{'wrapper__items--edited': !board.settings.blocked}"
                 :is="widgets[widgetIndex].type"
                 :item="widgets[widgetIndex]"
                 :value="values[widgetIndex]"
                 :index="widgetIndex"
                 :in-shortcuts="Boolean(board.shortcutsIndexes.includes(widgetIndex))"
+                :blocked="board.settings.blocked"
                 @action="(data) => { $emit('action', data) }"
                 @update="editWidgetSettings(widgetIndex)"
                 @delete="$emit('delete:widget', {widgetId: widgetIndex, settings: widgets[widgetIndex]})"
@@ -65,6 +71,11 @@
 </template>
 
 <style lang="stylus">
+  .wrapper__items
+    border 1px solid #ccc
+  .wrapper__items--edited
+    border 1px solid transparent
+    box-shadow 0 1px 5px rgba(0,0,0,0.2), 0 2px 2px rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12)!important
   .button--add
     bottom 16px
     right 16px
@@ -93,8 +104,7 @@ export default {
       editedWidgetId: undefined,
       editedWidgetTopics: undefined,
       colNum: 12,
-      rowHeight: 100,
-      isDragable: true
+      rowHeight: 100
     }
   },
   methods: {

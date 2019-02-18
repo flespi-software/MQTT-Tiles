@@ -1,6 +1,9 @@
 <template>
   <div v-if="mini" style="text-align: center;" @click.stop="actionHandler">
-    <div style="height: 60px; width: 60px; line-height: 60px; margin: 0 auto; border-radius: 5px;" :class="[`bg-${currentValue !== null ? `${item.color}-1` : 'grey-3'}`]">
+    <div
+      style="height: 60px; width: 60px; line-height: 60px; margin: 0 auto; border-radius: 5px;"
+      :class="[`bg-${currentValue !== null ? `${item.color}-1` : 'grey-3'}`]"
+    >
       <q-icon
         size="3rem"
         :color="item.currentValue !== null ? `${item.color}-7` : 'grey-5'"
@@ -10,55 +13,70 @@
     </div>
     <div class="ellipsis q-mt-sm">{{item.name}}</div>
   </div>
-  <q-card v-else inline class="widget__switcher" style="width: 100%; height: 100%;">
-    <q-item class="q-py-none q-px-sm" :class="[`bg-${item.color}-7`]">
-      <q-item-main class="ellipsis text-white">
+  <q-card flat v-else inline class="widget__switcher q-pa-sm" style="width: 100%; height: 100%;" :class="[`bg-${item.color}-1`]">
+    <q-item class="q-pa-none" style="min-height: 22px;">
+      <q-item-main class="ellipsis" :class="[`text-${item.color}-7`]" style="font-size: .9rem">
         {{item.name}}
         <q-tooltip>{{item.name}}</q-tooltip>
       </q-item-main>
-      <q-item-side>
-        <q-btn v-if="item.settings.width !== 1" :icon="inShortcuts ? 'mdi-star' : 'mdi-star-outline'" @click="$emit('fast-bind')" round dense flat :color="inShortcuts ? 'yellow' : 'white'">
-          <q-tooltip>{{`${inShortcuts ? 'Remove from' : 'Add to'} shortcuts`}}</q-tooltip>
-        </q-btn>
-        <q-btn round dense flat icon="mdi-dots-vertical" color="white">
-          <q-popover anchor="bottom right" self="top right">
-            <q-list dense>
-              <q-item v-if="item.settings.width === 1" class="cursor-pointer" v-close-overlay highlight @click.native="$emit('fast-bind')">
-                <q-item-side :icon="inShortcuts ? 'mdi-star' : 'mdi-star-outline'" :color="inShortcuts ? 'yellow-9' : 'dark'"/>
-                <q-item-main :label="`${inShortcuts ? 'Remove from' : 'Add to'} shortcuts`"/>
-              </q-item>
-              <q-item class="cursor-pointer" v-close-overlay highlight @click.native="$emit('update')">
-                <q-item-side icon="mdi-settings" />
-                <q-item-main label="Edit"/>
-              </q-item>
-              <q-item-separator/>
-              <q-item class="cursor-pointer" v-close-overlay highlight @click.native="$emit('delete')">
-                <q-item-side color="red" icon="mdi-delete-outline" />
-                <q-item-main label="Remove"/>
-              </q-item>
-            </q-list>
-          </q-popover>
-        </q-btn>
-      </q-item-side>
+      <transition name="block">
+        <q-item-side v-if="!blocked" style="min-width: 20px;">
+          <q-btn size="0.9rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" v-if="item.settings.width !== 1" :icon="inShortcuts ? 'mdi-star' : 'mdi-star-outline'" @click="$emit('fast-bind')" dense flat :color="inShortcuts ? 'yellow-9' : `${item.color}-7`">
+            <q-tooltip>{{`${inShortcuts ? 'Remove from' : 'Add to'} shortcuts`}}</q-tooltip>
+          </q-btn>
+          <q-btn size="0.9rem" class="q-pa-none" style="min-height: 1rem;" dense flat icon="mdi-dots-vertical" :color="`${item.color}-7`">
+            <q-popover anchor="top right" self="top right" :offset="[8, 8]" style="box-shadow: none;">
+              <div class="q-pa-sm" :class="[`bg-${item.color}-1`]">
+                <q-btn v-close-overlay v-if="item.settings.width === 1" size="0.9rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" :icon="inShortcuts ? 'mdi-star' : 'mdi-star-outline'" @click="$emit('fast-bind')" dense flat :color="inShortcuts ? 'yellow-9' : `${item.color}-7`">
+                  <q-tooltip>{{`${inShortcuts ? 'Remove from' : 'Add to'} shortcuts`}}</q-tooltip>
+                </q-btn>
+                <q-btn v-close-overlay size="0.9rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" icon="mdi-settings" @click="$emit('update')" dense flat :color="`${item.color}-7`">
+                  <q-tooltip>Edit</q-tooltip>
+                </q-btn>
+                <q-btn v-close-overlay size="0.9rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" icon="mdi-delete-outline" @click="$emit('delete')" dense flat color="red">
+                  <q-tooltip>Remove</q-tooltip>
+                </q-btn>
+                <q-btn v-close-overlay size="0.9rem" class="q-pa-none" style="min-height: 1rem;" icon="mdi-close" dense flat :color="`${item.color}-7`"/>
+              </div>
+            </q-popover>
+          </q-btn>
+        </q-item-side>
+      </transition>
     </q-item>
-    <q-card-media class="widget__content" :class="[`bg-${item.color}-1`]" style="height: calc(100% - 40px);">
+    <q-card-media class="widget__content" :class="[`bg-${item.color}-1`]" style="height: calc(100% - 22px);">
       <q-icon
         @click.native.stop="actionHandler"
         size="3.8rem"
         :color="item.currentValue !== null ? `${item.color}-7` : 'grey-5'"
         :name="currentValue ? 'mdi-toggle-switch-outline' : 'mdi-toggle-switch-off-outline'"
         style="width: 100%; height: 100%;"
-        :class="[`${currentValue === null ? 'disabled' : !item.settings.actionTopic ? '' : 'cursor-pointer'}`]"
+        :class="[`${currentValue === null ? 'disabled' : actionTopic ? 'cursor-pointer' : ''}`]"
       />
     </q-card-media>
   </q-card>
 </template>
 
+<style lang="stylus">
+.block-leave-to
+  transition all .2s ease-in-out
+  opacity 0
+.block-leave
+  transition all .2s ease-in-out
+  opacity 1
+.block-enter
+  transition all .2s ease-in-out
+  opacity 0
+.block-enter-to
+  transition all .2s ease-in-out
+  opacity 1
+</style>
+
 <script>
 import { WIDGET_STATUS_DISABLED } from '../../../constants'
+import { DEFAULT_MODE, COMMAND_MODE, ACCUMULATE_AND_MODE, ACCUMULATE_OR_MODE } from './constants.js'
 export default {
   name: 'Switcher',
-  props: ['item', 'index', 'value', 'mini', 'in-shortcuts'],
+  props: ['item', 'index', 'value', 'mini', 'in-shortcuts', 'blocked'],
   data () {
     return {
       WIDGET_STATUS_DISABLED
@@ -66,28 +84,57 @@ export default {
   },
   computed: {
     currentValue () {
+      let mode = this.item.settings.accumulateLogic
+      let initValue = mode === ACCUMULATE_AND_MODE
       return Object.keys(this.value).reduce((result, topic) => {
         if (result === null) { return result }
         let value = this.value[topic] !== null ? this.value[topic].toString() : this.value[topic]
-        return value === this.item.settings.trueValue
-          ? result && true : value === this.item.settings.falseValue
-            ? result && false : null
-      }, true)
+        switch (mode) {
+          case ACCUMULATE_AND_MODE: {
+            result = value === this.item.settings.trueValue
+              ? result && true : value === this.item.settings.falseValue
+                ? result && false : null
+            break
+          }
+          case ACCUMULATE_OR_MODE: {
+            result = value === this.item.settings.trueValue
+              ? result || true : value === this.item.settings.falseValue
+                ? result || false : null
+            break
+          }
+        }
+        return result
+      }, initValue)
+    },
+    actionTopic () {
+      if (this.currentValue === null) {
+        return null
+      } else if (this.item.topics.length === 1) {
+        return this.item.topics[0]
+      } else if (this.item.settings.mode === DEFAULT_MODE) {
+        return this.item.settings.actionTopic
+      } else if (this.item.settings.mode === COMMAND_MODE) {
+        return this.currentValue ? this.item.settings.falseActionTopic : this.item.settings.trueActionTopic
+      }
     }
   },
   methods: {
     getValue () {
-      return Object.keys(this.value).reduce((result, topic) => {
-        let value = this.value[topic] !== null ? this.value[topic].toString() : this.value[topic]
-        return (value === this.item.settings.trueValue) && (result === this.item.settings.trueValue)
-          ? this.item.settings.falseValue : (value === this.item.settings.falseValue) && (result === this.item.settings.falseValue)
-            ? this.item.settings.trueValue : value
-              ? this.item.settings.falseValue : this.item.settings.trueValue
-      }, this.item.settings.falseValue)
+      if (this.item.settings.mode === COMMAND_MODE) {
+        return this.currentValue ? this.item.settings.falsePayload : this.item.settings.truePayload
+      } else {
+        return Object.keys(this.value).reduce((result, topic) => {
+          let value = this.value[topic] !== null ? this.value[topic].toString() : this.value[topic]
+          return (value === this.item.settings.trueValue) && (result === this.item.settings.trueValue)
+            ? this.item.settings.falseValue : (value === this.item.settings.falseValue) && (result === this.item.settings.falseValue)
+              ? this.item.settings.trueValue : value
+                ? this.item.settings.falseValue : this.item.settings.trueValue
+        }, this.item.settings.falseValue)
+      }
     },
     actionHandler () {
-      if (this.currentValue !== null && !!this.item.settings.actionTopic) {
-        let data = {topic: this.item.settings.actionTopic, payload: this.getValue(), settings: {retain: this.item.settings.save}}
+      if (this.currentValue !== null && this.actionTopic !== null) {
+        let data = {topic: this.actionTopic, payload: this.getValue(), settings: {retain: this.item.settings.save}}
         this.$emit('action', data)
       }
     }

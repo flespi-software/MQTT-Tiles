@@ -9,7 +9,7 @@
       <div style="margin: 20px;" :style="{ height: $q.platform.is.mobile ? 'calc(100% - 100px)' : '50vh', width: $q.platform.is.mobile ? 'calc(100% - 40px)' : '50vw'}">
         <q-input color="dark"  v-model="currentSettings.name" float-label="Name" :error="!currentSettings.name"/>
         <q-select color="dark" v-model="currentSettings.type" :options="typeOptions" float-label="Type" @input="changeTypeHandler"/>
-        <q-input
+        <!-- <q-input
           v-if="!(this.currentSettings.settings.single && this.currentSettings.topics.length > 0) || this.currentSettings.settings.single === undefined"
           color="dark"
           v-model="currentTopic"
@@ -22,11 +22,7 @@
               condition: !!currentTopic && validateTopic(currentTopic) && !currentSettings.topics.includes(currentTopic)
             }
           ]"
-        />
-        <div class="q-my-sm" style="font-size: .8rem;">
-          <span class="q-mr-xs q-mt-xs" :class="{'text-red-6':  !currentSettings.topics.length}" style="display: inline-flex; font-size: .9rem; line-height: 26px; vertical-align: bottom;">Topics: <span class="q-ml-xs" v-if="!currentSettings.topics.length">Add at least one topic</span></span>
-          <q-chip class="q-mr-xs q-mt-xs" small v-for="(topic, index) in currentSettings.topics" :key="topic" closable @hide="removeTopicHandler(index)">{{topic}}</q-chip>
-        </div>
+        /> -->
         <div class="color-palette">
           <div class="text-grey-6 q-pb-sm color-palette__label">Color</div>
           <div class="row color-palette__wrapper">
@@ -40,6 +36,23 @@
               <q-icon class="item__icon" size="1.4rem" v-if="color === currentSettings.color" name="mdi-check" color="white"/>
             </span>
           </div>
+        </div>
+        <q-field
+          v-if="!(this.currentSettings.settings.single && this.currentSettings.topics.length > 0) || this.currentSettings.settings.single === undefined"
+          :error="!isValidCurrentTopics"
+          error-label="Recheck your topics, please"
+        >
+          <q-chips-input
+            v-model="currentSettings.topics"
+            color="dark"
+            float-label="Topics"
+            add-icon="mdi-plus"
+            :error="!isValidCurrentTopics"
+          />
+        </q-field>
+        <div class="q-my-sm" style="font-size: .8rem;" v-else>
+          <span class="q-mr-xs q-mt-xs" :class="{'text-red-6':  !currentSettings.topics.length}" style="display: inline-flex; font-size: .9rem; line-height: 26px; vertical-align: bottom;">Topics: </span>
+          <q-chip class="q-mr-xs q-mt-xs" small v-for="(topic, index) in currentSettings.topics" :key="topic" closable @hide="removeTopicHandler(index)">{{topic}}</q-chip>
         </div>
         <component
           :is="currentSettings.type"
@@ -96,7 +109,6 @@ export default {
     let defaultSettings = {
       name: 'New widget',
       color: 'grey',
-      value: null,
       type: 'switcher',
       topics: [],
       settings: {},
@@ -118,11 +130,16 @@ export default {
   computed: {
     validateCurrentSettings () {
       return !!this.currentSettings.name &&
-        !!this.currentSettings.topics.length
+        !!this.isValidCurrentTopics
     },
     status: {
       get () { return this.value },
       set (value) { this.$emit('input', value) }
+    },
+    isValidCurrentTopics () {
+      return !!this.currentSettings.topics.length &&
+        this.currentSettings.topics.every(topic => this.validateTopic(topic)) &&
+        this.currentSettings.topics.every(topic => this.currentSettings.topics.filter(topicCompare => topicCompare === topic).length === 1)
     }
   },
   methods: {

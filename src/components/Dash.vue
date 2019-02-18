@@ -12,6 +12,7 @@
       @action="actionHandler"
       @fast-bind="fastBindWidgetHandler"
       @resized="resizeHandler"
+      @block="blockBoardHandler"
       :style="{height: `${clientSettings ? 'calc(100vh - 50px)' : 'calc(100vh - 110px)'}`}"
     />
     <boards
@@ -51,6 +52,7 @@ import { uid, LocalStorage } from 'quasar'
 import debounce from 'lodash/debounce'
 import cloneDeep from 'lodash/cloneDeep'
 import remove from 'lodash/remove'
+import difference from 'lodash/difference'
 import Vue from 'vue'
 import Board from './Board'
 import Boards from './Boards'
@@ -80,7 +82,7 @@ export default {
       client: undefined,
       clientStatus: false,
       clientErrors: [],
-      defaultBoard: Object.freeze({ name: 'New board', settings: { edited: true }, shortcutsIndexes: [], widgetsIndexes: [], layout: [] }),
+      defaultBoard: Object.freeze({ name: 'New board', settings: { edited: true, blocked: false }, shortcutsIndexes: [], widgetsIndexes: [], layout: [] }),
       boards: {},
       widgets: {},
       subscriptions: {},
@@ -250,6 +252,10 @@ export default {
       let board = this.boards[boardId]
       Vue.set(board.settings, 'edited', !board.settings.edited)
     },
+    blockBoardHandler () {
+      let board = this.boards[this.activeBoardId]
+      Vue.set(board.settings, 'blocked', !board.settings.blocked)
+    },
     /* widgets logic start */
     runtimeInitWidgets () {
       let widgetsIndexes = Object.keys(this.widgets)
@@ -318,7 +324,7 @@ export default {
       Vue.set(this.widgets, widget.id, widget)
     },
     editWidget ({widgetId, settings, topics}) {
-      if (!topics.every(topic => settings.topics.includes(topic))) {
+      if (difference(settings.topics, topics).length || difference(topics, settings.topics).length) {
         topics.forEach(oldTopic => {
           if (settings.topics.includes(oldTopic)) { return false }
           removeFromArrayByValue(this.widgetsBySubscription[oldTopic], widgetId)

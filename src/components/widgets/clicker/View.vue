@@ -13,38 +13,37 @@
     </div>
     <div class="ellipsis q-mt-sm">{{item.name}}</div>
   </div>
-  <q-card v-else inline class="widget__informer" style="width: 100%; height: 100%;">
-    <q-item class="q-py-none q-px-sm" :class="[`bg-${item.color}-7`]">
-      <q-item-main class="ellipsis text-white">
+  <q-card flat v-else inline class="widget__informer q-pa-sm" style="width: 100%; height: 100%;" :class="[`bg-${item.color}-1`]">
+    <q-item class="q-py-none q-px-sm" style="min-height: 22px;">
+      <q-item-main class="ellipsis text-white" :class="[`text-${item.color}-7`]" style="font-size: .9rem">
         {{item.name}}
         <q-tooltip>{{item.name}}</q-tooltip>
       </q-item-main>
-      <q-item-side>
-        <q-btn v-if="item.settings.width !== 1" :icon="inShortcuts ? 'mdi-star' : 'mdi-star-outline'" @click="$emit('fast-bind')" round dense flat :color="inShortcuts ? 'yellow' : 'white'">
-          <q-tooltip>{{`${inShortcuts ? 'Remove from' : 'Add to'} shortcuts`}}</q-tooltip>
-        </q-btn>
-        <q-btn round dense flat icon="mdi-dots-vertical" color="white">
-          <q-popover anchor="bottom right" self="top right">
-            <q-list dense>
-              <q-item v-if="item.settings.width === 1" class="cursor-pointer" v-close-overlay highlight @click.native="$emit('fast-bind')">
-                <q-item-side :icon="inShortcuts ? 'mdi-star' : 'mdi-star-outline'" :color="inShortcuts ? 'yellow-9' : 'dark'"/>
-                <q-item-main :label="`${inShortcuts ? 'Remove from' : 'Add to'} shortcuts`"/>
-              </q-item>
-              <q-item class="cursor-pointer" v-close-overlay highlight @click.native="$emit('update')">
-                <q-item-side icon="mdi-settings" />
-                <q-item-main label="Edit"/>
-              </q-item>
-              <q-item-separator/>
-              <q-item class="cursor-pointer" v-close-overlay highlight @click.native="$emit('delete')">
-                <q-item-side color="red" icon="mdi-delete-outline" />
-                <q-item-main label="Remove"/>
-              </q-item>
-            </q-list>
-          </q-popover>
-        </q-btn>
-      </q-item-side>
+      <transition name="block">
+        <q-item-side v-if="!blocked" style="min-width: 20px;">
+          <q-btn size="0.9rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" v-if="item.settings.width !== 1" :icon="inShortcuts ? 'mdi-star' : 'mdi-star-outline'" @click="$emit('fast-bind')" dense flat :color="inShortcuts ? 'yellow-9' : `${item.color}-7`">
+            <q-tooltip>{{`${inShortcuts ? 'Remove from' : 'Add to'} shortcuts`}}</q-tooltip>
+          </q-btn>
+          <q-btn size="0.9rem" class="q-pa-none" style="min-height: 1rem;" dense flat icon="mdi-dots-vertical" :color="`${item.color}-7`">
+            <q-popover anchor="top right" self="top right" :offset="[8, 8]" style="box-shadow: none;">
+              <div class="q-pa-sm" :class="[`bg-${item.color}-1`]">
+                <q-btn v-close-overlay v-if="item.settings.width === 1" size="0.9rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" :icon="inShortcuts ? 'mdi-star' : 'mdi-star-outline'" @click="$emit('fast-bind')" dense flat :color="inShortcuts ? 'yellow-9' : `${item.color}-7`">
+                  <q-tooltip>{{`${inShortcuts ? 'Remove from' : 'Add to'} shortcuts`}}</q-tooltip>
+                </q-btn>
+                <q-btn v-close-overlay size="0.9rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" icon="mdi-settings" @click="$emit('update')" dense flat :color="`${item.color}-7`">
+                  <q-tooltip>Edit</q-tooltip>
+                </q-btn>
+                <q-btn v-close-overlay size="0.9rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" icon="mdi-delete-outline" @click="$emit('delete')" dense flat color="red">
+                  <q-tooltip>Remove</q-tooltip>
+                </q-btn>
+                <q-btn v-close-overlay size="0.9rem" class="q-pa-none" style="min-height: 1rem;" icon="mdi-close" dense flat :color="`${item.color}-7`"/>
+              </div>
+            </q-popover>
+          </q-btn>
+        </q-item-side>
+      </transition>
     </q-item>
-    <q-card-media :class="[`bg-${item.color}-1`]" class="widget__content clicker__payload q-px-sm" style="height: calc(100% - 40px);">
+    <q-card-media :class="[`bg-${item.color}-1`]" class="widget__content clicker__payload q-px-sm" style="height: calc(100% - 22px);">
       <q-btn
         class="payload__button"
         :disabled="item.status === WIDGET_STATUS_DISABLED"
@@ -71,13 +70,25 @@
         text-overflow ellipsis
         overflow hidden
         width 100%
+  .block-leave-to
+    transition all .2s ease-in-out
+    opacity 0
+  .block-leave
+    transition all .2s ease-in-out
+    opacity 1
+  .block-enter
+    transition all .2s ease-in-out
+    opacity 0
+  .block-enter-to
+    transition all .2s ease-in-out
+    opacity 1
 </style>
 
 <script>
 import { WIDGET_STATUS_DISABLED } from '../../../constants'
 export default {
   name: 'Clicker',
-  props: ['item', 'index', 'mini', 'in-shortcuts', 'value'],
+  props: ['item', 'index', 'mini', 'in-shortcuts', 'value', 'blocked'],
   data () {
     return {
       WIDGET_STATUS_DISABLED
