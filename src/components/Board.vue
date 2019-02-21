@@ -1,5 +1,6 @@
 <template>
   <div class="dash__board">
+    <q-resize-observable @resize="onResize" />
     <settings
       v-if="settingsModel"
       v-model="settingsModel"
@@ -22,7 +23,8 @@
     <div class="widgets__wrapper scroll">
       <div style="width: 100%; position: relative;" v-if="board.widgetsIndexes.length">
         <grid-layout
-          :layout.sync="board.layout"
+          ref="grid"
+          :layout.sync="currentLayout"
           :col-num="colNum"
           :row-height="rowHeight"
           :is-draggable="!board.settings.blocked"
@@ -35,11 +37,11 @@
         >
             <grid-item v-for="(widgetIndex, index) in board.widgetsIndexes"
               :key="widgetIndex"
-              :x="board.layout[index].x"
-              :y="board.layout[index].y"
-              :w="board.layout[index].w"
-              :h="board.layout[index].h"
-              :i="board.layout[index].i"
+              :x="currentLayout[index].x"
+              :y="currentLayout[index].y"
+              :w="currentLayout[index].w"
+              :h="currentLayout[index].h"
+              :i="currentLayout[index].i"
               :minW="widgets[widgetIndex].settings.minWidth || 1"
               :minH="widgets[widgetIndex].settings.minHeight || 1"
               dragIgnoreFrom=".widget__content, i, button, a"
@@ -94,6 +96,20 @@ import VueGridLayout from 'vue-grid-layout'
 import Switcher from './widgets/swither/View'
 import Informer from './widgets/informer/View'
 import Clicker from './widgets/clicker/View'
+
+const BREAKPOINTS = { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }
+function getBreakpoint (width) {
+  width = width || window.innerWidth
+  let breakpoints = ['xxs', 'xs', 'sm', 'md', 'lg']
+  return breakpoints.reduce((breakpoint, current) => {
+    if (width > BREAKPOINTS[current]) {
+      return current
+    } else {
+      return breakpoint
+    }
+  }, null)
+}
+
 export default {
   name: 'Board',
   props: ['board', 'widgets', 'values'],
@@ -104,7 +120,20 @@ export default {
       editedWidgetId: undefined,
       editedWidgetTopics: undefined,
       colNum: 12,
-      rowHeight: 100
+      rowHeight: 100,
+      breakpoints: BREAKPOINTS,
+      breakpoint: 'xxs'
+    }
+  },
+  computed: {
+    currentLayout: {
+      get () {
+        return this.board.layouts[this.breakpoint]
+      },
+      set (layout) {
+        if (this.breakpoint !== this.$refs.grid && this.$refs.grid.lastBreakpoint) { return false }
+        this.$emit('update:layout', {layout, breakpoint: this.breakpoint})
+      }
     }
   },
   methods: {
@@ -131,7 +160,8 @@ export default {
     },
     resizeHandler (index, height, width) {
       this.$emit('resized', { index, height, width })
-    }
+    },
+    onResize ({width}) { this.breakpoint = getBreakpoint(width) }
   },
   components: {
     Settings,

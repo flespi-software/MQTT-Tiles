@@ -13,6 +13,7 @@
       @fast-bind="fastBindWidgetHandler"
       @resized="resizeHandler"
       @block="blockBoardHandler"
+      @update:layout="layoutUpdateHandler"
       :style="{height: `${clientSettings ? 'calc(100vh - 50px)' : 'calc(100vh - 110px)'}`}"
     />
     <boards
@@ -26,7 +27,16 @@
       @select="setActiveBoard"
       @action="actionHandler"
       :style="{height: `${clientSettings ? 'calc(100vh - 50px)' : 'calc(100vh - 110px)'}`}"
-    />
+    >
+      <template slot="actions" v-if="clientStatus && clientSettings.syncToRetain && clientSettings.syncNamespace">
+        <q-btn color="dark" flat round icon="mdi-cloud-download-outline" @click="downloadBoardsFromConnection">
+          <q-tooltip>Download boards from connection</q-tooltip>
+        </q-btn>
+        <q-btn color="dark" flat round class="q-ml-sm" icon="mdi-cloud-upload-outline" @click="uploadBoardsToConnection">
+          <q-tooltip>Upload boards to connection</q-tooltip>
+        </q-btn>
+      </template>
+    </boards>
     <div v-if="!clientSettings" class="bg-red-2 text-red-8 text-center absolute connections--empty">
       <div class="text-bold q-mt-md">No active connections</div>
     </div>
@@ -56,21 +66,24 @@ import difference from 'lodash/difference'
 import Vue from 'vue'
 import Board from './Board'
 import Boards from './Boards'
-import { BOARDS_LOCALSTORAGE_NAME, WIDGETS_LOCALSTORAGE_NAME, WIDGET_STATUS_DISABLED, WIDGET_STATUS_ENABLED } from '../constants'
+import { BOARDS_LOCALSTORAGE_NAME, WIDGET_STATUS_DISABLED, WIDGET_STATUS_ENABLED } from '../constants'
 
 let clearWidgets = function clearWidgets (widgets) {
     Object.keys(widgets).forEach((widgetId) => {
       widgets[widgetId].status = WIDGET_STATUS_DISABLED
     })
   },
-  saveWidgetsToLocalStorage = debounce((widgets) => {
+  getBoardsToSave = function getBoardsToSave (boards, widgets) {
+    boards = cloneDeep(boards)
     widgets = cloneDeep(widgets)
     clearWidgets(widgets)
-    LocalStorage.set(WIDGETS_LOCALSTORAGE_NAME, widgets)
-  }, 500, { trailing: true }),
-  saveBoardsToLocalStorage = debounce((boards) => {
-    boards = cloneDeep(boards)
-    LocalStorage.set(BOARDS_LOCALSTORAGE_NAME, boards)
+    Object.keys(boards).forEach(boardId => {
+      boards[boardId].widgetsIndexes = boards[boardId].widgetsIndexes.map(widgetIndex => widgets[widgetIndex])
+    })
+    return boards
+  },
+  saveBoardsToLocalStorage = debounce((boards, widgets) => {
+    LocalStorage.set(BOARDS_LOCALSTORAGE_NAME, getBoardsToSave(boards, widgets))
   }, 500, { trailing: true }),
   removeFromArrayByValue = (array, value) => remove(array, (el) => { return el === value })
 
@@ -82,12 +95,21 @@ export default {
       client: undefined,
       clientStatus: false,
       clientErrors: [],
-      defaultBoard: Object.freeze({ name: 'New board', settings: { edited: true, blocked: false }, shortcutsIndexes: [], widgetsIndexes: [], layout: [] }),
+      defaultBoard: Object.freeze(
+        {
+          name: 'New board',
+          settings: { edited: true, blocked: false },
+          shortcutsIndexes: [],
+          widgetsIndexes: [],
+          layouts: { lg: [], md: [], sm: [], xs: [], xxs: [] }
+        }
+      ),
       boards: {},
       widgets: {},
       subscriptions: {},
       widgetsBySubscription: {},
-      activeBoardId: undefined
+      activeBoardId: undefined,
+      colsByBreakpoint: { lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }
     }
   },
   computed: {
@@ -256,6 +278,26 @@ export default {
       let board = this.boards[this.activeBoardId]
       Vue.set(board.settings, 'blocked', !board.settings.blocked)
     },
+    initSavedBoards (savedBoards) {
+      if (savedBoards) {
+        let widgets = {}
+        Object.keys(savedBoards).forEach(boardId => {
+          let board = savedBoards[boardId]
+          let indexes = []
+          board.widgetsIndexes.forEach((widget) => {
+            indexes.push(widget.id)
+            widgets[widget.id] = widget
+            return widgets
+          })
+          board.widgetsIndexes = indexes
+        })
+        this.boards = savedBoards
+        if (widgets) {
+          this.widgets = widgets
+          this.runtimeInitWidgets()
+        }
+      }
+    },
     /* widgets logic start */
     runtimeInitWidgets () {
       let widgetsIndexes = Object.keys(this.widgets)
@@ -278,9 +320,10 @@ export default {
         this.subscribe(topics, { qos: 1 })
       }
     },
-    widgetLayoutSetup (width, height) {
+    widgetLayoutSetup (width, height, breakpoint) {
       let board = this.boards[this.activeBoardId],
-        layout = board.layout,
+        colNum = this.colsByBreakpoint[breakpoint],
+        layout = board.layouts[breakpoint],
         {x, y} = freeSpace()
       function freeSpace () {
         let max = layout.reduce((max, widget) => {
@@ -289,7 +332,8 @@ export default {
           }
           return max
         }, {y: 0, x: 0, h: 0, w: 0})
-        if (max.x + max.w + width <= 12) {
+        if (max.x + max.w + width <= colNum) {
+          // todo check if w > colNum => w = col.num
           return { x: max.x + max.w, y: max.y }
         } else {
           return { x: 0, y: max.y + 1 }
@@ -303,10 +347,25 @@ export default {
         y
       })
     },
+    widgetLayoutsSetup (width, height) {
+      Object.keys(this.colsByBreakpoint).forEach(breakpoint => {
+        this.widgetLayoutSetup(width, height, breakpoint)
+      })
+    },
+    layoutUpdateHandler ({layout, breakpoint}) {
+      Vue.set(this.boards[this.activeBoardId].layouts, breakpoint, layout)
+    },
+    deleteWidgetFromLayout (widgetIndex) {
+      let board = this.boards[this.activeBoardId],
+        layouts = board.layouts
+      Object.keys(this.colsByBreakpoint).forEach(breakpoint => {
+        Vue.delete(layouts[breakpoint], widgetIndex)
+      })
+    },
     addWidget (widget) {
       if (!widget.id) {
         widget.id = uid()
-        this.widgetLayoutSetup(widget.settings.width, widget.settings.height)
+        this.widgetLayoutsSetup(widget.settings.width, widget.settings.height)
         this.boards[this.activeBoardId].widgetsIndexes.push(widget.id)
       }
       widget.topics.forEach(topic => {
@@ -360,7 +419,7 @@ export default {
         let widgetsIndexes = this.boards[this.activeBoardId].widgetsIndexes,
           widgetIndex = widgetsIndexes.indexOf(widgetId)
         Vue.delete(widgetsIndexes, widgetIndex)
-        Vue.delete(this.boards[this.activeBoardId].layout, widgetIndex)
+        this.deleteWidgetFromLayout(widgetIndex)
 
         settings.topics.forEach(topic => {
           let widgetsBySubscription = this.widgetsBySubscription[topic]
@@ -406,19 +465,48 @@ export default {
       let widget = this.widgets[this.boards[this.activeBoardId].widgetsIndexes[index]]
       Vue.set(widget.settings, 'height', height)
       Vue.set(widget.settings, 'width', width)
-    }
+    },
     /* widgets logic end */
+    downloadBoardsFromConnection () {
+      let topic = this.clientSettings.syncNamespace,
+        savedBoards = {}
+      this.subscribe(topic)
+        .then(() => {
+          savedBoards = JSON.parse(this.subscriptions[topic].toString())
+          this.$q.dialog({
+            title: 'Replace current boards with the saved ones?',
+            message: `You have the following saved boards: ${Object.keys(savedBoards).map(id => savedBoards[id].name).join(', ')}.`,
+            color: 'dark',
+            ok: true,
+            cancel: true
+          }).then(() => {
+            this.initSavedBoards(savedBoards)
+          })
+        })
+        .catch(() => {})
+        .finally(() => {
+          this.unsubscribe(topic)
+            .then(() => {
+              Vue.delete(this.subscriptions, topic)
+            })
+        })
+    },
+    uploadBoardsToConnection () {
+      this.$q.dialog({
+        title: 'Upload current boards to the connection?',
+        message: `All saved boards in current connection will be replaced with current boards.`,
+        color: 'dark',
+        ok: true,
+        cancel: true
+      }).then(() => {
+        this.publish(this.clientSettings.syncNamespace, JSON.stringify(getBoardsToSave(this.boards, this.widgets)), { qos: 1, retain: true })
+      })
+        .catch(() => {})
+    }
   },
   created () {
-    let savedBoards = LocalStorage.get.item(BOARDS_LOCALSTORAGE_NAME),
-      savedWidgets = LocalStorage.get.item(WIDGETS_LOCALSTORAGE_NAME)
-    if (savedBoards) {
-      this.boards = savedBoards
-    }
-    if (savedWidgets) {
-      this.widgets = savedWidgets
-      this.runtimeInitWidgets()
-    }
+    let savedBoards = LocalStorage.get.item(BOARDS_LOCALSTORAGE_NAME)
+    this.initSavedBoards(savedBoards)
     if (this.clientSettings) { this.createClient() }
   },
   watch: {
@@ -438,13 +526,13 @@ export default {
     boards: {
       deep: true,
       handler (boards) {
-        saveBoardsToLocalStorage(boards)
+        saveBoardsToLocalStorage(boards, this.widgets)
       }
     },
     widgets: {
       deep: true,
       handler (widgets) {
-        saveWidgetsToLocalStorage(widgets)
+        saveBoardsToLocalStorage(this.boards, widgets)
       }
     }
   },

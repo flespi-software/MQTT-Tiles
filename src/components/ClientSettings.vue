@@ -16,6 +16,8 @@
         <q-input style="display: inline-flex; width: calc(100% - 115px)" color="dark" v-if="currentSettings.protocolVersion === 5" v-model="currentSettings.properties.sessionExpiryInterval" type="number" float-label="Session expiry interval"/>
         <q-input color="dark" v-model="currentSettings.username" float-label="Username"/>
         <q-input color="dark" v-model="currentSettings.password" float-label="Password"/>
+        <q-checkbox style="height: 56px" class="q-mr-sm" color="dark" v-model="currentSettings.syncToRetain" label="Sync boards settings"/>
+        <q-input style="display: inline-flex; width: calc(100% - 188px)" color="dark" v-if="currentSettings.syncToRetain" v-model="currentSettings.syncNamespace" float-label="Namespace to sync boards settings"/>
       </div>
       <q-toolbar slot="footer" color='dark'>
         <q-toolbar-title>
@@ -48,7 +50,9 @@ export default {
       password: '',
       properties: {
         sessionExpiryInterval: undefined
-      }
+      },
+      syncToRetain: false,
+      syncNamespace: 'xflespifront/mqtttiles/boards'
     }
     return {
       defaultSettings,

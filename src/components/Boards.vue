@@ -5,6 +5,7 @@
     </q-btn>
     <q-toolbar color="white">
       <q-toolbar-title class="text-dark">Boards</q-toolbar-title>
+      <slot name="actions"/>
     </q-toolbar>
     <div class="q-px-sm scroll boards__wrapper">
       <div v-if="Object.keys(boards).length" class="row">

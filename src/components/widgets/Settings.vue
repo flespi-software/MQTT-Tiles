@@ -9,20 +9,6 @@
       <div style="margin: 20px;" :style="{ height: $q.platform.is.mobile ? 'calc(100% - 100px)' : '50vh', width: $q.platform.is.mobile ? 'calc(100% - 40px)' : '50vw'}">
         <q-input color="dark"  v-model="currentSettings.name" float-label="Name" :error="!currentSettings.name"/>
         <q-select color="dark" v-model="currentSettings.type" :options="typeOptions" float-label="Type" @input="changeTypeHandler"/>
-        <!-- <q-input
-          v-if="!(this.currentSettings.settings.single && this.currentSettings.topics.length > 0) || this.currentSettings.settings.single === undefined"
-          color="dark"
-          v-model="currentTopic"
-          :float-label="currentSettings.topics.includes(currentTopic) ? 'Topic (must be unique)' : 'Topic'"
-          :error="!currentTopic || !validateTopic(currentTopic)"
-          :after="[
-            {
-              icon: 'mdi-plus',
-              handler: addTopicHandler,
-              condition: !!currentTopic && validateTopic(currentTopic) && !currentSettings.topics.includes(currentTopic)
-            }
-          ]"
-        /> -->
         <div class="color-palette">
           <div class="text-grey-6 q-pb-sm color-palette__label">Color</div>
           <div class="row color-palette__wrapper">
@@ -139,6 +125,7 @@ export default {
     isValidCurrentTopics () {
       return !!this.currentSettings.topics.length &&
         this.currentSettings.topics.every(topic => this.validateTopic(topic)) &&
+        /* check topics don`t duplicating */
         this.currentSettings.topics.every(topic => this.currentSettings.topics.filter(topicCompare => topicCompare === topic).length === 1)
     }
   },
