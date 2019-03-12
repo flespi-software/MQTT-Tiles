@@ -1,10 +1,10 @@
-# Dasher
-![Logo](/misc/logo.png?raw=true "dasher logo")
-> Dashboard based on MQTT. Supports MQTT 5.0 and 3.1.X protocols, connections to multiple brokers, multiple subscribe widgets. Saves configuration in browser's local cache.
+# MQTTTiles
+![Logo](/misc/logo.png?raw=true "MQTTTiles logo")
+> Dashboard based on MQTT. Supports MQTT 5.0 and 3.1.X protocols, connections to multiple brokers, multiple subscribe widgets. Saves configuration in browser's local cache or in retain message on broker.
 
-> Live version available here: [dasher](https://dasher.flespi.io).
+> Live version available here: [dasher](https://mqtttiles.flespi.io).
 
-![Screenshot](/misc/screenshot.png?raw=true "dasher")
+![Screenshot](/misc/screenshot.png?raw=true "MQTTTiles")
 
 ## Features
 * ES6 Javascript
@@ -28,7 +28,7 @@
 
 ``` bash
 # clone the repo
-$ git clone https://github.com/flespi-software/dasher.git dasher
+$ git clone https://github.com/flespi-software/mqtttiles.git mqtttiles
 
 # go into app's directory and install dependencies
 $ cd dasher
@@ -42,4 +42,4 @@ $ quasar build
 ```
 
 ## License
-[MIT](https://github.com/flespi-software/dasher/blob/master/LICENSE) license.
+[MIT](https://github.com/flespi-software/mqtttiles/blob/master/LICENSE) license.

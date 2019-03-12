@@ -1,18 +1,19 @@
 {
   "name": "mqtttiles",
-  "version": "1.0.6",
+  "version": "1.1.0",
   "description": "MQTT Dash board creator",
   "productName": "MQTT Tiles",
   "cordovaId": "org.cordova.quasar.app",
   "author": "Siarhei Buntsevich <sebu@gurtam.com>",
   "private": true,
   "scripts": {
-    "deploy": "rm -rf dist && quasar build -m pwa && rm -rf deploy && mkdir deploy && cp -R dist/pwa-mat/* misc LICENSE package.json README.md deploy && node_modules/git-directory-deploy/bin/git-directory-deploy.sh -ddeploy -bgh-pages -rhttps://git.gurtam.net/flespi/frontend/MQTTTiles.git && rm -rf deploy"
+    "deploy": "quasar build -m pwa && rm -rf deploy && mkdir deploy && cp -R dist/pwa-mat/* misc LICENSE package.json README.md deploy && node_modules/git-directory-deploy/bin/git-directory-deploy.sh -ddeploy -bgh-pages -rhttps://git.gurtam.net/flespi/frontend/MQTTTiles.git && rm -rf deploy"
   },
   "dependencies": {
+    "canvas-gauges": "^2.1.5",
     "lodash": "^4.17.11",
-    "mqtt": "git+https://github.com/mqttjs/MQTT.js.git",
-    "vue-grid-layout": "git+https://github.com/jbaysolutions/vue-grid-layout.git"
+    "mqtt": "git+https://github.com/scarry1992/MQTT.js.git#cork-fix",
+    "vue-grid-layout": "^2.3.4"
   },
   "devDependencies": {
     "babel-eslint": "^8.2.1",
