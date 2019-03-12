@@ -100,11 +100,14 @@
 import Switcher from './widgets/swither/View'
 import Clicker from './widgets/clicker/View'
 import Informer from './widgets/informer/View'
+import Linear from './widgets/linear/View'
+import Radial from './widgets/radial/View'
+import Singleselect from './widgets/singleselect/View'
 export default {
   name: 'Boards',
   props: ['boards', 'widgets', 'values'],
   components: {
-    Switcher, Clicker, Informer
+    Switcher, Clicker, Informer, Linear, Radial, Singleselect
   }
 }
 </script>

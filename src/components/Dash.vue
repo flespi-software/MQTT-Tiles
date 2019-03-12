@@ -269,6 +269,7 @@ export default {
 
         Vue.delete(this.boards, boardId)
       })
+        .catch(() => {})
     },
     editBoardHandler (boardId) {
       let board = this.boards[boardId]
@@ -432,6 +433,7 @@ export default {
         })
         Vue.delete(this.widgets, widgetId)
       })
+        .catch(() => {})
     },
     fastBindWidgetHandler (widgetId) {
       let shortcutsIndexes = this.boards[this.activeBoardId].shortcutsIndexes,

@@ -13,11 +13,11 @@
         <q-input color="dark"  v-model="currentSettings.keepalive" type="number" float-label="Keep alive"/>
         <q-select color="dark" v-model="currentSettings.protocolVersion" :options="[{label: '3.1.1', value: 4}, {label: '5.0', value: 5}]" float-label="Version of MQTT"/>
         <q-checkbox style="height: 56px" color="dark" class="q-mr-sm" v-model="currentSettings.clean" :label="currentSettings.protocolVersion === 5 ? 'Clean start' : 'Clean session'"/>
-        <q-input style="display: inline-flex; width: calc(100% - 115px)" color="dark" v-if="currentSettings.protocolVersion === 5" v-model="currentSettings.properties.sessionExpiryInterval" type="number" float-label="Session expiry interval"/>
-        <q-input color="dark" v-model="currentSettings.username" float-label="Username"/>
-        <q-input color="dark" v-model="currentSettings.password" float-label="Password"/>
+        <q-input style="display: inline-flex; width: calc(100% - 115px)" color="dark" v-if="currentSettings.protocolVersion === 5" v-model="currentSettings.properties.sessionExpiryInterval" type="number" float-label="Session expiry interval" clearable :clear-value="undefined"/>
+        <q-input color="dark" v-model="currentSettings.username" float-label="Username" clearable :clear-value="undefined"/>
+        <q-input color="dark" v-model="currentSettings.password" float-label="Password" clearable :clear-value="undefined"/>
         <q-checkbox style="height: 56px" class="q-mr-sm" color="dark" v-model="currentSettings.syncToRetain" label="Sync boards settings"/>
-        <q-input style="display: inline-flex; width: calc(100% - 188px)" color="dark" v-if="currentSettings.syncToRetain" v-model="currentSettings.syncNamespace" float-label="Namespace to sync boards settings"/>
+        <q-input style="display: inline-flex; width: calc(100% - 188px)" color="dark" v-if="currentSettings.syncToRetain" v-model="currentSettings.syncNamespace" float-label="Namespace to sync boards settings" clearable :clear-value="undefined"/>
       </div>
       <q-toolbar slot="footer" color='dark'>
         <q-toolbar-title>

@@ -42,8 +42,10 @@ export default {
       accumulateLogic: ACCUMULATE_AND_MODE,
       save: true,
       mode: DEFAULT_MODE,
-      height: 1,
-      width: 2
+      height: 2,
+      width: 2,
+      minWidth: 1,
+      minHeight: 2
     }
     return {
       defaultSettings,

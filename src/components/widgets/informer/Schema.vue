@@ -26,10 +26,12 @@ export default {
     let defaultSettings = {
       prefix: '',
       postfix: '',
-      height: 1,
+      height: 2,
       width: 2,
       payloadType: WIDGET_PAYLOAD_TYPE_STRING,
-      payloadField: ''
+      payloadField: '',
+      minWidth: 2,
+      minHeight: 2
     }
     return {
       defaultSettings,

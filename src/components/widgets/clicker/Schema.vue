@@ -15,9 +15,11 @@ export default {
       label: '',
       payload: '',
       save: false,
-      height: 1,
+      height: 2,
       width: 3,
-      single: true
+      minWidth: 2,
+      minHeight: 2,
+      maxTopicsLength: 1
     }
     return {
       defaultSettings,

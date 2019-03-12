@@ -96,6 +96,10 @@ import VueGridLayout from 'vue-grid-layout'
 import Switcher from './widgets/swither/View'
 import Informer from './widgets/informer/View'
 import Clicker from './widgets/clicker/View'
+import Radial from './widgets/radial/View'
+import Linear from './widgets/linear/View'
+import Frame from './widgets/frame/View'
+import Singleselect from './widgets/singleselect/View'
 
 const BREAKPOINTS = { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }
 function getBreakpoint (width) {
@@ -120,7 +124,7 @@ export default {
       editedWidgetId: undefined,
       editedWidgetTopics: undefined,
       colNum: 12,
-      rowHeight: 100,
+      rowHeight: 50,
       breakpoints: BREAKPOINTS,
       breakpoint: 'xxs'
     }
@@ -168,6 +172,10 @@ export default {
     Switcher,
     Informer,
     Clicker,
+    Radial,
+    Linear,
+    Frame,
+    Singleselect,
     GridLayout: VueGridLayout.GridLayout,
     GridItem: VueGridLayout.GridItem
   }

@@ -1,15 +1,15 @@
 <template>
-  <div v-if="mini" style="text-align: center;" @click.stop="actionHandler">
+  <div v-if="mini" style="text-align: center;">
     <div
       style="height: 60px; width: 60px; line-height: 60px; margin: 0 auto; border-radius: 5px;"
       :class="[`bg-${currentValue !== null ? `${item.color}-1` : 'grey-3'}`]"
     >
-      <q-icon
-        size="3rem"
-        :color="item.currentValue !== null ? `${item.color}-7` : 'grey-5'"
-        :name="currentValue ? 'mdi-toggle-switch-outline' : 'mdi-toggle-switch-off-outline'"
-        :class="[`${currentValue === null ? 'disabled' : !item.settings.actionTopic ? '' : 'cursor-pointer'}`]"
-      />
+      <div class='ellipsis' :style="{fontSize: `${stringLength > 5 ? 16 : 18}px`}">
+        {{`${currentLabel}`}}
+      </div>
+      <q-tooltip ref="tooltip">
+        {{`${currentLabel} (${currentValue})`}}
+      </q-tooltip>
     </div>
     <div class="ellipsis q-mt-sm">{{item.name}}</div>
   </div>
@@ -44,14 +44,17 @@
       </transition>
     </q-item>
     <q-card-media class="widget__content" :class="[`bg-${item.color}-1`]" style="height: calc(100% - 22px);">
-      <q-icon
-        @click.native.stop="actionHandler"
-        size="3.8rem"
-        :color="item.currentValue !== null ? `${item.color}-7` : 'grey-5'"
-        :name="currentValue ? 'mdi-toggle-switch-outline' : 'mdi-toggle-switch-off-outline'"
-        style="width: 100%; height: 100%;"
-        :class="[`${currentValue === null ? 'disabled' : actionTopic ? 'cursor-pointer' : ''}`]"
-      />
+      <q-list style="height: 100%; overflow: auto;" no-border>
+        <q-item tag="label" v-for="(listItem, index) in item.settings.items" :key="`${index}${listItem.value}`">
+          <q-item-side>
+            <q-radio v-model="currentValue" :val="listItem.val" :color="`${item.color}-7`" />
+          </q-item-side>
+          <q-item-main class="cursor-pointer">
+            <q-item-tile label>{{listItem.label}}<span class="text-grey-7 q-ml-xs">({{listItem.val || '*Empty*'}})</span></q-item-tile>
+            <q-item-tile v-if="item.settings.mode === COMMAND_MODE" sublabel>{{listItem.actionTopic}}<span class="text-grey-7 q-ml-xs">({{listItem.actionPayload || '*Empty*'}})</span></q-item-tile>
+          </q-item-main>
+        </q-item>
+      </q-list>
     </q-card-media>
   </q-card>
 </template>
@@ -73,68 +76,64 @@
 
 <script>
 import { WIDGET_STATUS_DISABLED } from '../../../constants'
-import { DEFAULT_MODE, COMMAND_MODE, ACCUMULATE_AND_MODE, ACCUMULATE_OR_MODE } from './constants.js'
+import { DEFAULT_MODE, COMMAND_MODE } from './constants.js'
 export default {
-  name: 'Switcher',
+  name: 'Singleselect',
   props: ['item', 'index', 'value', 'mini', 'in-shortcuts', 'blocked'],
   data () {
     return {
-      WIDGET_STATUS_DISABLED
+      WIDGET_STATUS_DISABLED,
+      DEFAULT_MODE,
+      COMMAND_MODE,
+      actionTopic: null,
+      actionPayload: ''
     }
   },
   computed: {
-    currentValue () {
-      let mode = this.item.settings.accumulateLogic
-      let initValue = mode === ACCUMULATE_AND_MODE
-      return Object.keys(this.value).reduce((result, topic) => {
-        if (result === null) { return result }
-        let value = this.value[topic] !== null ? this.value[topic].toString() : this.value[topic]
-        switch (mode) {
-          case ACCUMULATE_AND_MODE: {
-            result = value === this.item.settings.trueValue
-              ? result && true : value === this.item.settings.falseValue
-                ? result && false : null
-            break
-          }
-          case ACCUMULATE_OR_MODE: {
-            result = value === this.item.settings.trueValue
-              ? result || true : value === this.item.settings.falseValue
-                ? result || false : null
-            break
-          }
-        }
-        return result
-      }, initValue)
+    currentLabel () {
+      let value = this.value[Object.keys(this.value)[0]]
+      if (value === null) {
+        return 'N/A'
+      } else {
+        return this.item.settings.items.filter(item => item.val === this.currentValue)[0].label
+      }
     },
-    actionTopic () {
-      if (this.currentValue === null) {
-        return null
-      } else if (this.item.settings.mode === COMMAND_MODE) {
-        return this.currentValue ? this.item.settings.falseActionTopic : this.item.settings.trueActionTopic
-      } else if (this.item.topics.length === 1) {
-        return this.item.topics[0]
-      } else if (this.item.settings.mode === DEFAULT_MODE) {
-        return this.item.settings.actionTopic
+    stringLength () {
+      return this.currentLabel.length
+    },
+    currentValue: {
+      get () {
+        let value = this.value[Object.keys(this.value)[0]]
+        if (value === null) {
+          return null
+        } else {
+          return value.toString()
+        }
+      },
+      set (val) {
+        this.setAction(val)
+        this.actionHandler()
       }
     }
   },
   methods: {
-    getValue () {
-      if (this.item.settings.mode === COMMAND_MODE) {
-        return this.currentValue ? this.item.settings.falsePayload : this.item.settings.truePayload
+    setAction (val) {
+      let topic = '',
+        payload = ''
+      if (this.item.settings.mode === DEFAULT_MODE) {
+        topic = Object.keys(this.value)[0]
+        payload = val
       } else {
-        return Object.keys(this.value).reduce((result, topic) => {
-          let value = this.value[topic] !== null ? this.value[topic].toString() : this.value[topic]
-          return (value === this.item.settings.trueValue) && (result === this.item.settings.trueValue)
-            ? this.item.settings.falseValue : (value === this.item.settings.falseValue) && (result === this.item.settings.falseValue)
-              ? this.item.settings.trueValue : value
-                ? this.item.settings.falseValue : this.item.settings.trueValue
-        }, this.item.settings.falseValue)
+        let currentItem = this.item.settings.items.filter(item => item.val === val)[0]
+        topic = currentItem.actionTopic
+        payload = currentItem.actionPayload
       }
+      this.actionTopic = topic
+      this.actionPayload = payload
     },
     actionHandler () {
-      if (this.currentValue !== null && this.actionTopic) {
-        let data = {topic: this.actionTopic, payload: this.getValue(), settings: {retain: this.item.settings.save}}
+      if (this.actionTopic !== null) {
+        let data = {topic: this.actionTopic, payload: this.actionPayload, settings: {retain: this.item.settings.save}}
         this.$emit('action', data)
       }
     }

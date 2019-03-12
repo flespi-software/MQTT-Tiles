@@ -24,22 +24,22 @@
           </div>
         </div>
         <q-field
-          v-if="!(this.currentSettings.settings.single && this.currentSettings.topics.length > 0) || this.currentSettings.settings.single === undefined"
           :error="!isValidCurrentTopics"
-          error-label="Recheck your topics, please"
+          error-label="You must add all topics, which used by widget"
         >
           <q-chips-input
+            v-if="!(this.currentSettings.settings.maxTopicsLength && this.currentSettings.topics.length >= this.currentSettings.settings.maxTopicsLength) || this.currentSettings.settings.maxTopicsLength === undefined"
             v-model="currentSettings.topics"
             color="dark"
             float-label="Topics"
             add-icon="mdi-plus"
             :error="!isValidCurrentTopics"
           />
+          <div class="q-my-sm" style="font-size: .8rem;" v-else>
+            <span class="q-mr-xs q-mt-xs" :class="{'text-red-6':  !currentSettings.topics.length}" style="display: inline-flex; font-size: .9rem; line-height: 26px; vertical-align: bottom;">Topics: </span>
+            <q-chip class="q-mr-xs q-mt-xs" small v-for="(topic, index) in currentSettings.topics" :key="topic" closable @hide="removeTopicHandler(index)">{{topic}}</q-chip>
+          </div>
         </q-field>
-        <div class="q-my-sm" style="font-size: .8rem;" v-else>
-          <span class="q-mr-xs q-mt-xs" :class="{'text-red-6':  !currentSettings.topics.length}" style="display: inline-flex; font-size: .9rem; line-height: 26px; vertical-align: bottom;">Topics: </span>
-          <q-chip class="q-mr-xs q-mt-xs" small v-for="(topic, index) in currentSettings.topics" :key="topic" closable @hide="removeTopicHandler(index)">{{topic}}</q-chip>
-        </div>
         <component
           :is="currentSettings.type"
           :widget="currentSettings"
@@ -85,6 +85,10 @@ import validateTopic from '../../mixins/validateTopic.js'
 import Switcher from './swither/Schema'
 import Informer from './informer/Schema'
 import Clicker from './clicker/Schema'
+import Radial from './radial/Schema'
+import Linear from './linear/Schema'
+import Frame from './frame/Schema'
+import Singleselect from './singleselect/Schema'
 
 const DEFAULT_TOPIC = 'path/to/data'
 
@@ -106,7 +110,11 @@ export default {
       typeOptions: [
         {label: 'Toggle', value: 'switcher'},
         {label: 'Text', value: 'informer'},
-        {label: 'Button', value: 'clicker'}
+        {label: 'Button', value: 'clicker'},
+        {label: 'Radial guage', value: 'radial'},
+        {label: 'Linear guage', value: 'linear'},
+        {label: 'Iframe', value: 'frame'},
+        {label: 'Singleselect', value: 'singleselect'}
       ],
       colors: ['grey', 'red', 'green', 'orange', 'blue', 'light-blue'],
       isValideSchema: true,
@@ -126,7 +134,8 @@ export default {
       return !!this.currentSettings.topics.length &&
         this.currentSettings.topics.every(topic => this.validateTopic(topic)) &&
         /* check topics don`t duplicating */
-        this.currentSettings.topics.every(topic => this.currentSettings.topics.filter(topicCompare => topicCompare === topic).length === 1)
+        this.currentSettings.topics.every(topic => this.currentSettings.topics.filter(topicCompare => topicCompare === topic).length === 1) &&
+        (!this.currentSettings.settings.maxTopicsLength || (this.currentSettings.settings.maxTopicsLength && this.currentSettings.settings.maxTopicsLength === this.currentSettings.topics.length))
     }
   },
   methods: {
@@ -168,7 +177,7 @@ export default {
   },
   mixins: [validateTopic],
   components: {
-    Switcher, Informer, Clicker
+    Switcher, Informer, Clicker, Radial, Linear, Frame, Singleselect
   }
 }
 </script>

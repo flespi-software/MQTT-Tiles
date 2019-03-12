@@ -75,7 +75,9 @@ module.exports = function (ctx) {
         'QBtnToggle',
         'QChipsInput',
         'QField',
-        'QResizeObservable'
+        'QResizeObservable',
+        'QCollapsible',
+        'QRadio'
       ],
       directives: [
         'Ripple',
