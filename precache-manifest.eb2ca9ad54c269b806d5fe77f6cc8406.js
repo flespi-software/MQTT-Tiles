@@ -4,32 +4,32 @@ self.__precacheManifest = [
     "url": "js/02e96fcc.ae1fe33a.js"
   },
   {
+    "revision": "d7d55e7eed5ee8835e5f",
+    "url": "css/1e0dddf1.763633d4.css"
+  },
+  {
+    "revision": "d7d55e7eed5ee8835e5f",
+    "url": "js/1e0dddf1.4408bde4.js"
+  },
+  {
     "revision": "a9ff913a3c17b881b663",
     "url": "js/4b47640d.21cfc388.js"
   },
   {
-    "revision": "16e25da3d2a4775afb60",
+    "revision": "50c27199f6bb29211120",
     "url": "css/607658c8.516c1991.css"
   },
   {
-    "revision": "16e25da3d2a4775afb60",
-    "url": "js/607658c8.2b110bee.js"
+    "revision": "50c27199f6bb29211120",
+    "url": "js/607658c8.d6d2e21c.js"
   },
   {
-    "revision": "07e4c57908f21c82f298",
+    "revision": "9288917f597204d40b84",
     "url": "css/app.84aa3979.css"
   },
   {
-    "revision": "07e4c57908f21c82f298",
-    "url": "js/app.2f3555eb.js"
-  },
-  {
-    "revision": "5405d6957da5684b04c7",
-    "url": "css/c53347ac.763633d4.css"
-  },
-  {
-    "revision": "5405d6957da5684b04c7",
-    "url": "js/c53347ac.a01f506b.js"
+    "revision": "9288917f597204d40b84",
+    "url": "js/app.846ace7b.js"
   },
   {
     "revision": "0564a58ab2750f80c284",
@@ -48,10 +48,6 @@ self.__precacheManifest = [
     "url": "fonts/KFOkCnqEu92Fr1MmgVxIIzQ.e9dbbe8a.woff"
   },
   {
-    "revision": "8c2ade503b34e31430d6c98aa29a52a3",
-    "url": "fonts/KFOlCnqEu92Fr1MmYUtfBBc-.8c2ade50.woff"
-  },
-  {
     "revision": "a1471d1d6431c893582a5f6a250db3f9",
     "url": "fonts/KFOlCnqEu92Fr1MmSU5fBBc-.a1471d1d.woff"
   },
@@ -60,12 +56,16 @@ self.__precacheManifest = [
     "url": "fonts/KFOmCnqEu92Fr1Mu4mxM.bafb105b.woff"
   },
   {
-    "revision": "cf6613d1adf490972c557a8e318e0868",
-    "url": "fonts/KFOlCnqEu92Fr1MmWUlfBBc-.cf6613d1.woff"
-  },
-  {
     "revision": "de8b7431b74642e830af4d4f4b513ec9",
     "url": "fonts/KFOlCnqEu92Fr1MmEU9fBBc-.de8b7431.woff"
+  },
+  {
+    "revision": "8c2ade503b34e31430d6c98aa29a52a3",
+    "url": "fonts/KFOlCnqEu92Fr1MmYUtfBBc-.8c2ade50.woff"
+  },
+  {
+    "revision": "cf6613d1adf490972c557a8e318e0868",
+    "url": "fonts/KFOlCnqEu92Fr1MmWUlfBBc-.cf6613d1.woff"
   },
   {
     "revision": "8a9a261c8b8dfe90db11f1817a9d22e1",
@@ -92,12 +92,12 @@ self.__precacheManifest = [
     "url": "statics/quasar-logo.png"
   },
   {
-    "revision": "8c4120b4e88276badbc808e518572fad",
-    "url": "statics/icons/icon-192x192.png"
-  },
-  {
     "revision": "da2b422e2895b9b9c1782a71b6be9d63",
     "url": "statics/icons/apple-icon-152x152.png"
+  },
+  {
+    "revision": "8c4120b4e88276badbc808e518572fad",
+    "url": "statics/icons/icon-192x192.png"
   },
   {
     "revision": "20c6420ccf16a07d9d56538e30a6b524",
@@ -116,7 +116,7 @@ self.__precacheManifest = [
     "url": "statics/icons/icon-512x512.png"
   },
   {
-    "revision": "40840ee9376be9c36931cb44b597e9bf",
+    "revision": "291daf596fc284dc94cfa92d7d94a5d4",
     "url": "index.html"
   }
 ];
