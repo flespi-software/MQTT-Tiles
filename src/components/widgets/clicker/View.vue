@@ -1,13 +1,13 @@
 <template>
   <div v-if="mini" style="text-align: center;" @click.stop="actionHandler">
-    <div style="height: 60px; width: 60px; line-height: 60px; margin: 0 auto; border-radius: 5px;" :class="[`bg-${currentValue !== null ? `${item.color}-1` : 'grey-3'}`]">
+    <div style="height: 60px; width: 60px; line-height: 60px; margin: 0 auto; border-radius: 5px;" :class="[`bg-${item.color}-1`]">
       <q-btn
         :disabled="item.status === WIDGET_STATUS_DISABLED"
         size="0.8rem"
         dense
         round
         icon="mdi-send"
-        :color="currentValue !== null ? `${item.color}-7` : `${item.color}-4`"
+        :color="`${item.color}-7`"
       />
       <q-tooltip>Payload{{item.settings.payload ? `: ${item.settings.payload}` : ' is empty'}}</q-tooltip>
     </div>
@@ -47,7 +47,7 @@
       <q-btn
         class="payload__button"
         :disabled="item.status === WIDGET_STATUS_DISABLED"
-        :color="`${item.color}-${currentValue === null ? 4 : 7}`"
+        :color="`${item.color}-7`"
         :label="item.settings.label || 'Send'"
         rounded
         @click="actionHandler"
@@ -94,14 +94,9 @@ export default {
       WIDGET_STATUS_DISABLED
     }
   },
-  computed: {
-    currentValue () {
-      return this.value[this.item.topics[0]]
-    }
-  },
   methods: {
     actionHandler () {
-      let data = {topic: this.item.topics[0], payload: this.item.settings.payload, settings: {retain: this.item.settings.save}}
+      let data = {topic: this.item.settings.topic, payload: this.item.settings.payload, settings: {retain: this.item.settings.save}}
       this.$emit('action', data)
     }
   }

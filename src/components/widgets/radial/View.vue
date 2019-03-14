@@ -168,15 +168,11 @@ export default {
       }, {})
     },
     currentValueText () {
-      return this.valuesBySettings[Object.keys(this.value)[0]]
+      return this.valuesBySettings[this.item.topics[0]]
     },
     currentValue () {
-      let value = Object.keys(this.value).reduce((result, topic) => {
-        if (this.item.settings.minValueMode === WIDGET_RANGE_VALUE_DATASOURCE_MODE && this.item.settings.minValueTopic === topic) { return result }
-        if (this.item.settings.maxValueMode === WIDGET_RANGE_VALUE_DATASOURCE_MODE && this.item.settings.maxValueTopic === topic) { return result }
-        return typeof this.valuesBySettings[topic] === 'number' ? this.valuesBySettings[topic] : 0
-      }, 0)
-      return value
+      let value = parseFloat(this.value[this.item.topics[0]])
+      return Number.isNaN(value) ? 0 : value
     },
     stringLength () {
       return this.currentValueText.length + this.item.settings.units.length
@@ -184,12 +180,14 @@ export default {
     maxValue () {
       return this.item.settings.maxValueMode === WIDGET_RANGE_VALUE_CURRENT_MODE
         ? this.item.settings.maxValue
-        : this.valuesBySettings[this.item.settings.maxValueTopic]
+        : this.item.settings.minValueMode === WIDGET_RANGE_VALUE_DATASOURCE_MODE
+          ? this.valuesBySettings[this.item.settings.topics[1]]
+          : this.valuesBySettings[this.item.settings.topics[0]]
     },
     minValue () {
       return this.item.settings.minValueMode === WIDGET_RANGE_VALUE_CURRENT_MODE
         ? this.item.settings.minValue
-        : this.valuesBySettings[this.item.settings.minValueTopic]
+        : this.valuesBySettings[this.item.settings.topics[0]]
     },
     options () {
       let settings = this.item.settings,

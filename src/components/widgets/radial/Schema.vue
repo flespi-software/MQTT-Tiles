@@ -9,17 +9,17 @@
       </div>
       <div class="col-3">
         <q-input v-if="currentSettings.minValueMode === 0" type="number" color="dark" v-model="currentSettings.minValue" float-label="Min value"/>
-        <q-input v-else color="dark" v-model="currentSettings.minValueTopic" float-label="Min value topic" :error="!widget.topics.includes(currentSettings.minValueTopic)"/>
+        <q-input v-else color="dark" v-model="minValue" float-label="Min value topic" :error="widget.dataTopics.includes(currentSettings.topics[0]) || !validateTopic(currentSettings.topics[0])"/>
       </div>
       <div class="col-3">
-        <q-select class="q-mr-sm" color="dark" v-model="currentSettings.minValueMode" float-label="Min value source" :options="rangeValueModeOptions" @input="changeRangeValueTypeHandler"/>
+        <q-select class="q-mr-sm" color="dark" v-model="currentSettings.minValueMode" float-label="Min value source" :options="rangeValueModeOptions" @input="changeRangeValueTypeHandler('min')"/>
       </div>
       <div class="col-3">
         <q-input v-if="currentSettings.maxValueMode === 0" class="q-ml-sm" type="number" color="dark" v-model="currentSettings.maxValue" float-label="Max value"/>
-        <q-input v-else class="q-ml-sm" color="dark" v-model="currentSettings.maxValueTopic" float-label="Max value topic"  :error="!widget.topics.includes(currentSettings.maxValueTopic)"/>
+        <q-input v-else class="q-ml-sm" color="dark" v-model="maxValue" float-label="Max value topic" :error="widget.dataTopics.includes(currentSettings.topics[1]) || !validateTopic(currentSettings.topics[1])"/>
       </div>
       <div class="col-3">
-        <q-select color="dark" v-model="currentSettings.maxValueMode" float-label="Max value source" :options="rangeValueModeOptions" @input="changeRangeValueTypeHandler"/>
+        <q-select color="dark" v-model="currentSettings.maxValueMode" float-label="Max value source" :options="rangeValueModeOptions" @input="changeRangeValueTypeHandler('max')"/>
       </div>
       <div class="col-4">
         <q-input class="q-mr-sm" type="number" color="dark" v-model="currentSettings.lowLevel" float-label="Low level"/>
@@ -38,6 +38,8 @@
 </template>
 
 <script>
+import Vue from 'vue'
+import validateTopic from '../../../mixins/validateTopic.js'
 import {
   WIDGET_PAYLOAD_TYPE_NUMBER,
   WIDGET_PAYLOAD_TYPE_JSON,
@@ -53,11 +55,10 @@ export default {
       midLevel: 100,
       highLevel: 120,
       minValue: 0,
+      topics: [],
       minValueMode: WIDGET_RANGE_VALUE_CURRENT_MODE,
-      minValueTopic: 'min-value-topic',
       maxValue: 250,
       maxValueMode: WIDGET_RANGE_VALUE_CURRENT_MODE,
-      maxValueTopic: 'max-value-topic',
       units: '',
       height: 6,
       width: 3,
@@ -80,26 +81,65 @@ export default {
       ]
     }
   },
+  computed: {
+    minValue: {
+      get () {
+        return this.currentSettings.topics[0]
+      },
+      set (val) {
+        Vue.set(this.currentSettings.topics, 0, val)
+      }
+    },
+    maxValue: {
+      get () {
+        return this.currentSettings.minValueMode === WIDGET_RANGE_VALUE_CURRENT_MODE
+          ? this.currentSettings.topics[0]
+          : this.currentSettings.topics[1]
+      },
+      set (val) {
+        this.currentSettings.minValueMode === WIDGET_RANGE_VALUE_CURRENT_MODE
+          ? Vue.set(this.currentSettings.topics, 0, val)
+          : Vue.set(this.currentSettings.topics, 1, val)
+      }
+    }
+  },
   methods: {
     changePayloadTypeHandler (type) {
       if (!type) {
         this.currentSettings.payloadField = ''
       }
     },
-    changeRangeValueTypeHandler () {
-      let topicsLength = 1
-      if (this.currentSettings.minValueMode === WIDGET_RANGE_VALUE_DATASOURCE_MODE) { topicsLength++ }
-      if (this.currentSettings.maxValueMode === WIDGET_RANGE_VALUE_DATASOURCE_MODE) { topicsLength++ }
-      this.currentSettings.maxTopicsLength = topicsLength
+    changeRangeValueTypeHandler (type) {
+      let topics = []
+      if (this.currentSettings.minValueMode === WIDGET_RANGE_VALUE_DATASOURCE_MODE) {
+        if (type === 'max') {
+          topics.push(this.currentSettings.topics[0])
+        } else {
+          topics.push('min/value/topic')
+        }
+      }
+      if (this.currentSettings.maxValueMode === WIDGET_RANGE_VALUE_DATASOURCE_MODE) {
+        if (type === 'min') {
+          if (this.currentSettings.minValueMode === WIDGET_RANGE_VALUE_DATASOURCE_MODE) {
+            topics.push(this.currentSettings.topics[0])
+          } else {
+            topics.push(this.currentSettings.topics[1])
+          }
+        } else {
+          topics.push('max/value/topic')
+        }
+      }
+      Vue.set(this.currentSettings, 'topics', topics)
     },
     validate () {
-      return (this.currentSettings.minValueMode === WIDGET_RANGE_VALUE_CURRENT_MODE || (this.currentSettings.minValueMode === WIDGET_RANGE_VALUE_DATASOURCE_MODE && this.widget.topics.includes(this.currentSettings.minValueTopic))) &&
-        (this.currentSettings.maxValueMode === WIDGET_RANGE_VALUE_CURRENT_MODE || (this.currentSettings.maxValueMode === WIDGET_RANGE_VALUE_DATASOURCE_MODE && this.widget.topics.includes(this.currentSettings.maxValueTopic)))
+      return (this.currentSettings.minValueMode === WIDGET_RANGE_VALUE_CURRENT_MODE || (this.currentSettings.minValueMode === WIDGET_RANGE_VALUE_DATASOURCE_MODE && !this.widget.dataTopics.includes(this.currentSettings.topics[0]))) &&
+        (this.currentSettings.maxValueMode === WIDGET_RANGE_VALUE_CURRENT_MODE || (this.currentSettings.maxValueMode === WIDGET_RANGE_VALUE_DATASOURCE_MODE && !this.widget.dataTopics.includes(this.currentSettings.topics[1])))
     }
   },
   created () {
     this.$emit('update', this.currentSettings)
   },
+  mixins: [validateTopic],
   watch: {
     widget: {
       deep: true,

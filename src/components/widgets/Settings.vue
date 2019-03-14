@@ -26,18 +26,19 @@
         <q-field
           :error="!isValidCurrentTopics"
           error-label="You must add all topics, which used by widget"
+          v-if="this.currentSettings.settings.maxTopicsLength !== 0"
         >
           <q-chips-input
-            v-if="!(this.currentSettings.settings.maxTopicsLength && this.currentSettings.topics.length >= this.currentSettings.settings.maxTopicsLength) || this.currentSettings.settings.maxTopicsLength === undefined"
-            v-model="currentSettings.topics"
+            v-if="!(this.currentSettings.settings.maxTopicsLength && this.currentSettings.dataTopics.length >= this.currentSettings.settings.maxTopicsLength) || this.currentSettings.settings.maxTopicsLength === undefined"
+            v-model="currentSettings.dataTopics"
             color="dark"
             float-label="Topics"
             add-icon="mdi-plus"
             :error="!isValidCurrentTopics"
           />
           <div class="q-my-sm" style="font-size: .8rem;" v-else>
-            <span class="q-mr-xs q-mt-xs" :class="{'text-red-6':  !currentSettings.topics.length}" style="display: inline-flex; font-size: .9rem; line-height: 26px; vertical-align: bottom;">Topics: </span>
-            <q-chip class="q-mr-xs q-mt-xs" small v-for="(topic, index) in currentSettings.topics" :key="topic" closable @hide="removeTopicHandler(index)">{{topic}}</q-chip>
+            <span class="q-mr-xs q-mt-xs" :class="{'text-red-6':  !currentSettings.dataTopics.length}" style="display: inline-flex; font-size: .9rem; line-height: 26px; vertical-align: bottom;">Topics: </span>
+            <q-chip class="q-mr-xs q-mt-xs" small v-for="(topic, index) in currentSettings.dataTopics" :key="topic" closable @hide="removeTopicHandler(index)">{{topic}}</q-chip>
           </div>
         </q-field>
         <component
@@ -79,6 +80,7 @@
 
 <script>
 import merge from 'lodash/merge'
+import uniq from 'lodash/uniq'
 import Vue from 'vue'
 import { WIDGET_STATUS_DISABLED } from '../../constants'
 import validateTopic from '../../mixins/validateTopic.js'
@@ -101,6 +103,7 @@ export default {
       color: 'grey',
       type: 'switcher',
       topics: [],
+      dataTopics: [], // topics for datasource
       settings: {},
       status: WIDGET_STATUS_DISABLED
     }
@@ -124,18 +127,19 @@ export default {
   computed: {
     validateCurrentSettings () {
       return !!this.currentSettings.name &&
-        !!this.isValidCurrentTopics
+        !!this.isValidCurrentTopics &&
+        this.currentSettings.topics.every(topic => this.validateTopic(topic))
     },
     status: {
       get () { return this.value },
       set (value) { this.$emit('input', value) }
     },
     isValidCurrentTopics () {
-      return !!this.currentSettings.topics.length &&
-        this.currentSettings.topics.every(topic => this.validateTopic(topic)) &&
+      return (!!this.currentSettings.dataTopics.length || this.currentSettings.settings.maxTopicsLength === 0) &&
+        this.currentSettings.dataTopics.every(topic => this.validateTopic(topic)) &&
         /* check topics don`t duplicating */
-        this.currentSettings.topics.every(topic => this.currentSettings.topics.filter(topicCompare => topicCompare === topic).length === 1) &&
-        (!this.currentSettings.settings.maxTopicsLength || (this.currentSettings.settings.maxTopicsLength && this.currentSettings.settings.maxTopicsLength === this.currentSettings.topics.length))
+        this.currentSettings.dataTopics.every(topic => this.currentSettings.dataTopics.filter(topicCompare => topicCompare === topic).length === 1) &&
+        (this.currentSettings.settings.maxTopicsLength === undefined || (this.currentSettings.settings.maxTopicsLength !== undefined && this.currentSettings.settings.maxTopicsLength === this.currentSettings.dataTopics.length))
     }
   },
   methods: {
@@ -160,19 +164,33 @@ export default {
       this.isValideSchema = status
     },
     addTopicHandler () {
-      this.currentSettings.topics.push(this.currentTopic)
+      this.currentSettings.dataTopics.push(this.currentTopic)
       this.currentTopic = DEFAULT_TOPIC
     },
     removeTopicHandler (index) {
-      Vue.delete(this.currentSettings.topics, index)
+      Vue.delete(this.currentSettings.dataTopics, index)
     },
     updateSettingsHandler (settings) {
       Vue.set(this.currentSettings, 'settings', settings)
+    },
+    generateTopics () {
+      let topics = [...this.currentSettings.dataTopics]
+      /* topics for uniq widget logic */
+      if (this.currentSettings.settings.topics) {
+        topics = uniq([...topics, ...this.currentSettings.settings.topics])
+      }
+      return topics
     }
   },
   watch: {
     settings (settings) {
       this.currentSettings = merge({}, this.defaultSettings, settings)
+    },
+    'currentSettings.dataTopics' () {
+      this.currentSettings.topics = this.generateTopics()
+    },
+    'currentSettings.settings.topics' () {
+      this.currentSettings.topics = this.generateTopics()
     }
   },
   mixins: [validateTopic],

@@ -321,7 +321,7 @@ export default {
         this.subscribe(topics, { qos: 1 })
       }
     },
-    widgetLayoutSetup (width, height, breakpoint) {
+    widgetLayoutSetup (width, height, id, breakpoint) {
       let board = this.boards[this.activeBoardId],
         colNum = this.colsByBreakpoint[breakpoint],
         layout = board.layouts[breakpoint],
@@ -343,14 +343,14 @@ export default {
       layout.push({
         h: height,
         w: width,
-        i: board.widgetsIndexes.length,
+        i: id,
         x,
         y
       })
     },
-    widgetLayoutsSetup (width, height) {
+    widgetLayoutsSetup (width, height, id) {
       Object.keys(this.colsByBreakpoint).forEach(breakpoint => {
-        this.widgetLayoutSetup(width, height, breakpoint)
+        this.widgetLayoutSetup(width, height, id, breakpoint)
       })
     },
     layoutUpdateHandler ({layout, breakpoint}) {
@@ -366,7 +366,7 @@ export default {
     addWidget (widget) {
       if (!widget.id) {
         widget.id = uid()
-        this.widgetLayoutsSetup(widget.settings.width, widget.settings.height)
+        this.widgetLayoutsSetup(widget.settings.width, widget.settings.height, widget.id)
         this.boards[this.activeBoardId].widgetsIndexes.push(widget.id)
       }
       widget.topics.forEach(topic => {
