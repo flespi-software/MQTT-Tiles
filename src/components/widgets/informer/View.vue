@@ -1,12 +1,12 @@
 <template>
   <div v-if="mini" style="text-align: center;" @click.stop="showTooltip">
-    <div style="height: 60px; width: 60px; line-height: 60px; margin: 0 auto; border-radius: 5px;" :class="[`bg-${firstValue !== null ? `${item.color}-1` : 'grey-3'}`]">
+    <div style="height: 60px; width: 60px; line-height: 60px; margin: 0 auto; border-radius: 5px;" :class="[`bg-${text !== null ? `${item.color}-1` : 'grey-3'}`]">
       <div class='ellipsis' :style="{fontSize: `${stringLength > 5 ? 16 : 18}px`}">
-        <span style="font-weight: bold;">{{`${item.settings.prefix}`}}</span>{{`${firstValue}`}}<span style="font-weight: bold;">{{`${item.settings.postfix}`}}</span>
+        <span style="font-weight: bold;">{{`${item.settings.prefix}`}}</span>{{`${text}`}}<span style="font-weight: bold;">{{`${item.settings.postfix}`}}</span>
       </div>
       <q-tooltip ref="tooltip">
         <span style="font-weight: bold;">{{`${item.settings.prefix}`}}</span>
-        {{`${firstValue}`}}
+        {{`${text}`}}
         <span style="font-weight: bold;">{{`${item.settings.postfix}`}}</span>
       </q-tooltip>
     </div>
@@ -43,25 +43,29 @@
       </transition>
     </q-item>
     <q-card-media class="widget__content" :class="[`bg-${item.color}-1`]" style="height: calc(100% - 29px);">
-      <div style="width: 100%; height: 100%;">
-        <div class="informer__payload" :style="{height: `${blocked ? '100%' : 'calc(100% - 15px)'}`}">
-          <div v-for="topic in Object.keys(value)" :key="topic" :class="[`text-${value[topic] !== null ? 'dark' : 'grey-5'}`]">
+      <div class="informer__payload-wrapper" :style="{height: `${blocked ? '100%' : 'calc(100% - 15px)'}`}">
+        <span class="informer__payload" :class="[`text-${value[topic] !== null ? 'dark' : 'grey-5'}`]">
+          <span style="font-weight: bold;">{{`${item.settings.prefix}`}}</span>
+          {{text}}
+          <span style="font-weight: bold;">{{`${item.settings.postfix}`}}</span>
+          <q-tooltip>
             <span style="font-weight: bold;">{{`${item.settings.prefix}`}}</span>
-            {{valuesBySettings[topic]}}
+            {{text}}
             <span style="font-weight: bold;">{{`${item.settings.postfix}`}}</span>
-            <q-tooltip>
-              <span style="font-weight: bold;">{{`${item.settings.prefix}`}}</span>
-              {{valuesBySettings[topic]}}
-              <span style="font-weight: bold;">{{`${item.settings.postfix}`}}</span>
-            </q-tooltip>
-          </div>
-        </div>
+          </q-tooltip>
+        </span>
       </div>
     </q-card-media>
   </q-card>
 </template>
 
 <style lang="stylus">
+  .informer__payload-wrapper
+    display inline-flex
+    align-items center
+    justify-content center
+    vertical-align middle
+    width 100%
   .informer__payload
     font-size 1.2rem
     word-break break-all
@@ -85,7 +89,8 @@
 </style>
 
 <script>
-import { WIDGET_STATUS_DISABLED, WIDGET_PAYLOAD_TYPE_STRING, WIDGET_PAYLOAD_TYPE_JSON } from '../../../constants'
+import { WIDGET_STATUS_DISABLED } from '../../../constants'
+import getValueByTopic from '../../../mixins/getValueByTopic.js'
 export default {
   name: 'Informer',
   props: ['item', 'index', 'mini', 'in-shortcuts', 'value', 'blocked'],
@@ -99,43 +104,19 @@ export default {
       if (this.$q.platform.is.mobile) {
         this.$refs.tooltip.toogle()
       }
-    },
-    getValueBySettings (value) {
-      if (value === null) {
-        value = 'N/A'
-      } else {
-        switch (this.item.settings.payloadType) {
-          case WIDGET_PAYLOAD_TYPE_STRING: {
-            value = value.toString()
-            break
-          }
-          case WIDGET_PAYLOAD_TYPE_JSON: {
-            if (this.item.settings.payloadField) {
-              value = JSON.parse(value.toString())[this.item.settings.payloadField] || 'N/A'
-            } else {
-              value = JSON.parse(value.toString())
-            }
-            break
-          }
-          default: { value = value.toString() }
-        }
-      }
-      return value
     }
   },
   computed: {
-    valuesBySettings () {
-      return Object.keys(this.value).reduce((values, topic) => {
-        values[topic] = this.getValueBySettings(this.value[topic])
-        return values
-      }, {})
+    topic () {
+      return this.item.dataTopics[0].topicFilter
     },
-    firstValue () {
-      return this.valuesBySettings[Object.keys(this.value)[0]]
+    text () {
+      return this.getValueByTopic(this.value[this.topic], this.item.dataTopics[0])
     },
     stringLength () {
-      return this.item.settings.prefix.length + this.firstValue.length + this.item.settings.postfix.length
+      return this.item.settings.prefix.length + this.text.length + this.item.settings.postfix.length
     }
-  }
+  },
+  mixins: [getValueByTopic]
 }
 </script>

@@ -464,7 +464,7 @@ export default {
       })
     },
     resizeHandler ({index, height, width}) {
-      let widget = this.widgets[this.boards[this.activeBoardId].widgetsIndexes[index]]
+      let widget = this.widgets[index]
       Vue.set(widget.settings, 'height', height)
       Vue.set(widget.settings, 'width', width)
     },

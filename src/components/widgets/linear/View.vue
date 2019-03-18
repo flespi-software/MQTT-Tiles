@@ -77,11 +77,10 @@
 <script>
 import {
   WIDGET_STATUS_DISABLED,
-  WIDGET_PAYLOAD_TYPE_NUMBER,
-  WIDGET_PAYLOAD_TYPE_JSON,
   WIDGET_RANGE_VALUE_CURRENT_MODE,
   WIDGET_RANGE_VALUE_DATASOURCE_MODE
 } from '../../../constants'
+import getValueByTopic from '../../../mixins/getValueByTopic.js'
 import LinearGauge from './LinearGuage'
 export default {
   name: 'Linear',
@@ -125,28 +124,6 @@ export default {
         this.$refs.tooltip.toogle()
       }
     },
-    getValueBySettings (value) {
-      if (value === null) {
-        value = 'N/A'
-      } else {
-        switch (this.item.settings.payloadType) {
-          case WIDGET_PAYLOAD_TYPE_NUMBER: {
-            value = parseFloat(value)
-            break
-          }
-          case WIDGET_PAYLOAD_TYPE_JSON: {
-            if (this.item.settings.payloadField) {
-              value = JSON.parse(value.toString())[this.item.settings.payloadField] || 'N/A'
-            } else {
-              value = JSON.parse(value.toString())
-            }
-            break
-          }
-          default: { value = value.toString() }
-        }
-      }
-      return value
-    },
     onResize ({width, height}) {
       this.width = width
       this.height = height
@@ -154,16 +131,25 @@ export default {
   },
   computed: {
     valuesBySettings () {
-      return Object.keys(this.value).reduce((values, topic) => {
-        values[topic] = this.getValueBySettings(this.value[topic])
-        return values
-      }, {})
+      let valueTopic = this.item.dataTopics[0],
+        minTopic = this.item.settings.topics[0],
+        maxTopic = this.item.settings.topics[1],
+        values = {
+          [valueTopic.topicFilter]: parseFloat(this.getValueByTopic(this.value[valueTopic.topicFilter], valueTopic))
+        }
+      if (minTopic) {
+        values[minTopic.topicFilter] = parseFloat(this.getValueByTopic(this.value[minTopic.topicFilter], minTopic))
+      }
+      if (maxTopic) {
+        values[maxTopic.topicFilter] = parseFloat(this.getValueByTopic(this.value[maxTopic.topicFilter], maxTopic))
+      }
+      return values
     },
     currentValueText () {
-      return this.valuesBySettings[this.item.topics[0]]
+      return this.valuesBySettings[this.item.dataTopics[0].topicFilter]
     },
     currentValue () {
-      let value = parseFloat(this.value[this.item.topics[0]])
+      let value = this.valuesBySettings[this.item.dataTopics[0].topicFilter]
       return Number.isNaN(value) ? 0 : value
     },
     stringLength () {
@@ -173,13 +159,13 @@ export default {
       return this.item.settings.maxValueMode === WIDGET_RANGE_VALUE_CURRENT_MODE
         ? this.item.settings.maxValue
         : this.item.settings.minValueMode === WIDGET_RANGE_VALUE_DATASOURCE_MODE
-          ? this.valuesBySettings[this.item.settings.topics[1]]
-          : this.valuesBySettings[this.item.settings.topics[0]]
+          ? this.valuesBySettings[this.item.settings.topics[1].topicFilter]
+          : this.valuesBySettings[this.item.settings.topics[0].topicFilter]
     },
     minValue () {
       return this.item.settings.minValueMode === WIDGET_RANGE_VALUE_CURRENT_MODE
         ? this.item.settings.minValue
-        : this.valuesBySettings[this.item.settings.topics[0]]
+        : this.valuesBySettings[this.item.settings.topics[0].topicFilter]
     },
     options () {
       let settings = this.item.settings,
@@ -235,6 +221,7 @@ export default {
       }
     }
   },
-  components: { LinearGauge }
+  components: { LinearGauge },
+  mixins: [getValueByTopic]
 }
 </script>

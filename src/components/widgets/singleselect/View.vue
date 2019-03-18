@@ -50,8 +50,9 @@
             <q-radio v-model="currentValue" :val="listItem.val" :color="`${item.color}-7`" />
           </q-item-side>
           <q-item-main class="cursor-pointer">
-            <q-item-tile label>{{listItem.label}}<span class="text-grey-7 q-ml-xs">({{listItem.val || '*Empty*'}})</span></q-item-tile>
-            <q-item-tile v-if="item.settings.mode === COMMAND_MODE" sublabel>{{listItem.actionTopic}}<span class="text-grey-7 q-ml-xs">({{listItem.actionPayload || '*Empty*'}})</span></q-item-tile>
+            <q-item-tile label>{{listItem.label || listItem.val}}<span class="text-grey-7 q-ml-xs" v-if="listItem.label">({{listItem.val || '*Empty*'}})</span></q-item-tile>
+            <q-item-tile v-if="item.settings.mode === COMMAND_MODE" sublabel>{{listItem.actionTopic}}</q-item-tile>
+            <q-item-tile v-if="item.settings.mode === COMMAND_MODE" sublabel>({{listItem.actionPayload || '*Empty*'}})</q-item-tile>
           </q-item-main>
         </q-item>
       </q-list>
@@ -77,6 +78,7 @@
 <script>
 import { WIDGET_STATUS_DISABLED } from '../../../constants'
 import { DEFAULT_MODE, COMMAND_MODE } from './constants.js'
+import getValueByTopic from '../../../mixins/getValueByTopic.js'
 export default {
   name: 'Singleselect',
   props: ['item', 'index', 'value', 'mini', 'in-shortcuts', 'blocked'],
@@ -91,7 +93,7 @@ export default {
   },
   computed: {
     currentLabel () {
-      let value = this.value[Object.keys(this.value)[0]]
+      let value = this.value[this.item.dataTopics[0].topicFilter]
       if (value === null) {
         return 'N/A'
       } else {
@@ -103,11 +105,11 @@ export default {
     },
     currentValue: {
       get () {
-        let value = this.value[Object.keys(this.value)[0]]
+        let value = this.value[this.item.dataTopics[0].topicFilter]
         if (value === null) {
           return null
         } else {
-          return value.toString()
+          return this.getValueByTopic(value, this.item.dataTopics[0])
         }
       },
       set (val) {
@@ -121,7 +123,7 @@ export default {
       let topic = '',
         payload = ''
       if (this.item.settings.mode === DEFAULT_MODE) {
-        topic = Object.keys(this.value)[0]
+        topic = this.item.dataTopics[0].topicFilter
         payload = val
       } else {
         let currentItem = this.item.settings.items.filter(item => item.val === val)[0]
@@ -137,6 +139,7 @@ export default {
         this.$emit('action', data)
       }
     }
-  }
+  },
+  mixins: [getValueByTopic]
 }
 </script>

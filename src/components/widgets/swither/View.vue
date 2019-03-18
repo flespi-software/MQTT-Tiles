@@ -74,6 +74,7 @@
 <script>
 import { WIDGET_STATUS_DISABLED } from '../../../constants'
 import { DEFAULT_MODE, COMMAND_MODE, ACCUMULATE_AND_MODE, ACCUMULATE_OR_MODE } from './constants.js'
+import getValueByTopic from '../../../mixins/getValueByTopic.js'
 export default {
   name: 'Switcher',
   props: ['item', 'index', 'value', 'mini', 'in-shortcuts', 'blocked'],
@@ -86,9 +87,11 @@ export default {
     currentValue () {
       let mode = this.item.settings.accumulateLogic
       let initValue = mode === ACCUMULATE_AND_MODE
-      return Object.keys(this.value).reduce((result, topic) => {
+      return this.item.dataTopics.reduce((result, topicObj) => {
         if (result === null) { return result }
-        let value = this.value[topic] !== null ? this.value[topic].toString() : this.value[topic]
+        let value = this.value[topicObj.topicFilter] !== null
+          ? this.getValueByTopic(this.value[topicObj.topicFilter], topicObj)
+          : this.value[topicObj.topicFilter]
         switch (mode) {
           case ACCUMULATE_AND_MODE: {
             result = value === this.item.settings.trueValue
@@ -123,8 +126,10 @@ export default {
       if (this.item.settings.mode === COMMAND_MODE) {
         return this.currentValue ? this.item.settings.falsePayload : this.item.settings.truePayload
       } else {
-        return Object.keys(this.value).reduce((result, topic) => {
-          let value = this.value[topic] !== null ? this.value[topic].toString() : this.value[topic]
+        return this.item.dataTopics.reduce((result, topicObj) => {
+          let value = this.value[topicObj.topicFilter] !== null
+            ? this.getValueByTopic(this.value[topicObj.topicFilter], topicObj)
+            : this.value[topicObj.topicFilter]
           return (value === this.item.settings.trueValue) && (result === this.item.settings.trueValue)
             ? this.item.settings.falseValue : (value === this.item.settings.falseValue) && (result === this.item.settings.falseValue)
               ? this.item.settings.trueValue : value
@@ -138,6 +143,7 @@ export default {
         this.$emit('action', data)
       }
     }
-  }
+  },
+  mixins: [getValueByTopic]
 }
 </script>

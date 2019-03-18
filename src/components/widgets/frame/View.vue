@@ -64,6 +64,7 @@
 </style>
 
 <script>
+import getValueByTopic from '../../../mixins/getValueByTopic.js'
 export default {
   name: 'Frame',
   props: ['item', 'index', 'mini', 'in-shortcuts', 'value', 'blocked'],
@@ -87,9 +88,10 @@ export default {
   computed: {
     link () {
       let urlPattern = /\b(?:https?|ftp):\/\/[a-z0-9-+&@#/%?=~_|!:,.;]*[a-z0-9-+&@#/%=~_|]/gim
-      let linkValue = this.value[Object.keys(this.value)[0]]
+      let linkValue = this.getValueByTopic(this.value[this.item.dataTopics[0].topicFilter], this.item.dataTopics[0])
       return linkValue && linkValue.toString().match(urlPattern) ? linkValue : null
     }
-  }
+  },
+  mixins: [getValueByTopic]
 }
 </script>

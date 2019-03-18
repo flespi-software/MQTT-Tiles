@@ -23,24 +23,33 @@
             </span>
           </div>
         </div>
-        <q-field
-          :error="!isValidCurrentTopics"
-          error-label="You must add all topics, which used by widget"
-          v-if="this.currentSettings.settings.maxTopicsLength !== 0"
-        >
-          <q-chips-input
-            v-if="!(this.currentSettings.settings.maxTopicsLength && this.currentSettings.dataTopics.length >= this.currentSettings.settings.maxTopicsLength) || this.currentSettings.settings.maxTopicsLength === undefined"
-            v-model="currentSettings.dataTopics"
+        <q-list class="relative-position" v-if="this.currentSettings.settings.maxTopicsLength !== 0">
+          <q-btn
             color="dark"
-            float-label="Topics"
-            add-icon="mdi-plus"
-            :error="!isValidCurrentTopics"
+            style="top: -20px; right: 8px; position: absolute; z-index: 1130;"
+            class="col-12"
+            fab-mini
+            @click="addTopicHandler"
+            icon="mdi-plus"
+            v-if="!(this.currentSettings.settings.maxTopicsLength && this.currentSettings.dataTopics.length >= this.currentSettings.settings.maxTopicsLength) || this.currentSettings.settings.maxTopicsLength === undefined"
           />
-          <div class="q-my-sm" style="font-size: .8rem;" v-else>
-            <span class="q-mr-xs q-mt-xs" :class="{'text-red-6':  !currentSettings.dataTopics.length}" style="display: inline-flex; font-size: .9rem; line-height: 26px; vertical-align: bottom;">Topics: </span>
-            <q-chip class="q-mr-xs q-mt-xs" small v-for="(topic, index) in currentSettings.dataTopics" :key="topic" closable @hide="removeTopicHandler(index)">{{topic}}</q-chip>
-          </div>
-        </q-field>
+          <q-list-header :class="{'text-red-6': !currentSettings.dataTopics.length}">Topics{{currentSettings.dataTopics.length ? '' : ' is empty'}}</q-list-header>
+          <q-collapsible
+            v-for="(topic, index) in currentSettings.dataTopics"
+            :key="`${index}${topic.topicFilter}`"
+            :header-class="[`bg-${validateTopic(topic.topicFilter) && checkUniqueTopic(topic.topicFilter, index) ? 'grey-4' : 'red-2'}`]"
+            collapse-icon="mdi-settings"
+            :opened="true"
+          >
+            <template slot="header">
+              <q-item-main :label="topic.topicFilter || 'Empty'" />
+              <q-item-side right>
+                <q-btn flat color="red-6" rounded @click="removeTopicHandler(index)" icon="mdi-delete"/>
+              </q-item-side>
+            </template>
+            <topic v-model="currentSettings.dataTopics[index]" />
+          </q-collapsible>
+        </q-list>
         <component
           :is="currentSettings.type"
           :widget="currentSettings"
@@ -84,6 +93,7 @@ import uniq from 'lodash/uniq'
 import Vue from 'vue'
 import { WIDGET_STATUS_DISABLED } from '../../constants'
 import validateTopic from '../../mixins/validateTopic.js'
+import Topic from './components/Topic'
 import Switcher from './swither/Schema'
 import Informer from './informer/Schema'
 import Clicker from './clicker/Schema'
@@ -91,8 +101,6 @@ import Radial from './radial/Schema'
 import Linear from './linear/Schema'
 import Frame from './frame/Schema'
 import Singleselect from './singleselect/Schema'
-
-const DEFAULT_TOPIC = 'path/to/data'
 
 export default {
   name: 'Settings',
@@ -121,14 +129,18 @@ export default {
       ],
       colors: ['grey', 'red', 'green', 'orange', 'blue', 'light-blue'],
       isValideSchema: true,
-      currentTopic: DEFAULT_TOPIC
+      defaultTopic: {
+        topicFilter: '',
+        payloadType: 0,
+        payloadField: ''
+      }
     }
   },
   computed: {
     validateCurrentSettings () {
       return !!this.currentSettings.name &&
         !!this.isValidCurrentTopics &&
-        this.currentSettings.topics.every(topic => this.validateTopic(topic))
+        this.currentSettings.topics.every(topicFilter => this.validateTopic(topicFilter))
     },
     status: {
       get () { return this.value },
@@ -136,9 +148,9 @@ export default {
     },
     isValidCurrentTopics () {
       return (!!this.currentSettings.dataTopics.length || this.currentSettings.settings.maxTopicsLength === 0) &&
-        this.currentSettings.dataTopics.every(topic => this.validateTopic(topic)) &&
+        this.currentSettings.dataTopics.every(topic => this.validateTopic(topic.topicFilter)) &&
         /* check topics don`t duplicating */
-        this.currentSettings.dataTopics.every(topic => this.currentSettings.dataTopics.filter(topicCompare => topicCompare === topic).length === 1) &&
+        this.currentSettings.dataTopics.every(topic => this.currentSettings.dataTopics.filter(topicCompare => topicCompare.topicFilter === topic.topicFilter).length === 1) &&
         (this.currentSettings.settings.maxTopicsLength === undefined || (this.currentSettings.settings.maxTopicsLength !== undefined && this.currentSettings.settings.maxTopicsLength === this.currentSettings.dataTopics.length))
     }
   },
@@ -164,20 +176,28 @@ export default {
       this.isValideSchema = status
     },
     addTopicHandler () {
-      this.currentSettings.dataTopics.push(this.currentTopic)
-      this.currentTopic = DEFAULT_TOPIC
+      this.currentSettings.dataTopics.push(Object.assign({}, this.defaultTopic))
     },
     removeTopicHandler (index) {
       Vue.delete(this.currentSettings.dataTopics, index)
+    },
+    checkUniqueTopic (topic, index) {
+      let isUnique = true
+      this.currentSettings.dataTopics.map(topic => topic.topicFilter).some((currentTopic, currentTopicIndex) => {
+        let sameValue = currentTopic === topic
+        if (sameValue) { isUnique = currentTopicIndex === index }
+        return sameValue
+      })
+      return isUnique
     },
     updateSettingsHandler (settings) {
       Vue.set(this.currentSettings, 'settings', settings)
     },
     generateTopics () {
-      let topics = [...this.currentSettings.dataTopics]
+      let topics = this.currentSettings.dataTopics.map(topic => topic.topicFilter)
       /* topics for uniq widget logic */
       if (this.currentSettings.settings.topics) {
-        topics = uniq([...topics, ...this.currentSettings.settings.topics])
+        topics = uniq([...topics, ...this.currentSettings.settings.topics.map(topic => topic.topicFilter)])
       }
       return topics
     }
@@ -195,7 +215,7 @@ export default {
   },
   mixins: [validateTopic],
   components: {
-    Switcher, Informer, Clicker, Radial, Linear, Frame, Singleselect
+    Topic, Switcher, Informer, Clicker, Radial, Linear, Frame, Singleselect
   }
 }
 </script>

@@ -13,23 +13,23 @@
             v-for="(item, index) in currentSettings.items"
             :key="`${index}${item.value}`"
             group="singleselect-items"
-            icon-toggle
             :header-class="[`bg-${checkUniqueValue(item.val, index) && !!item.actionTopic ? 'grey-4' : 'red-2'}`]"
             collapse-icon="mdi-settings"
+            :opened="true"
           >
             <template slot="header">
               <q-item-side right>
                 <q-btn :disabled="index !== currentSettings.items.length - 1" dense flat class="col-1" @click="upItem(index)" icon="mdi-arrow-up"/>
                 <q-btn :disabled="index !== 0" dense flat class="col-1" @click="downItem(index)" icon="mdi-arrow-down"/>
               </q-item-side>
-              <q-item-main :label="item.label" />
+              <q-item-main :label="item.label || item.val || `item ${index + 1}`" />
               <q-item-side right>
                 <q-btn flat color="red-6" rounded @click="removeItem(index)" icon="mdi-delete"/>
               </q-item-side>
             </template>
             <div class="row">
               <div class="col-6">
-                <q-input class="q-mr-xs" color="dark" v-model="item.label" float-label="Label"/>
+                <q-input autofocus class="q-mr-xs" color="dark" v-model="item.label" float-label="Label"/>
               </div>
               <div class="col-6">
                 <q-input class="q-ml-xs" color="dark" v-model="item.val" float-label="Value" :error="!checkUniqueValue(item.val, index)"/>
@@ -75,17 +75,11 @@ export default {
       defaultSettings,
       defaultItem,
       currentItem: Object.assign({}, defaultItem),
-      editedItems: {},
       currentSettings: Object.assign({}, defaultSettings, this.widget.settings),
       modeOptions: [
         {label: 'Default mode', value: DEFAULT_MODE},
         {label: 'Command mode', value: COMMAND_MODE}
       ]
-    }
-  },
-  computed: {
-    editedItemsIndexes () {
-      return Object.keys(this.editedItems).map(index => +index)
     }
   },
   methods: {
