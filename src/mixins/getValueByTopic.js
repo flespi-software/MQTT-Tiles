@@ -17,7 +17,7 @@ export default {
               } else {
                 value = JSON.parse(value.toString())
               }
-            } catch (e) { value = value.toString() }
+            } catch (e) { value = 'N/A' }
             break
           }
           default: { value = value.toString() }
