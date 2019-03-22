@@ -10,6 +10,7 @@
       <q-toolbar color="dark">
         <q-btn class="lt-lg" flat rounded icon="mdi-menu" @click="leftDrawerOpen = !leftDrawerOpen"/>
         <q-toolbar-title style="line-height: 36px;">
+          <img src="statics/mqtttiles-logo.png" alt="MQTT Tiles" style="height: 30px; vertical-align: text-bottom;">
           MQTT Tiles
           <sup style="position: relative; font-size: .9rem; padding-left: 4px">{{version}}</sup>
         </q-toolbar-title>
