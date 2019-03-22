@@ -14,8 +14,8 @@
         <q-select color="dark" v-model="currentSettings.protocolVersion" :options="[{label: '3.1.1', value: 4}, {label: '5.0', value: 5}]" float-label="Version of MQTT"/>
         <q-checkbox style="height: 56px" color="dark" class="q-mr-sm" v-model="currentSettings.clean" :label="currentSettings.protocolVersion === 5 ? 'Clean start' : 'Clean session'"/>
         <q-input style="display: inline-flex; width: calc(100% - 115px)" color="dark" v-if="currentSettings.protocolVersion === 5" v-model="currentSettings.properties.sessionExpiryInterval" type="number" float-label="Session expiry interval" clearable :clear-value="undefined"/>
-        <q-input color="dark" v-model="currentSettings.username" float-label="Username" clearable :clear-value="undefined"/>
-        <q-input color="dark" v-model="currentSettings.password" float-label="Password" clearable :clear-value="undefined"/>
+        <q-input color="dark" v-model="currentSettings.username" float-label="Username" :clear-value="undefined" :after="[{icon: 'mdi-login', handler: flespiLoginHandler, condition: currentSettings.host.indexOf('flespi') !== -1}]"/>
+        <q-input color="dark" v-model="currentSettings.password" float-label="Password" :clear-value="undefined"/>
         <q-checkbox style="height: 56px" class="q-mr-sm" color="dark" v-model="currentSettings.syncToRetain" label="Sync boards settings"/>
         <q-input style="display: inline-flex; width: calc(100% - 188px)" color="dark" v-if="currentSettings.syncToRetain" v-model="currentSettings.syncNamespace" float-label="Namespace to sync boards settings" clearable :clear-value="undefined"/>
       </div>
@@ -83,6 +83,34 @@ export default {
       this.$q.notify({
         message: 'Host must be not empty and only over secured sockets'
       })
+    },
+    flespiLoginHandler () {
+      let tokenHandler = (event) => {
+        if (typeof event.data === 'string' && ~event.data.indexOf('FlespiToken')) {
+          this.currentSettings.username = event.data
+          window.removeEventListener('message', tokenHandler)
+        }
+      }
+      window.addEventListener('message', tokenHandler)
+      this.openWindow(`https://flespi.io/login/#/providers`)
+    },
+    openWindow (url, title) {
+      title = title || 'auth'
+      let w = 500, h = 600
+      let dualScreenLeft = window.screenLeft !== undefined ? window.screenLeft : screen.left
+      let dualScreenTop = window.screenTop !== undefined ? window.screenTop : screen.top
+
+      let width = window.innerWidth ? window.innerWidth : document.documentElement.clientWidth ? document.documentElement.clientWidth : screen.width
+      let height = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight ? document.documentElement.clientHeight : screen.height
+
+      let left = ((width / 2) - (w / 2)) + dualScreenLeft
+      let top = ((height / 2) - (h / 2)) + dualScreenTop
+      let newWindow = window.open(url, title, 'toolbar=no,location=no,status=yes,resizable=yes,scrollbars=yes, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left)
+
+      // Puts focus on the newWindow
+      if (window.focus) {
+        newWindow.focus()
+      }
     }
   },
   watch: {
