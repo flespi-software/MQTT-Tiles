@@ -16,20 +16,20 @@ self.__precacheManifest = [
     "url": "js/4b47640d.21cfc388.js"
   },
   {
-    "revision": "7d4dbd9845ff6e3e13f5",
+    "revision": "f3f1aba5d7e539a91cb3",
     "url": "css/607658c8.516c1991.css"
   },
   {
-    "revision": "7d4dbd9845ff6e3e13f5",
-    "url": "js/607658c8.136af999.js"
+    "revision": "f3f1aba5d7e539a91cb3",
+    "url": "js/607658c8.c71a4479.js"
   },
   {
-    "revision": "f71578aa593a0fbcccbb",
+    "revision": "e4f80967ab6ffc1792f8",
     "url": "css/app.84aa3979.css"
   },
   {
-    "revision": "f71578aa593a0fbcccbb",
-    "url": "js/app.6ac4149b.js"
+    "revision": "e4f80967ab6ffc1792f8",
+    "url": "js/app.d8c079a3.js"
   },
   {
     "revision": "0564a58ab2750f80c284",
@@ -76,47 +76,47 @@ self.__precacheManifest = [
     "url": "fonts/flUhRq6tzZclQEJ-Vdg-IuiaDsNa.c38ebd3c.woff"
   },
   {
-    "revision": "efb00e57304380d857603760600da5d5",
-    "url": "statics/icons/favicon-16x16.png"
-  },
-  {
     "revision": "2f9d7587924933c1912c342b190b53ca",
     "url": "statics/icons/favicon-32x32.png"
+  },
+  {
+    "revision": "efb00e57304380d857603760600da5d5",
+    "url": "statics/icons/favicon-16x16.png"
   },
   {
     "revision": "3020c8ac2c2872dec7741e5948520093",
     "url": "statics/icons/icon-128x128.png"
   },
   {
-    "revision": "3020c8ac2c2872dec7741e5948520093",
-    "url": "statics/quasar-logo.png"
-  },
-  {
-    "revision": "8c4120b4e88276badbc808e518572fad",
-    "url": "statics/icons/icon-192x192.png"
+    "revision": "da2b422e2895b9b9c1782a71b6be9d63",
+    "url": "statics/icons/apple-icon-152x152.png"
   },
   {
     "revision": "20c6420ccf16a07d9d56538e30a6b524",
     "url": "statics/icons/icon-256x256.png"
   },
   {
-    "revision": "da2b422e2895b9b9c1782a71b6be9d63",
-    "url": "statics/icons/apple-icon-152x152.png"
+    "revision": "8c4120b4e88276badbc808e518572fad",
+    "url": "statics/icons/icon-192x192.png"
   },
   {
-    "revision": "ed12d10fd0407eea42ccaf7af7991146",
-    "url": "statics/icons/ms-icon-144x144.png"
+    "revision": "3020c8ac2c2872dec7741e5948520093",
+    "url": "statics/quasar-logo.png"
   },
   {
     "revision": "66d7719a8ca03c1a591444c013802817",
     "url": "statics/icons/icon-384x384.png"
   },
   {
+    "revision": "ed12d10fd0407eea42ccaf7af7991146",
+    "url": "statics/icons/ms-icon-144x144.png"
+  },
+  {
     "revision": "a13b2bd5261e2df374128df1aab93001",
     "url": "statics/icons/icon-512x512.png"
   },
   {
-    "revision": "f990d3b6cf178a15880e74344b4ae4c9",
+    "revision": "1fbfe37af4336085efde358a24aadb3b",
     "url": "index.html"
   }
 ];
