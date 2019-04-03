@@ -587,18 +587,21 @@ export default {
     this.initSavedBoards(savedBoards)
   },
   watch: {
-    clientSettings (client, oldClient) {
-      if (isEqual(client, oldClient)) { return false }
-      if (this.client) { this.destroyClient() }
-      if (!client) {
-        this.client = undefined
-        return false
-      }
-      clearWidgets(this.widgets)
-      Object.keys(this.subscriptions).forEach(topic => {
-        this.setValueByTopic(topic, null)
-      })
-      this.createClient()
+    clientSettings: {
+      handler (client, oldClient) {
+        if (isEqual(client, oldClient)) { return false }
+        if (this.client) { this.destroyClient() }
+        if (!client) {
+          this.client = undefined
+          return false
+        }
+        clearWidgets(this.widgets)
+        Object.keys(this.subscriptions).forEach(topic => {
+          this.setValueByTopic(topic, null)
+        })
+        this.createClient()
+      },
+      immediate: true
     },
     boards: {
       deep: true,
