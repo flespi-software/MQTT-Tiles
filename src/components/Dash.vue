@@ -5,6 +5,8 @@
       :board="boards[activeBoardId]"
       :widgets="widgets"
       :values="values"
+      :canShare="canShare"
+      :isFrized="!fullView"
       @close="clearActiveBoard"
       @add:widget="addWidget"
       @edit:widget="editWidget"
@@ -14,6 +16,7 @@
       @resized="resizeHandler"
       @block="blockBoardHandler"
       @update:layout="layoutUpdateHandler"
+      @share="shareHandler(activeBoardId)"
       :style="{height: `${clientSettings ? 'calc(100vh - 50px)' : 'calc(100vh - 110px)'}`}"
     />
     <boards
@@ -21,14 +24,17 @@
       :boards="boards"
       :widgets="widgets"
       :values="values"
+      :canShare="canShare"
+      :isFrized="!fullView"
       @add="addBoard"
       @edit="editBoardHandler"
       @delete="deleteBoardHandler"
       @select="setActiveBoard"
       @action="actionHandler"
+      @share="shareHandler"
       :style="{height: `${clientSettings ? 'calc(100vh - 50px)' : 'calc(100vh - 110px)'}`}"
     >
-      <template slot="actions" v-if="clientStatus && clientSettings.syncToRetain && clientSettings.syncNamespace">
+      <template slot="actions" v-if="clientStatus && clientSettings.syncToRetain && clientSettings.syncNamespace && fullView">
         <q-btn color="dark" flat round icon="mdi-cloud-download-outline" @click="downloadBoardsFromConnection">
           <q-tooltip>Download boards from connection</q-tooltip>
         </q-btn>
@@ -63,10 +69,12 @@ import debounce from 'lodash/debounce'
 import cloneDeep from 'lodash/cloneDeep'
 import remove from 'lodash/remove'
 import difference from 'lodash/difference'
+import uniq from 'lodash/uniq'
 import Vue from 'vue'
 import Board from './Board'
 import Boards from './Boards'
 import { BOARDS_LOCALSTORAGE_NAME, WIDGET_STATUS_DISABLED, WIDGET_STATUS_ENABLED } from '../constants'
+import getActionTopics from './widgets/getActionTopics.js'
 
 let clearWidgets = function clearWidgets (widgets) {
     Object.keys(widgets).forEach((widgetId) => {
@@ -92,7 +100,9 @@ export default {
   props: ['clientSettings'],
   data () {
     return {
+      fullView: !(this.clientSettings && this.clientSettings.flespiBoard),
       client: undefined,
+      connack: undefined,
       clientStatus: false,
       clientErrors: [],
       defaultBoard: Object.freeze(
@@ -122,6 +132,11 @@ export default {
         })
         return values
       }, {})
+    },
+    canShare () {
+      return !!this.clientSettings && this.clientSettings.host.indexOf('flespi') !== -1 && this.clientSettings.syncToRetain && !!this.clientSettings.syncNamespace &&
+        /* check for not master token used for flespi connection */
+        (this.connack && this.connack.properties && this.connack.properties.userProperties && this.connack.properties.userProperties.token && JSON.parse(this.connack.properties.userProperties.token).access.type !== 1)
     }
   },
   methods: {
@@ -189,7 +204,8 @@ export default {
         this.setValueByTopic(topic, message)
       })
 
-      client.on('connect', () => {
+      client.on('connect', (connack) => {
+        this.connack = connack
         this.clientStatus = true
         this.$emit('change:status', true)
         this.initWidgets()
@@ -504,12 +520,71 @@ export default {
         this.publish(this.clientSettings.syncNamespace, JSON.stringify(getBoardsToSave(this.boards, this.widgets)), { qos: 1, retain: true })
       })
         .catch(() => {})
+    },
+    shareHandler (boardId) {
+      let subscribeTopics = Object.keys(this.subscriptions),
+        publishTopics = uniq(getActionTopics(Object.values(this.widgets)))
+      if (!this.canShare) { return false }
+      this.publish(this.clientSettings.syncNamespace, JSON.stringify(getBoardsToSave(this.boards, this.widgets)), { qos: 1, retain: true })
+      let topics = {}
+      subscribeTopics.forEach((subTopic) => {
+        if (!topics[subTopic]) {
+          topics[subTopic] = ['subscribe']
+        }
+      })
+      publishTopics.forEach((pubTopic) => {
+        if (!topics[pubTopic]) {
+          topics[pubTopic] = ['publish']
+        } else {
+          topics[pubTopic].push('publish')
+        }
+      })
+      let shareModel = Object.keys(topics).reduce((model, topic) => {
+        let shareObj = { uri: 'mqtt' }
+        shareObj.topic = topic
+        shareObj.actions = topics[topic]
+        model.push(shareObj)
+        return model
+      }, [])
+      this.$emit('share', { boardId, share: shareModel })
     }
   },
   created () {
+    if (this.clientSettings) {
+      this.createClient()
+      if (this.clientSettings.flespiBoard) {
+        let topic = this.clientSettings.syncNamespace,
+          savedBoards = {}
+        this.$q.loading.show()
+        this.subscribe(topic)
+          .then(() => {
+            savedBoards = this.subscriptions[topic] ? JSON.parse(this.subscriptions[topic].toString()) : {}
+            if (savedBoards[this.clientSettings.flespiBoard]) {
+              savedBoards = { [this.clientSettings.flespiBoard]: savedBoards[this.clientSettings.flespiBoard] }
+              this.initSavedBoards(savedBoards)
+              this.setActiveBoard(this.clientSettings.flespiBoard)
+            } else {
+              this.$q.notify({
+                type: 'negative',
+                message: `Board ${this.clientSettings.flespiBoard} not found`,
+                timeout: 1000,
+                position: 'bottom-left'
+              })
+            }
+          })
+          .catch((e) => { console.log(e) })
+          .finally(() => {
+            this.unsubscribe(topic)
+              .then(() => {
+                Vue.delete(this.subscriptions, topic)
+              })
+            this.$q.loading.hide()
+          })
+      }
+      return true
+    }
     let savedBoards = LocalStorage.get.item(BOARDS_LOCALSTORAGE_NAME)
     this.initSavedBoards(savedBoards)
-    if (this.clientSettings) { this.createClient() }
   },
   watch: {
     clientSettings (client, oldClient) {
@@ -528,13 +603,13 @@ export default {
     boards: {
       deep: true,
       handler (boards) {
-        saveBoardsToLocalStorage(boards, this.widgets)
+        this.fullView && saveBoardsToLocalStorage(boards, this.widgets)
       }
     },
     widgets: {
       deep: true,
       handler (widgets) {
-        saveBoardsToLocalStorage(this.boards, widgets)
+        this.fullView && saveBoardsToLocalStorage(this.boards, widgets)
       }
     }
   },

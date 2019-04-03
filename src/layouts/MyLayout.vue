@@ -8,7 +8,7 @@
     />
     <q-layout-header>
       <q-toolbar color="dark">
-        <q-btn class="lt-lg" flat rounded icon="mdi-menu" @click="leftDrawerOpen = !leftDrawerOpen"/>
+        <q-btn class="lt-lg" flat rounded icon="mdi-menu" @click="leftDrawerOpen = !leftDrawerOpen" v-if="fullViewMode"/>
         <q-toolbar-title style="line-height: 36px;">
           <img src="statics/mqtttiles-logo.png" alt="MQTT Tiles" style="height: 30px; vertical-align: text-bottom;">
           MQTT Tiles
@@ -16,7 +16,7 @@
         </q-toolbar-title>
       </q-toolbar>
     </q-layout-header>
-    <q-layout-drawer side="left" v-model="leftDrawerOpen">
+    <q-layout-drawer side="left" v-model="leftDrawerOpen" v-if="fullViewMode">
       <div class="connections__subheader q-px-md bg-dark" style="position: relative; height: 70px;">
         <span class="text-white" style="font-size: 1.4rem; line-height: 70px;">My connections</span>
         <q-btn fab-mini @click="openSettings" icon="mdi-plus" color="white" class="text-dark" style="position: absolute; bottom: -20px; right: 16px; z-index: 1;"/>
@@ -62,7 +62,7 @@
       </div>
     </q-layout-drawer>
     <q-page-container>
-      <router-view :client="clients[activeClientId]" @change:status="changeStatus" />
+      <router-view :client="clients[activeClientId]" @change:status="changeStatus" @share="shareHandler" />
     </q-page-container>
   </q-layout>
 </template>
@@ -72,8 +72,10 @@ import clientSettings from '../components/ClientSettings'
 import { LocalStorage } from 'quasar'
 import debounce from 'lodash/debounce'
 import Vue from 'vue'
+import { Base64 } from 'js-base64'
 import { CLIENTS_LOCAL_STORAGE_NAME } from '../constants'
 import {version} from '../../package.json'
+import { defaultClient } from '../constants/defaultes.js'
 
 let saveClientsToLocalStorage = debounce((clients) => {
   LocalStorage.set(CLIENTS_LOCAL_STORAGE_NAME, clients)
@@ -90,7 +92,8 @@ export default {
       activeClientId: undefined,
       editedClientId: undefined,
       connected: false,
-      version
+      version,
+      fullViewMode: true
     }
   },
   computed: {
@@ -130,19 +133,64 @@ export default {
     },
     changeStatus (status) {
       this.connected = status
+    },
+    shareHandler (data) {
+      let token = this.clients[this.activeClientId].username,
+        topic = this.clients[this.activeClientId].syncNamespace,
+        shareObj = { token, topic, boardId: data.boardId },
+        link = `${window.location.href}${Base64.encode(JSON.stringify(shareObj))}`
+      this.$copyText(link)
+        .then((e) => {
+          this.$q.notify({
+            type: 'positive',
+            icon: 'content_copy',
+            message: `Link copied`,
+            timeout: 1000,
+            position: 'bottom-left'
+          })
+        }, (e) => {
+          this.$q.notify({
+            type: 'negative',
+            icon: 'content_copy',
+            message: `Error coping link`,
+            timeout: 1000,
+            position: 'bottom-left'
+          })
+        })
     }
   },
   created () {
-    let savedClients = LocalStorage.get.item(CLIENTS_LOCAL_STORAGE_NAME)
-    if (savedClients) {
-      this.clients = savedClients
+    let shareData = this.$q.sessionStorage.get.item('mqtt-tiles-share')
+    /* if follow by share link */
+    if (this.$route.params.hash || shareData) {
+      this.fullViewMode = false
+      let client = defaultClient(),
+        data
+      if (this.$route.params.hash) {
+        data = JSON.parse(Base64.decode(this.$route.params.hash))
+      } else {
+        data = shareData
+      }
+      this.$q.sessionStorage.set('mqtt-tiles-share', data)
+      client.username = data.token
+      client.syncNamespace = data.topic
+      client.syncToRetain = true
+      client.flespiBoard = data.boardId
+      Vue.set(this.clients, 0, client)
+      this.setActiveClient(0)
+      this.$router.push('/')
+    } else {
+      let savedClients = LocalStorage.get.item(CLIENTS_LOCAL_STORAGE_NAME)
+      if (savedClients) {
+        this.clients = savedClients
+      }
     }
   },
   watch: {
     clients: {
       deep: true,
       handler (clients) {
-        saveClientsToLocalStorage(clients)
+        this.fullViewMode && saveClientsToLocalStorage(clients)
       }
     }
   },

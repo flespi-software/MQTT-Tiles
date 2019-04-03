@@ -1,6 +1,6 @@
 <template>
   <div class="dash__boards">
-    <q-btn fab color="dark" @click="$emit('add')" icon="mdi-plus" class="absolute button--add">
+    <q-btn fab color="dark" @click="$emit('add')" icon="mdi-plus" class="absolute button--add" v-if="!isFrized">
       <q-tooltip>Add new board</q-tooltip>
     </q-btn>
     <q-toolbar color="white">
@@ -28,6 +28,9 @@
                 />
               </q-item-main>
               <q-item-side>
+                <q-btn round dense flat icon="mdi-share" color="dark" @click.native="$emit('share', id)" v-if="canShare">
+                  <q-tooltip>Share board</q-tooltip>
+                </q-btn>
                 <q-btn round dense flat icon="mdi-fullscreen" color="dark" @click.native="$emit('select', id)">
                   <q-tooltip>Show full board</q-tooltip>
                 </q-btn>
@@ -74,7 +77,7 @@
       </div>
       <div v-else class="text-dark text-bold wrapper--empty">
         <div class="q-mb-sm">No boards</div>
-        <div><q-btn color="dark" icon="mdi-plus-circle-outline" label="New board" @click="$emit('add')" /></div>
+        <div v-if="!isFrized"><q-btn color="dark" icon="mdi-plus-circle-outline" label="New board" @click="$emit('add')" /></div>
       </div>
     </div>
   </div>
@@ -97,7 +100,7 @@
 </style>
 
 <script>
-import Switcher from './widgets/swither/View'
+import Switcher from './widgets/switcher/View'
 import Clicker from './widgets/clicker/View'
 import Informer from './widgets/informer/View'
 import Linear from './widgets/linear/View'
@@ -105,7 +108,7 @@ import Radial from './widgets/radial/View'
 import Singleselect from './widgets/singleselect/View'
 export default {
   name: 'Boards',
-  props: ['boards', 'widgets', 'values'],
+  props: ['boards', 'widgets', 'values', 'canShare', 'isFrized'],
   components: {
     Switcher, Clicker, Informer, Linear, Radial, Singleselect
   }

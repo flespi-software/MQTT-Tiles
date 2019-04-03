@@ -1,6 +1,6 @@
 <template>
   <q-page class="flex flex-center">
-    <dash :clientSettings="client" @change:status="(status) => { $emit('change:status', status) }"/>
+    <dash :clientSettings="client" @change:status="(status) => { $emit('change:status', status) }" @share="model => $emit('share', model)"/>
   </q-page>
 </template>
 

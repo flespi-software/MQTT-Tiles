@@ -8,15 +8,18 @@
       @save="saveSettingsHandler"
       @hide="hideSettingsHandler"
     />
-    <q-btn v-if='!board.settings.blocked' fab color="dark" @click="openSettings" icon="mdi-plus" class="absolute button--add">
+    <q-btn v-if='!board.settings.blocked  && !isFrized' fab color="dark" @click="openSettings" icon="mdi-plus" class="absolute button--add">
       <q-tooltip>Add new widget</q-tooltip>
     </q-btn>
     <q-toolbar color="white">
-      <q-btn round flat color="dark" icon="mdi-arrow-left" @click="$emit('close')">
+      <q-btn round flat color="dark" icon="mdi-arrow-left" @click="$emit('close')" v-if="!isFrized">
         <q-tooltip>Back to boards list</q-tooltip>
       </q-btn>
       <q-toolbar-title class="text-dark">{{board.name}}</q-toolbar-title>
-      <q-btn @click="$emit('block')" :icon="board.settings.blocked ? 'mdi-lock' : 'mdi-lock-open'" color="dark" flat round>
+      <q-btn v-if="canShare" @click="shareHandler" icon="mdi-share" color="dark" flat round>
+        <q-tooltip>Share board</q-tooltip>
+      </q-btn>
+      <q-btn @click="$emit('block')" :icon="board.settings.blocked ? 'mdi-lock' : 'mdi-lock-open'" color="dark" flat round v-if="!isFrized">
         <q-tooltip>{{board.settings.blocked ? 'Unlock your board' : 'Lock your board'}}</q-tooltip>
       </q-btn>
     </q-toolbar>
@@ -27,8 +30,8 @@
           :layout.sync="currentLayout"
           :col-num="colNum"
           :row-height="rowHeight"
-          :is-draggable="!board.settings.blocked"
-          :is-resizable="!board.settings.blocked"
+          :is-draggable="!board.settings.blocked && !isFrized"
+          :is-resizable="!board.settings.blocked && !isFrized"
           :is-mirrored="false"
           :vertical-compact="false"
           :margin="[10, 10]"
@@ -49,13 +52,13 @@
             >
               <component
                 class="wrapper__items"
-                :class="{'wrapper__items--edited': !board.settings.blocked}"
+                :class="{'wrapper__items--edited': !board.settings.blocked && !isFrized}"
                 :is="widgets[widgetIndex].type"
                 :item="widgets[widgetIndex]"
                 :value="values[widgetIndex]"
                 :index="widgetIndex"
                 :in-shortcuts="Boolean(board.shortcutsIndexes.includes(widgetIndex))"
-                :blocked="board.settings.blocked"
+                :blocked="board.settings.blocked || isFrized"
                 @action="(data) => { $emit('action', data) }"
                 @update="editWidgetSettings(widgetIndex)"
                 @delete="$emit('delete:widget', {widgetId: widgetIndex, settings: widgets[widgetIndex]})"
@@ -93,7 +96,7 @@
 <script>
 import Settings from './widgets/Settings'
 import VueGridLayout from 'vue-grid-layout'
-import Switcher from './widgets/swither/View'
+import Switcher from './widgets/switcher/View'
 import Informer from './widgets/informer/View'
 import Clicker from './widgets/clicker/View'
 import Radial from './widgets/radial/View'
@@ -116,7 +119,7 @@ function getBreakpoint (width) {
 
 export default {
   name: 'Board',
-  props: ['board', 'widgets', 'values'],
+  props: ['board', 'widgets', 'values', 'canShare', 'isFrized'],
   data () {
     return {
       settingsModel: false,
@@ -165,7 +168,10 @@ export default {
     resizeHandler (index, height, width) {
       this.$emit('resized', { index, height, width })
     },
-    onResize ({width}) { this.breakpoint = getBreakpoint(width) }
+    onResize ({width}) { this.breakpoint = getBreakpoint(width) },
+    shareHandler () {
+      this.$emit('share')
+    }
   },
   components: {
     Settings,

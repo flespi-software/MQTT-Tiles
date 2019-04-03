@@ -53,7 +53,7 @@
 
 <script>
 import Vue from 'vue'
-import Topic from '../components/Topic'
+import Topic from '../Topic'
 import validateTopic from '../../../mixins/validateTopic.js'
 import {
   WIDGET_RANGE_VALUE_CURRENT_MODE,

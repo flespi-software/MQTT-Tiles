@@ -34,26 +34,13 @@
 
 <script>
 import merge from 'lodash/merge'
+import { defaultClient } from '../constants/defaultes.js'
 
 export default {
   name: 'ClientSettings',
   props: ['value', 'settings'],
   data () {
-    let defaultSettings = {
-      clientName: 'New client',
-      clientId: `mqtt-tiles-${Math.random().toString(16).substr(2, 8)}`,
-      host: 'wss://mqtt.flespi.io',
-      keepalive: 60,
-      protocolVersion: 5,
-      clean: true,
-      username: 'FlespiToken XXXXXXXXXXXXXXXXXXX',
-      password: '',
-      properties: {
-        sessionExpiryInterval: undefined
-      },
-      syncToRetain: false,
-      syncNamespace: 'xflespifront/mqtttiles/boards'
-    }
+    let defaultSettings = defaultClient()
     return {
       defaultSettings,
       currentSettings: this.settings ? merge({}, defaultSettings, this.settings) : merge({}, defaultSettings)

@@ -94,9 +94,14 @@ export default {
       WIDGET_STATUS_DISABLED
     }
   },
+  computed: {
+    actionTopic () {
+      return this.item.settings.topic
+    }
+  },
   methods: {
     actionHandler () {
-      let data = {topic: this.item.settings.topic, payload: this.item.settings.payload, settings: {retain: this.item.settings.save}}
+      let data = {topic: this.actionTopic, payload: this.item.settings.payload, settings: {retain: this.item.settings.save}}
       this.$emit('action', data)
     }
   }

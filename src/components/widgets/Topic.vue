@@ -7,11 +7,11 @@
 </template>
 
 <script>
-import validateTopic from '../../../mixins/validateTopic.js'
+import validateTopic from '../../mixins/validateTopic.js'
 import {
   WIDGET_PAYLOAD_TYPE_STRING,
   WIDGET_PAYLOAD_TYPE_JSON
-} from '../../../constants'
+} from '../../constants'
 export default {
   name: 'Topic',
   props: {

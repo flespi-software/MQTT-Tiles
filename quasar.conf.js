@@ -4,6 +4,7 @@ module.exports = function (ctx) {
   return {
     // app plugins (/src/plugins)
     plugins: [
+      'clipboard'
     ],
     css: [
       'app.styl'
@@ -87,7 +88,9 @@ module.exports = function (ctx) {
       plugins: [
         'Notify',
         'LocalStorage',
-        'Dialog'
+        'SessionStorage',
+        'Dialog',
+        'Loading'
       ]
       // iconSet: ctx.theme.mat ? 'material-icons' : 'ionicons'
       // i18n: 'de' // Quasar language
