@@ -4,36 +4,36 @@ self.__precacheManifest = [
     "url": "js/02e96fcc.89d5d4ac.js"
   },
   {
-    "revision": "05006f00d5a25d4b21e7",
-    "url": "css/1e0dddf1.e01ccf30.css"
+    "revision": "a7a48f6f9d63884fa673",
+    "url": "css/3c730b34.e01ccf30.css"
   },
   {
-    "revision": "05006f00d5a25d4b21e7",
-    "url": "js/1e0dddf1.6fafefd9.js"
+    "revision": "a7a48f6f9d63884fa673",
+    "url": "js/3c730b34.90d3e868.js"
   },
   {
     "revision": "a9ff913a3c17b881b663",
     "url": "js/4b47640d.21cfc388.js"
   },
   {
-    "revision": "f7382b35d93600deccde",
-    "url": "css/607658c8.57257f35.css"
+    "revision": "a9aad5fb5353f4b91a89",
+    "url": "css/7a7a50c4.2973739d.css"
   },
   {
-    "revision": "f7382b35d93600deccde",
-    "url": "js/607658c8.e11cc473.js"
+    "revision": "a9aad5fb5353f4b91a89",
+    "url": "js/7a7a50c4.90d36bb8.js"
   },
   {
-    "revision": "9f8c43538b7bb57b8f59",
+    "revision": "e1c344611fd65e538435",
     "url": "css/app.84aa3979.css"
   },
   {
-    "revision": "9f8c43538b7bb57b8f59",
-    "url": "js/app.bac9a7ff.js"
+    "revision": "e1c344611fd65e538435",
+    "url": "js/app.ae384f6b.js"
   },
   {
-    "revision": "0564a58ab2750f80c284",
-    "url": "js/vendor.56ff3e5a.js"
+    "revision": "858224388ff6d9767402",
+    "url": "js/vendor.3ab7e789.js"
   },
   {
     "revision": "6536e4067e72c89cd3f1530d83e9888c",
@@ -44,16 +44,16 @@ self.__precacheManifest = [
     "url": "fonts/mdi.5d43a6f5.woff"
   },
   {
-    "revision": "bafb105baeb22d965c70fe52ba6b49d9",
-    "url": "fonts/KFOmCnqEu92Fr1Mu4mxM.bafb105b.woff"
+    "revision": "a1471d1d6431c893582a5f6a250db3f9",
+    "url": "fonts/KFOlCnqEu92Fr1MmSU5fBBc-.a1471d1d.woff"
   },
   {
     "revision": "e9dbbe8a693dd275c16d32feb101f1c1",
     "url": "fonts/KFOkCnqEu92Fr1MmgVxIIzQ.e9dbbe8a.woff"
   },
   {
-    "revision": "a1471d1d6431c893582a5f6a250db3f9",
-    "url": "fonts/KFOlCnqEu92Fr1MmSU5fBBc-.a1471d1d.woff"
+    "revision": "bafb105baeb22d965c70fe52ba6b49d9",
+    "url": "fonts/KFOmCnqEu92Fr1Mu4mxM.bafb105b.woff"
   },
   {
     "revision": "de8b7431b74642e830af4d4f4b513ec9",
@@ -84,12 +84,12 @@ self.__precacheManifest = [
     "url": "statics/icons/apple-touch-icon-60x60.png"
   },
   {
-    "revision": "3f4fe93c1e76d3d2226a641dfd63210d",
-    "url": "statics/icons/apple-touch-icon-72x72.png"
-  },
-  {
     "revision": "38e884c9114660366c69ca0390e7deae",
     "url": "statics/icons/favicon-16x16.png"
+  },
+  {
+    "revision": "3f4fe93c1e76d3d2226a641dfd63210d",
+    "url": "statics/icons/apple-touch-icon-72x72.png"
   },
   {
     "revision": "0e3fb5411838ed21c6c2aa8868bcf4c2",
@@ -100,16 +100,12 @@ self.__precacheManifest = [
     "url": "statics/icons/favicon.ico"
   },
   {
-    "revision": "1278d26cea8d24a048e3bc6f3ddea5b4",
-    "url": "statics/icons/mstile-70x70.png"
+    "revision": "3ec551b38d5fc9df52e5891850e2bb05",
+    "url": "statics/icons/apple-touch-icon-114x114.png"
   },
   {
     "revision": "d96f1c935149ba49e4fe5c173ab257b3",
     "url": "statics/icons/apple-touch-icon-120x120.png"
-  },
-  {
-    "revision": "3ec551b38d5fc9df52e5891850e2bb05",
-    "url": "statics/icons/apple-touch-icon-114x114.png"
   },
   {
     "revision": "1c94d86bf6b3db238df933f40d79c936",
@@ -122,6 +118,10 @@ self.__precacheManifest = [
   {
     "revision": "f45dcc8e5dfdd3f42a9006cda65a5ca3",
     "url": "statics/icons/mstile-310x150.png"
+  },
+  {
+    "revision": "1278d26cea8d24a048e3bc6f3ddea5b4",
+    "url": "statics/icons/mstile-70x70.png"
   },
   {
     "revision": "cf4fa3ec0ec96cd47e2d73d302af1716",
@@ -153,27 +153,23 @@ self.__precacheManifest = [
   },
   {
     "revision": "457e201cb44bbf929a441a4c31955ab0",
-    "url": "statics/icons/mstile-144x144.png"
+    "url": "statics/icons/ms-icon-144x144.png"
   },
   {
-    "revision": "3985a59ab7e51a65da385c0aded04626",
-    "url": "statics/icons/mstile-150x150.png"
+    "revision": "457e201cb44bbf929a441a4c31955ab0",
+    "url": "statics/icons/mstile-144x144.png"
   },
   {
     "revision": "c973814e56ef4c2880534a90797e971d",
     "url": "statics/mqtttiles-logo.png"
   },
   {
-    "revision": "457e201cb44bbf929a441a4c31955ab0",
-    "url": "statics/icons/ms-icon-144x144.png"
+    "revision": "3985a59ab7e51a65da385c0aded04626",
+    "url": "statics/icons/mstile-150x150.png"
   },
   {
     "revision": "4335745280dd52c742248f24116ff768",
     "url": "statics/icons/icon-256x256.png"
-  },
-  {
-    "revision": "cc6ffcc57666a7d6371105eb8464db68",
-    "url": "statics/icons/mstile-310x310.png"
   },
   {
     "revision": "68853917849c40e8e8b7e5dfdb5ab922",
@@ -184,7 +180,11 @@ self.__precacheManifest = [
     "url": "statics/icons/icon-512x512.png"
   },
   {
-    "revision": "ffead007daf8f77d8d363be513a26636",
+    "revision": "cc6ffcc57666a7d6371105eb8464db68",
+    "url": "statics/icons/mstile-310x310.png"
+  },
+  {
+    "revision": "8f09569192a7640495c6accdcf039a3c",
     "url": "index.html"
   }
 ];

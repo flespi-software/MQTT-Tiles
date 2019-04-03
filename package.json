@@ -1,18 +1,21 @@
 {
   "name": "mqtttiles",
-  "version": "1.1.5",
+  "version": "1.2.0",
   "description": "MQTT Dash board creator",
   "productName": "MQTT Tiles",
   "cordovaId": "org.cordova.quasar.app",
   "author": "Siarhei Buntsevich <sebu@gurtam.com>",
+  "main": "index.js",
   "private": true,
   "scripts": {
-    "deploy": "quasar build -m pwa && rm -rf deploy && mkdir deploy && cp -R dist/pwa-mat/* misc LICENSE package.json README.md deploy && node_modules/git-directory-deploy/bin/git-directory-deploy.sh -ddeploy -bgh-pages -rhttps://git.gurtam.net/flespi/frontend/MQTTTiles.git && rm -rf deploy"
+    "deploy": "quasar build -m pwa && mkdir -p deploy && cp -R dist/pwa-mat/* misc LICENSE package.json README.md deploy && node_modules/git-directory-deploy/bin/git-directory-deploy.sh -ddeploy -bgh-pages -rhttps://git.gurtam.net/flespi/frontend/MQTTTiles.git"
   },
   "dependencies": {
     "canvas-gauges": "^2.1.5",
+    "js-base64": "^2.5.1",
     "lodash": "^4.17.11",
-    "mqtt": "git+https://github.com/scarry1992/MQTT.js.git#cork-fix",
+    "mqtt": "git+https://github.com/mqttjs/MQTT.js.git",
+    "vue-clipboard2": "^0.3.0",
     "vue-grid-layout": "^2.3.4"
   },
   "devDependencies": {
