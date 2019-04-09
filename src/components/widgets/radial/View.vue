@@ -81,7 +81,7 @@ import {
   WIDGET_RANGE_VALUE_DATASOURCE_MODE
 } from '../../../constants'
 import getValueByTopic from '../../../mixins/getValueByTopic.js'
-import RadialGauge from './RadialGuage'
+import RadialGauge from './RadialGauge'
 export default {
   name: 'Radial',
   props: ['item', 'index', 'mini', 'in-shortcuts', 'value', 'blocked'],

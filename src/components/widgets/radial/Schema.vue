@@ -83,7 +83,7 @@ export default {
       defaultSettings,
       currentSettings: Object.assign({}, defaultSettings, this.widget.settings),
       rangeValueModeOptions: [
-        {label: 'Valued', value: WIDGET_RANGE_VALUE_CURRENT_MODE},
+        {label: 'Manual', value: WIDGET_RANGE_VALUE_CURRENT_MODE},
         {label: 'Broker', value: WIDGET_RANGE_VALUE_DATASOURCE_MODE}
       ],
       defaultTopic: {

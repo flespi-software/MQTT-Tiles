@@ -81,7 +81,7 @@ import {
   WIDGET_RANGE_VALUE_DATASOURCE_MODE
 } from '../../../constants'
 import getValueByTopic from '../../../mixins/getValueByTopic.js'
-import LinearGauge from './LinearGuage'
+import LinearGauge from './LinearGauge'
 export default {
   name: 'Linear',
   props: ['item', 'index', 'mini', 'in-shortcuts', 'value', 'blocked'],

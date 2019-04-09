@@ -33,7 +33,7 @@
             icon="mdi-plus"
             v-if="!(this.currentSettings.settings.maxTopicsLength && this.currentSettings.dataTopics.length >= this.currentSettings.settings.maxTopicsLength) || this.currentSettings.settings.maxTopicsLength === undefined"
           />
-          <q-list-header :class="{'text-red-6': !currentSettings.dataTopics.length}">Topics{{currentSettings.dataTopics.length ? '' : ' is empty'}}</q-list-header>
+          <q-list-header :class="{'text-red-6': !currentSettings.dataTopics.length}">Topics{{currentSettings.dataTopics.length ? '' : ' are empty'}}</q-list-header>
           <q-collapsible
             v-for="(topic, index) in currentSettings.dataTopics"
             :key="`${index}${topic.topicFilter}`"
@@ -122,10 +122,10 @@ export default {
         {label: 'Toggle', value: 'switcher'},
         {label: 'Text', value: 'informer'},
         {label: 'Button', value: 'clicker'},
-        {label: 'Radial guage', value: 'radial'},
-        {label: 'Linear guage', value: 'linear'},
+        {label: 'Radial gauge', value: 'radial'},
+        {label: 'Linear gauge', value: 'linear'},
         {label: 'Iframe', value: 'frame'},
-        {label: 'Singleselect', value: 'singleselect'}
+        {label: 'Radio button', value: 'singleselect'}
       ],
       colors: ['grey', 'red', 'green', 'orange', 'blue', 'light-blue'],
       isValideSchema: true,

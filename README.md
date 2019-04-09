@@ -31,7 +31,7 @@
 $ git clone https://github.com/flespi-software/mqtttiles.git mqtttiles
 
 # go into app's directory and install dependencies
-$ cd dasher
+$ cd mqtttiles
 $ npm install
 
 # serve with hot reload at localhost:8080

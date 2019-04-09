@@ -8,7 +8,7 @@
       <div class="singleselect__items-wrapper col-12 relative-position q-mb-sm">
         <q-list>
           <q-btn color="dark" style="top: -20px; right: 8px; position: absolute; z-index: 1130;" class="col-12" fab-mini @click="addItem" icon="mdi-plus"/>
-          <q-list-header :class="{'text-red-6': !currentSettings.items.length}">Items{{currentSettings.items.length ? '' : ' is empty'}}</q-list-header>
+          <q-list-header :class="{'text-red-6': !currentSettings.items.length}">Items{{currentSettings.items.length ? '' : ' are empty'}}</q-list-header>
           <q-collapsible
             v-for="(item, index) in currentSettings.items"
             :key="`${index}${item.value}`"

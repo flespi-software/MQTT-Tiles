@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="text-grey-6 text-center">!That widget waiting for link as payload!</div>
+    <div class="text-grey-6 text-center q-mt-md" style="font-size: 1.3rem;">Link as payload expected!</div>
   </div>
 </template>
 

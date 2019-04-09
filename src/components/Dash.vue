@@ -78,6 +78,7 @@ import Boards from './Boards'
 import { BOARDS_LOCALSTORAGE_NAME, WIDGET_STATUS_DISABLED, WIDGET_STATUS_ENABLED } from '../constants'
 import getActionTopics from './widgets/getActionTopics.js'
 import CopyReplaceDialog from './CopyReplaceDialog'
+import {version} from '../../package.json'
 
 let clearWidgets = function clearWidgets (widgets) {
     Object.keys(widgets).forEach((widgetId) => {
@@ -90,6 +91,7 @@ let clearWidgets = function clearWidgets (widgets) {
     clearWidgets(widgets)
     Object.keys(boards).forEach(boardId => {
       boards[boardId].widgetsIndexes = boards[boardId].widgetsIndexes.map(widgetIndex => widgets[widgetIndex])
+      boards[boardId].appVersion = version
     })
     return boards
   },
@@ -98,6 +100,7 @@ let clearWidgets = function clearWidgets (widgets) {
     widgets = cloneDeep(widgets)
     clearWidgets(widgets)
     board.widgetsIndexes = board.widgetsIndexes.map(widgetIndex => widgets[widgetIndex])
+    board.appVersion = version
     return board
   },
   saveBoardsToLocalStorage = debounce((boards, widgets) => {
@@ -148,6 +151,7 @@ export default {
     },
     canShare () {
       return !!this.clientSettings && this.clientSettings.host.indexOf('flespi') !== -1 &&
+        !this.clientSettings.flespiBoard &&
         /* check for not master token used for flespi connection */
         (
           this.connack && this.connack.properties &&
@@ -617,7 +621,9 @@ export default {
       if (!this.canShare) { return false }
       this.exportPrepareBoardHandler(boardId)
         .then((id) => {
-          this.$emit('share', { boardId: id, share: shareModel })
+          if (id) {
+            this.$emit('share', { boardId: id, share: shareModel })
+          }
         })
     },
     shareUploadedHandler (boardId) {
@@ -683,6 +689,13 @@ export default {
     }
     let savedBoards = LocalStorage.get.item(BOARDS_LOCALSTORAGE_NAME)
     this.initSavedBoards(savedBoards)
+    if (window) {
+      window.addEventListener('beforeunload', () => {
+        if (this.client) {
+          this.client.end(true)
+        }
+      })
+    }
   },
   destroyed () {
     if (this.client) {
@@ -699,6 +712,7 @@ export default {
           return false
         }
         clearWidgets(this.widgets)
+        this.boardsFromConnection = {}
         Object.keys(this.subscriptions).forEach(topic => {
           this.setValueByTopic(topic, null)
         })

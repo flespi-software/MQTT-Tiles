@@ -73,7 +73,7 @@ import { LocalStorage } from 'quasar'
 import debounce from 'lodash/debounce'
 import Vue from 'vue'
 import { Base64 } from 'js-base64'
-import { CLIENTS_LOCAL_STORAGE_NAME } from '../constants'
+import { CLIENTS_LOCAL_STORAGE_NAME, ACTIVE_CLIENT_LOCAL_STORAGE_NAME } from '../constants'
 import {version} from '../../package.json'
 import { defaultClient } from '../constants/defaultes.js'
 
@@ -130,6 +130,7 @@ export default {
     },
     setActiveClient (clientId) {
       this.activeClientId = clientId
+      LocalStorage.set(ACTIVE_CLIENT_LOCAL_STORAGE_NAME, clientId)
     },
     changeStatus (status) {
       this.connected = status
@@ -178,11 +179,14 @@ export default {
       client.flespiBoard = data.boardId
       Vue.set(this.clients, 0, client)
       this.setActiveClient(0)
-      this.$router.push('/')
     } else {
       let savedClients = LocalStorage.get.item(CLIENTS_LOCAL_STORAGE_NAME)
+      let activeClient = LocalStorage.get.item(ACTIVE_CLIENT_LOCAL_STORAGE_NAME)
       if (savedClients) {
         this.clients = savedClients
+        if (activeClient && this.clients[activeClient]) {
+          this.$nextTick(() => { this.setActiveClient(activeClient) })
+        }
       }
     }
   },
