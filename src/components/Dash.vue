@@ -7,6 +7,7 @@
       :values="values"
       :canShare="canShare"
       :isFrized="!fullView"
+      :hasConnection="!!clientSettings"
       @close="clearActiveBoard"
       @add:widget="addWidget"
       @edit:widget="editWidget"
@@ -24,28 +25,29 @@
       :boards="boards"
       :widgets="widgets"
       :values="values"
+      :remoteBoards="boardsFromConnection"
       :canShare="canShare"
       :isFrized="!fullView"
+      :hasConnection="!!clientSettings"
       @add="addBoard"
       @edit="editBoardHandler"
       @delete="deleteBoardHandler"
       @select="setActiveBoard"
       @action="actionHandler"
       @share="shareHandler"
+      @share:uploaded="shareUploadedHandler"
+      @export="exportPrepareBoardHandler"
+      @import="importBoardHandler"
       :style="{height: `${clientSettings ? 'calc(100vh - 50px)' : 'calc(100vh - 110px)'}`}"
-    >
-      <template slot="actions" v-if="clientStatus && clientSettings.syncToRetain && clientSettings.syncNamespace && fullView">
-        <q-btn color="dark" flat round icon="mdi-cloud-download-outline" @click="downloadBoardsFromConnection">
-          <q-tooltip>Download boards from connection</q-tooltip>
-        </q-btn>
-        <q-btn color="dark" flat round class="q-ml-sm" icon="mdi-cloud-upload-outline" @click="uploadBoardsToConnection">
-          <q-tooltip>Upload boards to connection</q-tooltip>
-        </q-btn>
-      </template>
-    </boards>
+    />
     <div v-if="!clientSettings" class="bg-red-2 text-red-8 text-center absolute connections--empty">
       <div class="text-bold q-mt-md">No active connections</div>
     </div>
+    <copy-replace-dialog
+      ref="copyReplaceDialog"
+      :initName="exportBoardId"
+      @change:name="(name) => exportBoardId = name"
+    />
   </div>
 </template>
 
@@ -75,6 +77,7 @@ import Board from './Board'
 import Boards from './Boards'
 import { BOARDS_LOCALSTORAGE_NAME, WIDGET_STATUS_DISABLED, WIDGET_STATUS_ENABLED } from '../constants'
 import getActionTopics from './widgets/getActionTopics.js'
+import CopyReplaceDialog from './CopyReplaceDialog'
 
 let clearWidgets = function clearWidgets (widgets) {
     Object.keys(widgets).forEach((widgetId) => {
@@ -89,6 +92,13 @@ let clearWidgets = function clearWidgets (widgets) {
       boards[boardId].widgetsIndexes = boards[boardId].widgetsIndexes.map(widgetIndex => widgets[widgetIndex])
     })
     return boards
+  },
+  getBoardToSave = function getBoardsToSave (board, widgets) {
+    board = cloneDeep(board)
+    widgets = cloneDeep(widgets)
+    clearWidgets(widgets)
+    board.widgetsIndexes = board.widgetsIndexes.map(widgetIndex => widgets[widgetIndex])
+    return board
   },
   saveBoardsToLocalStorage = debounce((boards, widgets) => {
     LocalStorage.set(BOARDS_LOCALSTORAGE_NAME, getBoardsToSave(boards, widgets))
@@ -108,6 +118,7 @@ export default {
       defaultBoard: Object.freeze(
         {
           name: 'New board',
+          id: '',
           settings: { edited: true, blocked: false },
           shortcutsIndexes: [],
           widgetsIndexes: [],
@@ -119,7 +130,9 @@ export default {
       subscriptions: {},
       widgetsBySubscription: {},
       activeBoardId: undefined,
-      colsByBreakpoint: { lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }
+      colsByBreakpoint: { lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 },
+      boardsFromConnection: {},
+      exportBoardId: ''
     }
   },
   computed: {
@@ -134,9 +147,14 @@ export default {
       }, {})
     },
     canShare () {
-      return !!this.clientSettings && this.clientSettings.host.indexOf('flespi') !== -1 && this.clientSettings.syncToRetain && !!this.clientSettings.syncNamespace &&
+      return !!this.clientSettings && this.clientSettings.host.indexOf('flespi') !== -1 &&
         /* check for not master token used for flespi connection */
-        (this.connack && this.connack.properties && this.connack.properties.userProperties && this.connack.properties.userProperties.token && JSON.parse(this.connack.properties.userProperties.token).access.type !== 1)
+        (
+          this.connack && this.connack.properties &&
+          this.connack.properties.userProperties &&
+          this.connack.properties.userProperties.token &&
+          JSON.parse(this.connack.properties.userProperties.token).access.type !== 1
+        )
     }
   },
   methods: {
@@ -201,6 +219,11 @@ export default {
 
       let client = mqtt.connect(config.host, config)
       client.on('message', (topic, message, packet) => {
+        /* synced board processing */
+        if (topic.indexOf(config.syncNamespace) !== -1) {
+          this.savedBoardProcess(topic.split('/').reverse()[0], message)
+          return false
+        }
         this.setValueByTopic(topic, message)
       })
 
@@ -209,6 +232,7 @@ export default {
         this.clientStatus = true
         this.$emit('change:status', true)
         this.initWidgets()
+        this.getSyncedBoards()
       })
       client.on('error', (error) => {
         this.errorHandler(error, false)
@@ -268,6 +292,7 @@ export default {
         ok: true,
         cancel: true
       }).then(() => {
+        console.log(123)
         let widgetsIndexes = this.boards[boardId].widgetsIndexes
         widgetsIndexes.forEach((widgetIndex) => {
           let topics = this.widgets[widgetIndex].topics
@@ -289,11 +314,30 @@ export default {
     },
     editBoardHandler (boardId) {
       let board = this.boards[boardId]
+      if (board.id !== boardId) {
+        Vue.set(this.boards, board.id, board)
+        Vue.delete(this.boards, boardId)
+      }
       Vue.set(board.settings, 'edited', !board.settings.edited)
     },
     blockBoardHandler () {
       let board = this.boards[this.activeBoardId]
       Vue.set(board.settings, 'blocked', !board.settings.blocked)
+    },
+    initBoard (board) {
+      board = cloneDeep(board)
+      let widgets = {}
+      let indexes = []
+      board.widgetsIndexes.forEach((widget) => {
+        indexes.push(widget.id)
+        widgets[widget.id] = widget
+        return widgets
+      })
+      board.widgetsIndexes = indexes
+      Vue.set(this.boards, board.id, board)
+      Object.keys(widgets).forEach(widgetId => {
+        this.addWidget(widgets[widgetId])
+      })
     },
     initSavedBoards (savedBoards) {
       if (savedBoards) {
@@ -485,47 +529,102 @@ export default {
       Vue.set(widget.settings, 'width', width)
     },
     /* widgets logic end */
-    downloadBoardsFromConnection () {
-      let topic = this.clientSettings.syncNamespace,
-        savedBoards = {}
-      this.subscribe(topic)
-        .then(() => {
-          savedBoards = JSON.parse(this.subscriptions[topic].toString())
-          this.$q.dialog({
-            title: 'Replace current boards with the saved ones?',
-            message: `You have the following saved boards: ${Object.keys(savedBoards).map(id => savedBoards[id].name).join(', ')}.`,
-            color: 'dark',
-            ok: true,
-            cancel: true
-          }).then(() => {
-            this.initSavedBoards(savedBoards)
-          })
-        })
-        .catch(() => {})
-        .finally(() => {
-          this.unsubscribe(topic)
-            .then(() => {
-              Vue.delete(this.subscriptions, topic)
-            })
-        })
+    getSyncedBoards () {
+      if (Object.keys(this.boardsFromConnection).length) { this.boardsFromConnection = {} }
+      this.subscribe(`${this.clientSettings.syncNamespace}/+`)
     },
-    uploadBoardsToConnection () {
+    savedBoardProcess (id, board) {
+      if (!board.length) {
+        Vue.delete(this.boardsFromConnection, id)
+        return false
+      }
+      board = JSON.parse(board)
+      if (typeof board === 'object') {
+        Vue.set(this.boardsFromConnection, id, board)
+      }
+    },
+    importBoardHandler (id) {
+      let board = this.boardsFromConnection[id],
+        message = this.boards[id] ? `Replace board ${this.boards[id].name} with remote board?` : 'Download remote board to the connection?'
       this.$q.dialog({
-        title: 'Upload current boards to the connection?',
-        message: `All saved boards in current connection will be replaced with current boards.`,
+        title: message,
+        message: `Board ${board.name} will be downloaded.`,
         color: 'dark',
         ok: true,
         cancel: true
       }).then(() => {
-        this.publish(this.clientSettings.syncNamespace, JSON.stringify(getBoardsToSave(this.boards, this.widgets)), { qos: 1, retain: true })
+        this.initBoard(board)
       })
         .catch(() => {})
     },
+    exportPrepareBoardHandler (id) {
+      this.exportBoardId = id
+      this.oldExportBoardId = id
+      if (this.boardsFromConnection[id]) {
+        return this.$refs.copyReplaceDialog.open()
+          .then((id) => this.exportBoardHandler(id))
+          .catch(() => {})
+      } else {
+        return Promise.resolve(this.exportBoardHandler(id))
+      }
+    },
+    exportBoardHandler (id) {
+      let board, currentId
+      if (id === this.exportBoardId) {
+        board = this.boards[id]
+        currentId = id
+      } else {
+        let oldBoard = this.boards[id]
+        oldBoard.id = this.exportBoardId
+        Vue.set(this.boards, this.exportBoardId, oldBoard)
+        Vue.delete(this.boards, id)
+        board = this.boards[this.exportBoardId]
+        currentId = this.exportBoardId
+      }
+      let topic = `${this.clientSettings.syncNamespace}/${currentId}`
+      this.publish(topic, JSON.stringify(getBoardToSave(board, this.widgets)), { qos: 1, retain: true })
+      this.closeExportHandler()
+      return currentId
+    },
+    closeExportHandler () {
+      this.exportBoardId = ''
+    },
     shareHandler (boardId) {
-      let subscribeTopics = Object.keys(this.subscriptions),
-        publishTopics = uniq(getActionTopics(Object.values(this.widgets)))
+      let board = this.boards[boardId],
+        widgets = board.widgetsIndexes.map(widgetId => this.widgets[widgetId]),
+        subscribeTopics = uniq(widgets.reduce((topics, widget) => { return [...topics, ...widget.topics] }, [])),
+        publishTopics = uniq(getActionTopics(widgets))
+      let topics = {}
+      subscribeTopics.forEach((subTopic) => {
+        if (!topics[subTopic]) {
+          topics[subTopic] = ['subscribe']
+        }
+      })
+      publishTopics.forEach((pubTopic) => {
+        if (!topics[pubTopic]) {
+          topics[pubTopic] = ['publish']
+        } else {
+          topics[pubTopic].push('publish')
+        }
+      })
+      let shareModel = Object.keys(topics).reduce((model, topic) => {
+        let shareObj = { uri: 'mqtt' }
+        shareObj.topic = topic
+        shareObj.actions = topics[topic]
+        model.push(shareObj)
+        return model
+      }, [])
       if (!this.canShare) { return false }
-      this.publish(this.clientSettings.syncNamespace, JSON.stringify(getBoardsToSave(this.boards, this.widgets)), { qos: 1, retain: true })
+      this.exportPrepareBoardHandler(boardId)
+        .then((id) => {
+          this.$emit('share', { boardId: id, share: shareModel })
+        })
+    },
+    shareUploadedHandler (boardId) {
+      let board = this.boardsFromConnection[boardId],
+        widgets = board.widgetsIndexes,
+        subscribeTopics = uniq(widgets.reduce((topics, widget) => { return [...topics, ...widget.topics] }, [])),
+        publishTopics = uniq(getActionTopics(widgets))
       let topics = {}
       subscribeTopics.forEach((subTopic) => {
         if (!topics[subTopic]) {
@@ -547,44 +646,48 @@ export default {
         return model
       }, [])
       this.$emit('share', { boardId, share: shareModel })
+    },
+    shareSync () {
+      let boardId = this.clientSettings.flespiBoard,
+        topic = `${this.clientSettings.syncNamespace}/${boardId}`,
+        savedBoard
+      this.$q.loading.show()
+      this.subscribe(topic)
+        .then(() => {
+          savedBoard = this.boardsFromConnection[boardId]
+          if (savedBoard) {
+            this.initSavedBoards({[boardId]: savedBoard})
+            this.setActiveBoard(boardId)
+          } else {
+            this.$q.notify({
+              type: 'negative',
+              message: `Board ${boardId} not found`,
+              timeout: 1000,
+              position: 'bottom-left'
+            })
+          }
+        })
+        .catch((e) => { console.log(e) })
+        .finally(() => {
+          this.$q.loading.hide()
+        })
     }
   },
   created () {
     if (this.clientSettings) {
       this.createClient()
       if (this.clientSettings.flespiBoard) {
-        let topic = this.clientSettings.syncNamespace,
-          savedBoards = {}
-        this.$q.loading.show()
-        this.subscribe(topic)
-          .then(() => {
-            savedBoards = this.subscriptions[topic] ? JSON.parse(this.subscriptions[topic].toString()) : {}
-            if (savedBoards[this.clientSettings.flespiBoard]) {
-              savedBoards = { [this.clientSettings.flespiBoard]: savedBoards[this.clientSettings.flespiBoard] }
-              this.initSavedBoards(savedBoards)
-              this.setActiveBoard(this.clientSettings.flespiBoard)
-            } else {
-              this.$q.notify({
-                type: 'negative',
-                message: `Board ${this.clientSettings.flespiBoard} not found`,
-                timeout: 1000,
-                position: 'bottom-left'
-              })
-            }
-          })
-          .catch((e) => { console.log(e) })
-          .finally(() => {
-            this.unsubscribe(topic)
-              .then(() => {
-                Vue.delete(this.subscriptions, topic)
-              })
-            this.$q.loading.hide()
-          })
+        this.shareSync()
       }
       return true
     }
     let savedBoards = LocalStorage.get.item(BOARDS_LOCALSTORAGE_NAME)
     this.initSavedBoards(savedBoards)
+  },
+  destroyed () {
+    if (this.client) {
+      this.client.end()
+    }
   },
   watch: {
     clientSettings: {
@@ -616,6 +719,6 @@ export default {
       }
     }
   },
-  components: { Board, Boards }
+  components: { Board, Boards, CopyReplaceDialog }
 }
 </script>

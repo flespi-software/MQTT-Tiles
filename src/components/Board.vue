@@ -119,7 +119,7 @@ function getBreakpoint (width) {
 
 export default {
   name: 'Board',
-  props: ['board', 'widgets', 'values', 'canShare', 'isFrized'],
+  props: ['board', 'widgets', 'values', 'canShare', 'isFrized', 'hasConnection'],
   data () {
     return {
       settingsModel: false,

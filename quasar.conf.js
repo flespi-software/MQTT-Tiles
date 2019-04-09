@@ -78,7 +78,8 @@ module.exports = function (ctx) {
         'QField',
         'QResizeObservable',
         'QCollapsible',
-        'QRadio'
+        'QRadio',
+        'QDialog'
       ],
       directives: [
         'Ripple',

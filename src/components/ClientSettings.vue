@@ -16,8 +16,6 @@
         <q-input style="display: inline-flex; width: calc(100% - 115px)" color="dark" v-if="currentSettings.protocolVersion === 5" v-model="currentSettings.properties.sessionExpiryInterval" type="number" float-label="Session expiry interval" clearable :clear-value="undefined"/>
         <q-input color="dark" v-model="currentSettings.username" float-label="Username" :clear-value="undefined" :after="[{icon: 'mdi-login', handler: flespiLoginHandler, condition: currentSettings.host.indexOf('flespi') !== -1}]"/>
         <q-input color="dark" v-model="currentSettings.password" float-label="Password" :clear-value="undefined"/>
-        <q-checkbox style="height: 56px" class="q-mr-sm" color="dark" v-model="currentSettings.syncToRetain" label="Sync boards settings"/>
-        <q-input style="display: inline-flex; width: calc(100% - 188px)" color="dark" v-if="currentSettings.syncToRetain" v-model="currentSettings.syncNamespace" float-label="Namespace to sync boards settings" clearable :clear-value="undefined"/>
       </div>
       <q-toolbar slot="footer" color='dark'>
         <q-toolbar-title>
