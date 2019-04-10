@@ -353,6 +353,10 @@ export default {
         Vue.set(board.widgetsIndexes, index, newId)
         Vue.set(this.widgets[newId], 'id', newId)
         Vue.delete(this.widgets, widgetId)
+        let shortcutIndex = board.shortcutsIndexes.indexOf(widgetId)
+        if (shortcutIndex !== -1) {
+          Vue.set(board.shortcutsIndexes, shortcutIndex, newId)
+        }
         this.widgets[newId].topics.forEach((topic, index) => {
           let widgetsBySubscription = this.widgetsBySubscription[topic]
           Vue.set(widgetsBySubscription, widgetsBySubscription.indexOf(widgetId), newId)
@@ -598,6 +602,10 @@ export default {
               board.id = this.exportBoardId
               board.widgetsIndexes.forEach((widget, index) => {
                 let newId = uid()
+                let shortcutIndex = board.shortcutsIndexes.indexOf(board.widgetsIndexes[index].id)
+                if (shortcutIndex !== -1) {
+                  Vue.set(board.shortcutsIndexes, shortcutIndex, newId)
+                }
                 board.widgetsIndexes[index].id = newId
                 Object.keys(board.layouts).forEach(layoutName => {
                   board.layouts[layoutName][index].i = newId

@@ -78,7 +78,7 @@ export default {
       height: 8,
       width: 1,
       maxTopicsLength: 1,
-      minWidth: 2,
+      minWidth: 1,
       minHeight: 2
     }
     return {

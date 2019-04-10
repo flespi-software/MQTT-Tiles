@@ -8,7 +8,7 @@
         size="3rem"
         :color="item.currentValue === null ? 'grey-4' : currentValue ? `${item.color}-7` : `${item.color}-5`"
         :name="currentValue ? 'mdi-toggle-switch-outline' : 'mdi-toggle-switch-off-outline'"
-        :class="[`${currentValue === null ? 'disabled' : !item.settings.actionTopic ? '' : 'cursor-pointer'}`]"
+        :class="[`${currentValue === null ? 'disabled' : !actionTopic ? '' : 'cursor-pointer'}`]"
       />
     </div>
     <div class="ellipsis q-mt-sm">{{item.name}}</div>
