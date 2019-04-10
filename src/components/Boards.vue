@@ -1,6 +1,6 @@
 <template>
   <div class="dash__boards">
-    <q-btn fab color="dark" @click="addHandler" icon="mdi-plus" class="absolute button--add" v-if="!isFrized">
+    <q-btn fab color="dark" @click="$emit('add')" icon="mdi-plus" class="absolute button--add" v-if="!isFrized">
       <q-tooltip>Add new board</q-tooltip>
     </q-btn>
     <div v-if="Object.keys(remoteBoards).length" class="remote-control text-center">
@@ -9,7 +9,7 @@
     <div class="boards__remote scroll bg-grey-3 q-pb-md q-pt-lg flex no-wrap" v-if="Object.keys(remoteBoards).length && isPanelShowed">
       <div class="q-my-xs q-px-sm q-my-sm remote__board" v-for="(board, id) in remoteBoards" :key="`remote-${id}`">
         <q-card>
-          <q-item class="q-py-none q-px-sm bg-grey-4">
+          <q-item class="q-py-none q-pl-sm q-pr-none bg-grey-4">
             <q-item-main class="ellipsis">
               <div class="ellipsis" style="height: 24px; line-height: 24px;">
                 {{board.name}}
@@ -20,14 +20,28 @@
               </div>
             </q-item-main>
             <q-item-side>
-              <q-btn round dense flat icon="mdi-share" color="dark" @click.native="$emit('share:uploaded', id)" v-if="canShare">
-                <q-tooltip>Share board</q-tooltip>
+              <q-btn round dense flat icon="mdi-dots-vertical" color="dark">
+                <q-popover anchor="bottom right" self="top right">
+                  <q-list dense>
+                    <q-item class="cursor-pointer" v-close-overlay highlight @click.native.stop="$emit('share:uploaded', id)" v-if="canShare">
+                      <q-item-side icon="mdi-share" />
+                      <q-item-main label="Share"/>
+                    </q-item>
+                    <q-item-separator/>
+                    <q-item class="cursor-pointer" v-close-overlay highlight @click.native.stop="$emit('delete:uploaded', id)">
+                      <q-item-side color="red" icon="mdi-delete-outline" />
+                      <q-item-main label="Remove"/>
+                    </q-item>
+                  </q-list>
+                </q-popover>
               </q-btn>
             </q-item-side>
           </q-item>
           <q-card-separator />
-          <q-card-main class="text-center">
+          <q-card-main class="text-center relative-position">
             <q-icon name="mdi-download" size="20px" color="dark" class="cursor-pointer" @click.native="$emit('import', id)" />
+            <span class="text-grey-5 absolute" style="font-size: 10px; bottom: 4px; left: 4px; cursor: default;" v-if='board.appVersion' title="MQTT Tiles version">v.{{board.appVersion}}</span>
+            <span class="text-bold text-white absolute bg-purple-6 round-borders q-px-xs" style="font-size: 10px; bottom: 4px; right: 4px; cursor: default;" title="Widgets count">{{board.widgetsIndexes.length}}</span>
           </q-card-main>
         </q-card>
       </div>
@@ -39,7 +53,7 @@
     <div class="q-px-sm scroll boards__wrapper" :style="{height: isPanelShowed ? 'calc(100% - 199px)' : 'calc(100% - 50px)'}">
       <div v-if="Object.keys(boards).length" class="row">
         <div class="q-pt-md q-px-sm col-xl-4 col-md-6 col-sm-6 col-xs-12" v-for="(board, id) in boards" :key="id">
-          <q-card>
+          <q-card v-click-outside="() => outsideClickHandler(id)">
             <q-item class="q-py-none q-px-sm bg-grey-4">
               <q-item-main class="ellipsis">
                 <div class="ellipsis" style="height: 24px; line-height: 24px;">
@@ -62,11 +76,11 @@
                     <q-list dense>
                       <q-item class="cursor-pointer" v-close-overlay highlight @click.native.stop="$emit('export', id)" v-if="hasConnection">
                         <q-item-side icon="mdi-cloud-upload-outline" />
-                        <q-item-main label="Upload"/>
+                        <q-item-main label="Save to broker"/>
                       </q-item>
                       <q-item class="cursor-pointer" v-close-overlay highlight @click.native.stop="$emit('edit', id);">
                         <q-item-side icon="mdi-pencil" />
-                        <q-item-main label="Edit"/>
+                        <q-item-main label="Name"/>
                       </q-item>
                       <q-item-separator/>
                       <q-item class="cursor-pointer" v-close-overlay highlight @click.native.stop="$emit('delete', id)">
@@ -162,6 +176,7 @@
 </style>
 
 <script>
+import vClickOutside from 'v-click-outside'
 import Switcher from './widgets/switcher/View'
 import Clicker from './widgets/clicker/View'
 import Informer from './widgets/informer/View'
@@ -177,18 +192,15 @@ export default {
     }
   },
   methods: {
-    addHandler () {
-      this.$emit('add')
-      // this.$nextTick(() => {
-      //   let key = Object.keys(this.boards).reverse()[0],
-      //     board = this.boards[key]
-      //   this.board.id = key
-      //   this.name = board.name
-      // })
+    outsideClickHandler (boardId) {
+      if (this.boards[boardId] && this.boards[boardId].settings.edited) { this.$emit('edit', boardId) }
     }
   },
   components: {
     Switcher, Clicker, Informer, Linear, Radial, Singleselect
+  },
+  directives: {
+    clickOutside: vClickOutside.directive
   }
 }
 </script>

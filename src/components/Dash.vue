@@ -36,6 +36,7 @@
       @action="actionHandler"
       @share="shareHandler"
       @share:uploaded="shareUploadedHandler"
+      @delete:uploaded="deleteUploadedBoard"
       @export="exportPrepareBoardHandler"
       @import="importBoardHandler"
       :style="{height: `${clientSettings ? 'calc(100vh - 50px)' : 'calc(100vh - 110px)'}`}"
@@ -236,7 +237,9 @@ export default {
         this.clientStatus = true
         this.$emit('change:status', true)
         this.initWidgets()
-        this.getSyncedBoards()
+        if (!this.clientSettings.flespiBoard) {
+          this.getSyncedBoards()
+        }
       })
       client.on('error', (error) => {
         this.errorHandler(error, false)
@@ -315,24 +318,49 @@ export default {
       })
         .catch(() => {})
     },
+    deleteUploadedBoard (boardId) {
+      this.$q.dialog({
+        title: 'Warning',
+        message: `Do you really want to delete remote board?`,
+        color: 'dark',
+        ok: true,
+        cancel: true
+      })
+        .then(() => {
+          this.publish(`${this.clientSettings.syncNamespace}/${boardId}`, '', { qos: 1, retain: true })
+        })
+        .catch(() => {})
+    },
     editBoardHandler (boardId) {
       let board = this.boards[boardId]
       if (board.id !== boardId) {
-        Vue.set(this.boards, board.id, board)
-        Vue.delete(this.boards, boardId)
-        /* update widgets ids */
-        board.widgetsIndexes.forEach((widgetId, index) => {
-          let newId = uid()
-          Vue.set(this.widgets, newId, this.widgets[widgetId])
-          Vue.set(board.widgetsIndexes, index, newId)
-          Vue.delete(this.widgets, widgetId)
-          this.widgets[newId].topics.forEach((topic, index) => {
-            let widgetsBySubscription = this.widgetsBySubscription[topic]
-            Vue.set(widgetsBySubscription, widgetsBySubscription.indexOf(widgetId), newId)
-          })
-        })
+        this.replaceBoardHandler(boardId)
       }
       Vue.set(board.settings, 'edited', !board.settings.edited)
+    },
+    replaceBoardHandler (boardId) {
+      let board = this.boards[boardId]
+      Vue.set(this.boards, board.id, board)
+      if (this.activeBoardId === boardId) {
+        this.clearActiveBoard()
+        this.$nextTick(() => { this.setActiveBoard(board.id) })
+      }
+      Vue.delete(this.boards, boardId)
+      /* update widgets ids */
+      board.widgetsIndexes.forEach((widgetId, index) => {
+        let newId = uid()
+        Vue.set(this.widgets, newId, this.widgets[widgetId])
+        Vue.set(board.widgetsIndexes, index, newId)
+        Vue.set(this.widgets[newId], 'id', newId)
+        Vue.delete(this.widgets, widgetId)
+        this.widgets[newId].topics.forEach((topic, index) => {
+          let widgetsBySubscription = this.widgetsBySubscription[topic]
+          Vue.set(widgetsBySubscription, widgetsBySubscription.indexOf(widgetId), newId)
+        })
+        Object.keys(board.layouts).forEach(layoutName => {
+          board.layouts[layoutName][index].i = newId
+        })
+      })
     },
     blockBoardHandler () {
       let board = this.boards[this.activeBoardId]
@@ -358,6 +386,7 @@ export default {
         let widgets = {}
         Object.keys(savedBoards).forEach(boardId => {
           let board = savedBoards[boardId]
+          if (board.settings.edited) { board.settings.edited = false }
           let indexes = []
           board.widgetsIndexes.forEach((widget) => {
             indexes.push(widget.id)
@@ -558,22 +587,33 @@ export default {
       }
     },
     importBoardHandler (id) {
-      let board = this.boardsFromConnection[id],
-        message = this.boards[id] ? `Replace board ${this.boards[id].name} with remote board?` : 'Download remote board to the connection?'
-      this.$q.dialog({
-        title: message,
-        message: `Board ${board.name} will be downloaded.`,
-        color: 'dark',
-        ok: true,
-        cancel: true
-      }).then(() => {
+      let board = cloneDeep(this.boardsFromConnection[id])
+      this.exportBoardId = id
+      if (this.boards[id]) {
+        this.$refs.copyReplaceDialog.open({
+          loadLabel: 'Restore'
+        })
+          .then((id) => {
+            if (id !== this.exportBoardId) {
+              board.id = this.exportBoardId
+              board.widgetsIndexes.forEach((widget, index) => {
+                let newId = uid()
+                board.widgetsIndexes[index].id = newId
+                Object.keys(board.layouts).forEach(layoutName => {
+                  board.layouts[layoutName][index].i = newId
+                })
+              })
+            }
+            this.initBoard(board)
+            this.exportBoardId = ''
+          })
+          .catch(() => {})
+      } else {
         this.initBoard(board)
-      })
-        .catch(() => {})
+      }
     },
     exportPrepareBoardHandler (id) {
       this.exportBoardId = id
-      this.oldExportBoardId = id
       if (this.boardsFromConnection[id]) {
         return this.$refs.copyReplaceDialog.open()
           .then((id) => this.exportBoardHandler(id))
@@ -588,11 +628,9 @@ export default {
         board = this.boards[id]
         currentId = id
       } else {
-        let oldBoard = this.boards[id]
-        oldBoard.id = this.exportBoardId
-        Vue.set(this.boards, this.exportBoardId, oldBoard)
-        Vue.delete(this.boards, id)
-        board = this.boards[this.exportBoardId]
+        board = this.boards[id]
+        board.id = this.exportBoardId
+        this.replaceBoardHandler(id)
         currentId = this.exportBoardId
       }
       let topic = `${this.clientSettings.syncNamespace}/${currentId}`
@@ -673,7 +711,7 @@ export default {
         .then(() => {
           savedBoard = this.boardsFromConnection[boardId]
           if (savedBoard) {
-            this.initSavedBoards({[boardId]: savedBoard})
+            this.initBoard(savedBoard)
             this.setActiveBoard(boardId)
           } else {
             this.$q.notify({
@@ -684,7 +722,7 @@ export default {
             })
           }
         })
-        .catch((e) => { console.log(e) })
+        .catch(() => {})
         .finally(() => {
           this.$q.loading.hide()
         })

@@ -10,13 +10,13 @@
     <span slot="message">{{message}}</span>
 
     <div slot="body" style="min-width: 300px; min-height: 80px;">
-      <q-checkbox v-model="isNeedCopy" color="dark" label="Rename to upload a copy"/>
+      <q-checkbox v-model="isNeedCopy" color="dark" label="Rename to save a copy"/>
       <q-input color="dark" v-model="nameModel" :disabled="!isNeedCopy" float-label="Name" :error="isNeedCopy && oldName === name"/>
     </div>
 
     <template slot="buttons" slot-scope="props">
       <q-btn color="dark" flat label="Close" @click="props.cancel, mode = 'cancel'" />
-      <q-btn color="dark" flat :label="!isNeedCopy ? 'Replace' : 'Upload'" @click="mode = 'ok'" :disabled="isNeedCopy && oldName === name"/>
+      <q-btn color="dark" flat :label="!isNeedCopy ? replaceLabel : loadLabel" @click="mode = 'ok'" :disabled="isNeedCopy && oldName === name"/>
     </template>
   </q-dialog>
 </template>
@@ -32,15 +32,17 @@ export default {
       isNeedCopy: false,
       name: '',
       oldName: '',
-      mode: ''
+      mode: '',
+      replaceLabel: 'Replace',
+      loadLabel: 'Save'
     }
   },
   computed: {
     title () {
-      return !this.isNeedCopy ? `Replace board` : `Upload board`
+      return !this.isNeedCopy ? `Replace board` : `Save board`
     },
     message () {
-      return !this.isNeedCopy ? `Such board exists on the server. Replace?` : `Upload the new board on the server?`
+      return !this.isNeedCopy ? `Such board exists on the server. Replace?` : `Save the new board on the server?`
     },
     nameModel: {
       get () { return this.name },
@@ -51,7 +53,9 @@ export default {
     }
   },
   methods: {
-    open () {
+    open (settings) {
+      this.replaceLabel = (settings && settings.replaceLabel) || 'Replace'
+      this.loadLabel = (settings && settings.loadLabel) || 'Save'
       this.$nextTick(() => {
         this.name = this.initName
         this.oldName = this.initName
@@ -66,6 +70,7 @@ export default {
               reject(new Error('canceled'))
             }
             this.mode = ''
+            this.isNeedCopy = false
             this.dialogModel = false
             clearInterval(indetvalId)
           }
