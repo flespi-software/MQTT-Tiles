@@ -64,7 +64,7 @@
                         <q-item-side icon="mdi-cloud-upload-outline" />
                         <q-item-main label="Upload"/>
                       </q-item>
-                      <q-item class="cursor-pointer" v-close-overlay highlight @click.native.stop="name = board.name; currentId = board.id; $emit('edit', id);">
+                      <q-item class="cursor-pointer" v-close-overlay highlight @click.native.stop="$emit('edit', id);">
                         <q-item-side icon="mdi-pencil" />
                         <q-item-main label="Edit"/>
                       </q-item>
@@ -78,7 +78,7 @@
                 </q-btn>
               </q-item-side>
               <q-item-side v-show="board.settings.edited">
-                <q-btn v-if="!!currentId && !currentId.match(/[/+#\s]/g) && (!boards[currentId] || currentId === board.id) && !!name" round dense flat icon="mdi-content-save" color="dark" @click.native="board.id = currentId; currentId = ''; board.name = name; name = ''; $emit('edit', id);">
+                <q-btn v-if="!!board.id && !board.id.match(/[/+#\s]/g) && (!boards[board.id] || id === board.id) && !!board.name" round dense flat icon="mdi-content-save" color="dark" @click.native="$emit('edit', id);">
                   <q-tooltip>Save board settings</q-tooltip>
                 </q-btn>
               </q-item-side>
@@ -107,15 +107,15 @@
             <q-card-main v-else>
               <q-input
                   autofocus
-                  v-model="name"
+                  v-model="board.name"
                   color="dark"
-                  :error="!name"
+                  :error="!board.name"
                   float-label="Name"
                 />
                 <q-input
-                  v-model="currentId"
+                  v-model="board.id"
                   color="dark"
-                  :error="!currentId || !!currentId.match(/[/+#\s]/g) || (boards[currentId] && currentId !== board.id)"
+                  :error="!board.id || !!board.id.match(/[/+#\s]/g) || (boards[board.id] && id !== board.id)"
                   float-label="Sync alias"
                 />
             </q-card-main>
@@ -173,20 +173,18 @@ export default {
   props: ['boards', 'widgets', 'values', 'remoteBoards', 'canShare', 'isFrized', 'hasConnection'],
   data () {
     return {
-      name: '',
-      currentId: '',
       isPanelShowed: false
     }
   },
   methods: {
     addHandler () {
       this.$emit('add')
-      this.$nextTick(() => {
-        let key = Object.keys(this.boards).reverse()[0],
-          board = this.boards[key]
-        this.currentId = key
-        this.name = board.name
-      })
+      // this.$nextTick(() => {
+      //   let key = Object.keys(this.boards).reverse()[0],
+      //     board = this.boards[key]
+      //   this.board.id = key
+      //   this.name = board.name
+      // })
     }
   },
   components: {

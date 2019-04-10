@@ -296,7 +296,6 @@ export default {
         ok: true,
         cancel: true
       }).then(() => {
-        console.log(123)
         let widgetsIndexes = this.boards[boardId].widgetsIndexes
         widgetsIndexes.forEach((widgetIndex) => {
           let topics = this.widgets[widgetIndex].topics
@@ -321,6 +320,17 @@ export default {
       if (board.id !== boardId) {
         Vue.set(this.boards, board.id, board)
         Vue.delete(this.boards, boardId)
+        /* update widgets ids */
+        board.widgetsIndexes.forEach((widgetId, index) => {
+          let newId = uid()
+          Vue.set(this.widgets, newId, this.widgets[widgetId])
+          Vue.set(board.widgetsIndexes, index, newId)
+          Vue.delete(this.widgets, widgetId)
+          this.widgets[newId].topics.forEach((topic, index) => {
+            let widgetsBySubscription = this.widgetsBySubscription[topic]
+            Vue.set(widgetsBySubscription, widgetsBySubscription.indexOf(widgetId), newId)
+          })
+        })
       }
       Vue.set(board.settings, 'edited', !board.settings.edited)
     },
@@ -625,6 +635,7 @@ export default {
             this.$emit('share', { boardId: id, share: shareModel })
           }
         })
+        .catch(() => {})
     },
     shareUploadedHandler (boardId) {
       let board = this.boardsFromConnection[boardId],
@@ -707,15 +718,15 @@ export default {
       handler (client, oldClient) {
         if (isEqual(client, oldClient)) { return false }
         if (this.client) { this.destroyClient() }
-        if (!client) {
-          this.client = undefined
-          return false
-        }
         clearWidgets(this.widgets)
         this.boardsFromConnection = {}
         Object.keys(this.subscriptions).forEach(topic => {
           this.setValueByTopic(topic, null)
         })
+        if (!client) {
+          this.client = undefined
+          return false
+        }
         this.createClient()
       },
       immediate: true
