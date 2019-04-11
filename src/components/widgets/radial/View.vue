@@ -185,7 +185,7 @@ export default {
             } else if (index === arr.length - 1) {
               values.push(this.maxValue)
             } else {
-              let value = Math.round(values[values.length - 1] + step)
+              let value = Math.round((values[values.length - 1] + step) * 100) / 100
               if (Number.isNaN(value)) {
                 value = 'N/A'
               }

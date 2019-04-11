@@ -545,18 +545,18 @@ export default {
     fastBindWidgetHandler (widgetId) {
       let shortcutsIndexes = this.boards[this.activeBoardId].shortcutsIndexes,
         index = shortcutsIndexes.indexOf(widgetId)
-      if (shortcutsIndexes.length === 4) {
-        this.$q.notify({
-          message: 'Shortcuts can contain four widgets maximum',
-          detail: 'Delete something to add a new widget.',
-          type: 'warning',
-          delay: 1000
-        })
-        return false
-      }
       if (index !== -1) {
         Vue.delete(shortcutsIndexes, index)
       } else {
+        if (shortcutsIndexes.length === 4) {
+          this.$q.notify({
+            message: 'Shortcuts can contain four widgets maximum',
+            detail: 'Delete something to add a new widget.',
+            type: 'warning',
+            delay: 1000
+          })
+          return false
+        }
         shortcutsIndexes.push(widgetId)
       }
     },
