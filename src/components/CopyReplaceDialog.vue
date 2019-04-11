@@ -11,7 +11,7 @@
 
     <div slot="body" style="min-width: 300px; min-height: 80px;">
       <q-checkbox v-model="isNeedCopy" color="dark" label="Rename to save a copy"/>
-      <q-input color="dark" v-model="nameModel" :disabled="!isNeedCopy" float-label="Name" :error="isNeedCopy && oldName === name"/>
+      <q-input color="dark" v-model="nameModel" :disable="!isNeedCopy" float-label="Name" :error="isNeedCopy && oldName === name"/>
     </div>
 
     <template slot="buttons" slot-scope="props">
