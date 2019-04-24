@@ -87,6 +87,7 @@ export default {
       Vue.set(this.currentSettings, 'widgetSettings', {})
     },
     updateSettingsHandler (settings) {
+      Vue.set(this.currentSettings, 'widgetSettings', {})
       Vue.set(this.currentSettings, 'widgetSettings', settings)
     },
     setColor (color) {
