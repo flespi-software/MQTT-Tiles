@@ -47,7 +47,7 @@
                 <q-btn flat color="red-6" rounded @click="removeTopicHandler(index)" icon="mdi-delete"/>
               </q-item-side>
             </template>
-            <topic :value="currentSettings.dataTopics[index]" @input="(settings) => editTopicHandler(index, settings)"/>
+            <topic v-model="currentSettings.dataTopics[index]"/>
           </q-collapsible>
         </q-list>
         <component
@@ -194,11 +194,6 @@ export default {
     },
     addTopicHandler () {
       this.currentSettings.dataTopics.push(Object.assign({}, this.defaultTopic))
-    },
-    editTopicHandler (index, {topicFilter, payloadType, payloadField}) {
-      Vue.set(this.currentSettings.dataTopics[index], 'topicFilter', topicFilter)
-      Vue.set(this.currentSettings.dataTopics[index], 'payloadType', payloadType)
-      Vue.set(this.currentSettings.dataTopics[index], 'payloadField', payloadField)
     },
     removeTopicHandler (index) {
       Vue.delete(this.currentSettings.dataTopics, index)
