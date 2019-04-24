@@ -30,6 +30,9 @@
                 <q-btn v-close-overlay v-if="item.settings.width === 1" size="0.9rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" :icon="inShortcuts ? 'mdi-star' : 'mdi-star-outline'" @click="$emit('fast-bind')" dense flat :color="inShortcuts ? 'yellow-9' : `${item.color}-7`">
                   <q-tooltip>{{`${inShortcuts ? 'Remove from' : 'Add to'} shortcuts`}}</q-tooltip>
                 </q-btn>
+                <q-btn v-close-overlay size="0.9rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" icon="mdi-content-duplicate" @click="$emit('duplicate')" dense flat :color="`${item.color}-7`">
+                  <q-tooltip>Duplicate</q-tooltip>
+                </q-btn>
                 <q-btn v-close-overlay size="0.9rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" icon="mdi-settings" @click="$emit('update')" dense flat :color="`${item.color}-7`">
                   <q-tooltip>Edit</q-tooltip>
                 </q-btn>
@@ -53,6 +56,9 @@
         :class="[`${currentValue === null ? 'disabled' : actionTopic ? 'cursor-pointer' : ''}`]"
       />
     </q-card-media>
+    <div class="absolute-bottom-left q-px-xs q-pt-xs" style="font-size: 12px; border-top-right-radius: 5px;" :class="[`text-${item.color}-7`, `bg-${item.color}-1`]">
+      {{timestamp}}
+    </div>
   </q-card>
 </template>
 
@@ -75,6 +81,7 @@
 import { WIDGET_STATUS_DISABLED } from '../../../constants'
 import { DEFAULT_MODE, COMMAND_MODE, ACCUMULATE_AND_MODE, ACCUMULATE_OR_MODE } from './constants.js'
 import getValueByTopic from '../../../mixins/getValueByTopic.js'
+import timestamp from '../../../mixins/timestamp.js'
 export default {
   name: 'Switcher',
   props: ['item', 'index', 'value', 'mini', 'in-shortcuts', 'blocked'],
@@ -90,7 +97,7 @@ export default {
       return this.item.dataTopics.reduce((result, topicObj) => {
         if (result === null) { return result }
         let value = this.value[topicObj.topicFilter] !== null
-          ? this.getValueByTopic(this.value[topicObj.topicFilter], topicObj)
+          ? this.getValueByTopic(this.value[topicObj.topicFilter].payload, topicObj)
           : this.value[topicObj.topicFilter]
         switch (mode) {
           case ACCUMULATE_AND_MODE: {
@@ -128,7 +135,7 @@ export default {
       } else {
         return this.item.dataTopics.reduce((result, topicObj) => {
           let value = this.value[topicObj.topicFilter] !== null
-            ? this.getValueByTopic(this.value[topicObj.topicFilter], topicObj)
+            ? this.getValueByTopic(this.value[topicObj.topicFilter].payload, topicObj)
             : this.value[topicObj.topicFilter]
           return (value === this.item.settings.trueValue) && (result === this.item.settings.trueValue)
             ? this.item.settings.falseValue : (value === this.item.settings.falseValue) && (result === this.item.settings.falseValue)
@@ -144,6 +151,6 @@ export default {
       }
     }
   },
-  mixins: [getValueByTopic]
+  mixins: [getValueByTopic, timestamp]
 }
 </script>

@@ -30,6 +30,9 @@
                 <q-btn v-close-overlay v-if="item.settings.width === 1" size="0.9rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" :icon="inShortcuts ? 'mdi-star' : 'mdi-star-outline'" @click="$emit('fast-bind')" dense flat :color="inShortcuts ? 'yellow-9' : `${item.color}-7`">
                   <q-tooltip>{{`${inShortcuts ? 'Remove from' : 'Add to'} shortcuts`}}</q-tooltip>
                 </q-btn>
+                <q-btn v-close-overlay size="0.9rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" icon="mdi-content-duplicate" @click="$emit('duplicate')" dense flat :color="`${item.color}-7`">
+                  <q-tooltip>Duplicate</q-tooltip>
+                </q-btn>
                 <q-btn v-close-overlay size="0.9rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" icon="mdi-settings" @click="$emit('update')" dense flat :color="`${item.color}-7`">
                   <q-tooltip>Edit</q-tooltip>
                 </q-btn>
@@ -57,6 +60,9 @@
         </q-item>
       </q-list>
     </q-card-media>
+    <div class="absolute-bottom-left q-px-xs q-pt-xs" style="font-size: 12px; border-top-right-radius: 5px;" :class="[`text-${item.color}-7`, `bg-${item.color}-1`]">
+      {{timestamp}}
+    </div>
   </q-card>
 </template>
 
@@ -79,6 +85,7 @@
 import { WIDGET_STATUS_DISABLED } from '../../../constants'
 import { DEFAULT_MODE, COMMAND_MODE } from './constants.js'
 import getValueByTopic from '../../../mixins/getValueByTopic.js'
+import timestamp from '../../../mixins/timestamp.js'
 export default {
   name: 'Singleselect',
   props: ['item', 'index', 'value', 'mini', 'in-shortcuts', 'blocked'],
@@ -93,7 +100,7 @@ export default {
   },
   computed: {
     currentLabel () {
-      let value = this.value[this.item.dataTopics[0].topicFilter]
+      let value = this.value[this.item.dataTopics[0].topicFilter] && this.value[this.item.dataTopics[0].topicFilter].payload
       if (value === null) {
         return 'N/A'
       } else {
@@ -105,7 +112,7 @@ export default {
     },
     currentValue: {
       get () {
-        let value = this.value[this.item.dataTopics[0].topicFilter]
+        let value = this.value[this.item.dataTopics[0].topicFilter] && this.value[this.item.dataTopics[0].topicFilter].payload
         if (value === null) {
           return null
         } else {
@@ -140,6 +147,6 @@ export default {
       }
     }
   },
-  mixins: [getValueByTopic]
+  mixins: [getValueByTopic, timestamp]
 }
 </script>

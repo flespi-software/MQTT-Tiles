@@ -22,7 +22,7 @@
                 <q-btn :disabled="index !== currentSettings.items.length - 1" dense flat class="col-1" @click="upItem(index)" icon="mdi-arrow-up"/>
                 <q-btn :disabled="index !== 0" dense flat class="col-1" @click="downItem(index)" icon="mdi-arrow-down"/>
               </q-item-side>
-              <q-item-main :label="item.label || item.val || `item ${index + 1}`" />
+              <q-item-main :label="item.label ? `${item.label} [${item.val}]` : item.val || `item ${index + 1}`" />
               <q-item-side right>
                 <q-btn flat color="red-6" rounded @click="removeItem(index)" icon="mdi-delete"/>
               </q-item-side>

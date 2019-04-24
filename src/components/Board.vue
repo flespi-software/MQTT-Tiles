@@ -5,10 +5,11 @@
       v-if="settingsModel"
       v-model="settingsModel"
       :settings="currentSettings"
+      :mode="operationMode"
       @save="saveSettingsHandler"
       @hide="hideSettingsHandler"
     />
-    <q-btn v-if='!board.settings.blocked  && !isFrized' fab color="dark" @click="openSettings" icon="mdi-plus" class="absolute button--add">
+    <q-btn v-if='!board.settings.blocked  && !isFrized' fab color="dark" @click="addWidgetHandler" icon="mdi-plus" class="absolute button--add">
       <q-tooltip>Add new widget</q-tooltip>
     </q-btn>
     <q-toolbar color="white">
@@ -61,6 +62,7 @@
                 :blocked="board.settings.blocked || isFrized"
                 @action="(data) => { $emit('action', data) }"
                 @update="editWidgetSettings(widgetIndex)"
+                @duplicate="duplicateWidgetHandler(widgetIndex)"
                 @delete="$emit('delete:widget', {widgetId: widgetIndex, settings: widgets[widgetIndex]})"
                 @fast-bind="$emit('fast-bind', widgetIndex)"
               />
@@ -69,7 +71,7 @@
       </div>
       <div v-else class="text-center text-grey-8 q-mt-md" style="font-size: 2rem;">
         <div class="text-bold">The board is empty</div>
-        <div><q-btn color="dark" icon="mdi-plus-circle-outline" label="Add widget" @click="openSettings" /></div>
+        <div><q-btn color="dark" icon="mdi-plus-circle-outline" label="Add widget" @click="addWidgetHandler" /></div>
       </div>
     </div>
   </div>
@@ -94,6 +96,8 @@
 </style>
 
 <script>
+import Vue from 'vue'
+import cloneDeep from 'lodash/cloneDeep'
 import Settings from './widgets/Settings'
 import VueGridLayout from 'vue-grid-layout'
 import Switcher from './widgets/switcher/View'
@@ -103,6 +107,8 @@ import Radial from './widgets/radial/View'
 import Linear from './widgets/linear/View'
 import Frame from './widgets/frame/View'
 import Singleselect from './widgets/singleselect/View'
+import Multiplier from './widgets/multiplier/View'
+import { WIDGET_MODE_EDIT, WIDGET_MODE_ADD, WIDGET_MODE_DUPLICATE } from '../constants'
 
 const BREAKPOINTS = { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }
 function getBreakpoint (width) {
@@ -129,7 +135,8 @@ export default {
       colNum: 12,
       rowHeight: 50,
       breakpoints: BREAKPOINTS,
-      breakpoint: 'xxs'
+      breakpoint: 'xxs',
+      operationMode: -1
     }
   },
   computed: {
@@ -158,11 +165,17 @@ export default {
       } else {
         this.$emit('add:widget', settings)
       }
+      this.operationMode = -1
+    },
+    addWidgetHandler () {
+      this.operationMode = WIDGET_MODE_ADD
+      this.openSettings()
     },
     editWidgetSettings (widgetId) {
       this.currentSettings = this.widgets[widgetId]
       this.editedWidgetId = widgetId
       this.editedWidgetTopics = [...this.currentSettings.topics]
+      this.operationMode = WIDGET_MODE_EDIT
       this.openSettings()
     },
     resizeHandler (index, height, width) {
@@ -171,6 +184,12 @@ export default {
     onResize ({width}) { this.breakpoint = getBreakpoint(width) },
     shareHandler () {
       this.$emit('share')
+    },
+    duplicateWidgetHandler (widgetId) {
+      this.currentSettings = cloneDeep(this.widgets[widgetId])
+      Vue.delete(this.currentSettings, 'id')
+      this.operationMode = WIDGET_MODE_DUPLICATE
+      this.openSettings()
     }
   },
   components: {
@@ -182,6 +201,7 @@ export default {
     Linear,
     Frame,
     Singleselect,
+    Multiplier,
     GridLayout: VueGridLayout.GridLayout,
     GridItem: VueGridLayout.GridItem
   }

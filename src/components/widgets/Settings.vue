@@ -36,8 +36,8 @@
           <q-list-header :class="{'text-red-6': !currentSettings.dataTopics.length}">Topics{{currentSettings.dataTopics.length ? '' : ' are empty'}}</q-list-header>
           <q-collapsible
             v-for="(topic, index) in currentSettings.dataTopics"
-            :key="`${index}${topic.topicFilter}`"
-            :header-class="[`bg-${validateTopic(topic.topicFilter) && checkUniqueTopic(topic.topicFilter, index) ? 'grey-4' : 'red-2'}`]"
+            :key="index"
+            :header-class="[`bg-${topicsHighlight[index]}`]"
             collapse-icon="mdi-settings"
             :opened="true"
           >
@@ -47,7 +47,7 @@
                 <q-btn flat color="red-6" rounded @click="removeTopicHandler(index)" icon="mdi-delete"/>
               </q-item-side>
             </template>
-            <topic v-model="currentSettings.dataTopics[index]" />
+            <topic :value="currentSettings.dataTopics[index]" @input="(settings) => editTopicHandler(index, settings)"/>
           </q-collapsible>
         </q-list>
         <component
@@ -61,7 +61,7 @@
         <q-toolbar-title>
         </q-toolbar-title>
         <q-btn flat dense class="q-mr-sm" @click="closeHandler">Close</q-btn>
-        <q-btn flat dense :disable="!validateCurrentSettings || !isValideSchema" @click="saveSettingsHandler">{{settings ? 'Update' : 'Save'}}</q-btn>
+        <q-btn flat dense :disable="!validateCurrentSettings || !isValideSchema" @click="saveSettingsHandler">{{saveButtonLabels[mode]}}</q-btn>
       </q-toolbar>
     </q-modal-layout>
   </q-modal>
@@ -91,7 +91,7 @@
 import merge from 'lodash/merge'
 import uniq from 'lodash/uniq'
 import Vue from 'vue'
-import { WIDGET_STATUS_DISABLED } from '../../constants'
+import { WIDGET_STATUS_DISABLED, WIDGET_MODE_EDIT, WIDGET_MODE_ADD, WIDGET_MODE_DUPLICATE } from '../../constants'
 import validateTopic from '../../mixins/validateTopic.js'
 import Topic from './Topic'
 import Switcher from './switcher/Schema'
@@ -101,10 +101,11 @@ import Radial from './radial/Schema'
 import Linear from './linear/Schema'
 import Frame from './frame/Schema'
 import Singleselect from './singleselect/Schema'
+import Multiplier from './multiplier/Schema'
 
 export default {
   name: 'Settings',
-  props: ['value', 'settings'],
+  props: ['value', 'settings', 'mode'],
   data () {
     let defaultSettings = {
       name: 'New widget',
@@ -125,7 +126,8 @@ export default {
         {label: 'Radial gauge', value: 'radial'},
         {label: 'Linear gauge', value: 'linear'},
         {label: 'Iframe', value: 'frame'},
-        {label: 'Radio button', value: 'singleselect'}
+        {label: 'Radio button', value: 'singleselect'},
+        {label: 'Multiplier', value: 'multiplier'}
       ],
       colors: ['grey', 'red', 'green', 'orange', 'blue', 'light-blue'],
       isValideSchema: true,
@@ -133,6 +135,11 @@ export default {
         topicFilter: '',
         payloadType: 0,
         payloadField: ''
+      },
+      saveButtonLabels: {
+        [WIDGET_MODE_ADD]: 'Save',
+        [WIDGET_MODE_EDIT]: 'Update',
+        [WIDGET_MODE_DUPLICATE]: 'Clone'
       }
     }
   },
@@ -152,6 +159,16 @@ export default {
         /* check topics don`t duplicating */
         this.currentSettings.dataTopics.every(topic => this.currentSettings.dataTopics.filter(topicCompare => topicCompare.topicFilter === topic.topicFilter).length === 1) &&
         (this.currentSettings.settings.maxTopicsLength === undefined || (this.currentSettings.settings.maxTopicsLength !== undefined && this.currentSettings.settings.maxTopicsLength === this.currentSettings.dataTopics.length))
+    },
+    topicsHighlight () {
+      return this.currentSettings.dataTopics.reduce((colors, topic, index) => {
+        if (this.validateTopic(topic.topicFilter) && this.checkUniqueTopic(topic.topicFilter, index)) {
+          colors[index] = 'grey-4'
+        } else {
+          colors[index] = 'red-2'
+        }
+        return colors
+      }, [])
     }
   },
   methods: {
@@ -177,6 +194,11 @@ export default {
     },
     addTopicHandler () {
       this.currentSettings.dataTopics.push(Object.assign({}, this.defaultTopic))
+    },
+    editTopicHandler (index, {topicFilter, payloadType, payloadField}) {
+      Vue.set(this.currentSettings.dataTopics[index], 'topicFilter', topicFilter)
+      Vue.set(this.currentSettings.dataTopics[index], 'payloadType', payloadType)
+      Vue.set(this.currentSettings.dataTopics[index], 'payloadField', payloadField)
     },
     removeTopicHandler (index) {
       Vue.delete(this.currentSettings.dataTopics, index)
@@ -215,7 +237,7 @@ export default {
   },
   mixins: [validateTopic],
   components: {
-    Topic, Switcher, Informer, Clicker, Radial, Linear, Frame, Singleselect
+    Topic, Switcher, Informer, Clicker, Radial, Linear, Frame, Singleselect, Multiplier
   }
 }
 </script>

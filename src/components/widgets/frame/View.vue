@@ -10,6 +10,9 @@
           <q-btn size="0.9rem" class="q-pa-none" style="min-height: 1rem;" dense flat icon="mdi-dots-vertical" :color="`${item.color}-7`">
             <q-popover anchor="top right" self="top right" :offset="[8, 8]" style="box-shadow: none;">
               <div class="q-pa-sm" :class="[`bg-${item.color}-1`]">
+                <q-btn v-close-overlay size="0.9rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" icon="mdi-content-duplicate" @click="$emit('duplicate')" dense flat :color="`${item.color}-7`">
+                  <q-tooltip>Duplicate</q-tooltip>
+                </q-btn>
                 <q-btn v-close-overlay size="0.9rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" icon="mdi-settings" @click="$emit('update')" dense flat :color="`${item.color}-7`">
                   <q-tooltip>Edit</q-tooltip>
                 </q-btn>
@@ -88,7 +91,7 @@ export default {
   computed: {
     link () {
       let urlPattern = /\b(?:https?|ftp):\/\/[a-z0-9-+&@#/%?=~_|!:,.;]*[a-z0-9-+&@#/%=~_|]/gim
-      let linkValue = this.getValueByTopic(this.value[this.item.dataTopics[0].topicFilter], this.item.dataTopics[0])
+      let linkValue = this.getValueByTopic(this.value[this.item.dataTopics[0].topicFilter] && this.value[this.item.dataTopics[0].topicFilter].payload, this.item.dataTopics[0])
       return linkValue && linkValue.toString().match(urlPattern) ? linkValue : null
     }
   },

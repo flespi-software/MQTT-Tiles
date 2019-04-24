@@ -73,6 +73,8 @@ import cloneDeep from 'lodash/cloneDeep'
 import remove from 'lodash/remove'
 import difference from 'lodash/difference'
 import uniq from 'lodash/uniq'
+import get from 'lodash/get'
+import set from 'lodash/set'
 import Vue from 'vue'
 import Board from './Board'
 import Boards from './Boards'
@@ -136,20 +138,28 @@ export default {
       activeBoardId: undefined,
       colsByBreakpoint: { lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 },
       boardsFromConnection: {},
-      exportBoardId: ''
+      exportBoardId: '',
+      bufferValues: {}
     }
   },
   computed: {
     values () {
-      return Object.keys(this.widgets).reduce((values, widgetId) => {
+      let values = Object.keys(this.widgets).reduce((values, widgetId) => {
         let value = values[widgetId] = {},
           widget = this.widgets[widgetId]
         widget.topics.forEach(topic => {
-          value[topic] = this.subscriptions[topic]
+          if (widget.type === 'multiplier' && !!this.subscriptions[topic]) {
+            value[topic] = this.getMultiplierValue(topic, this.subscriptions[topic], cloneDeep(get(this.bufferValues, `${widgetId}.${topic}`, undefined)))
+          } else {
+            value[topic] = this.subscriptions[topic]
+          }
         })
         return values
       }, {})
+      this.setBufferValues(values)
+      return values
     },
+    subscriptionsTopics () { return Object.keys(this.subscriptions) },
     canShare () {
       return !!this.clientSettings && this.clientSettings.host.indexOf('flespi') !== -1 &&
         !this.clientSettings.flespiBoard &&
@@ -164,6 +174,33 @@ export default {
   },
   methods: {
     uid,
+    setBufferValues (values) {
+      this.bufferValues = values
+    },
+    checkTopic (topic, mask) {
+      if (topic === mask) { return true }
+      let topicPath = topic.split('/')
+      let currentTopicPath = mask.split('/')
+      /* process $share subscriptions */
+      if (currentTopicPath[0] === '$share') {
+        currentTopicPath.splice(0, 2)
+      }
+      /* if the lengths are the same or the last element of the path is '#'. '#' can just be in the end of the path of the subscribed topic */
+      if (currentTopicPath.length === topicPath.length || currentTopicPath[currentTopicPath.length - 1] === '#') {
+        return currentTopicPath.reduce((result, currentPath, index) => {
+          /*
+          '+' in the path of the topic means any part of the path of the topic.
+          '#' in the path of the topic means any part or later length of the path of the topic.
+          */
+          if (currentPath === '#' || currentPath === '+') {
+            return result && true
+          }
+          return result && currentPath === topicPath[index]
+        }, true)
+      } else {
+        return false
+      }
+    },
     clearObject (obj) {
       return Object.keys(obj).reduce((result, key) => {
         let value = obj[key]
@@ -226,10 +263,10 @@ export default {
       client.on('message', (topic, message, packet) => {
         /* synced board processing */
         if (topic.indexOf(config.syncNamespace) !== -1) {
-          this.savedBoardProcess(topic.split('/').reverse()[0], message)
+          this.savedBoardProcess(topic.split('/').slice(-1), message)
           return false
         }
-        this.setValueByTopic(topic, message)
+        this.setValueByTopic(topic, {...packet, timestamp: Date.now()})
       })
 
       client.on('connect', (connack) => {
@@ -253,7 +290,17 @@ export default {
       this.initClient()
     },
     setValueByTopic (topic, value) {
-      Vue.set(this.subscriptions, topic, value)
+      /* init value in store */
+      if (value === null) {
+        Vue.set(this.subscriptions, topic, value)
+        return true
+      }
+      /* write value */
+      this.subscriptionsTopics.forEach((subTopic) => {
+        if (this.checkTopic(topic, subTopic)) {
+          Vue.set(this.subscriptions, subTopic, value)
+        }
+      })
     },
     async subscribe () {
       if (this.client) {
@@ -574,6 +621,39 @@ export default {
       let widget = this.widgets[index]
       Vue.set(widget.settings, 'height', height)
       Vue.set(widget.settings, 'width', width)
+      /* modify all layouts */
+      let board = this.boards[this.activeBoardId]
+      let layouts = board.layouts
+      Object.keys(layouts).forEach(layoutName => {
+        let layoutWidgetItem = layouts[layoutName].filter(item => item.i === index)[0]
+        layoutWidgetItem.h = height
+        layoutWidgetItem.w = width
+      })
+    },
+    getMultiplierValue (subscriptionTopic, packet, initValue) {
+      let path = subscriptionTopic.split('/')
+      let currentPath = packet.topic.split('/')
+      let value = initValue || {}
+      let setPath = []
+      path.forEach((pathItem, index) => {
+        if (pathItem === '+') {
+          setPath.push(currentPath[index])
+        }
+      })
+      if (packet.payload.length) {
+        if (setPath.length) {
+          set(value, setPath.join('-'), packet)
+        } else {
+          value = packet
+        }
+      } else {
+        if (setPath.length) {
+          Vue.delete(value, setPath.join('-'))
+        } else {
+          value = null
+        }
+      }
+      return value
     },
     /* widgets logic end */
     getSyncedBoards () {

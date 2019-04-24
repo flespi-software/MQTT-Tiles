@@ -29,6 +29,9 @@
                 <q-btn v-close-overlay v-if="item.settings.width === 1" size="0.9rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" :icon="inShortcuts ? 'mdi-star' : 'mdi-star-outline'" @click="$emit('fast-bind')" dense flat :color="inShortcuts ? 'yellow-9' : `${item.color}-7`">
                   <q-tooltip>{{`${inShortcuts ? 'Remove from' : 'Add to'} shortcuts`}}</q-tooltip>
                 </q-btn>
+                <q-btn v-close-overlay size="0.9rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" icon="mdi-content-duplicate" @click="$emit('duplicate')" dense flat :color="`${item.color}-7`">
+                  <q-tooltip>Duplicate</q-tooltip>
+                </q-btn>
                 <q-btn v-close-overlay size="0.9rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" icon="mdi-settings" @click="$emit('update')" dense flat :color="`${item.color}-7`">
                   <q-tooltip>Edit</q-tooltip>
                 </q-btn>
@@ -43,8 +46,8 @@
       </transition>
     </q-item>
     <q-card-media class="widget__content" :class="[`bg-${item.color}-1`]" style="height: calc(100% - 29px);">
-      <div class="informer__payload-wrapper" :style="{height: `${blocked ? '100%' : 'calc(100% - 15px)'}`}">
-        <span class="informer__payload" :class="[`text-${value[topic] !== null ? 'dark' : 'grey-5'}`]">
+      <div class="informer__payload-wrapper scroll" style="padding-bottom: 15px;">
+        <div class="informer__payload" :class="[`text-${value[topic] !== null ? 'dark' : 'grey-5'}`]">
           <span style="font-weight: bold;">{{`${item.settings.prefix}`}}</span>
           {{text}}
           <span style="font-weight: bold;">{{`${item.settings.postfix}`}}</span>
@@ -53,7 +56,10 @@
             {{text}}
             <span style="font-weight: bold;">{{`${item.settings.postfix}`}}</span>
           </q-tooltip>
-        </span>
+        </div>
+      </div>
+      <div class="absolute-bottom-left q-px-xs q-pt-xs" style="font-size: 12px; border-top-right-radius: 5px;" :class="[`text-${item.color}-7`, `bg-${item.color}-1`]">
+        {{timestamp}}
       </div>
     </q-card-media>
   </q-card>
@@ -61,9 +67,7 @@
 
 <style lang="stylus">
   .informer__payload-wrapper
-    display inline-flex
     align-items center
-    justify-content center
     vertical-align middle
     width 100%
   .informer__payload
@@ -91,6 +95,7 @@
 <script>
 import { WIDGET_STATUS_DISABLED } from '../../../constants'
 import getValueByTopic from '../../../mixins/getValueByTopic.js'
+import timestamp from '../../../mixins/timestamp.js'
 export default {
   name: 'Informer',
   props: ['item', 'index', 'mini', 'in-shortcuts', 'value', 'blocked'],
@@ -111,12 +116,12 @@ export default {
       return this.item.dataTopics[0].topicFilter
     },
     text () {
-      return this.getValueByTopic(this.value[this.topic], this.item.dataTopics[0])
+      return this.getValueByTopic(this.value[this.topic] && this.value[this.topic].payload, this.item.dataTopics[0])
     },
     stringLength () {
       return this.item.settings.prefix.length + this.text.length + this.item.settings.postfix.length
     }
   },
-  mixins: [getValueByTopic]
+  mixins: [getValueByTopic, timestamp]
 }
 </script>

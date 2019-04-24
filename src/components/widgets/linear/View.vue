@@ -10,7 +10,7 @@
     </div>
     <div class="ellipsis q-mt-sm">{{item.name}}</div>
   </div>
-  <q-card flat v-else inline class="widget__linear" style="width: 100%; height: 100%;" :class="[`bg-${item.color}-1`]">
+  <q-card flat v-else inline class="widget__linear absolute" style="width: 100%; height: 100%;" :class="[`bg-${item.color}-1`]">
     <q-item class="q-px-sm q-pt-sm q-pb-none" style="min-height: 29px;">
       <q-item-main class="ellipsis" :class="[`text-${item.color}-7`]" style="font-size: .9rem">
         {{item.name}}
@@ -26,6 +26,9 @@
               <div class="q-pa-sm" :class="[`bg-${item.color}-1`]">
                 <q-btn v-close-overlay v-if="item.settings.width === 1" size="0.9rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" :icon="inShortcuts ? 'mdi-star' : 'mdi-star-outline'" @click="$emit('fast-bind')" dense flat :color="inShortcuts ? 'yellow-9' : `${item.color}-7`">
                   <q-tooltip>{{`${inShortcuts ? 'Remove from' : 'Add to'} shortcuts`}}</q-tooltip>
+                </q-btn>
+                <q-btn v-close-overlay size="0.9rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" icon="mdi-content-duplicate" @click="$emit('duplicate')" dense flat :color="`${item.color}-7`">
+                  <q-tooltip>Duplicate</q-tooltip>
                 </q-btn>
                 <q-btn v-close-overlay size="0.9rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" icon="mdi-settings" @click="$emit('update')" dense flat :color="`${item.color}-7`">
                   <q-tooltip>Edit</q-tooltip>
@@ -46,6 +49,9 @@
           <q-resize-observable @resize="onResize" />
           <linear-gauge :options="options" :value="currentValue"/>
         </div>
+      </div>
+      <div class="absolute-bottom-left q-px-xs q-pt-xs" style="font-size: 12px; border-top-right-radius: 5px;" :class="[`text-${item.color}-7`, `bg-${item.color}-1`]">
+        {{timestamp}}
       </div>
     </q-card-media>
   </q-card>
@@ -81,6 +87,7 @@ import {
   WIDGET_RANGE_VALUE_DATASOURCE_MODE
 } from '../../../constants'
 import getValueByTopic from '../../../mixins/getValueByTopic.js'
+import timestamp from '../../../mixins/timestamp.js'
 import LinearGauge from './LinearGauge'
 export default {
   name: 'Linear',
@@ -135,13 +142,13 @@ export default {
         minTopic = this.item.settings.topics[0],
         maxTopic = this.item.settings.topics[1],
         values = {
-          [valueTopic.topicFilter]: parseFloat(this.getValueByTopic(this.value[valueTopic.topicFilter], valueTopic))
+          [valueTopic.topicFilter]: parseFloat(this.getValueByTopic(this.value[valueTopic.topicFilter] && this.value[valueTopic.topicFilter].payload, valueTopic))
         }
       if (minTopic) {
-        values[minTopic.topicFilter] = parseFloat(this.getValueByTopic(this.value[minTopic.topicFilter], minTopic))
+        values[minTopic.topicFilter] = parseFloat(this.getValueByTopic(this.value[minTopic.topicFilter] && this.value[minTopic.topicFilter].payload, minTopic))
       }
       if (maxTopic) {
-        values[maxTopic.topicFilter] = parseFloat(this.getValueByTopic(this.value[maxTopic.topicFilter], maxTopic))
+        values[maxTopic.topicFilter] = parseFloat(this.getValueByTopic(this.value[maxTopic.topicFilter] && this.value[maxTopic.topicFilter].payload, maxTopic))
       }
       return values
     },
@@ -222,6 +229,6 @@ export default {
     }
   },
   components: { LinearGauge },
-  mixins: [getValueByTopic]
+  mixins: [getValueByTopic, timestamp]
 }
 </script>

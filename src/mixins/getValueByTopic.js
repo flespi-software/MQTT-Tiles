@@ -1,4 +1,5 @@
 import { WIDGET_PAYLOAD_TYPE_STRING, WIDGET_PAYLOAD_TYPE_JSON } from '../constants'
+import get from 'lodash/get'
 export default {
   methods: {
     getValueByTopic (value, topic) {
@@ -13,7 +14,7 @@ export default {
           case WIDGET_PAYLOAD_TYPE_JSON: {
             try {
               if (topic.payloadField) {
-                value = JSON.parse(value.toString())[topic.payloadField] || 'N/A'
+                value = get(JSON.parse(value.toString()), topic.payloadField, 'N/A').toString()
               } else {
                 value = JSON.parse(value.toString())
               }

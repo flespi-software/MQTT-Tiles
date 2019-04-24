@@ -199,6 +199,23 @@ export default {
       let activeClient = LocalStorage.get.item(ACTIVE_CLIENT_LOCAL_STORAGE_NAME)
       if (savedClients) {
         this.clients = savedClients
+        if (this.$route.params.flespiToken) {
+          let token = this.$route.params.flespiToken.replace('FlespiToken ', '')
+          let clientIdsByFlespiToken = this.clientsIds.filter(clientId => {
+            let clientToken = this.clients[clientId].username.replace('FlespiToken ', '')
+            return token === clientToken
+          })
+          if (clientIdsByFlespiToken.length) {
+            activeClient = clientIdsByFlespiToken[0]
+          } else {
+            let client = defaultClient()
+            client.username = token
+            let id = (parseInt(this.clientsIds[this.clientsIds.slice(-1)]) + 1).toString()
+            Vue.set(this.clients, id, client)
+            activeClient = id
+          }
+          this.$router.push('/')
+        }
         if (activeClient && this.clients[activeClient]) {
           this.$nextTick(() => { this.setActiveClient(activeClient) })
         }
