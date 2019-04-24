@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
 
 importScripts(
-  "precache-manifest.8512edf0caa22f8ec6f6cf42c9750481.js"
+  "precache-manifest.b6ceb4db6d853f22608e0868dcbe6722.js"
 );
 
 workbox.core.setCacheNameDetails({prefix: "mqtttiles"});
