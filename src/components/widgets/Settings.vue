@@ -186,7 +186,8 @@ export default {
     setColor (color) {
       Vue.set(this.currentSettings, 'color', color)
     },
-    changeTypeHandler () {
+    changeTypeHandler (type) {
+      if (type === this.currentSettings.type) { return false }
       Vue.set(this.currentSettings, 'settings', {})
     },
     validateSchemas (status) {
