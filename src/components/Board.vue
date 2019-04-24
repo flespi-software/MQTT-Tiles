@@ -20,6 +20,9 @@
       <q-btn v-if="canShare" @click="shareHandler" icon="mdi-share" color="dark" flat round>
         <q-tooltip>Share board</q-tooltip>
       </q-btn>
+      <q-btn v-if="canShare" @click="uploadHandler" icon="mdi-upload" color="dark" flat round>
+        <q-tooltip>Upload board</q-tooltip>
+      </q-btn>
       <q-btn @click="$emit('block')" :icon="board.settings.blocked ? 'mdi-lock' : 'mdi-lock-open'" color="dark" flat round v-if="!isFrized">
         <q-tooltip>{{board.settings.blocked ? 'Unlock your board' : 'Lock your board'}}</q-tooltip>
       </q-btn>
@@ -184,6 +187,9 @@ export default {
     onResize ({width}) { this.breakpoint = getBreakpoint(width) },
     shareHandler () {
       this.$emit('share')
+    },
+    uploadHandler () {
+      this.$emit('upload')
     },
     duplicateWidgetHandler (widgetId) {
       this.currentSettings = cloneDeep(this.widgets[widgetId])

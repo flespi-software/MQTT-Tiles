@@ -18,6 +18,7 @@
       @block="blockBoardHandler"
       @update:layout="layoutUpdateHandler"
       @share="shareHandler(activeBoardId)"
+      @upload="exportPrepareBoardHandler(activeBoardId)"
       :style="{height: `${clientSettings ? 'calc(100vh - 50px)' : 'calc(100vh - 110px)'}`}"
     />
     <boards
@@ -31,7 +32,7 @@
       :hasConnection="!!clientSettings"
       @add="addBoard"
       @edit="editBoardHandler"
-      @delete="deleteBoardHandler"
+      @delete="deleteBoardDialogHandler"
       @select="setActiveBoard"
       @action="actionHandler"
       @share="shareHandler"
@@ -263,7 +264,7 @@ export default {
       client.on('message', (topic, message, packet) => {
         /* synced board processing */
         if (topic.indexOf(config.syncNamespace) !== -1) {
-          this.savedBoardProcess(topic.split('/').slice(-1), message)
+          this.savedBoardProcess(topic.split('/').slice(-1)[0], message)
           return false
         }
         this.setValueByTopic(topic, {...packet, timestamp: Date.now()})
@@ -339,30 +340,31 @@ export default {
       Vue.set(this.boards, id, settings)
     },
     deleteBoardHandler (boardId) {
+      let widgetsIndexes = this.boards[boardId].widgetsIndexes
+      widgetsIndexes.forEach((widgetIndex) => {
+        let topics = this.widgets[widgetIndex].topics
+        topics.forEach((topic) => {
+          let widgetsIndexesBySubscription = this.widgetsBySubscription[topic]
+          removeFromArrayByValue(widgetsIndexesBySubscription, widgetIndex)
+          if (!widgetsIndexesBySubscription.length) {
+            this.unsubscribe(topic)
+            Vue.delete(this.widgetsBySubscription, topic)
+            Vue.delete(this.subscriptions, topic)
+          }
+        })
+        Vue.delete(this.widgets, widgetIndex)
+      })
+
+      Vue.delete(this.boards, boardId)
+    },
+    deleteBoardDialogHandler (boardId) {
       this.$q.dialog({
         title: 'Warning',
         message: `Do you really want to delete ${this.boards[boardId].name} board?`,
         color: 'dark',
         ok: true,
         cancel: true
-      }).then(() => {
-        let widgetsIndexes = this.boards[boardId].widgetsIndexes
-        widgetsIndexes.forEach((widgetIndex) => {
-          let topics = this.widgets[widgetIndex].topics
-          topics.forEach((topic) => {
-            let widgetsIndexesBySubscription = this.widgetsBySubscription[topic]
-            removeFromArrayByValue(widgetsIndexesBySubscription, widgetIndex)
-            if (!widgetsIndexesBySubscription.length) {
-              this.unsubscribe(topic)
-              Vue.delete(this.widgetsBySubscription, topic)
-              Vue.delete(this.subscriptions, topic)
-            }
-          })
-          Vue.delete(this.widgets, widgetIndex)
-        })
-
-        Vue.delete(this.boards, boardId)
-      })
+      }).then(() => { this.deleteBoardHandler(boardId) })
         .catch(() => {})
     },
     deleteUploadedBoard (boardId) {
@@ -668,6 +670,12 @@ export default {
       board = JSON.parse(board)
       if (typeof board === 'object') {
         Vue.set(this.boardsFromConnection, id, board)
+        if (id === this.activeBoardId && this.clientSettings.flespiBoard) {
+          this.activeBoardId = null
+          this.deleteBoardHandler(id)
+          this.initBoard(this.boardsFromConnection[id])
+          this.setActiveBoard(id)
+        }
       }
     },
     importBoardHandler (id) {
