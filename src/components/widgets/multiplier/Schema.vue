@@ -2,7 +2,7 @@
   <div>
     <div class="row">
       <div class="q-mt-sm col-12">
-        <q-select color="dark" v-model="currentSettings.type" :options="typeOptions" float-label="Widget multiplie type" @input="changeTypeHandler"/>
+        <q-select color="dark" v-model="currentSettings.type" :options="typeOptions" float-label="Widget multiplie type" />
       </div>
       <div class="color-palette col-12">
         <div class="text-grey-6 q-pb-sm color-palette__label">Color</div>
@@ -83,9 +83,6 @@ export default {
     this.$emit('update', this.currentSettings)
   },
   methods: {
-    changeTypeHandler () {
-      Vue.set(this.currentSettings, 'widgetSettings', {})
-    },
     updateSettingsHandler (settings) {
       Vue.set(this.currentSettings, 'widgetSettings', {})
       Vue.set(this.currentSettings, 'widgetSettings', settings)
