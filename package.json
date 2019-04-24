@@ -1,6 +1,6 @@
 {
   "name": "mqtttiles",
-  "version": "1.2.14",
+  "version": "1.2.15",
   "description": "MQTT-based IoT dashboard visualization tool",
   "productName": "MQTT Tiles",
   "cordovaId": "org.cordova.quasar.app",
@@ -17,7 +17,8 @@
     "mqtt": "git+https://github.com/mqttjs/MQTT.js.git",
     "v-click-outside": "^2.1.1",
     "vue-clipboard2": "^0.3.0",
-    "vue-grid-layout": "^2.3.4"
+    "vue-grid-layout": "^2.3.4",
+    "workbox-webpack-plugin": "^4.3.0"
   },
   "devDependencies": {
     "babel-eslint": "^8.2.1",
@@ -31,7 +32,7 @@
     "eslint-plugin-standard": "^3.0.1",
     "eslint-plugin-vue": "^4.3.0",
     "git-directory-deploy": "^1.5.1",
-    "quasar-cli": "^0.17.23",
+    "quasar-cli": "^0.17.24",
     "strip-ansi": "=3.0.1"
   },
   "engines": {
