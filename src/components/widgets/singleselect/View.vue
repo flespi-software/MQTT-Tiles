@@ -53,7 +53,7 @@
             <q-radio v-model="currentValue" :val="listItem.val" :color="`${item.color}-7`" />
           </q-item-side>
           <q-item-main class="cursor-pointer">
-            <q-item-tile label>{{listItem.label || listItem.val}}<span class="text-grey-7 q-ml-xs" v-if="listItem.label">({{listItem.val || '*Empty*'}})</span></q-item-tile>
+            <q-item-tile label>{{listItem.label || listItem.val || 'Empty'}}</q-item-tile>
             <q-item-tile v-if="item.settings.mode === COMMAND_MODE" sublabel>{{listItem.actionTopic}}</q-item-tile>
             <q-item-tile v-if="item.settings.mode === COMMAND_MODE" sublabel>({{listItem.actionPayload || '*Empty*'}})</q-item-tile>
           </q-item-main>

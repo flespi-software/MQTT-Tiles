@@ -8,7 +8,7 @@
       </q-toolbar>
       <div style="margin: 20px;" :style="{ height: $q.platform.is.mobile ? 'calc(100% - 100px)' : '50vh', width: $q.platform.is.mobile ? 'calc(100% - 40px)' : '50vw'}">
         <q-input color="dark"  v-model="currentSettings.name" float-label="Name" :error="!currentSettings.name"/>
-        <q-select color="dark" v-model="currentSettings.type" :options="typeOptions" float-label="Type" @input="changeTypeHandler"/>
+        <q-select color="dark" v-model="currentSettings.type" :options="typeOptions" float-label="Type"/>
         <div class="color-palette">
           <div class="text-grey-6 q-pb-sm color-palette__label">Color</div>
           <div class="row color-palette__wrapper">
@@ -44,7 +44,7 @@
             <template slot="header">
               <q-item-main :label="topic.topicFilter || 'Empty'" />
               <q-item-side right>
-                <q-btn flat color="red-6" rounded @click="removeTopicHandler(index)" icon="mdi-delete"/>
+                <q-btn flat color="red-6" round dense @click="removeTopicHandler(index)" icon="mdi-delete"/>
               </q-item-side>
             </template>
             <topic v-model="currentSettings.dataTopics[index]"/>
@@ -185,10 +185,6 @@ export default {
     },
     setColor (color) {
       Vue.set(this.currentSettings, 'color', color)
-    },
-    changeTypeHandler (type) {
-      if (type === this.currentSettings.type) { return false }
-      Vue.set(this.currentSettings, 'settings', {})
     },
     validateSchemas (status) {
       this.isValideSchema = status

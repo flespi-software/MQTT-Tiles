@@ -27,7 +27,7 @@
                       <q-item-side icon="mdi-share" />
                       <q-item-main label="Share"/>
                     </q-item>
-                    <q-item-separator/>
+                    <q-item-separator v-if="canShare"/>
                     <q-item class="cursor-pointer" v-close-overlay highlight @click.native.stop="$emit('delete:uploaded', id)">
                       <q-item-side color="red" icon="mdi-delete-outline" />
                       <q-item-main label="Remove"/>
