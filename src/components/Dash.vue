@@ -826,7 +826,6 @@ export default {
   },
   created () {
     if (this.clientSettings) {
-      this.createClient()
       if (this.clientSettings.flespiBoard) {
         this.shareSync()
       }
