@@ -8,7 +8,7 @@
       </q-toolbar>
       <div style="margin: 20px;" :style="{ height: $q.platform.is.mobile ? 'calc(100% - 100px)' : '50vh', width: $q.platform.is.mobile ? 'calc(100% - 40px)' : '50vw'}">
         <q-input color="dark"  v-model="currentSettings.name" float-label="Name" :error="!currentSettings.name"/>
-        <q-select color="dark" v-model="currentSettings.type" :options="typeOptions" float-label="Type"/>
+        <q-select color="dark" v-model="currentSettings.type" :options="typeOptions" float-label="Type" @input="currentSettings.settings = {}"/>
         <div class="color-palette">
           <div class="text-grey-6 q-pb-sm color-palette__label">Color</div>
           <div class="row color-palette__wrapper">
@@ -23,7 +23,7 @@
             </span>
           </div>
         </div>
-        <q-list class="relative-position" v-if="this.currentSettings.settings.maxTopicsLength !== 0">
+        <q-list class="relative-position" v-if="currentSettings.settings.maxTopicsLength !== 0">
           <q-btn
             color="dark"
             style="top: -20px; right: 8px; position: absolute; z-index: 1130;"
@@ -102,6 +102,7 @@ import Linear from './linear/Schema'
 import Frame from './frame/Schema'
 import Singleselect from './singleselect/Schema'
 import Multiplier from './multiplier/Schema'
+import Complex from './complex/Schema'
 
 export default {
   name: 'Settings',
@@ -127,7 +128,8 @@ export default {
         {label: 'Linear gauge', value: 'linear'},
         {label: 'Iframe', value: 'frame'},
         {label: 'Radio button', value: 'singleselect'},
-        {label: 'Multiplier', value: 'multiplier'}
+        {label: 'Multiplier', value: 'multiplier'},
+        {label: 'Complex', value: 'complex'}
       ],
       colors: ['grey', 'red', 'green', 'orange', 'blue', 'light-blue'],
       isValideSchema: true,
@@ -229,7 +231,7 @@ export default {
   },
   mixins: [validateTopic],
   components: {
-    Topic, Switcher, Informer, Clicker, Radial, Linear, Frame, Singleselect, Multiplier
+    Topic, Switcher, Informer, Clicker, Radial, Linear, Frame, Singleselect, Multiplier, Complex
   }
 }
 </script>

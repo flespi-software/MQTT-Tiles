@@ -1,8 +1,20 @@
 <template>
   <div>
     <div class="row">
+      <div class="q-mt-sm col-12" v-if="widget.topics.length && widget.topics[0].split('/')">
+        <div class="q-mb-sm text-dark">Group layer</div>
+        <div
+          v-for="(path, index) in widget.topics[0].split('/')"
+          :key="`${index}${path}`"
+          :class="{'bg-dark text-white': currentSettings.groupLayout >= index, 'text-dark bg-grey-3': currentSettings.groupLayout < index}"
+          class="q-mr-xs q-pa-xs round-borders cursor-pointer inline-block"
+          @click="setGroupLayer(index)"
+        >
+          {{path}}
+        </div>
+      </div>
       <div class="q-mt-sm col-12">
-        <q-select color="dark" v-model="currentSettings.type" :options="typeOptions" float-label="Widget multiplie type" />
+        <q-select color="dark" v-model="currentSettings.type" :options="typeOptions" @input="currentSettings.widgetSettings = {}" float-label="Widget multiplier type" />
       </div>
       <div class="color-palette col-12">
         <div class="text-grey-6 q-pb-sm color-palette__label">Color</div>
@@ -38,6 +50,7 @@ import Informer from '../informer/Schema'
 import Radial from '../radial/Schema'
 import Linear from '../linear/Schema'
 import Singleselect from '../singleselect/Schema'
+import Complex from '../complex/Schema'
 import { WIDGET_STATUS_DISABLED } from '../../../constants'
 export default {
   name: 'MultiplierSchema',
@@ -45,9 +58,11 @@ export default {
   data () {
     let defaultSettings = {
       type: '',
+      groupLayout: 0,
       widgetSettings: {},
-      height: 4,
-      width: 2,
+      topics: [],
+      height: 8,
+      width: 5,
       maxTopicsLength: 1,
       minWidth: 1,
       minHeight: 2,
@@ -61,13 +76,15 @@ export default {
         {label: 'Text', value: 'informer'},
         {label: 'Radial gauge', value: 'radial'},
         {label: 'Linear gauge', value: 'linear'},
-        {label: 'Radio button', value: 'singleselect'}
+        {label: 'Radio button', value: 'singleselect'},
+        {label: 'Complex', value: 'complex'}
       ],
       colors: ['grey', 'red', 'green', 'orange', 'blue', 'light-blue']
     }
   },
   computed: {
     schemaWidget () {
+      this.updateTopics()
       return {
         name: 'Multiplier',
         color: this.currentSettings.color,
@@ -83,6 +100,9 @@ export default {
     this.$emit('update', this.currentSettings)
   },
   methods: {
+    updateTopics () {
+      this.$set(this.currentSettings, 'topics', this.currentSettings.widgetSettings.topics)
+    },
     updateSettingsHandler (settings) {
       Vue.set(this.currentSettings, 'widgetSettings', {})
       Vue.set(this.currentSettings, 'widgetSettings', settings)
@@ -92,6 +112,9 @@ export default {
     },
     validateSchemas (status) {
       this.$emit('validate', status)
+    },
+    setGroupLayer (index) {
+      this.$set(this.currentSettings, 'groupLayout', index)
     }
   },
   watch: {
@@ -102,7 +125,7 @@ export default {
   },
   mixins: [validateTopic],
   components: {
-    Switcher, Informer, Radial, Linear, Singleselect
+    Switcher, Informer, Radial, Linear, Singleselect, Complex
   }
 }
 </script>

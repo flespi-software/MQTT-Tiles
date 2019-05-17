@@ -51,6 +51,7 @@
 <script>
 import { DEFAULT_MODE, COMMAND_MODE } from './constants.js'
 import Vue from 'vue'
+import isEqual from 'lodash/isEqual'
 export default {
   name: 'SingleselectSchema',
   props: ['widget'],
@@ -134,7 +135,8 @@ export default {
   watch: {
     currentSettings: {
       deep: true,
-      handler (val) {
+      handler (val, old) {
+        if (isEqual(val, old)) { return false }
         this.$emit('validate', this.validate())
         this.$emit('update', val)
       }

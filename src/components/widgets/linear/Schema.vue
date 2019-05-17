@@ -55,6 +55,7 @@
 
 <script>
 import Vue from 'vue'
+import isEqual from 'lodash/isEqual'
 import Topic from '../Topic'
 import validateTopic from '../../../mixins/validateTopic.js'
 import {
@@ -178,8 +179,9 @@ export default {
   watch: {
     widget: {
       deep: true,
-      handler (val) {
+      handler (val, old) {
         this.$emit('validate', this.validate())
+        if (isEqual(val, old)) { return false }
         this.$emit('update', this.currentSettings)
       }
     }

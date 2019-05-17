@@ -16,6 +16,19 @@
         <q-input style="display: inline-flex; width: calc(100% - 115px)" color="dark" v-if="currentSettings.protocolVersion === 5" v-model="currentSettings.properties.sessionExpiryInterval" type="number" float-label="Session expiry interval" clearable :clear-value="undefined"/>
         <q-input color="dark" v-model="currentSettings.username" float-label="Username" :clear-value="undefined" :after="[{icon: 'mdi-login', handler: flespiLoginHandler, condition: currentSettings.host.indexOf('flespi') !== -1}]"/>
         <q-input color="dark" v-model="currentSettings.password" float-label="Password" :clear-value="undefined"/>
+        <q-collapsible v-if="currentSettings.protocolVersion === 5" class="q-mt-md q-mb-sm bg-grey-4" label="Subscribe User Properties">
+          <div>
+            <q-list v-if="currentSettings.userProperties">
+              <q-item v-for="(value, name) in currentSettings.userProperties" :key="`${name}: ${value}`">
+                <q-icon class="q-mr-sm cursor-pointer" size='1rem' @click.native="removeUserProperty(name)" name="mdi-close-circle"/>
+                <span>{{`${name}: ${value}`}}</span>
+              </q-item>
+            </q-list>
+            <q-input color="dark" v-model="userProperty.name" float-label="User property name"/>
+            <q-input color="dark" v-model="userProperty.value" float-label="User property value"/>
+            <q-btn :disable="!userProperty.name || !userProperty.value" style="width: 100%" class="q-mt-sm" color="dark" @click="addUserProperty">Add</q-btn>
+          </div>
+        </q-collapsible>
       </div>
       <q-toolbar slot="footer" color='dark'>
         <q-toolbar-title>
@@ -41,7 +54,11 @@ export default {
     let defaultSettings = defaultClient()
     return {
       defaultSettings,
-      currentSettings: this.settings ? merge({}, defaultSettings, this.settings) : merge({}, defaultSettings)
+      currentSettings: this.settings ? merge({}, defaultSettings, this.settings) : merge({}, defaultSettings),
+      userProperty: {
+        name: '',
+        value: ''
+      }
     }
   },
   computed: {
@@ -68,6 +85,22 @@ export default {
       this.$q.notify({
         message: 'Host must be not empty and only over secured sockets'
       })
+    },
+    addUserProperty () {
+      if (!this.currentSettings.userProperties) {
+        this.$set(this.currentSettings, 'userProperties', {})
+      }
+      this.$set(this.currentSettings.userProperties, this.userProperty.name, this.userProperty.value)
+      this.userProperty = {
+        value: '',
+        name: ''
+      }
+    },
+    removeUserProperty (name) {
+      this.$delete(this.currentSettings.userProperties, name)
+      if (!Object.keys(this.currentSettings.userProperties).length) {
+        this.$set(this.currentSettings, 'userProperties', null)
+      }
     },
     flespiLoginHandler () {
       let tokenHandler = (event) => {

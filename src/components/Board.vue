@@ -111,6 +111,7 @@ import Linear from './widgets/linear/View'
 import Frame from './widgets/frame/View'
 import Singleselect from './widgets/singleselect/View'
 import Multiplier from './widgets/multiplier/View'
+import Complex from './widgets/complex/View'
 import { WIDGET_MODE_EDIT, WIDGET_MODE_ADD, WIDGET_MODE_DUPLICATE } from '../constants'
 
 const BREAKPOINTS = { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }
@@ -208,6 +209,7 @@ export default {
     Frame,
     Singleselect,
     Multiplier,
+    Complex,
     GridLayout: VueGridLayout.GridLayout,
     GridItem: VueGridLayout.GridItem
   }

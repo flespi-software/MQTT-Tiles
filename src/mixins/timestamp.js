@@ -15,7 +15,7 @@ export default {
       if (now.getDate() + now.getMonth() === time.getDate() + time.getMonth()) {
         format = 'HH:mm:ss'
       }
-      return timestamp ? date.formatDate(timestamp, format) : 'N/A'
+      return timestamp ? date.formatDate(timestamp, format) : ''
     }
   }
 }

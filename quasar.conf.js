@@ -79,7 +79,9 @@ module.exports = function (ctx) {
         'QResizeObservable',
         'QCollapsible',
         'QRadio',
-        'QDialog'
+        'QDialog',
+        'QProgress',
+        'QKnob'
       ],
       directives: [
         'Ripple',
@@ -105,13 +107,13 @@ module.exports = function (ctx) {
       // workboxPluginMode: 'InjectManifest',
       // workboxOptions: {},
       manifest: {
-        // name: 'Quasar App',
+        name: 'MQTTTiles',
         // short_name: 'Quasar-PWA',
         // description: 'Best PWA App in town!',
         display: 'standalone',
-        orientation: 'portrait',
-        background_color: '#ffffff',
-        theme_color: '#027be3',
+        orientation: 'any',
+        background_color: '#333333',
+        theme_color: '#333333',
         icons: [
           {
             'src': 'statics/icons/icon-128x128.png',

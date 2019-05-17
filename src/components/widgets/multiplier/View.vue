@@ -31,14 +31,14 @@
         <div  v-for="(widget, widgetIndex) in widgets"
           :key="widgetIndex"
           style="display: inline-block; position: relative;"
-          :style="{width: widgetsWidth, minHeight: `${50 * item.settings.widgetSettings.height}px`}"
+          :style="{width: widgetsWidth, minHeight: item.settings.type === 'radial' || item.settings.type === 'linear' ? `${50 * item.settings.widgetSettings.height}px` : ''}"
           class="q-ma-sm"
         >
           <component
             class="wrapper__items"
             :is="item.settings.type"
             :item="widgets[widgetIndex]"
-            :value="{[widgetIndex]: currentValue[widgetIndex]}"
+            :value="values[widgetIndex]"
             :index="widgetIndex"
             :blocked="true"
             @action="(data) => { $emit('action', data) }"
@@ -65,7 +65,7 @@
 </style>
 
 <script>
-import Vue from 'vue'
+import get from 'lodash/get'
 import cloneDeep from 'lodash/cloneDeep'
 import { WIDGET_STATUS_DISABLED } from '../../../constants'
 import getValueByTopic from '../../../mixins/getValueByTopic.js'
@@ -75,6 +75,7 @@ import Informer from '../informer/View'
 import Radial from '../radial/View'
 import Linear from '../linear/View'
 import Singleselect from '../singleselect/View'
+import Complex from '../complex/View'
 export default {
   name: 'Multiplier',
   props: ['item', 'index', 'value', 'mini', 'in-shortcuts', 'blocked'],
@@ -86,9 +87,69 @@ export default {
     }
   },
   computed: {
+    currentTopic () {
+      let topic = this.item.dataTopics[0].topicFilter
+      let pathByGroup = topic.split('/').slice(0, this.item.settings.groupLayout + 1)
+      let topicByGroup = pathByGroup.join('/')
+      return topicByGroup
+    },
     currentValue () {
       if (!this.value) { return {} }
-      return this.value[Object.keys(this.value)[0]]
+      let topic = this.item.dataTopics[0].topicFilter
+      if (!topic || !this.value[topic]) { return {} }
+      let path = this.currentTopic.split('/')
+      let value = null
+      if (path.indexOf('+') === -1) {
+        value = get(this.value[topic], path.slice(0, -1).join('.'), null)
+      } else {
+        value = path.reduce((val, pathPart, index) => {
+          if (pathPart === '+') {
+            val = val.reduce((resultItems, item) => {
+              let keys = Object.keys(item.value)
+              keys.forEach((key) => {
+                let nestItem = {
+                  name: `${item.name ? `${item.name}.` : ''}${key}`,
+                  value: item.value[key]
+                }
+                resultItems.push(nestItem)
+              })
+              return resultItems
+            }, [])
+          } else {
+            val = val.reduce((val, item, index) => {
+              val[index].value = item.value[pathPart]
+              return val
+            }, val)
+          }
+          return val
+        }, [{name: '', value: this.value[topic]}])
+
+        value = value.reduce((value, item) => {
+          value[item.name] = item.value
+          return value
+        }, {})
+      }
+      value = Object.keys(value).reduce((val, name) => {
+        val[name] = {
+          payload: value[name]
+        }
+        return val
+      }, {})
+      return value
+    },
+    values () {
+      return Object.keys(this.currentValue).reduce((values, widgetId) => {
+        let widget = this.widgets[widgetId]
+        let topic = this.item.dataTopics[0].topicFilter
+        let value = {[topic]: this.currentValue[widgetId]}
+        widget.topics.forEach((currentTopic) => {
+          if (topic === currentTopic) { return false }
+          value[currentTopic] = {}
+          value[currentTopic].payload = this.value[currentTopic].payload
+        })
+        values[widgetId] = value
+        return values
+      }, {})
     },
     widgetsWidth () {
       let width = (this.item.settings.widgetSettings.width / this.item.settings.width) * 100
@@ -106,18 +167,34 @@ export default {
     }
   },
   methods: {
+    initMultiplier () {
+      let value = this.currentValue
+      if (!value) { return false }
+      this.widgets = {}
+      this.layout = []
+      Object.keys(value).forEach(name => {
+        if (!this.widgets[name]) {
+          this.initWidget(name)
+          this.initWidgetInLayout(name)
+        }
+      })
+    },
     initWidget (name) {
+      let topics = [this.item.dataTopics[0].topicFilter]
+      if (this.item.settings.widgetSettings.topics) {
+        topics = [this.item.dataTopics[0].topicFilter, ...this.item.settings.widgetSettings.topics.map(topic => topic.topicFilter)]
+      }
       let widget = {
         name,
         id: name,
         color: this.item.settings.color,
         type: this.item.settings.type,
-        topics: [name],
-        dataTopics: [{payloadField: this.item.dataTopics[0].payloadField, payloadType: this.item.dataTopics[0].payloadType, topicFilter: name}], // topics for datasource
+        topics,
+        dataTopics: [{payloadField: this.item.dataTopics[0].payloadField, payloadType: this.item.dataTopics[0].payloadType, topicFilter: this.item.dataTopics[0].topicFilter}], // topics for datasource
         settings: cloneDeep(this.item.settings.widgetSettings),
         status: WIDGET_STATUS_DISABLED
       }
-      Vue.set(this.widgets, name, widget)
+      this.$set(this.widgets, name, widget)
     },
     initWidgetInLayout (name) {
       let colNum = this.item.settings.width,
@@ -153,35 +230,13 @@ export default {
       deep: true,
       immediate: true,
       handler (value) {
-        if (!value) { return false }
-        this.widgets = {}
-        this.layout = []
-        Object.keys(value).forEach(topic => {
-          if (!value[topic]) { return false }
-          Object.keys(value[topic]).forEach(name => {
-            if (!this.widgets[name]) {
-              this.initWidget(name)
-              this.initWidgetInLayout(name)
-            }
-          })
-        })
+        this.initMultiplier()
       }
     },
     item: {
       deep: true,
       handler () {
-        if (!this.value) { return false }
-        this.widgets = {}
-        this.layout = []
-        Object.keys(this.value).forEach(topic => {
-          if (!this.value[topic]) { return false }
-          Object.keys(this.value[topic]).forEach(name => {
-            if (!this.widgets[name]) {
-              this.initWidget(name)
-              this.initWidgetInLayout(name)
-            }
-          })
-        })
+        this.initMultiplier()
       }
     }
   },
@@ -192,6 +247,7 @@ export default {
     Radial,
     Linear,
     Singleselect,
+    Complex,
     GridLayout: VueGridLayout.GridLayout,
     GridItem: VueGridLayout.GridItem
   }

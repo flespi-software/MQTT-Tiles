@@ -75,7 +75,8 @@ import remove from 'lodash/remove'
 import difference from 'lodash/difference'
 import uniq from 'lodash/uniq'
 import get from 'lodash/get'
-import set from 'lodash/set'
+// import set from 'lodash/set'
+import setWith from 'lodash/setWith'
 import Vue from 'vue'
 import Board from './Board'
 import Boards from './Boards'
@@ -149,8 +150,8 @@ export default {
         let value = values[widgetId] = {},
           widget = this.widgets[widgetId]
         widget.topics.forEach(topic => {
-          if (widget.type === 'multiplier' && !!this.subscriptions[topic]) {
-            value[topic] = this.getMultiplierValue(topic, this.subscriptions[topic], cloneDeep(get(this.bufferValues, `${widgetId}.${topic}`, undefined)))
+          if (widget.type === 'multiplier' && !!this.subscriptions[topic] && topic === widget.dataTopics[0].topicFilter) {
+            value[topic] = this.getMultiplierValue(topic, this.subscriptions[topic], cloneDeep(get(this.bufferValues, `${widgetId}.${topic}`, undefined)), widget.groupLayout)
           } else {
             value[topic] = this.subscriptions[topic]
           }
@@ -474,7 +475,13 @@ export default {
       })
       let topics = Object.keys(this.subscriptions)
       if (topics.length) {
-        this.subscribe(topics, { qos: 1 })
+        let settings = { qos: 1 }
+        let userProperties = this.clientSettings && this.clientSettings.userProperties
+        if (userProperties) {
+          settings.properties = {}
+          settings.properties.userProperties = userProperties
+        }
+        this.subscribe(topics, settings)
       }
     },
     widgetLayoutSetup (width, height, id, breakpoint) {
@@ -530,7 +537,13 @@ export default {
         if (!hasSubscription) {
           this.widgetsBySubscription[topic] = []
           this.setValueByTopic(topic, null)
-          this.subscribe(topic, {qos: 1})
+          let settings = { qos: 1 }
+          let userProperties = this.clientSettings && this.clientSettings.userProperties
+          if (userProperties) {
+            settings.properties = {}
+            settings.properties.userProperties = userProperties
+          }
+          this.subscribe(topic, settings)
         }
         this.widgetsBySubscription[topic].push(widget.id)
       })
@@ -556,7 +569,13 @@ export default {
           if (!hasSubscription) {
             this.widgetsBySubscription[topic] = []
             this.setValueByTopic(topic, null)
-            this.subscribe(topic, {qos: 1})
+            let settings = { qos: 1 }
+            let userProperties = this.clientSettings && this.clientSettings.userProperties
+            if (userProperties) {
+              settings.properties = {}
+              settings.properties.userProperties = userProperties
+            }
+            this.subscribe(topic, settings)
           }
           this.widgetsBySubscription[topic].push(widgetId)
         })
@@ -632,21 +651,20 @@ export default {
         layoutWidgetItem.w = width
       })
     },
-    getMultiplierValue (subscriptionTopic, packet, initValue) {
+    getMultiplierValue (subscriptionTopic, packet, initValue, groupLayout) {
       let path = subscriptionTopic.split('/')
       let currentPath = packet.topic.split('/')
       let value = initValue || {}
       let setPath = []
       path.forEach((pathItem, index) => {
-        if (pathItem === '+') {
-          setPath.push(currentPath[index])
-        }
+        setPath.push(currentPath[index])
       })
       if (packet.payload.length) {
+        let payload = JSON.parse(packet.payload.toString())
         if (setPath.length) {
-          set(value, setPath.join('-'), packet)
+          setWith(value, setPath, payload, Object)
         } else {
-          value = packet
+          value = payload
         }
       } else {
         if (setPath.length) {
