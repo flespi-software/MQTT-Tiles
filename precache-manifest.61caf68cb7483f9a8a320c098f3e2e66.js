@@ -4,44 +4,40 @@ self.__precacheManifest = [
     "url": "statics/icons/favicon-32x32.png"
   },
   {
-    "revision": "5ef00c7a55304bdcf890f02119a4d853",
+    "revision": "6ecedd2e6113c7e50f1b5002c54e3d9a",
     "url": "index.html"
+  },
+  {
+    "revision": "68853917849c40e8e8b7e5dfdb5ab922",
+    "url": "statics/icons/icon-384x384.png"
+  },
+  {
+    "revision": "7674d3e616ee71e6cf0b",
+    "url": "js/35cfc3f4.c7336273.js"
   },
   {
     "revision": "a9ff913a3c17b881b663",
     "url": "js/4b47640d.21cfc388.js"
   },
   {
-    "revision": "d475e4c89fd2f3c1f8dd",
-    "url": "js/510c3fcc.5437d5c3.js"
-  },
-  {
-    "revision": "457e201cb44bbf929a441a4c31955ab0",
-    "url": "statics/icons/apple-touch-icon-144x144.png"
-  },
-  {
-    "revision": "4b413fa6af7adf81c241",
-    "url": "js/a022cdf8.437dad3d.js"
-  },
-  {
-    "revision": "d96f1c935149ba49e4fe5c173ab257b3",
-    "url": "statics/icons/apple-touch-icon-120x120.png"
-  },
-  {
-    "revision": "f1482725baf6a957e3c4",
-    "url": "js/app.03200ad7.js"
-  },
-  {
-    "revision": "9d73ebc10213bb075e1d",
-    "url": "js/vendor.c642c309.js"
+    "revision": "3355215c75b9f1e4f753",
+    "url": "js/510c3fcc.38c1cf20.js"
   },
   {
     "revision": "853d7b482c93458838e7ab1b1798e6f4",
     "url": "statics/icons/icon-512x512.png"
   },
   {
-    "revision": "68853917849c40e8e8b7e5dfdb5ab922",
-    "url": "statics/icons/icon-384x384.png"
+    "revision": "38ba41e7873f0ff2bd0d",
+    "url": "js/app.903713e8.js"
+  },
+  {
+    "revision": "9f6171faa5a62775c7e8",
+    "url": "js/vendor.d456ff2f.js"
+  },
+  {
+    "revision": "c973814e56ef4c2880534a90797e971d",
+    "url": "statics/mqtttiles-logo.png"
   },
   {
     "revision": "cc6ffcc57666a7d6371105eb8464db68",
@@ -60,28 +56,32 @@ self.__precacheManifest = [
     "url": "statics/icons/mstile-144x144.png"
   },
   {
-    "revision": "c973814e56ef4c2880534a90797e971d",
-    "url": "statics/mqtttiles-logo.png"
+    "revision": "457e201cb44bbf929a441a4c31955ab0",
+    "url": "statics/icons/ms-icon-144x144.png"
   },
   {
     "revision": "e1e243ed1d0ede18157ac17c17a0d2aa",
     "url": "statics/icons/icon-192x192.png"
   },
   {
-    "revision": "457e201cb44bbf929a441a4c31955ab0",
-    "url": "statics/icons/ms-icon-144x144.png"
-  },
-  {
     "revision": "c973814e56ef4c2880534a90797e971d",
     "url": "statics/icons/icon-128x128.png"
   },
   {
-    "revision": "6ca38f2c550252ff214f4c2b75ae02bd",
-    "url": "statics/icons/apple-touch-icon-57x57.png"
+    "revision": "1288c509d62807d356dc3c840521809a",
+    "url": "statics/icons/favicon-196x196.png"
+  },
+  {
+    "revision": "c973814e56ef4c2880534a90797e971d",
+    "url": "statics/icons/favicon-128x128.png"
   },
   {
     "revision": "2a43bae514c656e860a8ece15d3d1115",
     "url": "statics/icons/apple-touch-icon-60x60.png"
+  },
+  {
+    "revision": "6ca38f2c550252ff214f4c2b75ae02bd",
+    "url": "statics/icons/apple-touch-icon-57x57.png"
   },
   {
     "revision": "3f4fe93c1e76d3d2226a641dfd63210d",
@@ -92,20 +92,20 @@ self.__precacheManifest = [
     "url": "statics/icons/favicon-16x16.png"
   },
   {
-    "revision": "1add2b144c5e0ac937ee",
-    "url": "js/35cfc3f4.5c470641.js"
+    "revision": "20e2fba466e07d3edc47",
+    "url": "js/265e6440.2e279c3c.js"
   },
   {
     "revision": "6a398e80a59c5be4e5cb574e6f72d631",
     "url": "statics/icons/favicon.ico"
   },
   {
-    "revision": "1278d26cea8d24a048e3bc6f3ddea5b4",
-    "url": "statics/icons/mstile-70x70.png"
-  },
-  {
     "revision": "3ec551b38d5fc9df52e5891850e2bb05",
     "url": "statics/icons/apple-touch-icon-114x114.png"
+  },
+  {
+    "revision": "d96f1c935149ba49e4fe5c173ab257b3",
+    "url": "statics/icons/apple-touch-icon-120x120.png"
   },
   {
     "revision": "1c94d86bf6b3db238df933f40d79c936",
@@ -116,6 +116,10 @@ self.__precacheManifest = [
     "url": "statics/icons/favicon-96x96.png"
   },
   {
+    "revision": "1278d26cea8d24a048e3bc6f3ddea5b4",
+    "url": "statics/icons/mstile-70x70.png"
+  },
+  {
     "revision": "f45dcc8e5dfdd3f42a9006cda65a5ca3",
     "url": "statics/icons/mstile-310x150.png"
   },
@@ -124,20 +128,16 @@ self.__precacheManifest = [
     "url": "statics/icons/apple-icon-152x152.png"
   },
   {
+    "revision": "457e201cb44bbf929a441a4c31955ab0",
+    "url": "statics/icons/apple-touch-icon-144x144.png"
+  },
+  {
     "revision": "5bbfe74c5337a0274d33ad6c9508933f",
     "url": "statics/icons/apple-touch-icon-152x152.png"
   },
   {
-    "revision": "c973814e56ef4c2880534a90797e971d",
-    "url": "statics/icons/favicon-128x128.png"
-  },
-  {
-    "revision": "1288c509d62807d356dc3c840521809a",
-    "url": "statics/icons/favicon-196x196.png"
-  },
-  {
-    "revision": "bafb105baeb22d965c70fe52ba6b49d9",
-    "url": "fonts/KFOmCnqEu92Fr1Mu4mxM.bafb105b.woff"
+    "revision": "e9dbbe8a693dd275c16d32feb101f1c1",
+    "url": "fonts/KFOkCnqEu92Fr1MmgVxIIzQ.e9dbbe8a.woff"
   },
   {
     "revision": "c38ebd3cd38c98fbd16bf31d1d24ce64",
@@ -156,6 +156,10 @@ self.__precacheManifest = [
     "url": "fonts/flUhRq6tzZclQEJ-Vdg-IuiaDsNcIhQ8tQ.8a9a261c.woff2"
   },
   {
+    "revision": "bafb105baeb22d965c70fe52ba6b49d9",
+    "url": "fonts/KFOmCnqEu92Fr1Mu4mxM.bafb105b.woff"
+  },
+  {
     "revision": "8c2ade503b34e31430d6c98aa29a52a3",
     "url": "fonts/KFOlCnqEu92Fr1MmYUtfBBc-.8c2ade50.woff"
   },
@@ -172,19 +176,15 @@ self.__precacheManifest = [
     "url": "fonts/KFOlCnqEu92Fr1MmEU9fBBc-.de8b7431.woff"
   },
   {
-    "revision": "e9dbbe8a693dd275c16d32feb101f1c1",
-    "url": "fonts/KFOkCnqEu92Fr1MmgVxIIzQ.e9dbbe8a.woff"
-  },
-  {
-    "revision": "f1482725baf6a957e3c4",
+    "revision": "38ba41e7873f0ff2bd0d",
     "url": "css/app.e510cccd.css"
   },
   {
-    "revision": "4b413fa6af7adf81c241",
-    "url": "css/a022cdf8.add8f6aa.css"
+    "revision": "7674d3e616ee71e6cf0b",
+    "url": "css/35cfc3f4.142b8833.css"
   },
   {
-    "revision": "1add2b144c5e0ac937ee",
-    "url": "css/35cfc3f4.d615b9e7.css"
+    "revision": "20e2fba466e07d3edc47",
+    "url": "css/265e6440.5e15f63c.css"
   }
 ];
