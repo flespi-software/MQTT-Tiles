@@ -21,6 +21,9 @@
         <q-btn-toggle rounded toggle-text-color="dark" text-color="grey-6" flat v-model="currentSettings.accumulateLogic" :options="accumulateLogicOptions"/>
         <div class="text-grey-6" style="font-size: 0.75rem">How value will be accumulating*</div>
       </div>
+      <div class="q-mt-sm col-12">
+        <q-toggle color="dark" v-model="currentSettings.isNeedTime" label="Show last update time"/>
+      </div>
     </div>
   </div>
 </template>
@@ -45,7 +48,8 @@ export default {
       height: 2,
       width: 2,
       minWidth: 1,
-      minHeight: 2
+      minHeight: 2,
+      isNeedTime: true
     }
     return {
       defaultSettings,

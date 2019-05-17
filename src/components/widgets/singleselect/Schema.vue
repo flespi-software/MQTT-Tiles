@@ -44,6 +44,9 @@
           </q-collapsible>
         </q-list>
       </div>
+      <div class="q-mt-sm col-12">
+        <q-toggle color="dark" v-model="currentSettings.isNeedTime" label="Show last update time"/>
+      </div>
     </div>
   </div>
 </template>
@@ -70,7 +73,8 @@ export default {
       width: 2,
       maxTopicsLength: 1,
       minWidth: 2,
-      minHeight: 4
+      minHeight: 4,
+      isNeedTime: true
     }
     return {
       defaultSettings,

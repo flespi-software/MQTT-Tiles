@@ -1,5 +1,5 @@
 <template>
-  <q-modal v-model='status' @hide="closeHandler">
+  <q-modal v-model='status' @hide="closeHandler" no-esc-dismiss no-backdrop-dismiss>
     <q-modal-layout>
       <q-toolbar slot="header" color='dark'>
         <q-toolbar-title>

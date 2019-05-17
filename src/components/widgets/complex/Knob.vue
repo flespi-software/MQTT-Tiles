@@ -1,6 +1,6 @@
 <template>
   <div
-    class="q-pa-xs cursor-pointer"
+    class="q-pa-xs"
     :class="{ 'bg-grey-3': selected, 'round-borders': selected, [`text-${color}-7`]: true }"
   >
     <q-knob class="q-ma-sm" :value="value === undefined ? 50 : (value === 'N/A' ? 0 : value)" :min="item.min" :max="item.max" readonly :color="`${color}-7`" :track-color="`${color}-2`">

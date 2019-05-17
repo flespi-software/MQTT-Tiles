@@ -1,6 +1,6 @@
 <template>
-  <q-card flat inline class="widget__switcher q-pa-sm" style="width: 100%; height: 100%;" :class="[`bg-${item.color}-1`]">
-    <q-item class="q-pa-none" style="min-height: 22px;">
+  <q-card flat inline class="widget__complex q-py-sm" style="width: 100%; height: 100%;" :class="[`bg-${item.color}-1`]">
+    <q-item class="q-pa-none q-px-sm" style="min-height: 22px;">
       <q-item-main class="ellipsis" :class="[`text-${item.color}-7`]" style="font-size: .9rem">
         {{item.name}}
         <q-tooltip>{{item.name}}</q-tooltip>
@@ -26,8 +26,8 @@
         </q-item-side>
       </transition>
     </q-item>
-    <q-card-media class="widget__content q-pa-sm scroll row" :class="[`bg-${item.color}-1`]" style="height: calc(100% - 22px);">
-      <div class="items__top col-12 flex q-px-md q-py-xs" v-if="topItems.length" style="background-color: rgba(255,255,255,0.5)">
+    <q-card-media class="widget__content q-pa-sm" :class="[`bg-${item.color}-1`]" style="height: calc(100% - 22px);">
+      <div ref="itemsTop" class="items__top flex q-px-md q-py-xs fixed" style="top: 38px; left: 8px; right: 8px; background-color: rgba(255,255,255,0.5); max-height: 33%" v-if="topItems.length">
         <component
           v-for="(renderItem, layoutIndex) in topItems"
           :key="`top${layoutIndex}${renderItem.index}`"
@@ -37,27 +37,29 @@
           :color="item.color"
         />
       </div>
-      <div class="items__left flex q-pa-sm" v-if="leftItems.length" :class="{'col-6': leftItems.length && rightItems.length, 'col-12': !rightItems.length}">
-        <component
-          v-for="(renderItem, layoutIndex) in leftItems"
-          :key="`left${layoutIndex}${renderItem.index}`"
-          :is="`my-${renderItems[renderItem.index].type}`"
-          :item="renderItems[renderItem.index]"
-          :value="renderItem.val"
-          :color="item.color"
-        />
+      <div class="scroll row" :style="{ marginTop: `${mainMarginTop}px`, marginBottom: `${mainMarginBottom}px`, maxHeight: `calc(100% - ${mainMarginTop + mainMarginBottom}px)` }">
+        <div class="items__left flex q-pa-sm" v-if="leftItems.length" :class="{'col-6': leftItems.length && rightItems.length, 'col-12': !rightItems.length, 'justify-center': !rightItems.length}">
+          <component
+            v-for="(renderItem, layoutIndex) in leftItems"
+            :key="`left${layoutIndex}${renderItem.index}`"
+            :is="`my-${renderItems[renderItem.index].type}`"
+            :item="renderItems[renderItem.index]"
+            :value="renderItem.val"
+            :color="item.color"
+          />
+        </div>
+        <div class="items__right q-pa-sm" v-if="rightItems.length" :class="{'col-6': leftItems.length && rightItems.length, 'col-12': !leftItems.length}">
+          <component
+            v-for="(renderItem, layoutIndex) in rightItems"
+            :key="`right${layoutIndex}${renderItem.index}`"
+            :is="`my-${renderItems[renderItem.index].type}`"
+            :item="renderItems[renderItem.index]"
+            :value="renderItem.val"
+            :color="item.color"
+          />
+        </div>
       </div>
-      <div class="items__right q-pa-sm" v-if="rightItems.length" :class="{'col-6': leftItems.length && rightItems.length, 'col-12': !leftItems.length}">
-        <component
-          v-for="(renderItem, layoutIndex) in rightItems"
-          :key="`right${layoutIndex}${renderItem.index}`"
-          :is="`my-${renderItems[renderItem.index].type}`"
-          :item="renderItems[renderItem.index]"
-          :value="renderItem.val"
-          :color="item.color"
-        />
-      </div>
-      <div class="items__bottom col-12 flex q-px-md q-py-xs" v-if="bottomItems.length" style="background-color: rgba(255,255,255,0.5)">
+      <div ref="itemsBottom" class="items__bottom flex q-px-md q-py-xs fixed" style="bottom: 18px; left: 8px; right: 8px; background-color: rgba(255,255,255,0.5); max-height: 33%" v-if="bottomItems.length">
         <component
           v-for="(renderItem, layoutIndex) in bottomItems"
           :key="`bottom${layoutIndex}${renderItem.index}`"
@@ -68,7 +70,7 @@
         />
       </div>
     </q-card-media>
-    <div class="absolute-bottom-left q-px-xs q-pt-xs" style="font-size: 12px; border-top-right-radius: 5px; bottom: 1px; left: 1px; user-select: none;" :class="[`text-${item.color}-7`, `bg-${item.color}-1`]">
+    <div v-if="item.settings.isNeedTime" class="absolute-bottom-left q-px-xs q-pt-xs" style="font-size: 12px; border-top-right-radius: 5px; bottom: 1px; left: 1px; user-select: none;" :class="[`text-${item.color}-7`, `bg-${item.color}-1`]">
       {{timestamp}}
     </div>
   </q-card>
@@ -102,7 +104,9 @@ export default {
   props: ['item', 'index', 'value', 'mini', 'in-shortcuts', 'blocked'],
   data () {
     return {
-      WIDGET_STATUS_DISABLED
+      WIDGET_STATUS_DISABLED,
+      mainMarginTop: 0,
+      mainMarginBottom: 0
     }
   },
   computed: {
@@ -126,11 +130,11 @@ export default {
           type: item.type,
           label: item.label,
           position: item.position,
-          index: item.index
+          index: item.index,
+          val: item.path ? get(this.currentValue, item.path, 'N/A') : this.currentValue === null ? 'N/A' : this.currentValue
         }
         switch (item.type) {
           case 'knob': {
-            resItem.val = get(this.currentValue, item.path, 'N/A')
             resItem.min = item.minValueMode
               ? parseFloat(this.getValueByTopic(this.value[item.minValue.topicFilter] && this.value[item.minValue.topicFilter].payload, item.minValue))
               : item.minValue
@@ -140,7 +144,6 @@ export default {
             break
           }
           case 'progress': {
-            resItem.val = get(this.currentValue, item.path, 'N/A')
             resItem.min = item.minValueMode
               ? parseFloat(this.getValueByTopic(this.value[item.minValue.topicFilter] && this.value[item.minValue.topicFilter].payload, item.minValue))
               : item.minValue
@@ -150,7 +153,6 @@ export default {
             break
           }
           case 'text': {
-            resItem.val = get(this.currentValue, item.path, 'N/A')
             break
           }
         }
@@ -172,7 +174,17 @@ export default {
     }
   },
   methods: {
-    get
+    get,
+    setPaddings () {
+      this.mainMarginTop = this.$refs.itemsTop ? this.$refs.itemsTop.offsetHeight : 0
+      this.mainMarginBottom = this.$refs.itemsBottom ? this.$refs.itemsBottom.offsetHeight : 0
+    }
+  },
+  mounted () {
+    this.setPaddings()
+  },
+  updated () {
+    this.setPaddings()
   },
   mixins: [getValueByTopic, timestamp],
   components: {

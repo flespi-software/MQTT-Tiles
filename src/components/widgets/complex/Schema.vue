@@ -6,7 +6,7 @@
           <component
             v-for="(item, layoutIndex) in currentSettings.items.filter(item => item.position === 'top')"
             :key="`top${layoutIndex}${item.index}`"
-            class="complex__element"
+            class="complex__element cursor-pointer"
             :is="`my-${currentSettings.items[item.index].type}`"
             @click.native="selectHandler('top', layoutIndex)"
             :item="currentSettings.items[item.index]"
@@ -19,7 +19,7 @@
           <component
             v-for="(item, layoutIndex) in currentSettings.items.filter(item => item.position === 'left')"
             :key="`left${layoutIndex}${item.index}`"
-            class="complex__element"
+            class="complex__element cursor-pointer"
             :is="`my-${currentSettings.items[item.index].type}`"
             @click.native="selectHandler('left', layoutIndex)"
             :item="currentSettings.items[item.index]"
@@ -32,7 +32,7 @@
           <component
             v-for="(item, layoutIndex) in currentSettings.items.filter(item => item.position === 'right')"
             :key="`right${layoutIndex}${item.index}`"
-            class="complex__element text-center"
+            class="complex__element text-center cursor-pointer"
             :is="`my-${currentSettings.items[item.index].type}`"
             @click.native="selectHandler('right', layoutIndex)"
             :item="currentSettings.items[item.index]"
@@ -45,7 +45,7 @@
           <component
             v-for="(item, layoutIndex) in currentSettings.items.filter(item => item.position === 'bottom')"
             :key="`bottom${layoutIndex}${item.index}`"
-            class="complex__element"
+            class="complex__element cursor-pointer"
             :is="`my-${currentSettings.items[item.index].type}`"
             @click.native="selectHandler('bottom', layoutIndex)"
             :item="currentSettings.items[item.index]"
@@ -57,7 +57,7 @@
       </q-card>
       <div class="complex__items-wrapper col-12 relative-position q-mb-sm" v-if="edited">
         <q-collapsible
-          :header-class="[`bg-${!!editedItem.path ? 'grey-4' : 'red-2'}`]"
+          :header-class="[`bg-grey-4`]"
           collapse-icon="mdi-settings"
           :opened="true"
           style="border: solid #e0e0e0 1px"
@@ -73,7 +73,7 @@
               <q-input autofocus class="q-mr-xs" color="dark" v-model="editedItem.label" float-label="Label"/>
             </div>
             <div class="col-6">
-              <q-input class="q-ml-xs" color="dark" v-model="editedItem.path" float-label="Path" :error="!editedItem.path"/>
+              <q-input class="q-ml-xs" color="dark" v-model="editedItem.path" float-label="Path" placeholder="item[0].value"/>
             </div>
             <q-collapsible
               v-if="editedItem.type === 'knob' || editedItem.type === 'progress'"
@@ -113,6 +113,9 @@
             </q-collapsible>
           </div>
         </q-collapsible>
+      </div>
+      <div class="q-mt-sm col-12">
+        <q-toggle color="dark" v-model="currentSettings.isNeedTime" label="Show last update time"/>
       </div>
     </div>
   </div>
@@ -157,7 +160,8 @@ export default {
       width: 4,
       maxTopicsLength: 1,
       minWidth: 2,
-      minHeight: 4
+      minHeight: 4,
+      isNeedTime: true
     }
     return {
       defaultSettings,
@@ -262,9 +266,7 @@ export default {
       }
     },
     validate () {
-      return this.currentSettings.items.length && this.currentSettings.items.reduce((res, item) => {
-        return res && !!item.path
-      }, true)
+      return this.currentSettings.items.length
     }
   },
   created () {

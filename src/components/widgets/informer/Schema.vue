@@ -10,6 +10,9 @@
       <div class="col-6">
         <q-input class="q-ml-sm" color="dark" v-model="currentSettings.postfix" float-label="Postfix"/>
       </div>
+      <div class="q-mt-sm col-12">
+        <q-toggle color="dark" v-model="currentSettings.isNeedTime" label="Show last update time"/>
+      </div>
     </div>
   </div>
 </template>
@@ -26,7 +29,8 @@ export default {
       width: 2,
       minWidth: 2,
       minHeight: 2,
-      maxTopicsLength: 1
+      maxTopicsLength: 1,
+      isNeedTime: true
     }
     return {
       defaultSettings,

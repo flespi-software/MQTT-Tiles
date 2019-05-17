@@ -49,6 +49,9 @@
       <div class="col-4">
         <q-input class="q-mr-sm" color="dark" v-model="currentSettings.units" float-label="Units"/>
       </div>
+      <div class="q-mt-sm col-12">
+        <q-toggle color="dark" v-model="currentSettings.isNeedTime" label="Show last update time"/>
+      </div>
     </div>
   </div>
 </template>
@@ -80,7 +83,8 @@ export default {
       width: 1,
       maxTopicsLength: 1,
       minWidth: 1,
-      minHeight: 2
+      minHeight: 2,
+      isNeedTime: true
     }
     return {
       defaultSettings,
