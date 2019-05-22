@@ -11,11 +11,11 @@
   </div>
   <div v-else-if="settings.valueFormat === WIDGET_VALUE_FORMAT_PRE">
     <span v-if="prefix" style="font-weight: bold;">{{`${prefix}`}}</span>
-    <pre>{{text}}</pre>
+    <pre style="margin: 0;">{{text}}</pre>
     <span v-if="postfix" style="font-weight: bold;">{{`${postfix}`}}</span>
     <q-tooltip>
       <span v-if="prefix" style="font-weight: bold;">{{`${prefix}`}}</span>
-      <pre>{{title}}</pre>
+      <pre style="margin: 0;">{{title}}</pre>
       <span v-if="postfix" style="font-weight: bold;">{{`${postfix}`}}</span>
     </q-tooltip>
   </div>

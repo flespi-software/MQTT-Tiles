@@ -27,7 +27,7 @@
       </transition>
     </q-item>
     <q-card-media class="widget__content scroll" :class="[`bg-${item.color}-1`]" style="height: calc(100% - 44px);">
-      <div class="sattic-informer__payload-wrapper" style="padding-bottom: 15px;">
+      <div class="sattic-informer__payload-wrapper">
         <text-view class="static-informer__payload text-dark" :text="text" :title="text" :settings="item.settings" />
       </div>
     </q-card-media>

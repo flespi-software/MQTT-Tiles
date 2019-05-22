@@ -8,7 +8,7 @@
       </q-toolbar>
       <div style="margin: 20px;" :style="{ height: $q.platform.is.mobile ? 'calc(100% - 100px)' : '50vh', width: $q.platform.is.mobile ? 'calc(100% - 40px)' : '50vw'}">
         <q-input color="dark"  v-model="currentSettings.name" float-label="Name" :error="!currentSettings.name"/>
-        <q-select color="dark" v-model="currentSettings.type" :options="typeOptions" float-label="Type" @input="currentSettings.settings = {}"/>
+        <q-select color="dark" @input="typeChangeHandler" :value="currentSettings.type" :options="typeOptions" float-label="Type"/>
         <div class="color-palette">
           <div class="text-grey-6 q-pb-sm color-palette__label">Color</div>
           <div class="row color-palette__wrapper">
@@ -105,6 +105,7 @@ import Frame from './frame/Schema'
 import Singleselect from './singleselect/Schema'
 import Multiplier from './multiplier/Schema'
 import Complex from './complex/Schema'
+import Slider from './slider/Schema'
 
 export default {
   name: 'Settings',
@@ -128,6 +129,7 @@ export default {
         {label: 'Multi text', value: 'multi-informer'},
         {label: 'Static text', value: 'static-informer'},
         {label: 'Button', value: 'clicker'},
+        {label: 'Slider', value: 'slider'},
         {label: 'Radial gauge', value: 'radial'},
         {label: 'Linear gauge', value: 'linear'},
         {label: 'Iframe', value: 'frame'},
@@ -189,6 +191,14 @@ export default {
         this.currentSettings = merge({}, this.defaultSettings)
       })
     },
+    typeChangeHandler (type) {
+      console.log(this.currentSettings.type, type)
+      if (this.currentSettings.type !== type) {
+        this.currentSettings.settings = {}
+        this.currentSettings.dataTopics = []
+      }
+      this.$set(this.currentSettings, 'type', type)
+    },
     setColor (color) {
       Vue.set(this.currentSettings, 'color', color)
     },
@@ -235,7 +245,7 @@ export default {
   },
   mixins: [validateTopic],
   components: {
-    Topic, Switcher, Informer, Clicker, Radial, Linear, Frame, Singleselect, Multiplier, Complex, StaticInformer, MultiInformer
+    Topic, Switcher, Informer, Clicker, Radial, Linear, Frame, Singleselect, Multiplier, Complex, StaticInformer, MultiInformer, Slider
   }
 }
 </script>

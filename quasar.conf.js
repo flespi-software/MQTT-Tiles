@@ -82,7 +82,8 @@ module.exports = function (ctx) {
         'QRadio',
         'QDialog',
         'QProgress',
-        'QKnob'
+        'QKnob',
+        'QSlider'
       ],
       directives: [
         'Ripple',
