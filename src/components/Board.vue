@@ -105,6 +105,8 @@ import Settings from './widgets/Settings'
 import VueGridLayout from 'vue-grid-layout'
 import Switcher from './widgets/switcher/View'
 import Informer from './widgets/informer/View'
+import StaticInformer from './widgets/staticInformer/View'
+import MultiInformer from './widgets/multiInformer/View'
 import Clicker from './widgets/clicker/View'
 import Radial from './widgets/radial/View'
 import Linear from './widgets/linear/View'
@@ -203,6 +205,8 @@ export default {
     Settings,
     Switcher,
     Informer,
+    MultiInformer,
+    StaticInformer,
     Clicker,
     Radial,
     Linear,

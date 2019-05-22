@@ -53,7 +53,6 @@
 
 <script>
 import { DEFAULT_MODE, COMMAND_MODE } from './constants.js'
-import Vue from 'vue'
 import isEqual from 'lodash/isEqual'
 export default {
   name: 'SingleselectSchema',
@@ -93,7 +92,7 @@ export default {
       this.currentItem = Object.assign({}, this.defaultItem)
     },
     removeItem (itemIndex) {
-      Vue.delete(this.currentSettings.items, itemIndex)
+      this.$delete(this.currentSettings.items, itemIndex)
     },
     upItem (itemIndex) {
       let movedItem = this.currentSettings.items.splice(itemIndex, 1)[0]

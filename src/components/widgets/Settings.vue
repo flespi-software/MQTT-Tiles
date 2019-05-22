@@ -96,6 +96,8 @@ import validateTopic from '../../mixins/validateTopic.js'
 import Topic from './Topic'
 import Switcher from './switcher/Schema'
 import Informer from './informer/Schema'
+import StaticInformer from './staticInformer/Schema'
+import MultiInformer from './multiInformer/Schema'
 import Clicker from './clicker/Schema'
 import Radial from './radial/Schema'
 import Linear from './linear/Schema'
@@ -123,6 +125,8 @@ export default {
       typeOptions: [
         {label: 'Toggle', value: 'switcher'},
         {label: 'Text', value: 'informer'},
+        {label: 'Multi text', value: 'multi-informer'},
+        {label: 'Static text', value: 'static-informer'},
         {label: 'Button', value: 'clicker'},
         {label: 'Radial gauge', value: 'radial'},
         {label: 'Linear gauge', value: 'linear'},
@@ -231,7 +235,7 @@ export default {
   },
   mixins: [validateTopic],
   components: {
-    Topic, Switcher, Informer, Clicker, Radial, Linear, Frame, Singleselect, Multiplier, Complex
+    Topic, Switcher, Informer, Clicker, Radial, Linear, Frame, Singleselect, Multiplier, Complex, StaticInformer, MultiInformer
   }
 }
 </script>

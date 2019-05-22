@@ -8,7 +8,7 @@
     />
     <q-layout-header>
       <q-toolbar color="dark">
-        <q-btn class="lt-lg" flat rounded icon="mdi-menu" @click="leftDrawerOpen = !leftDrawerOpen" v-if="fullViewMode"/>
+        <q-btn flat rounded icon="mdi-menu" @click="leftDrawerOpen = !leftDrawerOpen" v-if="fullViewMode"/>
         <q-toolbar-title style="line-height: 36px;">
           <img src="statics/mqtttiles-logo.png" alt="MQTT Tiles" style="height: 30px; vertical-align: text-bottom;">
           MQTT Tiles

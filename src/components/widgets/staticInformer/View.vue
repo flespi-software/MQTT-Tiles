@@ -1,5 +1,5 @@
 <template>
-  <q-card flat inline class="widget__informer" style="width: 100%; height: 100%;" :class="[`bg-${item.color}-1`]">
+  <q-card flat inline class="widget__static-informer" style="width: 100%; height: 100%;" :class="[`bg-${item.color}-1`]">
     <q-item class="q-px-sm q-pt-sm q-pb-none" style="min-height: 29px;">
       <q-item-main class="ellipsis" :class="[`text-${item.color}-7`]" style="font-size: .9rem">
         {{item.name}}
@@ -26,32 +26,24 @@
         </q-item-side>
       </transition>
     </q-item>
-    <q-card-media class="widget__content" :class="[`bg-${item.color}-1`]" style="height: calc(100% - 29px);">
-      <div style="width: 100%; height: 100%;">
-        <div class="frame__payload" style="height: 100%">
-          <q-resize-observable @resize="onResize" />
-          <iframe v-if="link !== null" :src="link" frameborder="0" :height="height" :width="width" autoplay></iframe>
-          <div v-else style="height: 95%;" class="bg-grey-5 text-grey-8 relative-position q-pt-xs">
-            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
-              <q-icon name="mdi-block-helper" :size="`${height / 2}px`"/>
-            </div>
-            <div style="font-size: 1.5rem;">Invalid link address</div>
-          </div>
-        </div>
+    <q-card-media class="widget__content scroll" :class="[`bg-${item.color}-1`]" style="height: calc(100% - 44px);">
+      <div class="sattic-informer__payload-wrapper" style="padding-bottom: 15px;">
+        <text-view class="static-informer__payload text-dark" :text="text" :title="text" :settings="item.settings" />
       </div>
     </q-card-media>
   </q-card>
 </template>
 
 <style lang="stylus">
-  .frame__payload
+  .static-informer__payload-wrapper
+    align-items center
+    vertical-align middle
+    width 100%
+  .static-informer__payload
     font-size 1.2rem
     word-break break-all
-    overflow auto
-    width 100%
     display block
     padding 2px 4px
-    text-align center
   .block-leave-to
     transition all .2s ease-in-out
     opacity 0
@@ -67,14 +59,16 @@
 </style>
 
 <script>
+import { WIDGET_STATUS_DISABLED } from '../../../constants'
+import TextView from '../TextView'
 import getValueByTopic from '../../../mixins/getValueByTopic.js'
+import timestamp from '../../../mixins/timestamp.js'
 export default {
-  name: 'Frame',
+  name: 'StaticInformer',
   props: ['item', 'index', 'mini', 'in-shortcuts', 'value', 'blocked'],
   data () {
     return {
-      width: 0,
-      height: 0
+      WIDGET_STATUS_DISABLED
     }
   },
   methods: {
@@ -82,19 +76,14 @@ export default {
       if (this.$q.platform.is.mobile) {
         this.$refs.tooltip.toogle()
       }
-    },
-    onResize ({width, height}) {
-      this.width = width - 16
-      this.height = height - 16
     }
   },
   computed: {
-    link () {
-      let urlPattern = /\b(?:https?|ftp):\/\/[a-z0-9-+&@#/%?=~_|!:,.;]*[a-z0-9-+&@#/%=~_|]/gim
-      let linkValue = this.getValueByTopic(this.value[this.item.dataTopics[0].topicFilter] && this.value[this.item.dataTopics[0].topicFilter].payload, this.item.dataTopics[0])
-      return linkValue && linkValue.toString().match(urlPattern) ? linkValue : null
+    text () {
+      return this.item.settings.text
     }
   },
-  mixins: [getValueByTopic]
+  components: { TextView },
+  mixins: [getValueByTopic, timestamp]
 }
 </script>

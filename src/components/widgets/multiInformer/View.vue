@@ -26,32 +26,37 @@
         </q-item-side>
       </transition>
     </q-item>
-    <q-card-media class="widget__content" :class="[`bg-${item.color}-1`]" style="height: calc(100% - 29px);">
-      <div style="width: 100%; height: 100%;">
-        <div class="frame__payload" style="height: 100%">
-          <q-resize-observable @resize="onResize" />
-          <iframe v-if="link !== null" :src="link" frameborder="0" :height="height" :width="width" autoplay></iframe>
-          <div v-else style="height: 95%;" class="bg-grey-5 text-grey-8 relative-position q-pt-xs">
-            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
-              <q-icon name="mdi-block-helper" :size="`${height / 2}px`"/>
-            </div>
-            <div style="font-size: 1.5rem;">Invalid link address</div>
-          </div>
-        </div>
+    <q-card-media class="widget__content scroll" :class="[`bg-${item.color}-1`]" style="height: calc(100% - 44px);">
+      <div class="multi-informer__payload-wrapper" style="padding-bottom: 15px;">
+        <text-view
+          v-for="(text, index) in text"
+          :key="index"
+          class="multi-informer__payload"
+          :class="[`text-${value[item.settings.items[index].topic.topicFilter] !== null ? 'dark' : 'grey-5'}`]"
+          :text="text"
+          :title="title[index]"
+          :prefix="item.settings.items[index].prefix"
+          :postfix="item.settings.items[index].postfix"
+          :settings="item.settings.items[index]"
+        />
       </div>
     </q-card-media>
+    <div v-if="item.settings.isNeedTime" class="absolute-bottom-left q-px-xs q-pt-xs" style="font-size: 12px; border-top-right-radius: 5px;" :class="[`text-${item.color}-7`, `bg-${item.color}-1`]">
+      {{timestamp}}
+    </div>
   </q-card>
 </template>
 
 <style lang="stylus">
-  .frame__payload
+  .multi-informer__payload-wrapper
+    align-items center
+    vertical-align middle
+    width 100%
+  .multi-informer__payload
     font-size 1.2rem
     word-break break-all
-    overflow auto
-    width 100%
     display block
     padding 2px 4px
-    text-align center
   .block-leave-to
     transition all .2s ease-in-out
     opacity 0
@@ -67,14 +72,17 @@
 </style>
 
 <script>
+import { WIDGET_STATUS_DISABLED } from '../../../constants'
 import getValueByTopic from '../../../mixins/getValueByTopic.js'
+import TextView from '../TextView'
+import formatValue from '../../../mixins/formatValue.js'
+import timestamp from '../../../mixins/timestamp.js'
 export default {
-  name: 'Frame',
+  name: 'MultiInformer',
   props: ['item', 'index', 'mini', 'in-shortcuts', 'value', 'blocked'],
   data () {
     return {
-      width: 0,
-      height: 0
+      WIDGET_STATUS_DISABLED
     }
   },
   methods: {
@@ -82,19 +90,25 @@ export default {
       if (this.$q.platform.is.mobile) {
         this.$refs.tooltip.toogle()
       }
-    },
-    onResize ({width, height}) {
-      this.width = width - 16
-      this.height = height - 16
     }
   },
   computed: {
-    link () {
-      let urlPattern = /\b(?:https?|ftp):\/\/[a-z0-9-+&@#/%?=~_|!:,.;]*[a-z0-9-+&@#/%=~_|]/gim
-      let linkValue = this.getValueByTopic(this.value[this.item.dataTopics[0].topicFilter] && this.value[this.item.dataTopics[0].topicFilter].payload, this.item.dataTopics[0])
-      return linkValue && linkValue.toString().match(urlPattern) ? linkValue : null
+    title () {
+      // return this.getValueByTopic(this.value[this.topic] && this.value[this.topic].payload, this.item.dataTopics[0])
+      return this.item.settings.items.map(item => {
+        let topic = item.topic.topicFilter
+        return this.getValueByTopic(this.value[topic] && this.value[topic].payload, item.topic)
+      })
+    },
+    text () {
+      // return this.formatValue(this.title, this.item.settings)
+      return this.title.map((title, index) => {
+        let item = this.item.settings.items[index]
+        return this.formatValue(title, item)
+      })
     }
   },
-  mixins: [getValueByTopic]
+  components: { TextView },
+  mixins: [getValueByTopic, timestamp, formatValue]
 }
 </script>

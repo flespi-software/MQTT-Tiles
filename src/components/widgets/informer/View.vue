@@ -45,23 +45,22 @@
         </q-item-side>
       </transition>
     </q-item>
-    <q-card-media class="widget__content" :class="[`bg-${item.color}-1`]" style="height: calc(100% - 29px);">
-      <div class="informer__payload-wrapper scroll" style="padding-bottom: 15px;">
-        <div class="informer__payload" :class="[`text-${value[topic] !== null ? 'dark' : 'grey-5'}`]">
-          <span style="font-weight: bold;">{{`${item.settings.prefix}`}}</span>
-          {{text}}
-          <span style="font-weight: bold;">{{`${item.settings.postfix}`}}</span>
-          <q-tooltip>
-            <span style="font-weight: bold;">{{`${item.settings.prefix}`}}</span>
-            {{text}}
-            <span style="font-weight: bold;">{{`${item.settings.postfix}`}}</span>
-          </q-tooltip>
-        </div>
-      </div>
-      <div v-if="item.settings.isNeedTime" class="absolute-bottom-left q-px-xs q-pt-xs" style="font-size: 12px; border-top-right-radius: 5px;" :class="[`text-${item.color}-7`, `bg-${item.color}-1`]">
-        {{timestamp}}
+    <q-card-media class="widget__content scroll" :class="[`bg-${item.color}-1`]" style="height: calc(100% - 44px);">
+      <div class="informer__payload-wrapper" style="padding-bottom: 15px;">
+        <text-view
+          class="informer__payload"
+          :class="[`text-${value[topic] !== null ? 'dark' : 'grey-5'}`]"
+          :text="text"
+          :title="title"
+          :prefix="item.settings.prefix"
+          :postfix="item.settings.postfix"
+          :settings="item.settings"
+        />
       </div>
     </q-card-media>
+    <div v-if="item.settings.isNeedTime" class="absolute-bottom-left q-px-xs q-pt-xs" style="font-size: 12px; border-top-right-radius: 5px;" :class="[`text-${item.color}-7`, `bg-${item.color}-1`]">
+      {{timestamp}}
+    </div>
   </q-card>
 </template>
 
@@ -73,11 +72,8 @@
   .informer__payload
     font-size 1.2rem
     word-break break-all
-    overflow auto
-    width 100%
     display block
     padding 2px 4px
-    text-align center
   .block-leave-to
     transition all .2s ease-in-out
     opacity 0
@@ -95,7 +91,9 @@
 <script>
 import { WIDGET_STATUS_DISABLED } from '../../../constants'
 import getValueByTopic from '../../../mixins/getValueByTopic.js'
+import formatValue from '../../../mixins/formatValue.js'
 import timestamp from '../../../mixins/timestamp.js'
+import TextView from '../TextView'
 export default {
   name: 'Informer',
   props: ['item', 'index', 'mini', 'in-shortcuts', 'value', 'blocked'],
@@ -115,13 +113,17 @@ export default {
     topic () {
       return this.item.dataTopics[0].topicFilter
     },
-    text () {
+    title () {
       return this.getValueByTopic(this.value[this.topic] && this.value[this.topic].payload, this.item.dataTopics[0])
+    },
+    text () {
+      return this.formatValue(this.title, this.item.settings)
     },
     stringLength () {
       return this.item.settings.prefix.length + this.text.length + this.item.settings.postfix.length
     }
   },
-  mixins: [getValueByTopic, timestamp]
+  components: { TextView },
+  mixins: [getValueByTopic, timestamp, formatValue]
 }
 </script>
