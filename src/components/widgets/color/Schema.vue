@@ -21,7 +21,7 @@
           </div>
         </q-field>
       </div>
-      <div class="col-12" v-if="widget.dataTopics[0].payloadType">
+      <div class="col-12" v-if="widget.dataTopics[0] && widget.dataTopics[0].payloadType">
         <q-field helper="You can set publish template. %value% is variable of your color.">
           <div>
             <q-input type="textarea" color="dark" v-model="currentSettings.publishTemplate" float-label="Publish template"/>
