@@ -2,10 +2,10 @@
   <div v-if="mini" style="text-align: center;" @click.stop="showTooltip">
     <div style="height: 60px; width: 60px; line-height: 60px; margin: 0 auto; border-radius: 5px;" :class="[`bg-${currentValueText !== null ? `${item.color}-1` : 'grey-3'}`]">
       <div class='ellipsis' :style="{fontSize: `${stringLength > 5 ? 16 : 18}px`}">
-        {{`${currentValueText}${item.settings.units}`}}
+        {{`${currentValueText}`}}
       </div>
       <q-tooltip ref="tooltip">
-        {{`${currentValueText}${item.settings.units}`}}
+        {{`${currentValueText}`}}
       </q-tooltip>
     </div>
     <div class="ellipsis q-mt-sm">{{item.name}}</div>
@@ -130,7 +130,7 @@ export default {
       return values
     },
     currentValueText () {
-      return `${this.item.settings.units ? `${this.item.settings.units}: ` : ''}${this.valuesBySettings[this.item.dataTopics[0].topicFilter]}`
+      return `${this.valuesBySettings[this.item.dataTopics[0].topicFilter]}${this.item.settings.units}`
     },
     currentValue: {
       get () {

@@ -1,15 +1,5 @@
 <template>
-  <div v-if="settings.valueFormat === WIDGET_VALUE_FORMAT_STRING || settings.valueFormat === WIDGET_VALUE_FORMAT_HUMAN_READABLE_SIZE || settings.valueFormat === WIDGET_VALUE_FORMAT_DATE" class="text-center">
-    <span v-if="prefix" style="font-weight: bold;">{{`${prefix}`}}</span>
-    {{text}}
-    <span v-if="postfix" style="font-weight: bold;">{{`${postfix}`}}</span>
-    <q-tooltip>
-      <span v-if="prefix" style="font-weight: bold;">{{`${prefix}`}}</span>
-      {{title}}
-      <span v-if="postfix" style="font-weight: bold;">{{`${postfix}`}}</span>
-    </q-tooltip>
-  </div>
-  <div v-else-if="settings.valueFormat === WIDGET_VALUE_FORMAT_PRE">
+  <div v-if="settings.valueFormat === WIDGET_VALUE_FORMAT_PRE">
     <span v-if="prefix" style="font-weight: bold;">{{`${prefix}`}}</span>
     <pre style="margin: 0;">{{text}}</pre>
     <span v-if="postfix" style="font-weight: bold;">{{`${postfix}`}}</span>
@@ -33,6 +23,26 @@
     <span v-if="prefix" style="font-weight: bold;">{{`${prefix}`}}</span>
     <json-tree :data="getJsonValue()" />
     <span v-if="postfix" style="font-weight: bold;">{{`${postfix}`}}</span>
+  </div>
+  <div v-else-if="settings.valueFormat === WIDGET_VALUE_FORMAT_STRING || settings.valueFormat === WIDGET_VALUE_FORMAT_HUMAN_READABLE_SIZE || settings.valueFormat === WIDGET_VALUE_FORMAT_DATE" class="text-center">
+    <span v-if="prefix" style="font-weight: bold;">{{`${prefix}`}}</span>
+    {{text}}
+    <span v-if="postfix" style="font-weight: bold;">{{`${postfix}`}}</span>
+    <q-tooltip>
+      <span v-if="prefix" style="font-weight: bold;">{{`${prefix}`}}</span>
+      {{title}}
+      <span v-if="postfix" style="font-weight: bold;">{{`${postfix}`}}</span>
+    </q-tooltip>
+  </div>
+  <div v-else class="text-center">
+    <span v-if="prefix" style="font-weight: bold;">{{`${prefix}`}}</span>
+    {{text}}
+    <span v-if="postfix" style="font-weight: bold;">{{`${postfix}`}}</span>
+    <q-tooltip>
+      <span v-if="prefix" style="font-weight: bold;">{{`${prefix}`}}</span>
+      {{title}}
+      <span v-if="postfix" style="font-weight: bold;">{{`${postfix}`}}</span>
+    </q-tooltip>
   </div>
 </template>
 

@@ -106,6 +106,7 @@ import Singleselect from './singleselect/Schema'
 import Multiplier from './multiplier/Schema'
 import Complex from './complex/Schema'
 import Slider from './slider/Schema'
+import Color from './color/Schema'
 
 export default {
   name: 'Settings',
@@ -130,6 +131,7 @@ export default {
         {label: 'Static text', value: 'static-informer'},
         {label: 'Button', value: 'clicker'},
         {label: 'Slider', value: 'slider'},
+        {label: 'Color', value: 'color'},
         {label: 'Radial gauge', value: 'radial'},
         {label: 'Linear gauge', value: 'linear'},
         {label: 'Iframe', value: 'frame'},
@@ -192,7 +194,6 @@ export default {
       })
     },
     typeChangeHandler (type) {
-      console.log(this.currentSettings.type, type)
       if (this.currentSettings.type !== type) {
         this.currentSettings.settings = {}
         this.currentSettings.dataTopics = []
@@ -245,7 +246,7 @@ export default {
   },
   mixins: [validateTopic],
   components: {
-    Topic, Switcher, Informer, Clicker, Radial, Linear, Frame, Singleselect, Multiplier, Complex, StaticInformer, MultiInformer, Slider
+    Topic, Switcher, Informer, Clicker, Radial, Linear, Frame, Singleselect, Multiplier, Complex, StaticInformer, MultiInformer, Slider, Color
   }
 }
 </script>

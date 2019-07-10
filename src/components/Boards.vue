@@ -184,6 +184,7 @@ import Linear from './widgets/linear/View'
 import Radial from './widgets/radial/View'
 import Singleselect from './widgets/singleselect/View'
 import Slider from './widgets/slider/View'
+import Color from './widgets/color/View'
 export default {
   name: 'Boards',
   props: ['boards', 'widgets', 'values', 'remoteBoards', 'canShare', 'isFrized', 'hasConnection'],
@@ -198,7 +199,7 @@ export default {
     }
   },
   components: {
-    Switcher, Clicker, Informer, Linear, Radial, Singleselect, Slider
+    Switcher, Clicker, Informer, Linear, Radial, Singleselect, Slider, Color
   },
   directives: {
     clickOutside: vClickOutside.directive
