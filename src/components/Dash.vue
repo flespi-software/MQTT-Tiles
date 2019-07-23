@@ -69,19 +69,19 @@
 import isEqual from 'lodash/isEqual'
 import mqtt from '../plugins/async-mqtt.js'
 import { uid, LocalStorage } from 'quasar'
+import bl from 'bl'
 import debounce from 'lodash/debounce'
 import cloneDeep from 'lodash/cloneDeep'
 import remove from 'lodash/remove'
 import difference from 'lodash/difference'
 import uniq from 'lodash/uniq'
 import get from 'lodash/get'
-// import set from 'lodash/set'
-import setWith from 'lodash/setWith'
 import Vue from 'vue'
 import Board from './Board'
 import Boards from './Boards'
 import { BOARDS_LOCALSTORAGE_NAME, WIDGET_STATUS_DISABLED, WIDGET_STATUS_ENABLED } from '../constants'
 import getActionTopics from './widgets/getActionTopics.js'
+import messagesProcessing from './widgets/messagesProcessing.js'
 import CopyReplaceDialog from './CopyReplaceDialog'
 import {version} from '../../package.json'
 
@@ -141,7 +141,9 @@ export default {
       colsByBreakpoint: { lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 },
       boardsFromConnection: {},
       exportBoardId: '',
-      bufferValues: {}
+      bufferValues: {},
+      expireMessagesProcess: 0,
+      expireMessagesStore: {}
     }
   },
   computed: {
@@ -150,11 +152,7 @@ export default {
         let value = values[widgetId] = {},
           widget = this.widgets[widgetId]
         widget.topics.forEach(topic => {
-          if (widget.type === 'multiplier' && !!this.subscriptions[topic] && topic === widget.dataTopics[0].topicFilter) {
-            value[topic] = this.getMultiplierValue(topic, this.subscriptions[topic], cloneDeep(get(this.bufferValues, `${widgetId}.${topic}`, undefined)), widget.groupLayout)
-          } else {
-            value[topic] = this.subscriptions[topic]
-          }
+          value[topic] = messagesProcessing(widget.type)(this.subscriptions[topic], get(this.bufferValues, `${widgetId}.${topic}`, undefined), topic, widget)
         })
         return values
       }, {})
@@ -269,6 +267,7 @@ export default {
           return false
         }
         this.setValueByTopic(topic, {...packet, timestamp: Date.now()})
+        this.expireMessagesHandler(packet)
       })
 
       client.on('connect', (connack) => {
@@ -284,7 +283,10 @@ export default {
         this.errorHandler(error, false)
       })
       client.on('close', endHandler)
-      client.on('offline', endHandler)
+      client.on('offline', () => {
+        endHandler()
+        this.expireMessagesProcessingStop()
+      })
       client.on('end', endHandler)
       this.client = client
     },
@@ -303,6 +305,35 @@ export default {
           Vue.set(this.subscriptions, subTopic, value)
         }
       })
+    },
+    expireMessagesHandler (packet) {
+      if (packet.properties && packet.properties.messageExpiryInterval) {
+        if (!this.expireMessagesProcess) {
+          this.expireMessagesProcessing()
+        }
+        this.expireMessagesStore[packet.topic] = Date.now() + Math.floor(packet.properties.messageExpiryInterval * 1000)
+      }
+    },
+    expireMessagesProcessing () {
+      this.expireMessagesProcess = setInterval(() => {
+        let currentTimestamp = Date.now()
+        Object.keys(this.expireMessagesStore).forEach(topic => {
+          let timestamp = this.expireMessagesStore[topic]
+          if (timestamp < currentTimestamp) {
+            this.subscriptionsTopics.forEach((subTopic) => {
+              if (this.checkTopic(topic, subTopic)) {
+                Vue.set(this.subscriptions[subTopic], 'payload', bl().slice(0, -1))
+              }
+            })
+            this.$delete(this.expireMessagesStore, timestamp)
+          }
+        })
+      }, 30000)
+    },
+    expireMessagesProcessingStop () {
+      this.expireMessagesProcess && clearInterval(this.expireMessagesProcess)
+      this.expireMessagesStore = {}
+      this.expireMessagesProcess = 0
     },
     async subscribe () {
       if (this.client) {
@@ -650,30 +681,6 @@ export default {
         layoutWidgetItem.h = height
         layoutWidgetItem.w = width
       })
-    },
-    getMultiplierValue (subscriptionTopic, packet, initValue, groupLayout) {
-      let path = subscriptionTopic.split('/')
-      let currentPath = packet.topic.split('/')
-      let value = initValue || {}
-      let setPath = []
-      path.forEach((pathItem, index) => {
-        setPath.push(currentPath[index])
-      })
-      if (packet.payload.length) {
-        let payload = JSON.parse(packet.payload.toString())
-        if (setPath.length) {
-          setWith(value, setPath, payload, Object)
-        } else {
-          value = payload
-        }
-      } else {
-        if (setPath.length) {
-          Vue.delete(value, setPath.join('-'))
-        } else {
-          value = null
-        }
-      }
-      return value
     },
     /* widgets logic end */
     getSyncedBoards () {

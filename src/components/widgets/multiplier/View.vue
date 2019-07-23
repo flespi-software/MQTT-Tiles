@@ -100,7 +100,7 @@ export default {
       let path = this.currentTopic.split('/')
       let value = null
       if (path.indexOf('+') === -1) {
-        value = get(this.value[topic], path.slice(0, -1).join('.'), null)
+        value = path.length === 1 ? this.value[topic] : get(this.value[topic], path.slice(0, -1).join('.'), null)
       } else {
         value = path.reduce((val, pathPart, index) => {
           if (pathPart === '+') {

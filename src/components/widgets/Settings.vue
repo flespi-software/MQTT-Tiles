@@ -107,6 +107,9 @@ import Multiplier from './multiplier/Schema'
 import Complex from './complex/Schema'
 import Slider from './slider/Schema'
 import Color from './color/Schema'
+import MapLocation from './mapLocation/Schema'
+import MapRoute from './mapRoute/Schema'
+import StatusIndicator from './statusIndicator/Schema'
 
 export default {
   name: 'Settings',
@@ -125,19 +128,22 @@ export default {
       defaultSettings,
       currentSettings: this.settings ? merge({}, defaultSettings, this.settings) : merge({}, defaultSettings),
       typeOptions: [
-        {label: 'Toggle', value: 'switcher'},
-        {label: 'Text', value: 'informer'},
-        {label: 'Multi text', value: 'multi-informer'},
-        {label: 'Static text', value: 'static-informer'},
-        {label: 'Button', value: 'clicker'},
-        {label: 'Slider', value: 'slider'},
-        {label: 'Color', value: 'color'},
-        {label: 'Radial gauge', value: 'radial'},
-        {label: 'Linear gauge', value: 'linear'},
-        {label: 'Iframe', value: 'frame'},
-        {label: 'Radio button', value: 'singleselect'},
-        {label: 'Multiplier', value: 'multiplier'},
-        {label: 'Complex', value: 'complex'}
+        {label: 'Toggle', value: 'switcher', rightIcon: 'mdi-toggle-switch-outline'},
+        {label: 'Text', value: 'informer', rightIcon: 'mdi-format-color-text'},
+        {label: 'Multi text', value: 'multi-informer', rightIcon: 'mdi-card-text-outline'},
+        {label: 'Static text', value: 'static-informer', rightIcon: 'mdi-format-text'},
+        {label: 'Button', value: 'clicker', rightIcon: 'mdi-send'},
+        {label: 'Slider', value: 'slider', rightIcon: 'mdi-ray-vertex'},
+        {label: 'Color', value: 'color', rightIcon: 'mdi-palette'},
+        {label: 'Map (Location)', value: 'map-location', rightIcon: 'mdi-map-marker-outline'},
+        {label: 'Map (Route)', value: 'map-route', rightIcon: 'mdi-map-marker-distance'},
+        {label: 'Status Indicator', value: 'status-indicator', rightIcon: 'mdi-lightbulb-outline'},
+        {label: 'Radial gauge', value: 'radial', rightIcon: 'mdi-gauge'},
+        {label: 'Linear gauge', value: 'linear', rightIcon: 'mdi-oil-temperature'},
+        {label: 'Iframe', value: 'frame', rightIcon: 'mdi-window-maximize'},
+        {label: 'Radio button', value: 'singleselect', rightIcon: 'mdi-radiobox-marked'},
+        {label: 'Multiplier', value: 'multiplier', rightIcon: 'mdi-monitor-multiple'},
+        {label: 'Complex', value: 'complex', rightIcon: 'mdi-card-bulleted-outline'}
       ],
       colors: ['grey', 'red', 'green', 'orange', 'blue', 'light-blue'],
       isValideSchema: true,
@@ -246,7 +252,7 @@ export default {
   },
   mixins: [validateTopic],
   components: {
-    Topic, Switcher, Informer, Clicker, Radial, Linear, Frame, Singleselect, Multiplier, Complex, StaticInformer, MultiInformer, Slider, Color
+    Topic, Switcher, Informer, Clicker, Radial, Linear, Frame, Singleselect, Multiplier, Complex, StaticInformer, MultiInformer, Slider, Color, MapLocation, MapRoute, StatusIndicator
   }
 }
 </script>

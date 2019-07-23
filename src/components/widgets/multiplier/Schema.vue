@@ -87,6 +87,7 @@ export default {
       this.updateTopics()
       return {
         name: 'Multiplier',
+        parentType: this.widget.type,
         color: this.currentSettings.color,
         type: this.currentSettings.type,
         topics: [],
