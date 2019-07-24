@@ -1,6 +1,6 @@
 {
   "name": "mqtttiles",
-  "version": "1.4.5",
+  "version": "1.4.6",
   "description": "MQTT-based IoT dashboard visualization tool",
   "productName": "MQTT Tiles",
   "cordovaId": "org.cordova.quasar.app",
@@ -8,7 +8,7 @@
   "main": "index.js",
   "private": true,
   "scripts": {
-    "deploy": "quasar build -m pwa && mkdir -p deploy && cp -R dist/pwa-mat/* misc LICENSE package.json README.md deploy && node_modules/git-directory-deploy/bin/git-directory-deploy.sh -ddeploy -bgh-pages -rhttps://git.gurtam.net/flespi/frontend/MQTTTiles.git"
+    "deploy": "quasar build -m pwa && mkdir -p deploy && cp -R dist/pwa-mat/* misc LICENSE package.json README.md deploy && node_modules/git-directory-deploy/bin/git-directory-deploy.sh -ddeploy -bgh-pages -rhttps://git.gurtam.net/flespi/frontend/MQTTTiles.git && rm -rf deploy && git push github gh-pages"
   },
   "dependencies": {
     "@radial-color-picker/vue-color-picker": "^2.1.0",
