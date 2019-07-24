@@ -30,7 +30,7 @@
       <div style="width: 100%; height: 100%;">
         <div class="frame__payload" style="height: 100%">
           <q-resize-observable @resize="onResize" />
-          <iframe v-if="link !== null" :src="link" frameborder="0" :height="height" :width="width" autoplay></iframe>
+          <iframe v-if="link !== null" :src="link" frameborder="0" :height="height" :width="width" autoplay ref="frame"></iframe>
           <div v-else style="height: 95%;" class="bg-grey-5 text-grey-8 relative-position q-pt-xs">
             <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
               <q-icon name="mdi-block-helper" :size="`${height / 2}px`"/>
@@ -38,6 +38,9 @@
             <div style="font-size: 1.5rem;">Invalid link address</div>
           </div>
         </div>
+      </div>
+      <div v-if="item.settings.isNeedTime" class="absolute-bottom-left q-px-xs q-pt-xs" style="font-size: 12px; border-top-right-radius: 5px;" :class="[`text-${item.color}-7`, `bg-${item.color}-1`]">
+        {{timestamp}}
       </div>
     </q-card-media>
   </q-card>
@@ -68,13 +71,17 @@
 
 <script>
 import getValueByTopic from '../../../mixins/getValueByTopic.js'
+import timestamp from '../../../mixins/timestamp.js'
+import { IFRAME_MODE_INTEGRATION, IFRAME_MODE_SHOW } from './constants'
 export default {
   name: 'Frame',
   props: ['item', 'index', 'mini', 'in-shortcuts', 'value', 'blocked'],
   data () {
     return {
       width: 0,
-      height: 0
+      height: 0,
+      IFRAME_MODE_INTEGRATION,
+      IFRAME_MODE_SHOW
     }
   },
   methods: {
@@ -86,15 +93,49 @@ export default {
     onResize ({width, height}) {
       this.width = width - 16
       this.height = height - 16
+    },
+    send (msg) {
+      this.$refs.frame && this.$refs.frame.contentWindow.postMessage(msg, '*')
+    },
+    getPayload () {
+      let payload
+      if (this.item.settings.mode === IFRAME_MODE_INTEGRATION) {
+        let value = this.getValueByTopic(this.value[this.item.dataTopics[0].topicFilter] && this.value[this.item.dataTopics[0].topicFilter].payload, this.item.dataTopics[0])
+        payload = this.item.settings.template
+        payload = payload.replace('<{topic}>', this.value && this.value.topic)
+        payload = payload.replace(/<%([a-zA-Z0-9-+&@#/%?=~_|!:,.;]*)%>/gim, (_, name) => {
+          return value[name] || null
+        })
+      }
+      return payload
     }
   },
   computed: {
     link () {
-      let urlPattern = /\b(?:https?|ftp):\/\/[a-z0-9-+&@#/%?=~_|!:,.;]*[a-z0-9-+&@#/%=~_|]/gim
-      let linkValue = this.getValueByTopic(this.value[this.item.dataTopics[0].topicFilter] && this.value[this.item.dataTopics[0].topicFilter].payload, this.item.dataTopics[0])
-      return linkValue && linkValue.toString().match(urlPattern) ? linkValue : null
+      if (this.item.settings.mode === IFRAME_MODE_INTEGRATION) {
+        return this.item.settings.link
+      } else {
+        let urlPattern = /\b(?:https?|ftp):\/\/[a-z0-9-+&@#/%?=~_|!:,.;]*[a-z0-9-+&@#/%=~_|]/gim
+        let linkValue = this.getValueByTopic(this.value[this.item.dataTopics[0].topicFilter] && this.value[this.item.dataTopics[0].topicFilter].payload, this.item.dataTopics[0])
+        return linkValue && linkValue.toString().match(urlPattern) ? linkValue : null
+      }
     }
   },
-  mixins: [getValueByTopic]
+  watch: {
+    value: {
+      deep: true,
+      handler () {
+        this.send(this.getPayload())
+      }
+    }
+  },
+  created () {
+    window.addEventListener('message', (e) => {
+      if (e.data === 'MapView|state:{"ready": true}') {
+        this.send(this.getPayload())
+      }
+    })
+  },
+  mixins: [getValueByTopic, timestamp]
 }
 </script>

@@ -1,18 +1,19 @@
 <template>
   <div>
     <div class="row">
-      <!-- <div class="q-mt-sm col-12">
-        <q-toggle color="dark" v-model="currentSettings.save" label="Save last status on server (retained message)"/>
-      </div> -->
-      <!-- <q-btn-toggle class='q-mt-md col-12' rounded toggle-text-color="dark" text-color="grey-6" flat v-model="currentSettings.mode" :options="modeOptions" /> -->
-      <div class="singleselect__items-wrapper col-12 relative-position q-mb-sm q-mt-lg">
+      <div class="col-xs-12">
+        <q-input class="q-mr-xs icon-input" color="dark" v-model="currentSettings.defaultIcon" float-label="Default icon" :error="!currentSettings.defaultIcon">
+          <q-icon :name="`mdi-${currentSettings.defaultIcon}`" size="1.5rem" style="position: absolute; right: 0; bottom : 7px;"/>
+        </q-input>
+      </div>
+      <div class="status-indicator__items-wrapper col-12 relative-position q-mb-sm q-mt-lg">
         <q-list>
           <q-btn color="dark" style="top: -20px; right: 8px; position: absolute; z-index: 1130;" class="col-12" fab-mini @click="addItem" icon="mdi-plus"/>
           <q-list-header :class="{'text-red-6': !currentSettings.items.length}">Items{{currentSettings.items.length ? '' : ' are empty'}}</q-list-header>
           <q-collapsible
             v-for="(item, index) in currentSettings.items"
             :key="`${index}${item.value}`"
-            group="singleselect-items"
+            group="status-indicator-items"
             :header-class="[`bg-${checkUniqueValue(item.val, index) && !!item.actionTopic ? 'grey-4' : 'red-2'}`]"
             collapse-icon="mdi-settings"
             :opened="true"
@@ -22,7 +23,7 @@
                 <q-btn :disabled="index === 0" round dense flat class="col-1" @click.stop="upItem(index)" icon="mdi-arrow-up"/>
                 <q-btn :disabled="index === (currentSettings.items.length - 1)" round dense flat class="col-1" @click.stop="downItem(index)" icon="mdi-arrow-down"/>
               </q-item-side>
-              <q-item-main :label="item.label ? `${item.label} [${item.val}]` : item.val || `item ${index + 1}`" />
+              <q-item-main :label="getItemLabel(item, index)" />
               <q-item-side right v-if="!item.default">
                 <q-btn flat color="red-6" round dense @click="removeItem(index)" icon="mdi-delete"/>
               </q-item-side>
@@ -39,7 +40,7 @@
               </div>
               <div class="col-10">
                 <q-input class="q-mr-xs icon-input" :style="{color: item.color}" color="dark" v-model="item.icon" float-label="Icon">
-                  <q-icon :name="`mdi-${item.icon}`" size="1.5rem" :style="{color: item.color}" style="position: absolute; right: 0; bottom : 7px;"/>
+                  <q-icon :name="`mdi-${item.icon || currentSettings.defaultIcon}`" size="1.5rem" :style="{color: item.color}" style="position: absolute; right: 0; bottom : 7px;"/>
                 </q-input>
               </div>
               <div class="col-2 relative-position">
@@ -81,7 +82,7 @@ export default {
   data () {
     let defaultItem = {
       label: 'item',
-      icon: 'circle',
+      icon: '',
       color: '#000',
       val: '',
       actionTopic: 'topic/to/action',
@@ -91,7 +92,7 @@ export default {
       items: [
         {
           label: 'default',
-          icon: 'circle',
+          icon: '',
           color: '#000',
           val: '',
           default: true,
@@ -101,11 +102,12 @@ export default {
       ],
       save: true,
       mode: DEFAULT_MODE,
-      height: 4,
+      defaultIcon: 'circle',
+      height: 2,
       width: 2,
       maxTopicsLength: 1,
       minWidth: 2,
-      minHeight: 4,
+      minHeight: 2,
       isNeedTime: true
     }
     return {
@@ -145,7 +147,7 @@ export default {
       return isUnique
     },
     validate () {
-      return (
+      return !!this.currentSettings.defaultIcon && (
         this.currentSettings.mode === DEFAULT_MODE ||
           (this.currentSettings.mode === COMMAND_MODE && this.currentSettings.items.reduce((res, item) => {
             return res && !!item.actionTopic
@@ -163,6 +165,18 @@ export default {
           }
           return isUniq
         }, {})
+    },
+    getItemLabel (item, index) {
+      let label = ''
+      if (item.label) {
+        label += `${item.label} `
+        if (!item.default) {
+          label += `[${item.val || 'N/A'}]`
+        }
+      } else {
+        label = `${item.val || `item ${index + 1}`}`
+      }
+      return label
     }
   },
   created () {
@@ -172,8 +186,8 @@ export default {
     currentSettings: {
       deep: true,
       handler (val, old) {
-        if (isEqual(val, old)) { return false }
         this.$emit('validate', this.validate())
+        if (isEqual(val, old)) { return false }
         this.$emit('update', val)
       }
     }

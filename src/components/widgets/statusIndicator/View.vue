@@ -7,7 +7,7 @@
       <q-icon
         size="3rem"
         :style="{color: activeItem.color}"
-        :name="`mdi-${activeItem.icon}`"
+        :name="`mdi-${activeItem.icon || item.settings.defaultIcon}`"
       />
     </div>
     <div class="ellipsis q-mt-sm">{{item.name}}</div>
@@ -48,7 +48,7 @@
     <q-card-media class="widget__content" :class="[`bg-${item.color}-1`]" style="height: calc(100% - 22px);">
       <q-icon
         :style="{color: activeItem.color, fontSize: `${size}rem`}"
-        :name="`mdi-${activeItem.icon}`"
+        :name="`mdi-${activeItem.icon || item.settings.defaultIcon}`"
         style="width: 100%; height: 100%;"
       />
     </q-card-media>

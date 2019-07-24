@@ -1,5 +1,5 @@
 <template>
-  <div class="dash__wrapper">
+  <div class="dash__wrapper" :class="{'dash__wrapper--full': !fullView}">
     <board
       v-if="activeBoardId"
       :board="boards[activeBoardId]"
@@ -57,6 +57,8 @@
   .dash__wrapper
     height calc(100vh - 50px)
     width 100%
+  .dash__wrapper--full
+    height 100vh
   .connections--empty
     font-size 1.5rem
     bottom 0

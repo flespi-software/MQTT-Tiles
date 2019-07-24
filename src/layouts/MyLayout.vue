@@ -6,9 +6,9 @@
       @save="saveSettingsHandler"
       @hide="hideSettingsHandler"
     />
-    <q-layout-header>
+    <q-layout-header v-if="fullViewMode">
       <q-toolbar color="dark">
-        <q-btn flat rounded icon="mdi-menu" @click="leftDrawerOpen = !leftDrawerOpen" v-if="fullViewMode"/>
+        <q-btn flat rounded icon="mdi-menu" @click="leftDrawerOpen = !leftDrawerOpen"/>
         <q-toolbar-title style="line-height: 36px;">
           <img src="statics/mqtttiles-logo.png" alt="MQTT Tiles" style="height: 30px; vertical-align: text-bottom;">
           MQTT Tiles
