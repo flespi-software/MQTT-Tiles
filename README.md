@@ -82,7 +82,13 @@ framework: {
     'QField',
     'QResizeObservable',
     'QCollapsible',
-    'QRadio'
+    'QRadio',
+    'QDialog',
+    'QProgress',
+    'QKnob',
+    'QSlider',
+    'QColorPicker',
+    'QBtnDropdown'
   ],
   directives: [
     'Ripple',
