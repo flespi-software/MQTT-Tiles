@@ -4,36 +4,36 @@ self.__precacheManifest = [
     "url": "statics/icons/favicon-32x32.png"
   },
   {
-    "revision": "0dbf6355411740f27268f1e08411d84a",
+    "revision": "ba75a1eccacf06f78aaa67c89516b236",
     "url": "index.html"
-  },
-  {
-    "revision": "853d7b482c93458838e7ab1b1798e6f4",
-    "url": "statics/icons/icon-512x512.png"
-  },
-  {
-    "revision": "7674d3e616ee71e6cf0b",
-    "url": "js/35cfc3f4.c7336273.js"
   },
   {
     "revision": "a9ff913a3c17b881b663",
     "url": "js/4b47640d.21cfc388.js"
   },
   {
-    "revision": "93c7453a65d85cb0b0b7",
-    "url": "js/510c3fcc.58d1e73c.js"
+    "revision": "cd4e12833c51b449407b",
+    "url": "js/510c3fcc.dda8dd6c.js"
+  },
+  {
+    "revision": "853d7b482c93458838e7ab1b1798e6f4",
+    "url": "statics/icons/icon-512x512.png"
+  },
+  {
+    "revision": "f6b257540d73e6283948",
+    "url": "js/70187536.31a1c02b.js"
   },
   {
     "revision": "68853917849c40e8e8b7e5dfdb5ab922",
     "url": "statics/icons/icon-384x384.png"
   },
   {
-    "revision": "edd027dde6f383cc105c",
-    "url": "js/app.535d1d73.js"
+    "revision": "4540982cb565f1fcb36a",
+    "url": "js/app.954b9874.js"
   },
   {
-    "revision": "9f6171faa5a62775c7e8",
-    "url": "js/vendor.d456ff2f.js"
+    "revision": "e0e0539c29130003c712",
+    "url": "js/vendor.19e1b395.js"
   },
   {
     "revision": "cc6ffcc57666a7d6371105eb8464db68",
@@ -53,19 +53,19 @@ self.__precacheManifest = [
   },
   {
     "revision": "457e201cb44bbf929a441a4c31955ab0",
-    "url": "statics/icons/mstile-144x144.png"
-  },
-  {
-    "revision": "457e201cb44bbf929a441a4c31955ab0",
     "url": "statics/icons/ms-icon-144x144.png"
   },
   {
-    "revision": "c973814e56ef4c2880534a90797e971d",
-    "url": "statics/icons/icon-128x128.png"
+    "revision": "457e201cb44bbf929a441a4c31955ab0",
+    "url": "statics/icons/mstile-144x144.png"
   },
   {
     "revision": "e1e243ed1d0ede18157ac17c17a0d2aa",
     "url": "statics/icons/icon-192x192.png"
+  },
+  {
+    "revision": "c973814e56ef4c2880534a90797e971d",
+    "url": "statics/icons/icon-128x128.png"
   },
   {
     "revision": "1288c509d62807d356dc3c840521809a",
@@ -92,8 +92,8 @@ self.__precacheManifest = [
     "url": "statics/icons/favicon-16x16.png"
   },
   {
-    "revision": "84e571834f2b2d1459fc",
-    "url": "js/265e6440.12a49333.js"
+    "revision": "2358d67f455942361348",
+    "url": "js/35cfc3f4.b8812fb8.js"
   },
   {
     "revision": "6a398e80a59c5be4e5cb574e6f72d631",
@@ -136,8 +136,8 @@ self.__precacheManifest = [
     "url": "statics/icons/apple-touch-icon-152x152.png"
   },
   {
-    "revision": "a1471d1d6431c893582a5f6a250db3f9",
-    "url": "fonts/KFOlCnqEu92Fr1MmSU5fBBc-.a1471d1d.woff"
+    "revision": "bafb105baeb22d965c70fe52ba6b49d9",
+    "url": "fonts/KFOmCnqEu92Fr1Mu4mxM.bafb105b.woff"
   },
   {
     "revision": "c38ebd3cd38c98fbd16bf31d1d24ce64",
@@ -156,16 +156,16 @@ self.__precacheManifest = [
     "url": "fonts/flUhRq6tzZclQEJ-Vdg-IuiaDsNcIhQ8tQ.8a9a261c.woff2"
   },
   {
-    "revision": "bafb105baeb22d965c70fe52ba6b49d9",
-    "url": "fonts/KFOmCnqEu92Fr1Mu4mxM.bafb105b.woff"
-  },
-  {
     "revision": "8c2ade503b34e31430d6c98aa29a52a3",
     "url": "fonts/KFOlCnqEu92Fr1MmYUtfBBc-.8c2ade50.woff"
   },
   {
     "revision": "cf6613d1adf490972c557a8e318e0868",
     "url": "fonts/KFOlCnqEu92Fr1MmWUlfBBc-.cf6613d1.woff"
+  },
+  {
+    "revision": "a1471d1d6431c893582a5f6a250db3f9",
+    "url": "fonts/KFOlCnqEu92Fr1MmSU5fBBc-.a1471d1d.woff"
   },
   {
     "revision": "de8b7431b74642e830af4d4f4b513ec9",
@@ -176,15 +176,15 @@ self.__precacheManifest = [
     "url": "fonts/KFOkCnqEu92Fr1MmgVxIIzQ.e9dbbe8a.woff"
   },
   {
-    "revision": "edd027dde6f383cc105c",
-    "url": "css/app.e510cccd.css"
+    "revision": "4540982cb565f1fcb36a",
+    "url": "css/app.2d38a044.css"
   },
   {
-    "revision": "7674d3e616ee71e6cf0b",
+    "revision": "f6b257540d73e6283948",
+    "url": "css/70187536.1f7b329e.css"
+  },
+  {
+    "revision": "2358d67f455942361348",
     "url": "css/35cfc3f4.142b8833.css"
-  },
-  {
-    "revision": "84e571834f2b2d1459fc",
-    "url": "css/265e6440.5e15f63c.css"
   }
 ];
