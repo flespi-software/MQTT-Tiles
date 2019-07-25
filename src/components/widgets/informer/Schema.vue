@@ -42,7 +42,7 @@ export default {
       postfix: '',
       height: 2,
       width: 2,
-      minWidth: 2,
+      minWidth: 1,
       minHeight: 2,
       maxTopicsLength: 1,
       isNeedTime: true
