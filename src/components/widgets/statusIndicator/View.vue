@@ -95,7 +95,7 @@ export default {
       let height = this.item.settings.height,
         width = this.item.settings.width,
         active = height > width ? width : height
-      return active * 3
+      return active * 2.5
     },
     currentValue: {
       get () {

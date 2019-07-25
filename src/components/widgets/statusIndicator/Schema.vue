@@ -104,9 +104,9 @@ export default {
       mode: DEFAULT_MODE,
       defaultIcon: 'circle',
       height: 2,
-      width: 2,
+      width: 1,
       maxTopicsLength: 1,
-      minWidth: 2,
+      minWidth: 1,
       minHeight: 2,
       isNeedTime: true
     }

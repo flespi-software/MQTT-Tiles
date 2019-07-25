@@ -1,6 +1,6 @@
 {
   "name": "mqtttiles",
-  "version": "1.4.6",
+  "version": "1.4.7",
   "description": "MQTT-based IoT dashboard visualization tool",
   "productName": "MQTT Tiles",
   "cordovaId": "org.cordova.quasar.app",
