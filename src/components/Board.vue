@@ -12,11 +12,11 @@
     <q-btn v-if='!board.settings.blocked  && !isFrized' fab color="dark" @click="addWidgetHandler" icon="mdi-plus" class="absolute button--add">
       <q-tooltip>Add new widget</q-tooltip>
     </q-btn>
-    <q-toolbar color="white">
+    <q-toolbar color="white" v-if="(isFrized && board.name) || !isFrized">
       <q-btn round flat color="dark" icon="mdi-arrow-left" @click="$emit('close')" v-if="!isFrized">
         <q-tooltip>Back to boards list</q-tooltip>
       </q-btn>
-      <q-toolbar-title class="text-dark">{{board.name}}</q-toolbar-title>
+      <q-toolbar-title class="text-dark">{{board.name || '*No name*'}}</q-toolbar-title>
       <q-btn v-if="canShare" @click="shareHandler" icon="mdi-share" color="dark" flat round>
         <q-tooltip>Share board</q-tooltip>
       </q-btn>
@@ -27,7 +27,7 @@
         <q-tooltip>{{board.settings.blocked ? 'Unlock your board' : 'Lock your board'}}</q-tooltip>
       </q-btn>
     </q-toolbar>
-    <div class="widgets__wrapper scroll">
+    <div class="widgets__wrapper scroll" :style="{height: (isFrized && board.name) || !isFrized ? 'calc(100% - 50px)' : '100%'}">
       <div style="width: 100%; position: relative;" v-if="board.widgetsIndexes.length">
         <grid-layout
           ref="grid"
@@ -93,7 +93,6 @@
   .dash__board
     position relative
     .widgets__wrapper
-      height calc(100% - 50px)
       padding-bottom 82px
       position relative
 </style>

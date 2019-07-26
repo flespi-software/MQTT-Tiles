@@ -12,8 +12,8 @@
           <q-item class="q-py-none q-pl-sm q-pr-none bg-grey-4">
             <q-item-main class="ellipsis">
               <div class="ellipsis" style="height: 24px; line-height: 24px;">
-                {{board.name}}
-                <q-tooltip>{{board.name}}</q-tooltip>
+                {{board.name || '*No name*'}}
+                <q-tooltip v-if="board.name">{{board.name}}</q-tooltip>
               </div>
               <div class="ellipsis text-grey-9" style="height: 14px; line-height: 14px; font-size: 14px;">
                 {{board.id}}
@@ -57,8 +57,8 @@
             <q-item class="q-py-none q-px-sm bg-grey-4">
               <q-item-main class="ellipsis">
                 <div class="ellipsis" style="height: 24px; line-height: 24px;">
-                  {{board.name}}
-                  <q-tooltip>{{board.name}}</q-tooltip>
+                  {{board.name || '*No name*'}}
+                  <q-tooltip v-if="board.name">{{board.name}}</q-tooltip>
                 </div>
                 <div class="ellipsis text-grey-9" style="height: 14px; line-height: 14px; font-size: 14px;">
                   {{board.id}}
@@ -78,6 +78,14 @@
                         <q-item-side icon="mdi-cloud-upload-outline" />
                         <q-item-main label="Save to broker"/>
                       </q-item>
+                      <q-item class="cursor-pointer" v-close-overlay highlight @click.native.stop="$emit('export:string', id)">
+                        <q-item-side icon="mdi-export-variant" />
+                        <q-item-main label="Export as string"/>
+                      </q-item>
+                      <q-item class="cursor-pointer" v-close-overlay highlight @click.native.stop="$emit('export:file', id)">
+                        <q-item-side icon="mdi-file-export" />
+                        <q-item-main label="Export as file"/>
+                      </q-item>
                       <q-item class="cursor-pointer" v-close-overlay highlight @click.native.stop="$emit('edit', id);">
                         <q-item-side icon="mdi-pencil" />
                         <q-item-main label="Name"/>
@@ -92,7 +100,7 @@
                 </q-btn>
               </q-item-side>
               <q-item-side v-show="board.settings.edited">
-                <q-btn v-if="!!board.id && !board.id.match(/[/+#\s]/g) && (!boards[board.id] || id === board.id) && !!board.name" round dense flat icon="mdi-content-save" color="dark" @click.native="$emit('edit', id);">
+                <q-btn v-if="!!board.id && !board.id.match(/[/+#\s]/g) && (!boards[board.id] || id === board.id)" round dense flat icon="mdi-content-save" color="dark" @click.native="$emit('edit', id);">
                   <q-tooltip>Save board settings</q-tooltip>
                 </q-btn>
               </q-item-side>
@@ -123,7 +131,6 @@
                   autofocus
                   v-model="board.name"
                   color="dark"
-                  :error="!board.name"
                   float-label="Name"
                 />
                 <q-input

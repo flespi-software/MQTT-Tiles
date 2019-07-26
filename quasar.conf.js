@@ -85,7 +85,8 @@ module.exports = function (ctx) {
         'QKnob',
         'QSlider',
         'QColorPicker',
-        'QBtnDropdown'
+        'QBtnDropdown',
+        'QUploader'
       ],
       directives: [
         'Ripple',

@@ -42,7 +42,7 @@ export default {
       return !this.isNeedCopy ? `Replace board` : `Save board`
     },
     message () {
-      return !this.isNeedCopy ? `Such board exists on the server. Replace?` : `Save the new board on the server?`
+      return !this.isNeedCopy ? `Such board exists. Replace?` : `Save the new board?`
     },
     nameModel: {
       get () { return this.name },

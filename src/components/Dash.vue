@@ -19,7 +19,7 @@
       @update:layout="layoutUpdateHandler"
       @share="shareHandler(activeBoardId)"
       @upload="exportPrepareBoardHandler(activeBoardId)"
-      :style="{height: `${clientSettings ? 'calc(100vh - 50px)' : 'calc(100vh - 110px)'}`}"
+      :style="{height: `${clientSettings ? fullView ? 'calc(100vh - 50px)' : '100vh' : 'calc(100vh - 110px)'}`}"
     />
     <boards
       v-else
@@ -39,9 +39,15 @@
       @share:uploaded="shareUploadedHandler"
       @delete:uploaded="deleteUploadedBoard"
       @export="exportPrepareBoardHandler"
-      @import="importBoardHandler"
+      @export:string="exportBoardAsStringHandler"
+      @export:file="exportBoardAsFileHandler"
+      @import="importBoardFromConnectionHandler"
       :style="{height: `${clientSettings ? 'calc(100vh - 50px)' : 'calc(100vh - 110px)'}`}"
-    />
+    >
+      <div slot="actions">
+        <q-btn label="import" @click="importClickHandler" flat color="dark"/>
+      </div>
+    </boards>
     <div v-if="!clientSettings" class="bg-red-2 text-red-8 text-center absolute connections--empty">
       <div class="text-bold q-mt-md">No active connections</div>
     </div>
@@ -49,6 +55,13 @@
       ref="copyReplaceDialog"
       :initName="exportBoardId"
       @change:name="(name) => exportBoardId = name"
+    />
+    <import-export-modal
+      ref="importExportModal"
+      :mode="importExportMode"
+      :data="importExportData"
+      @close="importExportClose"
+      @import="importBoardFromUserHandler"
     />
   </div>
 </template>
@@ -79,12 +92,14 @@ import difference from 'lodash/difference'
 import uniq from 'lodash/uniq'
 import get from 'lodash/get'
 import Vue from 'vue'
+import { Base64 } from 'js-base64'
 import Board from './Board'
 import Boards from './Boards'
 import { BOARDS_LOCALSTORAGE_NAME, WIDGET_STATUS_DISABLED, WIDGET_STATUS_ENABLED } from '../constants'
 import getActionTopics from './widgets/getActionTopics.js'
 import messagesProcessing from './widgets/messagesProcessing.js'
 import CopyReplaceDialog from './CopyReplaceDialog'
+import ImportExportModal from './ImportExportModal'
 import {version} from '../../package.json'
 
 let clearWidgets = function clearWidgets (widgets) {
@@ -145,7 +160,9 @@ export default {
       exportBoardId: '',
       bufferValues: {},
       expireMessagesProcess: 0,
-      expireMessagesStore: {}
+      expireMessagesStore: {},
+      importExportMode: undefined,
+      importExportData: undefined
     }
   },
   computed: {
@@ -705,8 +722,8 @@ export default {
         }
       }
     },
-    importBoardHandler (id) {
-      let board = cloneDeep(this.boardsFromConnection[id])
+    importBoardHandler (board) {
+      let id = board.id
       this.exportBoardId = id
       if (this.boards[id]) {
         this.$refs.copyReplaceDialog.open({
@@ -734,6 +751,10 @@ export default {
       } else {
         this.initBoard(board)
       }
+    },
+    importBoardFromConnectionHandler (id) {
+      let board = cloneDeep(this.boardsFromConnection[id])
+      this.importBoardHandler(board)
     },
     exportPrepareBoardHandler (id) {
       this.exportBoardId = id
@@ -849,6 +870,37 @@ export default {
         .finally(() => {
           this.$q.loading.hide()
         })
+    },
+    exportBoardAsStringHandler (id) {
+      let board = this.boards[id],
+        boardModelForSave = getBoardToSave(board, this.widgets)
+      this.importExportMode = 1
+      this.importExportData = Base64.encode(JSON.stringify(boardModelForSave))
+      this.$refs.importExportModal.open()
+    },
+    exportBoardAsFileHandler (id) {
+      let board = this.boards[id],
+        boardModelForSave = getBoardToSave(board, this.widgets)
+      this.importExportMode = 1
+      this.importExportData = Base64.encode(JSON.stringify(boardModelForSave))
+      this.$refs.importExportModal.open()
+    },
+    importExportClose () {
+      this.importExportMode = undefined
+      this.importExportData = undefined
+    },
+    importClickHandler () {
+      this.importExportMode = 0
+      this.$refs.importExportModal.open()
+    },
+    importBoardFromUserHandler (data) {
+      let boardModel
+      try {
+        boardModel = JSON.parse(data)
+      } catch (e) {
+        boardModel = JSON.parse(Base64.decode(data))
+      }
+      this.importBoardHandler(boardModel)
     }
   },
   created () {
@@ -904,6 +956,6 @@ export default {
       }
     }
   },
-  components: { Board, Boards, CopyReplaceDialog }
+  components: { Board, Boards, CopyReplaceDialog, ImportExportModal }
 }
 </script>
