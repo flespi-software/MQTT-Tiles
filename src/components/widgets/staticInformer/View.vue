@@ -3,7 +3,6 @@
     <q-item class="q-px-sm q-pt-sm q-pb-none" style="min-height: 29px;">
       <q-item-main class="ellipsis" :class="[`text-${item.color}-7`]" style="font-size: .9rem">
         {{item.name}}
-        <q-tooltip>{{item.name}}</q-tooltip>
       </q-item-main>
       <transition name="block">
         <q-item-side v-if="!blocked" style="min-width: 20px;">
@@ -28,7 +27,7 @@
     </q-item>
     <q-card-media class="widget__content scroll" :class="[`bg-${item.color}-1`]" style="height: calc(100% - 44px);">
       <div class="sattic-informer__payload-wrapper">
-        <text-view class="static-informer__payload text-dark" :text="text" :title="text" :settings="item.settings" />
+        <text-view class="static-informer__payload text-dark" :text="text" :title="text" :settings="item.settings" :show-tooltip="false" />
       </div>
     </q-card-media>
   </q-card>

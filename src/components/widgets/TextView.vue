@@ -3,7 +3,7 @@
     <span v-if="prefix" style="font-weight: bold;">{{`${prefix}`}}</span>
     <pre style="margin: 0;">{{text}}</pre>
     <span v-if="postfix" style="font-weight: bold;">{{`${postfix}`}}</span>
-    <q-tooltip>
+    <q-tooltip v-if="showTooltip">
       <span v-if="prefix" style="font-weight: bold;">{{`${prefix}`}}</span>
       <pre style="margin: 0;">{{title}}</pre>
       <span v-if="postfix" style="font-weight: bold;">{{`${postfix}`}}</span>
@@ -13,7 +13,7 @@
     <span v-if="prefix" style="font-weight: bold;">{{`${prefix}`}}</span>
     <markdown :source="text" />
     <span v-if="postfix" style="font-weight: bold;">{{`${postfix}`}}</span>
-    <q-tooltip>
+    <q-tooltip v-if="showTooltip">
       <span v-if="prefix" style="font-weight: bold;">{{`${prefix}`}}</span>
       {{title}}
       <span v-if="postfix" style="font-weight: bold;">{{`${postfix}`}}</span>
@@ -28,7 +28,7 @@
     <span v-if="prefix" style="font-weight: bold;">{{`${prefix}`}}</span>
     {{text}}
     <span v-if="postfix" style="font-weight: bold;">{{`${postfix}`}}</span>
-    <q-tooltip>
+    <q-tooltip v-if="showTooltip">
       <span v-if="prefix" style="font-weight: bold;">{{`${prefix}`}}</span>
       {{title}}
       <span v-if="postfix" style="font-weight: bold;">{{`${postfix}`}}</span>
@@ -38,7 +38,7 @@
     <span v-if="prefix" style="font-weight: bold;">{{`${prefix}`}}</span>
     {{text}}
     <span v-if="postfix" style="font-weight: bold;">{{`${postfix}`}}</span>
-    <q-tooltip>
+    <q-tooltip v-if="showTooltip">
       <span v-if="prefix" style="font-weight: bold;">{{`${prefix}`}}</span>
       {{title}}
       <span v-if="postfix" style="font-weight: bold;">{{`${postfix}`}}</span>
@@ -58,7 +58,7 @@ import {
 import Markdown from './Markdown'
 import JsonTree from './JsonTree'
 export default {
-  props: ['prefix', 'postfix', 'text', 'title', 'settings'],
+  props: ['prefix', 'postfix', 'text', 'title', 'settings', 'showTooltip'],
   data () {
     return {
       WIDGET_VALUE_FORMAT_STRING,
