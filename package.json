@@ -1,6 +1,6 @@
 {
   "name": "mqtttiles",
-  "version": "1.5.2",
+  "version": "1.5.3",
   "description": "MQTT-based IoT dashboard visualization tool",
   "productName": "MQTT Tiles",
   "cordovaId": "org.cordova.quasar.app",
@@ -13,6 +13,7 @@
   "dependencies": {
     "@radial-color-picker/vue-color-picker": "^2.1.0",
     "canvas-gauges": "^2.1.5",
+    "compare-versions": "^3.5.0",
     "js-base64": "^2.5.1",
     "lodash": "^4.17.11",
     "mathjs": "^5.10.3",
