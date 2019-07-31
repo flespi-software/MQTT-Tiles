@@ -9,7 +9,7 @@ import math from 'mathjs'
 export default {
   methods: {
     formatValue (value, settings) {
-      if (settings.math) {
+      if (settings.math && value !== 'N/A') {
         try {
           let mathExp = settings.math.replace(/%value%/g, value)
           value = math.eval(mathExp)

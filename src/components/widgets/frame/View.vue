@@ -72,6 +72,7 @@
 <script>
 import getValueByTopic from '../../../mixins/getValueByTopic.js'
 import timestamp from '../../../mixins/timestamp.js'
+import get from 'lodash/get'
 import { IFRAME_MODE_INTEGRATION, IFRAME_MODE_SHOW } from './constants'
 export default {
   name: 'Frame',
@@ -104,7 +105,7 @@ export default {
         payload = this.item.settings.template
         payload = payload.replace('<{topic}>', this.value && this.value.topic)
         payload = payload.replace(/<%([a-zA-Z0-9-+&@#/%?=~_|!:,.;]*)%>/gim, (_, name) => {
-          return value[name] || null
+          return get(value, name, null)
         })
       }
       return payload

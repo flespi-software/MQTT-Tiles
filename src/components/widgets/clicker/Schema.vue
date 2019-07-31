@@ -19,7 +19,7 @@ export default {
       save: false,
       height: 2,
       width: 3,
-      minWidth: 2,
+      minWidth: 1,
       minHeight: 2,
       maxTopicsLength: 0
     }
