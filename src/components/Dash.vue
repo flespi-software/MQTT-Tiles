@@ -98,6 +98,7 @@ import Boards from './Boards'
 import { BOARDS_LOCALSTORAGE_NAME, WIDGET_STATUS_DISABLED, WIDGET_STATUS_ENABLED } from '../constants'
 import getActionTopics from './widgets/getActionTopics.js'
 import messagesProcessing from './widgets/messagesProcessing.js'
+import migrate from './widgets/migrations'
 import CopyReplaceDialog from './CopyReplaceDialog'
 import ImportExportModal from './ImportExportModal'
 import {version} from '../../package.json'
@@ -474,6 +475,7 @@ export default {
       board = cloneDeep(board)
       let widgets = {}
       let indexes = []
+      board.widgetsIndexes = migrate(board.widgetsIndexes, board.appVersion, version)
       board.widgetsIndexes.forEach((widget) => {
         indexes.push(widget.id)
         widgets[widget.id] = widget
@@ -492,6 +494,7 @@ export default {
           let board = savedBoards[boardId]
           if (board.settings.edited) { board.settings.edited = false }
           let indexes = []
+          board.widgetsIndexes = migrate(board.widgetsIndexes, board.appVersion, version)
           board.widgetsIndexes.forEach((widget) => {
             indexes.push(widget.id)
             widgets[widget.id] = widget

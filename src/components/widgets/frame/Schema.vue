@@ -6,7 +6,7 @@
       <q-input class="col-12" v-if="currentSettings.mode === IFRAME_MODE_INTEGRATION" color="dark" v-model="currentSettings.link" float-label="Iframe link"/>
       <q-input class="col-12" type="textarea" v-if="currentSettings.mode === IFRAME_MODE_INTEGRATION" color="dark" v-model="currentSettings.template" float-label="Payload template"/>
       <div v-if="currentSettings.mode === IFRAME_MODE_INTEGRATION" class="col-12 text-grey-6 q-mt-xs" style="font-size: .8rem">
-        You can use variables in template: <span class="text-grey-8">&lt;{topic}&gt;</span> is a topic from payload packet, <span class="text-grey-8">&lt;%payload.name%&gt;</span> is a JSON path to value in payload, if payload is object.
+        You can use variables in template: <span class="text-grey-8">&lt;{topic}&gt;</span> is a topic from payload packet, <span class="text-grey-8">&lt;{payload}&gt;</span> is a stringified payload of packet, <span class="text-grey-8">&lt;%payload.name%&gt;</span> is a JSON path to value in payload, if payload is object.
         <span class="text-dark cursor-pointer" @click="exampleSettingsApply">Example</span>
       </div>
       <div class="q-mt-sm col-12">

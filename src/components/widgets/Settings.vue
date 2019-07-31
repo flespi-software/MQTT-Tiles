@@ -7,7 +7,7 @@
         </q-toolbar-title>
       </q-toolbar>
       <div style="margin: 20px;" :style="{ height: $q.platform.is.mobile ? 'calc(100% - 100px)' : '50vh', width: $q.platform.is.mobile ? 'calc(100% - 40px)' : '50vw'}">
-        <q-input color="dark"  v-model="currentSettings.name" float-label="Name" :error="!currentSettings.name"/>
+        <q-input color="dark"  v-model="currentSettings.name" float-label="Name"/>
         <q-select color="dark" @input="typeChangeHandler" :value="currentSettings.type" :options="typeOptions" float-label="Type"/>
         <div class="color-palette">
           <div class="text-grey-6 q-pb-sm color-palette__label">Color</div>
@@ -161,8 +161,7 @@ export default {
   },
   computed: {
     validateCurrentSettings () {
-      return !!this.currentSettings.name &&
-        !!this.isValidCurrentTopics &&
+      return !!this.isValidCurrentTopics &&
         this.currentSettings.topics.every(topicFilter => this.validateTopic(topicFilter))
     },
     status: {

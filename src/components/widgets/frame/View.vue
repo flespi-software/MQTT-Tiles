@@ -104,8 +104,9 @@ export default {
         let value = this.getValueByTopic(this.value[this.item.dataTopics[0].topicFilter] && this.value[this.item.dataTopics[0].topicFilter].payload, this.item.dataTopics[0])
         payload = this.item.settings.template
         payload = payload.replace('<{topic}>', this.value && this.value.topic)
+        payload = payload.replace('<{payload}>', JSON.stringify(value))
         payload = payload.replace(/<%([a-zA-Z0-9-+&@#/%?=~_|!:,.;]*)%>/gim, (_, name) => {
-          return get(value, name, null)
+          return JSON.stringify(get(value, name, null))
         })
       }
       return payload
