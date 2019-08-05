@@ -24,8 +24,8 @@
                 <q-popover anchor="bottom right" self="top right">
                   <q-list dense>
                     <q-item class="cursor-pointer" v-close-overlay highlight @click.native.stop="$emit('share:uploaded', id)" v-if="canShare">
-                      <q-item-side icon="mdi-share" />
-                      <q-item-main label="Share"/>
+                      <q-item-side icon="mdi-link" />
+                      <q-item-main label="Get link"/>
                     </q-item>
                     <q-item-separator v-if="canShare"/>
                     <q-item class="cursor-pointer" v-close-overlay highlight @click.native.stop="$emit('delete:uploaded', id)">
@@ -39,6 +39,7 @@
           </q-item>
           <q-card-separator />
           <q-card-main class="text-center relative-position">
+            <div v-if="board.settings.lastModify" class="absolute-top-right text-grey-5 q-pr-xs" style="font-size: .7rem;">{{date(board.settings.lastModify, 'DD-MM-YYYY HH:mm:ss')}}</div>
             <q-icon name="mdi-download" size="20px" color="dark" class="cursor-pointer" @click.native="$emit('import', id)" />
             <span class="text-grey-5 absolute" style="font-size: 10px; bottom: 4px; left: 4px; cursor: default;" v-if='board.appVersion' title="MQTT Tiles version">v.{{board.appVersion}}</span>
             <span class="text-bold text-white absolute bg-purple-6 round-borders q-px-xs" style="font-size: 10px; bottom: 4px; right: 4px; cursor: default;" title="Widgets count">{{board.widgetsIndexes.length}}</span>
@@ -65,8 +66,8 @@
                 </div>
               </q-item-main>
               <q-item-side v-show="!board.settings.edited">
-                <q-btn round dense flat icon="mdi-share" color="dark" @click.native="$emit('share', id)" v-if="canShare">
-                  <q-tooltip>Share board</q-tooltip>
+                <q-btn round dense flat icon="mdi-link" color="dark" @click.native="$emit('share', id)" v-if="canShare">
+                  <q-tooltip>Get link</q-tooltip>
                 </q-btn>
                 <q-btn round dense flat icon="mdi-fullscreen" color="dark" @click.native="$emit('select', id)">
                   <q-tooltip>Show full board</q-tooltip>
@@ -106,7 +107,7 @@
               </q-item-side>
             </q-item>
             <q-card-separator />
-            <q-card-main class="row" :class="{ 'bg-grey-2': !board.shortcutsIndexes.length }" v-if="!board.settings.edited">
+            <q-card-main class="row relative-position" :class="{ 'bg-grey-2': !board.shortcutsIndexes.length }" v-if="!board.settings.edited">
               <div class="text-grey-8 col-12 q-mb-sm" style="font-size: 15px;">Shortcuts</div>
               <template v-if="board.shortcutsIndexes.length">
                 <div class="col-3 q-px-xs" v-for="(item, index) in [0, 1, 2, 3]" :key="index" style="margin-bottom: 2px;">
@@ -125,6 +126,7 @@
                 <div class="text-center text-grey-8 q-mb-sm q-mt-sm" style="font-size: 1.2rem;">You have no shortcuts</div>
                 <div class="text-center text-grey-8">You can add one on <q-btn icon="mdi-fullscreen" color="grey-8" size="sm" dense label="full board view" @click="$emit('select', id)" /></div>
               </div>
+              <div v-if="board.settings.lastModify" class="absolute-top-right text-grey-5 q-pr-xs" style="font-size: .7rem;">{{date(board.settings.lastModify, 'DD-MM-YYYY HH:mm:ss')}}</div>
             </q-card-main>
             <q-card-main v-else>
               <q-input
@@ -183,6 +185,7 @@
 </style>
 
 <script>
+import { date } from 'quasar'
 import vClickOutside from 'v-click-outside'
 import Switcher from './widgets/switcher/View'
 import Clicker from './widgets/clicker/View'
@@ -204,7 +207,8 @@ export default {
   methods: {
     outsideClickHandler (boardId) {
       if (this.boards[boardId] && this.boards[boardId].settings.edited) { this.$emit('edit', boardId) }
-    }
+    },
+    date: date.formatDate
   },
   components: {
     Switcher, Clicker, Informer, Linear, Radial, Singleselect, Slider, Color, StatusIndicator

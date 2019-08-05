@@ -8,11 +8,17 @@
       <q-input class="col-12" v-if="currentSettings.mode === 0 && widget.topics.length > 1" color="dark" v-model="currentSettings.actionTopic" float-label="Action topic"/>
       <div class="col-6 q-pr-sm">
         <q-input color="dark" v-model="currentSettings.trueValue" float-label="True value"/>
+        <q-input class="q-mr-xs icon-input" color="dark" v-model="currentSettings.trueIcon" float-label="True value icon">
+          <q-icon :name="`mdi-${currentSettings.trueIcon || 'toggle-switch-outline'}`" size="1.5rem" style="position: absolute; right: 0; bottom : 7px;"/>
+        </q-input>
         <q-input v-if="currentSettings.mode === 1" color="dark" v-model="currentSettings.trueActionTopic" float-label="True action topic" :after="[{icon: 'mdi-arrow-right', handler () { currentSettings.falseActionTopic = currentSettings.trueActionTopic }, content: true}]"/>
         <q-input v-if="currentSettings.mode === 1" color="dark" v-model="currentSettings.truePayload" float-label="True action payload" :after="[{icon: 'mdi-arrow-right', handler () { currentSettings.falsePayload = currentSettings.truePayload }, content: true}]"/>
       </div>
       <div class="col-6 q-pl-sm">
         <q-input color="dark" v-model="currentSettings.falseValue" float-label="False value"/>
+        <q-input class="q-mr-xs icon-input" color="dark" v-model="currentSettings.falseIcon" float-label="False value icon">
+          <q-icon :name="`mdi-${currentSettings.falseIcon || 'toggle-switch-off-outline'}`" size="1.5rem" style="position: absolute; right: 0; bottom : 7px;"/>
+        </q-input>
         <q-input v-if="currentSettings.mode === 1" color="dark" v-model="currentSettings.falseActionTopic" float-label="False action topic"/>
         <q-input v-if="currentSettings.mode === 1" color="dark" v-model="currentSettings.falsePayload" float-label="False action payload"/>
       </div>
@@ -37,9 +43,11 @@ export default {
     let defaultSettings = {
       actionTopic: '',
       trueValue: '1',
+      trueIcon: '',
       trueActionTopic: '',
       truePayload: '',
       falseValue: '0',
+      falseIcon: '',
       falseActionTopic: '',
       falsePayload: '',
       accumulateLogic: ACCUMULATE_AND_MODE,

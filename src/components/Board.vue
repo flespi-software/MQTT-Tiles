@@ -17,13 +17,13 @@
         <q-tooltip>Back to boards list</q-tooltip>
       </q-btn>
       <q-toolbar-title class="text-dark">{{board.name || '*No name*'}}</q-toolbar-title>
-      <q-btn v-if="canShare" @click="shareHandler" icon="mdi-share" color="dark" flat round>
-        <q-tooltip>Share board</q-tooltip>
+      <q-btn v-if="canShare" @click="shareHandler" icon="mdi-link" color="dark" flat round>
+        <q-tooltip>Get link</q-tooltip>
       </q-btn>
-      <q-btn v-if="canShare" @click="uploadHandler" icon="mdi-upload" color="dark" flat round>
+      <q-btn v-if="canShare" @click="uploadHandler" icon="mdi-cloud-upload-outline" color="dark" flat round>
         <q-tooltip>Upload board</q-tooltip>
       </q-btn>
-      <q-btn @click="$emit('block')" :icon="board.settings.blocked ? 'mdi-lock' : 'mdi-lock-open'" color="dark" flat round v-if="!isFrized">
+      <q-btn @click="blockBoardHandler" :icon="board.settings.blocked ? 'mdi-lock' : 'mdi-lock-open'" color="dark" flat round v-if="!isFrized">
         <q-tooltip>{{board.settings.blocked ? 'Unlock your board' : 'Lock your board'}}</q-tooltip>
       </q-btn>
     </q-toolbar>
@@ -66,8 +66,8 @@
                 @action="(data) => { $emit('action', data) }"
                 @update="editWidgetSettings(widgetIndex)"
                 @duplicate="duplicateWidgetHandler(widgetIndex)"
-                @delete="$emit('delete:widget', {widgetId: widgetIndex, settings: widgets[widgetIndex]})"
-                @fast-bind="$emit('fast-bind', widgetIndex)"
+                @delete="deleteWidgetHandler(widgetIndex)"
+                @fast-bind="fastBindHandler(widgetIndex)"
               />
             </grid-item>
         </grid-layout>
@@ -118,6 +118,7 @@ import Color from './widgets/color/View'
 import StatusIndicator from './widgets/statusIndicator/View'
 import MapLocation from './widgets/mapLocation/View'
 import MapRoute from './widgets/mapRoute/View'
+import TextSender from './widgets/textSender/View'
 import { WIDGET_MODE_EDIT, WIDGET_MODE_ADD, WIDGET_MODE_DUPLICATE } from '../constants'
 
 const BREAKPOINTS = { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }
@@ -176,6 +177,7 @@ export default {
         this.$emit('add:widget', settings)
       }
       this.operationMode = -1
+      this.setLastModifyBoard()
     },
     addWidgetHandler () {
       this.operationMode = WIDGET_MODE_ADD
@@ -190,6 +192,7 @@ export default {
     },
     resizeHandler (index, height, width) {
       this.$emit('resized', { index, height, width })
+      this.setLastModifyBoard()
     },
     onResize ({width}) { this.breakpoint = getBreakpoint(width) },
     shareHandler () {
@@ -203,6 +206,21 @@ export default {
       Vue.delete(this.currentSettings, 'id')
       this.operationMode = WIDGET_MODE_DUPLICATE
       this.openSettings()
+    },
+    deleteWidgetHandler (widgetIndex) {
+      this.$emit('delete:widget', {widgetId: widgetIndex, settings: this.widgets[widgetIndex]})
+      this.setLastModifyBoard()
+    },
+    fastBindHandler (widgetIndex) {
+      this.$emit('fast-bind', widgetIndex)
+      this.setLastModifyBoard()
+    },
+    blockBoardHandler () {
+      this.$emit('block')
+      this.setLastModifyBoard()
+    },
+    setLastModifyBoard () {
+      this.$emit('modify')
     }
   },
   components: {
@@ -223,6 +241,7 @@ export default {
     StatusIndicator,
     MapLocation,
     MapRoute,
+    TextSender,
     GridLayout: VueGridLayout.GridLayout,
     GridItem: VueGridLayout.GridItem
   }

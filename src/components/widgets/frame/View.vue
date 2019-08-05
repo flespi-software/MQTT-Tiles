@@ -81,6 +81,7 @@ export default {
     return {
       width: 0,
       height: 0,
+      currentPayloads: [],
       IFRAME_MODE_INTEGRATION,
       IFRAME_MODE_SHOW
     }
@@ -98,11 +99,12 @@ export default {
     send (msg) {
       this.$refs.frame && this.$refs.frame.contentWindow.postMessage(msg, '*')
     },
-    getPayload () {
+    getPayload (itemIndex) {
       let payload
       if (this.item.settings.mode === IFRAME_MODE_INTEGRATION) {
-        let value = this.getValueByTopic(this.value[this.item.dataTopics[0].topicFilter] && this.value[this.item.dataTopics[0].topicFilter].payload, this.item.dataTopics[0])
-        payload = this.item.settings.template
+        let topic = this.item.settings.items[itemIndex].topic
+        let value = this.getValueByTopic(this.value[topic.topicFilter] && this.value[topic.topicFilter].payload, topic)
+        payload = this.item.settings.items[itemIndex].template
         payload = payload.replace('<{topic}>', this.value && this.value.topic)
         payload = payload.replace('<{payload}>', JSON.stringify(value))
         payload = payload.replace(/<%([a-zA-Z0-9-+&@#/%?=~_|!:,.;]*)%>/gim, (_, name) => {
@@ -110,6 +112,15 @@ export default {
         })
       }
       return payload
+    },
+    update () {
+      this.item.settings.items.forEach((item, index) => {
+        let payload = this.getPayload(index)
+        if (this.currentPayloads[index] !== payload) {
+          this.send(payload)
+        }
+        this.$set(this.currentPayloads, index, payload)
+      })
     }
   },
   computed: {
@@ -127,14 +138,14 @@ export default {
     value: {
       deep: true,
       handler () {
-        this.send(this.getPayload())
+        this.update()
       }
     }
   },
   created () {
     window.addEventListener('message', (e) => {
       if (e.data === 'MapView|state:{"ready": true}') {
-        this.send(this.getPayload())
+        this.update()
       }
     })
   },

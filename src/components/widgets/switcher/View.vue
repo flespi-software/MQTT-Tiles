@@ -7,7 +7,7 @@
       <q-icon
         size="3rem"
         :color="item.currentValue === null ? 'grey-4' : currentValue ? `${item.color}-7` : `grey-6`"
-        :name="currentValue ? 'mdi-toggle-switch-outline' : 'mdi-toggle-switch-off-outline'"
+        :name="currentValue ? `mdi-${item.settings.trueIcon || 'toggle-switch-outline'}` : `mdi-${item.settings.falseIcon || 'toggle-switch-off-outline'}`"
         :class="[`${currentValue === null ? 'disabled' : !actionTopic ? '' : 'cursor-pointer'}`]"
       />
     </div>
@@ -51,7 +51,7 @@
         @click.native.stop="actionHandler"
         size="3.8rem"
         :color="item.currentValue === null ? 'grey-4' : currentValue ? `${item.color}-7` : `grey-6`"
-        :name="currentValue ? 'mdi-toggle-switch-outline' : 'mdi-toggle-switch-off-outline'"
+        :name="currentValue ? `mdi-${item.settings.trueIcon || 'toggle-switch-outline'}` : `mdi-${item.settings.falseIcon || 'toggle-switch-off-outline'}`"
         style="width: 100%; height: 100%;"
         :class="[`${currentValue === null ? 'disabled' : actionTopic ? 'cursor-pointer' : ''}`]"
       />

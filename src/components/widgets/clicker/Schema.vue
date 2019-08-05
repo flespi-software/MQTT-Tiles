@@ -2,6 +2,9 @@
   <div>
     <q-toggle class="q-mt-sm" color="dark" v-model="currentSettings.save" label="Save last status on server (retained message)"/>
     <q-input color="dark" v-model="currentSettings.label" :float-label="currentSettings.label.length <= 25 ? 'Button label' : 'Button label (25 symbols max)'" :error="currentSettings.label.length > 25"/>
+    <q-input class="q-mr-xs icon-input" color="dark" v-model="currentSettings.icon" float-label="Icon">
+      <q-icon :name="`mdi-${currentSettings.icon || 'send'}`" size="1.5rem" style="position: absolute; right: 0; bottom : 7px;"/>
+    </q-input>
     <q-input color="dark" v-model="currentSettings.topic" float-label="Topic"/>
     <q-input type="textarea" color="dark" v-model="currentSettings.payload" float-label="Payload"/>
   </div>
@@ -14,6 +17,7 @@ export default {
   data () {
     let defaultSettings = {
       label: '',
+      icon: '',
       topic: 'button/topic/publish',
       payload: '',
       save: false,

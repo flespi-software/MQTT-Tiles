@@ -110,6 +110,7 @@ import Color from './color/Schema'
 import MapLocation from './mapLocation/Schema'
 import MapRoute from './mapRoute/Schema'
 import StatusIndicator from './statusIndicator/Schema'
+import TextSender from './textSender/Schema'
 
 export default {
   name: 'Settings',
@@ -133,6 +134,7 @@ export default {
         {label: 'Multi text', value: 'multi-informer', rightIcon: 'mdi-card-text-outline'},
         {label: 'Static text', value: 'static-informer', rightIcon: 'mdi-format-text'},
         {label: 'Button', value: 'clicker', rightIcon: 'mdi-send'},
+        {label: 'Textarea', value: 'text-sender', rightIcon: 'mdi-text-subject'},
         {label: 'Slider', value: 'slider', rightIcon: 'mdi-ray-vertex'},
         {label: 'Color', value: 'color', rightIcon: 'mdi-palette'},
         {label: 'Map (Location)', value: 'map-location', rightIcon: 'mdi-map-marker-outline'},
@@ -145,7 +147,7 @@ export default {
         {label: 'Multiplier', value: 'multiplier', rightIcon: 'mdi-monitor-multiple'},
         {label: 'Complex', value: 'complex', rightIcon: 'mdi-card-bulleted-outline'}
       ],
-      colors: ['grey', 'red', 'green', 'orange', 'blue', 'light-blue'],
+      colors: ['grey', 'red', 'green', 'orange', 'blue', 'light-blue', 'purple', 'deep-orange', 'cyan', 'brown', 'blue-grey'],
       isValideSchema: true,
       defaultTopic: {
         topicFilter: '',
@@ -245,13 +247,16 @@ export default {
     'currentSettings.dataTopics' () {
       this.currentSettings.topics = this.generateTopics()
     },
-    'currentSettings.settings.topics' () {
-      this.currentSettings.topics = this.generateTopics()
+    'currentSettings.settings.topics': {
+      deep: true,
+      handler () {
+        this.currentSettings.topics = this.generateTopics()
+      }
     }
   },
   mixins: [validateTopic],
   components: {
-    Topic, Switcher, Informer, Clicker, Radial, Linear, Frame, Singleselect, Multiplier, Complex, StaticInformer, MultiInformer, Slider, Color, MapLocation, MapRoute, StatusIndicator
+    Topic, Switcher, Informer, Clicker, Radial, Linear, Frame, Singleselect, Multiplier, Complex, StaticInformer, MultiInformer, Slider, Color, MapLocation, MapRoute, StatusIndicator, TextSender
   }
 }
 </script>

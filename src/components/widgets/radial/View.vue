@@ -104,7 +104,12 @@ export default {
           'green': '#81c784',
           'orange': '#ffb74d',
           'blue': '#64b5f6',
-          'light-blue': '#4fc3f7'
+          'light-blue': '#4fc3f7',
+          'purple': '#ba68c8',
+          'deep-orange': '#ff8a65',
+          'cyan': '#4dd0e1',
+          'brown': '#a1887f',
+          'blue-grey': '#90a4ae'
         },
         borderOuter: {
           'grey': '#fafafa',
@@ -112,7 +117,12 @@ export default {
           'green': '#e8f5e9',
           'orange': '#fff3e0',
           'blue': '#e3f2fd',
-          'light-blue': '#e1f5fe'
+          'light-blue': '#e1f5fe',
+          'purple': '#f3e5f5',
+          'deep-orange': '#fbe9e7',
+          'cyan': '#e0f7fa',
+          'brown': '#efebe9',
+          'blue-grey': '#eceff1'
         },
         borderMiddle: {
           'grey': '#f5f5f5',
@@ -120,7 +130,12 @@ export default {
           'green': '#c8e6c9',
           'orange': '#ffe0b2',
           'blue': '#bbdefb',
-          'light-blue': '#b3e5fc'
+          'light-blue': '#b3e5fc',
+          'purple': '#f3e5f5',
+          'deep-orange': '#ffccbc',
+          'cyan': '#b2ebf2',
+          'brown': '#d7ccc8',
+          'blue-grey': '#cfd8dc'
         },
         borderInner: {
           'grey': '#eee',
@@ -128,7 +143,12 @@ export default {
           'green': '#a5d6a7',
           'orange': '#ffcc80',
           'blue': '#90caf9',
-          'light-blue': '#81d4fa'
+          'light-blue': '#81d4fa',
+          'purple': '#e1bee7',
+          'deep-orange': '#ffab91',
+          'cyan': '#80deea',
+          'brown': '#bcaaa4',
+          'blue-grey': '#b0bec5'
         }
       }
     }

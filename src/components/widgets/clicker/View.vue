@@ -6,7 +6,7 @@
         size="0.8rem"
         dense
         round
-        icon="mdi-send"
+        :icon="`mdi-${item.settings.icon || 'send'}`"
         :color="`${item.color}-7`"
       />
       <q-tooltip>Payload{{item.settings.payload ? `: ${item.settings.payload}` : ' is empty'}}</q-tooltip>
@@ -51,7 +51,8 @@
         class="payload__button"
         :disabled="item.status === WIDGET_STATUS_DISABLED"
         :color="`${item.color}-7`"
-        :label="item.settings.label || 'Send'"
+        :label="item.settings.icon ? undefined : item.settings.label || 'Send'"
+        :icon="`mdi-${item.settings.icon || undefined}`"
         rounded
         @click="actionHandler"
       />

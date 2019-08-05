@@ -26,7 +26,7 @@ export default {
               break
             }
             case WIDGET_VALUE_FORMAT_DATE: {
-              value = date.formatDate(value, 'DD/MM/YYYY HH:mm:ss.SSS')
+              value = value !== 'N/A' ? date.formatDate(value, 'DD/MM/YYYY HH:mm:ss.SSS') : value
               break
             }
           }

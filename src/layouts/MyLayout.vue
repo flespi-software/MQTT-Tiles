@@ -144,7 +144,7 @@ export default {
         message: 'Link generated!',
         timeout: 0,
         type: 'info',
-        icon: 'mdi-share',
+        icon: 'mdi-link',
         position: 'bottom-left',
         closeBtn: true,
         actions: [

@@ -1,6 +1,7 @@
 import getClickerActionTopics from './clicker/getActionTopics.js'
 import getSingleselectActionTopics from './singleselect/getActionTopics'
 import getSwitcherActionTopics from './switcher/getActionTopics'
+import getTextSenderActionTopics from './textSender/getActionTopics'
 
 export default function getACtionTopics (widgets) {
   return widgets.reduce((topics, widget) => {
@@ -15,6 +16,10 @@ export default function getACtionTopics (widgets) {
       }
       case 'clicker': {
         topics = [...topics, ...getClickerActionTopics(widget)]
+        break
+      }
+      case 'textSender': {
+        topics = [...topics, ...getTextSenderActionTopics(widget)]
         break
       }
     }

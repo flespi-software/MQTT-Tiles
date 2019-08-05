@@ -19,6 +19,7 @@
       @update:layout="layoutUpdateHandler"
       @share="shareHandler(activeBoardId)"
       @upload="exportPrepareBoardHandler(activeBoardId)"
+      @modify="modifyBoardHandler(activeBoardId)"
       :style="{height: `${clientSettings ? fullView ? 'calc(100vh - 50px)' : '100vh' : 'calc(100vh - 110px)'}`}"
     />
     <boards
@@ -390,6 +391,7 @@ export default {
         id = this.uid()
       settings.id = id
       Vue.set(this.boards, id, settings)
+      this.modifyBoardHandler(id)
     },
     deleteBoardHandler (boardId) {
       let widgetsIndexes = this.boards[boardId].widgetsIndexes
@@ -438,6 +440,10 @@ export default {
         this.replaceBoardHandler(boardId)
       }
       Vue.set(board.settings, 'edited', !board.settings.edited)
+      this.modifyBoardHandler(boardId)
+    },
+    modifyBoardHandler (activeBoardId) {
+      this.$set(this.boards[activeBoardId].settings, 'lastModify', Date.now())
     },
     replaceBoardHandler (boardId) {
       let board = this.boards[boardId]
