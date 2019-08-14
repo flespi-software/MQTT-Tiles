@@ -5,10 +5,12 @@
       :class="[`bg-${currentValue !== null ? `${item.color}-1` : 'grey-3'}`]"
     >
       <q-icon
+        v-if="activeItem.icon || !activeItem.label"
         size="3rem"
         :style="{color: activeItem.color}"
         :name="`mdi-${activeItem.icon || item.settings.defaultIcon}`"
       />
+      <div v-else :style="{color: activeItem.color}" style="text-overflow: ellipsis;overflow: hidden;">{{activeItem.label}}</div>
     </div>
     <div class="ellipsis q-mt-sm">{{item.name}}</div>
   </div>
@@ -47,10 +49,12 @@
     </q-item>
     <q-card-media class="widget__content" :class="[`bg-${item.color}-1`]" style="height: calc(100% - 22px);">
       <q-icon
+        v-if="activeItem.icon || !activeItem.label"
         :style="{color: activeItem.color, fontSize: `${size}rem`}"
         :name="`mdi-${activeItem.icon || item.settings.defaultIcon}`"
         style="width: 100%; height: 100%;"
       />
+      <div v-else style="width: 100%; height: 100%;" class="flex flex-center" :style="{color: activeItem.color}">{{activeItem.label}}</div>
     </q-card-media>
     <div v-if="item.settings.isNeedTime" class="absolute-bottom-left q-px-xs q-pt-xs" style="font-size: 12px; border-top-right-radius: 5px; bottom: 1px; left: 1px; user-select: none;" :class="[`text-${item.color}-7`, `bg-${item.color}-1`]">
       {{timestamp}}

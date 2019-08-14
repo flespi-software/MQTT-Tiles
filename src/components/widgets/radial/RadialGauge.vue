@@ -4,6 +4,10 @@
 
 <script>
 import { RadialGauge } from 'canvas-gauges'
+import throttle from 'lodash/throttle'
+let setValue = throttle((guage, value) => {
+  guage.value = value
+}, 1000, { trailing: true })
 export default {
   props: {
     value: Number,
@@ -33,7 +37,7 @@ export default {
       }
     },
     value (value) {
-      this.chart.value = value
+      setValue(this.chart, value)
     }
   }
 }

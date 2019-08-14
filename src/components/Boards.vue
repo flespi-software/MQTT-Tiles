@@ -1,6 +1,6 @@
 <template>
   <div class="dash__boards">
-    <q-btn fab color="dark" @click="$emit('add')" icon="mdi-plus" class="absolute button--add" v-if="!isFrized">
+    <q-btn fab color="dark" @click="openSettingsHandler" icon="mdi-plus" class="absolute button--add" v-if="!isFrized">
       <q-tooltip>Add new board</q-tooltip>
     </q-btn>
     <div v-if="Object.keys(remoteBoards).length" class="remote-control text-center">
@@ -54,7 +54,7 @@
     <div class="q-px-sm scroll boards__wrapper" :style="{height: isPanelShowed ? 'calc(100% - 199px)' : 'calc(100% - 50px)'}">
       <div v-if="Object.keys(boards).length" class="row">
         <div class="q-pt-md q-px-sm col-xl-4 col-md-6 col-sm-6 col-xs-12" v-for="(board, id) in boards" :key="id">
-          <q-card v-click-outside="() => outsideClickHandler(id)">
+          <q-card>
             <q-item class="q-py-none q-px-sm bg-grey-4">
               <q-item-main class="ellipsis">
                 <div class="ellipsis" style="height: 24px; line-height: 24px;">
@@ -65,7 +65,7 @@
                   {{board.id}}
                 </div>
               </q-item-main>
-              <q-item-side v-show="!board.settings.edited">
+              <q-item-side>
                 <q-btn round dense flat icon="mdi-link" color="dark" @click.native="$emit('share', id)" v-if="canShare">
                   <q-tooltip>Get link</q-tooltip>
                 </q-btn>
@@ -87,9 +87,9 @@
                         <q-item-side icon="mdi-file-export" />
                         <q-item-main label="Export as file"/>
                       </q-item>
-                      <q-item class="cursor-pointer" v-close-overlay highlight @click.native.stop="$emit('edit', id);">
-                        <q-item-side icon="mdi-pencil" />
-                        <q-item-main label="Name"/>
+                      <q-item class="cursor-pointer" v-close-overlay highlight @click.native.stop="openEditSettingsHandler(id)">
+                        <q-item-side icon="mdi-settings" />
+                        <q-item-main label="Settings"/>
                       </q-item>
                       <q-item-separator/>
                       <q-item class="cursor-pointer" v-close-overlay highlight @click.native.stop="$emit('delete', id)">
@@ -100,14 +100,9 @@
                   </q-popover>
                 </q-btn>
               </q-item-side>
-              <q-item-side v-show="board.settings.edited">
-                <q-btn v-if="!!board.id && !board.id.match(/[/+#\s]/g) && (!boards[board.id] || id === board.id)" round dense flat icon="mdi-content-save" color="dark" @click.native="$emit('edit', id);">
-                  <q-tooltip>Save board settings</q-tooltip>
-                </q-btn>
-              </q-item-side>
             </q-item>
             <q-card-separator />
-            <q-card-main class="row relative-position" :class="{ 'bg-grey-2': !board.shortcutsIndexes.length }" v-if="!board.settings.edited">
+            <q-card-main class="row relative-position" :class="{ 'bg-grey-2': !board.shortcutsIndexes.length }">
               <div class="text-grey-8 col-12 q-mb-sm" style="font-size: 15px;">Shortcuts</div>
               <template v-if="board.shortcutsIndexes.length">
                 <div class="col-3 q-px-xs" v-for="(item, index) in [0, 1, 2, 3]" :key="index" style="margin-bottom: 2px;">
@@ -116,7 +111,7 @@
                     :is="widgets[board.shortcutsIndexes[index]].type"
                     :item="widgets[board.shortcutsIndexes[index]]"
                     :value="values[board.shortcutsIndexes[index]]"
-                    @action="(data) => { $emit('action', data) }"
+                    @action="(data) => { actionHandler(board.id, data) }"
                     :index="board.shortcutsIndexes[index]"
                     :mini="true"
                   />
@@ -128,28 +123,22 @@
               </div>
               <div v-if="board.settings.lastModify" class="absolute-top-right text-grey-5 q-pr-xs" style="font-size: .7rem;">{{date(board.settings.lastModify, 'DD-MM-YYYY HH:mm:ss')}}</div>
             </q-card-main>
-            <q-card-main v-else>
-              <q-input
-                  autofocus
-                  v-model="board.name"
-                  color="dark"
-                  float-label="Name"
-                />
-                <q-input
-                  v-model="board.id"
-                  color="dark"
-                  :error="!board.id || !!board.id.match(/[/+#\s]/g) || (boards[board.id] && id !== board.id)"
-                  float-label="Sync alias"
-                />
-            </q-card-main>
           </q-card>
         </div>
       </div>
       <div v-else class="text-dark text-bold wrapper--empty">
         <div class="q-mb-sm">No boards</div>
-        <div v-if="!isFrized"><q-btn color="dark" icon="mdi-plus-circle-outline" label="New board" @click="$emit('add')" /></div>
+        <div v-if="!isFrized"><q-btn color="dark" icon="mdi-plus-circle-outline" label="New board" @click="openSettingsHandler" /></div>
       </div>
     </div>
+    <board-settings
+      v-if="settingsModalModel"
+      v-model="settingsModalModel"
+      :settings="editedBoardModel"
+      :boards="boards"
+      @add="addBoardHandler"
+      @edit="editBoardHandler"
+    />
   </div>
 </template>
 
@@ -186,7 +175,9 @@
 
 <script>
 import { date } from 'quasar'
-import vClickOutside from 'v-click-outside'
+import cloneDeep from 'lodash/cloneDeep'
+import uniq from 'lodash/uniq'
+import BoardSettings from './BoardSettings'
 import Switcher from './widgets/switcher/View'
 import Clicker from './widgets/clicker/View'
 import Informer from './widgets/informer/View'
@@ -201,20 +192,69 @@ export default {
   props: ['boards', 'widgets', 'values', 'remoteBoards', 'canShare', 'isFrized', 'hasConnection'],
   data () {
     return {
-      isPanelShowed: false
+      isPanelShowed: false,
+      settingsModalModel: false,
+      editedBoardModel: null
     }
   },
   methods: {
-    outsideClickHandler (boardId) {
-      if (this.boards[boardId] && this.boards[boardId].settings.edited) { this.$emit('edit', boardId) }
+    date: date.formatDate,
+    openSettingsHandler () {
+      this.settingsModalModel = true
     },
-    date: date.formatDate
+    openEditSettingsHandler (id) {
+      this.editedBoardModel = cloneDeep(this.boards[id])
+      this.openSettingsHandler()
+    },
+    editBoardHandler (boardModel) {
+      boardModel.widgetsIndexes.forEach(widgetIndex => {
+        let widget = cloneDeep(this.widgets[widgetIndex])
+        boardModel.settings.variables.forEach((variable) => {
+          if (!variable.values.includes(boardModel.activeVariables[variable.name])) {
+            boardModel.activeVariables[variable.name] = undefined
+          }
+        })
+        widget = this.modifyWidgetByVariables(widget, boardModel)
+        this.$emit('edit:widget', {settings: widget, widgetId: widget.id, topics: [...this.widgets[widgetIndex].topics]})
+      })
+      this.$emit('edit', {id: this.editedBoardModel.id, board: boardModel})
+      this.editedBoardModel = null
+    },
+    addBoardHandler (boardModel) {
+      this.$emit('add', boardModel)
+    },
+    modifyWidgetByVariables (widget, board) {
+      let modifyTopics = (topic) => {
+        if (!topic.topicTemplate) {
+          topic.topicTemplate = topic.topicFilter
+        }
+        let variables = board.activeVariables
+        topic.topicFilter = topic.topicTemplate.replace(/<%([a-zA-Z0-9-+&@#/%?=~_|!:,.;]*)%>/gim, (match, name) => {
+          return variables[name] || match
+        })
+      }
+      let allTopics = []
+      if (widget.dataTopics.length) {
+        widget.dataTopics.forEach(modifyTopics)
+        allTopics = [...allTopics, ...widget.dataTopics]
+      }
+      if (widget.settings.topics && widget.settings.topics.length) {
+        widget.settings.topics.forEach(modifyTopics)
+        allTopics = [...allTopics, ...widget.settings.topics]
+      }
+      widget.topics = uniq(allTopics.map(topic => topic.topicFilter))
+      return widget
+    },
+    actionHandler (boardId, data) {
+      let variables = this.boards[boardId].activeVariables
+      data.topic = data.topic.replace(/<%([a-zA-Z0-9-+&@#/%?=~_|!:,.;]*)%>/gim, (match, name) => {
+        return variables[name] || match
+      })
+      this.$emit('action', data)
+    }
   },
   components: {
-    Switcher, Clicker, Informer, Linear, Radial, Singleselect, Slider, Color, StatusIndicator
-  },
-  directives: {
-    clickOutside: vClickOutside.directive
+    BoardSettings, Switcher, Clicker, Informer, Linear, Radial, Singleselect, Slider, Color, StatusIndicator
   }
 }
 </script>

@@ -33,6 +33,7 @@
       :hasConnection="!!clientSettings"
       @add="addBoard"
       @edit="editBoardHandler"
+      @edit:widget="editWidget"
       @delete="deleteBoardDialogHandler"
       @select="setActiveBoard"
       @action="actionHandler"
@@ -142,16 +143,6 @@ export default {
       connack: undefined,
       clientStatus: false,
       clientErrors: [],
-      defaultBoard: Object.freeze(
-        {
-          name: 'New board',
-          id: '',
-          settings: { edited: true, blocked: false },
-          shortcutsIndexes: [],
-          widgetsIndexes: [],
-          layouts: { lg: [], md: [], sm: [], xs: [], xxs: [] }
-        }
-      ),
       boards: {},
       widgets: {},
       subscriptions: {},
@@ -386,12 +377,9 @@ export default {
     actionHandler ({topic, payload, settings}) {
       this.publish(topic, payload, settings)
     },
-    addBoard () {
-      let settings = cloneDeep(this.defaultBoard),
-        id = this.uid()
-      settings.id = id
-      Vue.set(this.boards, id, settings)
-      this.modifyBoardHandler(id)
+    addBoard (board) {
+      Vue.set(this.boards, board.id, board)
+      this.modifyBoardHandler(board.id)
     },
     deleteBoardHandler (boardId) {
       let widgetsIndexes = this.boards[boardId].widgetsIndexes
@@ -434,13 +422,12 @@ export default {
         })
         .catch(() => {})
     },
-    editBoardHandler (boardId) {
-      let board = this.boards[boardId]
-      if (board.id !== boardId) {
+    editBoardHandler ({id: boardId, board: newBoard}) {
+      this.$set(this.boards, boardId, newBoard)
+      if (boardId !== newBoard.id) {
         this.replaceBoardHandler(boardId)
       }
-      Vue.set(board.settings, 'edited', !board.settings.edited)
-      this.modifyBoardHandler(boardId)
+      this.modifyBoardHandler(newBoard.id)
     },
     modifyBoardHandler (activeBoardId) {
       this.$set(this.boards[activeBoardId].settings, 'lastModify', Date.now())
@@ -498,7 +485,6 @@ export default {
         let widgets = {}
         Object.keys(savedBoards).forEach(boardId => {
           let board = savedBoards[boardId]
-          if (board.settings.edited) { board.settings.edited = false }
           let indexes = []
           board.widgetsIndexes = migrate(board.widgetsIndexes, board.appVersion, version)
           board.widgetsIndexes.forEach((widget) => {

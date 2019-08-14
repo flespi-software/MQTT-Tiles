@@ -1,6 +1,6 @@
 {
   "name": "mqtttiles",
-  "version": "1.5.4",
+  "version": "1.5.5",
   "description": "MQTT-based IoT dashboard visualization tool",
   "productName": "MQTT Tiles",
   "cordovaId": "org.cordova.quasar.app",
@@ -19,7 +19,6 @@
     "mathjs": "^5.10.3",
     "mqtt": "git+https://github.com/scarry1992/MQTT.js.git#cork-fix",
     "prismjs": "^1.16.0",
-    "v-click-outside": "^2.1.1",
     "vue-clipboard2": "^0.3.0",
     "vue-grid-layout": "^2.3.4",
     "vue-markdown": "^2.2.4",

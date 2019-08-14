@@ -1,6 +1,6 @@
 <template>
   <div class="row">
-    <q-input autofocus class="col-8" color="dark" v-model="currentValue.topicFilter" float-label="Topic" :error="!validateTopic(currentValue.topicFilter)"/>
+    <q-input autofocus class="col-8" color="dark" v-model="currentValue.topicTemplate" @input="currentValue.topicFilter = currentValue.topicTemplate" float-label="Topic" :error="!validateTopic(currentValue.topicFilter)"/>
     <q-select class="col-4" color="dark" v-model="currentValue.payloadType" float-label="Payload type" :options="payloadTypeOptions"/>
     <q-field class="col-12" helper="You can set path in result JSON. Path started from root of object. Example: names[0].value" v-if="currentValue.payloadType === WIDGET_PAYLOAD_TYPE_JSON" >
       <q-input color="dark" v-model="currentValue.payloadField" float-label="Payload path"/>
@@ -22,6 +22,7 @@ export default {
   data () {
     return {
       defaultTopic: {
+        topicTemplate: '',
         topicFilter: '',
         payloadType: 0,
         payloadField: ''

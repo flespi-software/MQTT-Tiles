@@ -27,7 +27,21 @@
         <q-tooltip>{{board.settings.blocked ? 'Unlock your board' : 'Lock your board'}}</q-tooltip>
       </q-btn>
     </q-toolbar>
-    <div class="widgets__wrapper scroll" :style="{height: (isFrized && board.name) || !isFrized ? 'calc(100% - 50px)' : '100%'}">
+    <q-toolbar color="white" class="q-py-none" style="flex-wrap: wrap" v-if="board.settings.variables && board.settings.variables.length">
+      <q-resize-observable @resize="onVariablesWrapperResize" />
+      <q-select
+        v-for="variable in board.settings.variables"
+        :key="variable.name"
+        :value="board.activeVariables[variable.name]"
+        @input="(value) => changeVaribleHandler(variable.name, value)"
+        :float-label="variable.name"
+        :options="variable.values.map(value => ({label: value, value}))"
+        color="dark"
+        class="q-py-none q-mr-sm"
+        style="max-width: 150px;"
+      />
+    </q-toolbar>
+    <div class="widgets__wrapper scroll" :style="{height: wrapperHeight}">
       <div style="width: 100%; position: relative;" v-if="board.widgetsIndexes.length">
         <grid-layout
           ref="grid"
@@ -42,7 +56,8 @@
           :use-css-transforms="true"
           :responsive="true"
         >
-            <grid-item v-for="(widgetIndex, index) in board.widgetsIndexes"
+            <grid-item
+              v-for="(widgetIndex, index) in board.widgetsIndexes"
               :key="widgetIndex"
               :x="currentLayout[index].x"
               :y="currentLayout[index].y"
@@ -63,7 +78,7 @@
                 :index="widgetIndex"
                 :in-shortcuts="Boolean(board.shortcutsIndexes.includes(widgetIndex))"
                 :blocked="board.settings.blocked || isFrized"
-                @action="(data) => { $emit('action', data) }"
+                @action="actionHandler"
                 @update="editWidgetSettings(widgetIndex)"
                 @duplicate="duplicateWidgetHandler(widgetIndex)"
                 @delete="deleteWidgetHandler(widgetIndex)"
@@ -100,6 +115,7 @@
 <script>
 import Vue from 'vue'
 import cloneDeep from 'lodash/cloneDeep'
+import uniq from 'lodash/uniq'
 import Settings from './widgets/Settings'
 import VueGridLayout from 'vue-grid-layout'
 import Switcher from './widgets/switcher/View'
@@ -147,7 +163,8 @@ export default {
       rowHeight: 50,
       breakpoints: BREAKPOINTS,
       breakpoint: 'xxs',
-      operationMode: -1
+      operationMode: -1,
+      variablesWrapperHeight: 0
     }
   },
   computed: {
@@ -159,6 +176,16 @@ export default {
         if (this.breakpoint !== this.$refs.grid && this.$refs.grid.lastBreakpoint) { return false }
         this.$emit('update:layout', {layout, breakpoint: this.breakpoint})
       }
+    },
+    wrapperHeight () {
+      let subtrahend = 0
+      if (this.board.settings.variables && this.board.settings.variables.length) {
+        subtrahend += this.variablesWrapperHeight
+      }
+      if ((this.isFrized && this.board.name) || !this.isFrized) {
+        subtrahend += 50
+      }
+      return `calc(100% - ${subtrahend}px)`
     }
   },
   methods: {
@@ -171,6 +198,7 @@ export default {
       this.editedWidgetTopics = undefined
     },
     saveSettingsHandler (settings) {
+      settings = this.modifyWidgetByVariables(settings)
       if (this.editedWidgetId !== undefined) {
         this.$emit('edit:widget', {settings, widgetId: this.editedWidgetId, topics: this.editedWidgetTopics})
       } else {
@@ -221,6 +249,48 @@ export default {
     },
     setLastModifyBoard () {
       this.$emit('modify')
+    },
+    onVariablesWrapperResize ({height}) {
+      this.variablesWrapperHeight = height
+    },
+    changeVaribleHandler (variableName, value) {
+      /* write current value */
+      this.board.activeVariables[variableName] = value
+      /* modify all widgets */
+      this.board.widgetsIndexes.forEach(widgetIndex => {
+        let widget = cloneDeep(this.widgets[widgetIndex])
+        widget = this.modifyWidgetByVariables(widget)
+        this.$emit('edit:widget', {settings: widget, widgetId: widget.id, topics: [...this.widgets[widgetIndex].topics]})
+      })
+    },
+    modifyWidgetByVariables (widget) {
+      let modifyTopics = (topic) => {
+        if (!topic.topicTemplate) {
+          topic.topicTemplate = topic.topicFilter
+        }
+        let variables = this.board.activeVariables
+        topic.topicFilter = topic.topicTemplate.replace(/<%([a-zA-Z0-9-+&@#/%?=~_|!:,.;]*)%>/gim, (match, name) => {
+          return variables[name] || match
+        })
+      }
+      let allTopics = []
+      if (widget.dataTopics.length) {
+        widget.dataTopics.forEach(modifyTopics)
+        allTopics = [...allTopics, ...widget.dataTopics]
+      }
+      if (widget.settings.topics && widget.settings.topics.length) {
+        widget.settings.topics.forEach(modifyTopics)
+        allTopics = [...allTopics, ...widget.settings.topics]
+      }
+      widget.topics = uniq(allTopics.map(topic => topic.topicFilter))
+      return widget
+    },
+    actionHandler (data) {
+      let variables = this.board.activeVariables
+      data.topic = data.topic.replace(/<%([a-zA-Z0-9-+&@#/%?=~_|!:,.;]*)%>/gim, (match, name) => {
+        return variables[name] || match
+      })
+      this.$emit('action', data)
     }
   },
   components: {
