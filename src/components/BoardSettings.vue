@@ -35,6 +35,10 @@
                 :opened="true"
               >
                 <template slot="header">
+                  <q-item-side right>
+                    <q-btn :disabled="index === 0" round dense flat class="col-1" @click.stop="upItem(index)" icon="mdi-arrow-up"/>
+                    <q-btn :disabled="index === (currentSettings.settings.variables.length - 1)" round dense flat class="col-1" @click.stop="downItem(index)" icon="mdi-arrow-down"/>
+                  </q-item-side>
                   <q-item-main :label="variable.name" />
                   <q-item-side right>
                     <q-btn flat color="red-6" round dense @click="removeVar(index)" icon="mdi-delete"/>
@@ -143,6 +147,14 @@ export default {
         }, [])
       return variable.name &&
         sameVarIndexes.indexOf(index) === 0
+    },
+    upItem (itemIndex) {
+      let movedItem = this.currentSettings.settings.variables.splice(itemIndex, 1)[0]
+      this.currentSettings.settings.variables.splice(itemIndex - 1, 0, movedItem)
+    },
+    downItem (itemIndex) {
+      let movedItem = this.currentSettings.settings.variables.splice(itemIndex, 1)[0]
+      this.currentSettings.settings.variables.splice(itemIndex + 1, 0, movedItem)
     }
   }
 }
