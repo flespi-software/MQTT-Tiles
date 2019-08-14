@@ -45,7 +45,7 @@ import {
 } from './constants'
 export default {
   name: 'ColorSchema',
-  props: ['widget'],
+  props: ['widget', 'board'],
   data () {
     let defaultSettings = {
       publishTemplate: '',

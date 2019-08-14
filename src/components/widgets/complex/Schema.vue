@@ -89,7 +89,7 @@
                 </div>
                 <div class="col-12">
                   <q-input v-if="editedItem.minValueMode === 0" type="number" color="dark" v-model="editedItem.minValue" float-label="Min value"/>
-                  <topic v-else v-model="editedItem.minValue" label="Min value"/>
+                  <topic v-else v-model="editedItem.minValue" label="Min value" :board="board"/>
                 </div>
               </div>
             </q-collapsible>
@@ -107,7 +107,7 @@
                 </div>
                 <div class="col-12">
                   <q-input v-if="editedItem.maxValueMode === 0" type="number" color="dark" v-model="editedItem.maxValue" float-label="Max value"/>
-                  <topic v-else v-model="editedItem.maxValue" label="Max value"/>
+                  <topic v-else v-model="editedItem.maxValue" label="Max value" :board="board"/>
                 </div>
               </div>
             </q-collapsible>
@@ -141,7 +141,7 @@ import Knob from './Knob'
 import Progress from './Progress'
 export default {
   name: 'ComplexSchema',
-  props: ['widget'],
+  props: ['widget', 'board'],
   data () {
     let defaultItem = {
       label: 'item',

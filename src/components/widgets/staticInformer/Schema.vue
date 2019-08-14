@@ -20,7 +20,7 @@ import {
 } from '../../../constants'
 export default {
   name: 'StaticInformerSchema',
-  props: ['widget'],
+  props: ['widget', 'board'],
   data () {
     let defaultSettings = {
       valueFormat: 0,

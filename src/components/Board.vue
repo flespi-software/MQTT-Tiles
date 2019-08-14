@@ -5,6 +5,7 @@
       v-if="settingsModel"
       v-model="settingsModel"
       :settings="currentSettings"
+      :board="board"
       :mode="operationMode"
       @save="saveSettingsHandler"
       @hide="hideSettingsHandler"

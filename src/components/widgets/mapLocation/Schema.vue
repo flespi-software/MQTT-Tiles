@@ -10,7 +10,7 @@
       >
         <div class="row">
           <div class="col-12">
-            <topic v-model="latValue" label="Latitude value"/>
+            <topic v-model="latValue" label="Latitude value" :board="board"/>
           </div>
         </div>
       </q-collapsible>
@@ -23,7 +23,7 @@
       >
         <div class="row">
           <div class="col-12">
-            <topic v-model="lonValue" label="Longitude value"/>
+            <topic v-model="lonValue" label="Longitude value" :board="board"/>
           </div>
         </div>
       </q-collapsible>
@@ -40,7 +40,7 @@ import Topic from '../Topic'
 import validateTopic from '../../../mixins/validateTopic.js'
 export default {
   name: 'MapLocationSchema',
-  props: ['widget'],
+  props: ['widget', 'board'],
   data () {
     let defaultSettings = {
       topics: [

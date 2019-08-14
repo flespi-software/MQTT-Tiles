@@ -6,14 +6,16 @@
       <q-icon :name="`mdi-${currentSettings.icon || 'send'}`" size="1.5rem" style="position: absolute; right: 0; bottom : 7px;"/>
     </q-input>
     <q-input color="dark" v-model="currentSettings.topic" float-label="Topic"/>
+    <variables-helper v-if="board.settings.variables && board.settings.variables.length" :variables="board.settings.variables" @add="(variable) => currentSettings.topic += variable"/>
     <q-input type="textarea" color="dark" v-model="currentSettings.payload" float-label="Payload"/>
   </div>
 </template>
 
 <script>
+import VariablesHelper from '../VariablesHelper'
 export default {
   name: 'ClickerSchema',
-  props: ['widget'],
+  props: ['widget', 'board'],
   data () {
     let defaultSettings = {
       label: '',
@@ -48,6 +50,7 @@ export default {
         this.$emit('update', val)
       }
     }
-  }
+  },
+  components: { VariablesHelper }
 }
 </script>

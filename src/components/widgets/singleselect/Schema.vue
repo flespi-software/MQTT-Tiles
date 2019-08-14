@@ -40,6 +40,7 @@
               <div v-if="currentSettings.mode === 1" class="col-6">
                 <q-input class="q-ml-xs" color="dark" v-model="item.actionPayload" float-label="Action payload"/>
               </div>
+              <variables-helper class="col-12" v-if="board.settings.variables && board.settings.variables.length" :variables="board.settings.variables" @add="(variable) => item.actionTopic += variable"/>
             </div>
           </q-collapsible>
         </q-list>
@@ -52,11 +53,12 @@
 </template>
 
 <script>
+import VariablesHelper from '../VariablesHelper'
 import { DEFAULT_MODE, COMMAND_MODE } from './constants.js'
 import isEqual from 'lodash/isEqual'
 export default {
   name: 'SingleselectSchema',
-  props: ['widget'],
+  props: ['widget', 'board'],
   data () {
     let defaultItem = {
       label: 'item',
@@ -144,6 +146,7 @@ export default {
         this.$emit('update', val)
       }
     }
-  }
+  },
+  components: { VariablesHelper }
 }
 </script>

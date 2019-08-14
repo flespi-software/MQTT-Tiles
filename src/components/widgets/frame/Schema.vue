@@ -24,7 +24,7 @@
             </template>
             <div class="row">
               <q-input class="col-12" color="dark" v-model="item.label" float-label="Label"/>
-              <topic class="col-12" v-model="item.topic" :label="item.label" @input="setTopics"/>
+              <topic class="col-12" v-model="item.topic" :label="item.label" @input="setTopics" :board="board"/>
               <q-input class="col-12" type="textarea" color="dark" v-model="item.template" float-label="Payload template"/>
               <div class="col-12 text-grey-6 q-mt-xs" style="font-size: .8rem">
                 You can use variables in template: <span class="text-grey-10 cursor-pointer" @click="item.template += '<{topic}>'">&lt;{topic}&gt;</span> is a topic from payload packet, <span class="text-grey-10 cursor-pointer" @click="item.template += '<{payload}>'">&lt;{payload}&gt;</span> is a stringified payload of packet, <span class="text-grey-8">&lt;%payload.name%&gt;</span> is a JSON path to value in payload, if payload is object.
@@ -51,7 +51,7 @@ import cloneDeep from 'lodash/cloneDeep'
 import isEqual from 'lodash/isEqual'
 export default {
   name: 'FrameSchema',
-  props: ['widget'],
+  props: ['widget', 'board'],
   data () {
     let defaultSettings = {
         height: 6,

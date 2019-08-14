@@ -14,7 +14,7 @@
           </div>
           <div class="col-12">
             <q-input v-if="currentSettings.minValueMode === 0" type="number" color="dark" v-model="currentSettings.minValue" float-label="Min value"/>
-            <topic v-else v-model="minValue" label="Min value"/>
+            <topic v-else v-model="minValue" label="Min value" :board="board"/>
             <!-- <q-input v-else color="dark" v-model="minValue" float-label="Min value topic" :error="widget.dataTopics.includes(currentSettings.topics[0]) || !validateTopic(currentSettings.topics[0])"/> -->
           </div>
         </div>
@@ -32,7 +32,7 @@
           </div>
           <div class="col-12">
             <q-input v-if="currentSettings.maxValueMode === 0" type="number" color="dark" v-model="currentSettings.maxValue" float-label="Max value"/>
-            <topic v-else v-model="maxValue" label="Max value"/>
+            <topic v-else v-model="maxValue" label="Max value" :board="board"/>
             <!-- <q-input v-else color="dark" v-model="maxValue" float-label="Max value topic" :error="widget.dataTopics.includes(currentSettings.topics[1]) || !validateTopic(currentSettings.topics[1])"/> -->
           </div>
         </div>
@@ -67,7 +67,7 @@ import {
 } from '../../../constants'
 export default {
   name: 'LinearSchema',
-  props: ['widget'],
+  props: ['widget', 'board'],
   data () {
     let defaultSettings = {
       lowLevel: 60,

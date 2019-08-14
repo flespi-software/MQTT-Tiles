@@ -362,8 +362,8 @@ export default {
     async publish () {
       if (this.client) {
         return this.client.publish(...arguments)
-          .catch(err => { this.errorHandler(err) })
-      } else { this.showError(new Error('You have no active clients')) }
+          .catch(err => { this.errorHandler(err, true) })
+      } else { this.showError(new Error('You have no active clients'), true) }
     },
     async destroyClient () {
       await this.client.end(true)
@@ -375,6 +375,9 @@ export default {
       this.activeBoardId = undefined
     },
     actionHandler ({topic, payload, settings}) {
+      if (!settings.qos) {
+        settings.qos = 1
+      }
       this.publish(topic, payload, settings)
     },
     addBoard (board) {

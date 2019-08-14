@@ -33,7 +33,7 @@ import {
 } from '../../../constants'
 export default {
   name: 'InformerSchema',
-  props: ['widget'],
+  props: ['widget', 'board'],
   data () {
     let defaultSettings = {
       math: '',

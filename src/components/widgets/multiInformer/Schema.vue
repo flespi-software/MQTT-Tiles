@@ -24,7 +24,7 @@
               </q-item-side>
             </template>
             <div class="row">
-              <topic class="col-12" v-model="item.topic" @input="updateTopics"/>
+              <topic class="col-12" v-model="item.topic" @input="updateTopics" :board="board"/>
               <div class="col-6">
                 <q-input class="q-mr-sm" color="dark" v-model="item.prefix" float-label="Prefix"/>
               </div>
@@ -64,7 +64,7 @@ import Topic from '../Topic'
 import isEqual from 'lodash/isEqual'
 export default {
   name: 'MultiInformerSchema',
-  props: ['widget'],
+  props: ['widget', 'board'],
   data () {
     let defaultSettings = {
       items: [],

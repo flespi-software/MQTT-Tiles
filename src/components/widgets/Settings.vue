@@ -47,12 +47,13 @@
                 <q-btn flat color="red-6" round dense @click="removeTopicHandler(index)" icon="mdi-delete"/>
               </q-item-side>
             </template>
-            <topic v-model="currentSettings.dataTopics[index]"/>
+            <topic v-model="currentSettings.dataTopics[index]" :board="board"/>
           </q-collapsible>
         </q-list>
         <component
           :is="currentSettings.type"
           :widget="currentSettings"
+          :board="board"
           @update="updateSettingsHandler"
           @validate="validateSchemas"
         />
@@ -114,7 +115,7 @@ import TextSender from './textSender/Schema'
 
 export default {
   name: 'Settings',
-  props: ['value', 'settings', 'mode'],
+  props: ['value', 'settings', 'mode', 'board'],
   data () {
     let defaultSettings = {
       name: 'New widget',

@@ -15,7 +15,7 @@
           </div>
           <div class="col-12">
             <q-input v-if="currentSettings.minValueMode === 0" type="number" color="dark" v-model="currentSettings.minValue" float-label="Min value"/>
-            <topic v-else v-model="minValue" label="Min value"/>
+            <topic v-else v-model="minValue" label="Min value" :board="board"/>
           </div>
         </div>
       </q-collapsible>
@@ -32,7 +32,7 @@
           </div>
           <div class="col-12">
             <q-input v-if="currentSettings.maxValueMode === 0" type="number" color="dark" v-model="currentSettings.maxValue" float-label="Max value"/>
-            <topic v-else v-model="maxValue" label="Max value"/>
+            <topic v-else v-model="maxValue" label="Max value" :board="board"/>
           </div>
         </div>
       </q-collapsible>
@@ -60,7 +60,7 @@ import {
 } from '../../../constants'
 export default {
   name: 'SliderSchema',
-  props: ['widget'],
+  props: ['widget', 'board'],
   data () {
     let defaultSettings = {
       minValue: 0,

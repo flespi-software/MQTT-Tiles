@@ -34,6 +34,7 @@
         <component
           :is="currentSettings.type"
           :widget="schemaWidget"
+          :board="board"
           @update="updateSettingsHandler"
           @validate="validateSchemas"
         />
@@ -54,7 +55,7 @@ import Complex from '../complex/Schema'
 import { WIDGET_STATUS_DISABLED } from '../../../constants'
 export default {
   name: 'MultiplierSchema',
-  props: ['widget'],
+  props: ['widget', 'board'],
   data () {
     let defaultSettings = {
       type: '',

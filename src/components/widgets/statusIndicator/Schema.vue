@@ -78,7 +78,7 @@ import { DEFAULT_MODE, COMMAND_MODE } from './constants.js'
 import isEqual from 'lodash/isEqual'
 export default {
   name: 'StatusIndicatorSchema',
-  props: ['widget'],
+  props: ['widget', 'board'],
   data () {
     let defaultItem = {
       label: 'item',
