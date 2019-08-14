@@ -42,7 +42,7 @@
             :opened="true"
           >
             <template slot="header">
-              <q-item-main :label="topic.topicFilter || 'Empty'" />
+              <q-item-main :label="topic.topicTemplate || 'Empty'" />
               <q-item-side right>
                 <q-btn flat color="red-6" round dense @click="removeTopicHandler(index)" icon="mdi-delete"/>
               </q-item-side>

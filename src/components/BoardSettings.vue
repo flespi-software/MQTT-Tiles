@@ -42,7 +42,10 @@
                 </template>
                 <div class="row">
                   <q-input class="col-12" color="dark" v-model="variable.name" float-label="Name" :error="!variable.name"/>
-                  <q-chips-input class="col-12" color="dark" v-model="variable.values" float-label="Values" :error="!variable.values.length"/>
+                  <q-chips-input class="col-12" color="dark" v-model="variable.values" float-label="Values" :error="!variable.values.length || variable.values.includes('#')"/>
+                  <div class="col-12 text-red" v-if="!variable.values.length || variable.values.includes('#')" style="font-size: .8rem;">
+                    {{!variable.values.length ? 'Can`t be empty' : variable.values.includes('#') ? 'Value cannot be a #' : ''}}
+                  </div>
                 </div>
               </q-collapsible>
             </q-list>
