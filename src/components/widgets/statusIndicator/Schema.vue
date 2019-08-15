@@ -16,7 +16,7 @@
             v-for="(item, index) in currentSettings.items"
             :key="`${index}${item.value}`"
             group="status-indicator-items"
-            :header-class="[`bg-${checkUniqueValue(item.val, index) && !!item.actionTopic ? 'grey-4' : 'red-2'}`]"
+            :header-class="[`bg-${checkUniqueItem(item, index) && !!item.actionTopic ? 'grey-4' : 'red-2'}`]"
             collapse-icon="mdi-settings"
             :opened="true"
           >
@@ -38,7 +38,7 @@
                 <q-input autofocus class="q-mr-xs" color="dark" v-model="item.label" float-label="Label"/>
               </div>
               <div class="col-6" v-if="!item.default">
-                <q-input class="q-ml-xs" color="dark" v-model="item.val" float-label="Value" :error="!checkUniqueValue(item.val, index)"/>
+                <q-input class="q-ml-xs" color="dark" v-model="item.val" float-label="Value" :error="!checkUniqueItem(item, index)"/>
               </div>
               <div class="col-10">
                 <q-input class="q-mr-xs icon-input" :style="{color: item.color}" color="dark" v-model="item.icon" float-label="Icon">
@@ -58,6 +58,8 @@
               <div class="col-12 text-grey-6 q-mt-sm" style="font-size: .8rem;" v-if="item.default">
                 You can find more icons on <a href="https://materialdesignicons.com/" target="blank">MDI</a>
               </div>
+              <q-input class="col-12" color="dark" v-model="item.math" float-label="Math expression" placeholder="%value%" v-if="!item.default" :error="!checkUniqueItem(item, index)"/>
+              <div class="text-dark" v-if="!item.default" style="font-size: .8rem;">You can use math expressions to calculate the final value. Example: (%value% * 1000) / 1024, where %value% is the payload from your subscription.</div>
               <div v-if="currentSettings.mode === 1" class="col-6">
                 <q-input class="q-mr-xs" color="dark" v-model="item.actionTopic" float-label="Action topic" :error="!item.actionTopic"/>
               </div>
@@ -96,6 +98,7 @@ export default {
           label: 'default',
           icon: '',
           color: '#000',
+          math: '',
           val: '',
           default: true,
           actionTopic: 'topic/to/action',
@@ -140,11 +143,12 @@ export default {
       let movedItem = this.currentSettings.items.splice(itemIndex, 1)[0]
       this.currentSettings.items.splice(itemIndex + 1, 0, movedItem)
     },
-    checkUniqueValue (value, index) {
+    checkUniqueItem (item, index) {
       let isUnique = true
-      this.currentSettings.items.map(item => item.val).some((val, valIndex) => {
-        let sameValue = val === value
-        if (sameValue) { isUnique = valIndex === index }
+      this.currentSettings.items.some((currentItem, itemIndex) => {
+        let sameValue = currentItem.val === item.val
+        let sameMath = currentItem.math === item.math
+        if (sameValue && sameMath) { isUnique = itemIndex === index }
         return sameValue
       })
       return isUnique
@@ -158,8 +162,9 @@ export default {
       ) &&
         !!this.currentSettings.items.length &&
         this.currentSettings.items.reduce((isUniq, item, index, items) => {
-          if (!isUniq[item.val]) { isUniq[item.val] = 0 }
-          isUniq[item.val]++
+          let key = `${item.val} - ${item.math}`
+          if (!isUniq[key]) { isUniq[key] = 0 }
+          isUniq[key]++
           if (index === items.length - 1) {
             return Object.keys(isUniq).reduce((currentUniq, value) => {
               if (!currentUniq) { return currentUniq }

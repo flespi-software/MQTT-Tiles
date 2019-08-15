@@ -118,7 +118,7 @@ export default {
     },
     activeItem () {
       let defaultItem = this.item.settings.items[0]
-      let activeItem = this.item.settings.items.slice(1).filter(item => item.val === this.currentValue)
+      let activeItem = this.item.settings.items.slice(1).filter(item => item.val === `${this.mathProcessing(this.currentValue, item.math)}`)
       return activeItem[0] || defaultItem
     }
   },
