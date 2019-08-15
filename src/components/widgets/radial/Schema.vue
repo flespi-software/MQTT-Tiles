@@ -1,6 +1,8 @@
 <template>
   <div>
     <div class="row">
+      <q-input class="col-12" color="dark" v-model="currentSettings.math" float-label="Math expression" placeholder="%value%"/>
+      <div class="text-dark" style="font-size: .8rem;">You can use math expressions to calculate the final value. Example: (%value% * 1000) / 1024, where %value% is the payload from your subscription.</div>
       <q-collapsible
         class="col-12 q-mt-sm"
         :opened="true"
@@ -68,6 +70,7 @@ export default {
   props: ['widget', 'board'],
   data () {
     let defaultSettings = {
+      math: '',
       lowLevel: 60,
       midLevel: 100,
       highLevel: 120,

@@ -75,6 +75,17 @@
                 <q-btn round dense flat icon="mdi-dots-vertical" color="dark">
                   <q-popover anchor="bottom right" self="top right">
                     <q-list dense>
+                      <!-- <q-item style="padding: 0 0;">
+                        <q-item-main/>
+                        <q-item-side>
+                          <q-btn size="0.8rem" icon="mdi-settings" v-close-overlay @click="openEditSettingsHandler(id)" flat round>
+                            <q-tooltip>Settings</q-tooltip>
+                          </q-btn>
+                          <q-btn size="0.8rem" color="red" icon="mdi-delete-outline" v-close-overlay @click="$emit('delete', id)" flat round>
+                            <q-tooltip>Remove</q-tooltip>
+                          </q-btn>
+                        </q-item-side>
+                      </q-item> -->
                       <q-item class="cursor-pointer" v-close-overlay highlight @click.native.stop="$emit('export', id)" v-if="hasConnection">
                         <q-item-side icon="mdi-cloud-upload-outline" />
                         <q-item-main label="Save to broker"/>

@@ -81,6 +81,7 @@
 import { WIDGET_STATUS_DISABLED } from '../../../constants'
 import { DEFAULT_MODE, COMMAND_MODE } from './constants.js'
 import getValueByTopic from '../../../mixins/getValueByTopic.js'
+import formatValue from '../../../mixins/formatValue.js'
 import timestamp from '../../../mixins/timestamp.js'
 export default {
   name: 'StatusIndicator',
@@ -107,7 +108,7 @@ export default {
         if (value === null) {
           return null
         } else {
-          return this.getValueByTopic(value, this.item.dataTopics[0])
+          return `${this.mathProcessing(this.getValueByTopic(value, this.item.dataTopics[0]), this.item.settings.math)}`
         }
       },
       set (val) {
@@ -143,6 +144,6 @@ export default {
       }
     }
   },
-  mixins: [getValueByTopic, timestamp]
+  mixins: [getValueByTopic, timestamp, formatValue]
 }
 </script>

@@ -53,7 +53,7 @@
         :color="item.currentValue === null ? 'grey-4' : currentValue ? `${item.color}-7` : `grey-6`"
         :name="currentValue ? `mdi-${item.settings.trueIcon || 'toggle-switch-outline'}` : `mdi-${item.settings.falseIcon || 'toggle-switch-off-outline'}`"
         style="width: 100%; height: 100%;"
-        :class="[`${currentValue === null ? 'disabled' : actionTopic ? 'cursor-pointer' : ''}`]"
+        :class="[`${currentValue === null ? 'disabled' : isActiveWidget ? 'cursor-pointer' : ''}`]"
       />
     </q-card-media>
     <div v-if="item.settings.isNeedTime" class="absolute-bottom-left q-px-xs q-pt-xs" style="font-size: 12px; border-top-right-radius: 5px; bottom: 1px; left: 1px;" :class="[`text-${item.color}-7`, `bg-${item.color}-1`]">
@@ -81,6 +81,7 @@
 import { WIDGET_STATUS_DISABLED } from '../../../constants'
 import { DEFAULT_MODE, COMMAND_MODE, ACCUMULATE_AND_MODE, ACCUMULATE_OR_MODE } from './constants.js'
 import getValueByTopic from '../../../mixins/getValueByTopic.js'
+import formatValue from '../../../mixins/formatValue.js'
 import timestamp from '../../../mixins/timestamp.js'
 export default {
   name: 'Switcher',
@@ -97,7 +98,7 @@ export default {
       return this.item.dataTopics.reduce((result, topicObj) => {
         if (result === null) { return result }
         let value = this.value[topicObj.topicFilter] !== null
-          ? this.getValueByTopic(this.value[topicObj.topicFilter].payload, topicObj)
+          ? `${this.mathProcessing(this.getValueByTopic(this.value[topicObj.topicFilter].payload, topicObj), this.item.settings.math)}`
           : this.value[topicObj.topicFilter]
         switch (mode) {
           case ACCUMULATE_AND_MODE: {
@@ -126,6 +127,9 @@ export default {
       } else if (this.item.settings.mode === DEFAULT_MODE) {
         return this.item.settings.actionTopic
       }
+    },
+    isActiveWidget () {
+      return this.actionTopic && ((this.item.settings.math && this.item.settings.mode === COMMAND_MODE) || (!this.item.settings.math && this.item.settings.mode === DEFAULT_MODE))
     }
   },
   methods: {
@@ -145,12 +149,12 @@ export default {
       }
     },
     actionHandler () {
-      if (this.currentValue !== null && this.actionTopic) {
+      if (this.currentValue !== null && this.isActiveWidget) {
         let data = {topic: this.actionTopic, payload: this.getValue(), settings: {retain: this.item.settings.save}}
         this.$emit('action', data)
       }
     }
   },
-  mixins: [getValueByTopic, timestamp]
+  mixins: [getValueByTopic, timestamp, formatValue]
 }
 </script>

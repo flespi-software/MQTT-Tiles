@@ -8,13 +8,17 @@ const { humanStorageSize } = format
 import math from 'mathjs'
 export default {
   methods: {
-    formatValue (value, settings) {
-      if (settings.math && value !== 'N/A') {
+    mathProcessing (value, mathTemplate) {
+      if (mathTemplate && value !== 'N/A') {
         try {
-          let mathExp = settings.math.replace(/%value%/g, value)
+          let mathExp = mathTemplate.replace(/%value%/g, value)
           value = math.eval(mathExp)
         } catch (e) {}
       }
+      return value
+    },
+    formatValue (value, settings) {
+      value = this.mathProcessing(value, settings.math)
       if (settings.valueFormat) {
         try {
           switch (settings.valueFormat) {

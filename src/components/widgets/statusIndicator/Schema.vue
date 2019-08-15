@@ -6,6 +6,8 @@
           <q-icon :name="`mdi-${currentSettings.defaultIcon}`" size="1.5rem" style="position: absolute; right: 0; bottom : 7px;"/>
         </q-input>
       </div>
+      <q-input class="col-12" color="dark" v-model="currentSettings.math" float-label="Math expression" placeholder="%value%"/>
+      <div class="text-dark" style="font-size: .8rem;">You can use math expressions to calculate the final value. Example: (%value% * 1000) / 1024, where %value% is the payload from your subscription.</div>
       <div class="status-indicator__items-wrapper col-12 relative-position q-mb-sm q-mt-lg">
         <q-list>
           <q-btn color="dark" style="top: -20px; right: 8px; position: absolute; z-index: 1130;" class="col-12" fab-mini @click="addItem" icon="mdi-plus"/>
@@ -102,6 +104,7 @@ export default {
       ],
       save: true,
       mode: DEFAULT_MODE,
+      math: '',
       defaultIcon: 'circle',
       height: 2,
       width: 1,

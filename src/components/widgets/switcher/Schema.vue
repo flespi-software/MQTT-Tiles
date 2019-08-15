@@ -8,6 +8,7 @@
       <q-input class="col-12" v-if="currentSettings.mode === 0 && widget.topics.length > 1" color="dark" v-model="currentSettings.actionTopic" float-label="Action topic"/>
       <div class="col-6 q-pr-sm">
         <q-input color="dark" v-model="currentSettings.trueValue" float-label="True value"/>
+        <q-input color="dark" v-model="currentSettings.trueValueMath" float-label="True value math"/>
         <q-input class="q-mr-xs icon-input" color="dark" v-model="currentSettings.trueIcon" float-label="True value icon">
           <q-icon :name="`mdi-${currentSettings.trueIcon || 'toggle-switch-outline'}`" size="1.5rem" style="position: absolute; right: 0; bottom : 7px;"/>
         </q-input>
@@ -19,6 +20,7 @@
       </div>
       <div class="col-6 q-pl-sm">
         <q-input color="dark" v-model="currentSettings.falseValue" float-label="False value"/>
+        <q-input color="dark" v-model="currentSettings.falseValueMath" float-label="False value math"/>
         <q-input class="q-mr-xs icon-input" color="dark" v-model="currentSettings.falseIcon" float-label="False value icon">
           <q-icon :name="`mdi-${currentSettings.falseIcon || 'toggle-switch-off-outline'}`" size="1.5rem" style="position: absolute; right: 0; bottom : 7px;"/>
         </q-input>
@@ -28,6 +30,8 @@
         </div>
         <q-input v-if="currentSettings.mode === 1" color="dark" v-model="currentSettings.falsePayload" float-label="False action payload"/>
       </div>
+      <q-input class="col-12" color="dark" v-model="currentSettings.math" float-label="Math expression" placeholder="%value%"/>
+      <div class="text-dark" style="font-size: .8rem;">You can use math expressions to calculate the final value. Example: (%value% * 1000) / 1024, where %value% is the payload from your subscription.</div>
       <div class='q-my-md col-12' v-if="widget.topics.length > 1">
         <div class="text-grey-6" style="font-size: 0.75rem">Accumulate logic</div>
         <q-btn-toggle rounded toggle-text-color="dark" text-color="grey-6" flat v-model="currentSettings.accumulateLogic" :options="accumulateLogicOptions"/>
@@ -48,6 +52,7 @@ export default {
   props: ['widget', 'board'],
   data () {
     let defaultSettings = {
+      math: '',
       actionTopic: '',
       trueValue: '1',
       trueIcon: '',

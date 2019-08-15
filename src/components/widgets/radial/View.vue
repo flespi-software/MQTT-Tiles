@@ -87,6 +87,7 @@ import {
   WIDGET_RANGE_VALUE_DATASOURCE_MODE
 } from '../../../constants'
 import getValueByTopic from '../../../mixins/getValueByTopic.js'
+import formatValue from '../../../mixins/formatValue.js'
 import timestamp from '../../../mixins/timestamp.js'
 import RadialGauge from './RadialGauge'
 export default {
@@ -185,7 +186,7 @@ export default {
     },
     currentValue () {
       let value = this.valuesBySettings[this.item.dataTopics[0].topicFilter]
-      return Number.isNaN(value) ? 0 : value
+      return Number.isNaN(value) ? 0 : this.mathProcessing(value, this.item.settings.math)
     },
     stringLength () {
       return this.currentValueText.length + this.item.settings.units.length
@@ -254,6 +255,6 @@ export default {
     }
   },
   components: { RadialGauge },
-  mixins: [getValueByTopic, timestamp]
+  mixins: [getValueByTopic, timestamp, formatValue]
 }
 </script>
