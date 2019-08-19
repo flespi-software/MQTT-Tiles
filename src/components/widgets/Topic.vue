@@ -23,14 +23,19 @@ export default {
     board: Object
   },
   data () {
-    return {
-      defaultTopic: {
+    let defaultTopic = {
         topicTemplate: '',
         topicFilter: '',
         payloadType: 0,
         payloadField: ''
       },
-      currentValue: Object.assign({}, this.defaultTopic, this.value),
+      currentValue = Object.assign({}, this.defaultTopic, this.value)
+    if (!currentValue.topicTemplate) {
+      currentValue.topicTemplate = currentValue.topicFilter
+    }
+    return {
+      defaultTopic,
+      currentValue,
       WIDGET_PAYLOAD_TYPE_STRING,
       WIDGET_PAYLOAD_TYPE_JSON,
       payloadTypeOptions: [

@@ -46,7 +46,7 @@
         </q-item-side>
       </transition>
     </q-item>
-    <q-card-media :class="[`bg-${item.color}-1`]" class="widget__content clicker__payload q-px-sm" style="height: calc(100% - 22px);">
+    <q-card-media :class="[`bg-${item.color}-1`]" class="widget__content clicker__payload q-px-sm scroll" style="height: calc(100% - 22px);">
       <q-btn
         class="payload__button"
         :disabled="item.status === WIDGET_STATUS_DISABLED"

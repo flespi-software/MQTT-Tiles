@@ -26,7 +26,7 @@
         </q-item-side>
       </transition>
     </q-item>
-    <q-card-media class="widget__content" :class="[`bg-${item.color}-1`]" style="height: calc(100% - 29px);">
+    <q-card-media class="widget__content scroll" :class="[`bg-${item.color}-1`]" style="height: calc(100% - 29px);">
       <div style="width: 100%; height: 100%;">
         <div style="width: 100%; height: 100%;">
           <iframe style="width: 100%;height: calc(100% - 8px);" src="https://flespi.io/mapview" frameborder="0" ref="map"></iframe>
@@ -68,28 +68,41 @@ export default {
       WIDGET_STATUS_DISABLED
     }
   },
-  computed: {
-    route () {
-      let routeTopic = this.item.settings.topics[0],
-        values = [
-          this.getValueByTopic(this.value[routeTopic.topicFilter] && this.value[routeTopic.topicFilter].payload, routeTopic)
-        ]
-      this.setRoute(values)
-      return values
-    }
-  },
   methods: {
     setRoute (route) {
       this.$refs.map && this.$refs.map.contentWindow.postMessage(`MapView|cmd:{"addgroutes": ${JSON.stringify(route)}, "clear": "all"}`, '*')
+    },
+    getRoute () {
+      let routeTopic = this.item.settings.topics[0],
+        value = this.getValueByTopic(this.value[routeTopic.topicFilter] && this.value[routeTopic.topicFilter].payload, routeTopic),
+        values = []
+      value = value === 'N/A' ? '' : value
+      if (Array.isArray(value)) {
+        values = value
+      } else {
+        values = [value]
+      }
+      return values
     }
   },
   created () {
     window.addEventListener('message', (e) => {
       if (e.data === 'MapView|state:{"ready": true}') {
-        this.setRoute(this.route)
+        this.setRoute(this.getRoute())
       }
     })
   },
-  mixins: [getValueByTopic, timestamp]
+  mixins: [getValueByTopic, timestamp],
+  watch: {
+    value: {
+      deep: true,
+      handler (value) {
+        this.setRoute(this.getRoute())
+      }
+    },
+    'item.settings.topics' () {
+      this.setRoute(this.getRoute())
+    }
+  }
 }
 </script>

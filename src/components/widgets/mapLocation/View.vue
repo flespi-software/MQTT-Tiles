@@ -26,7 +26,7 @@
         </q-item-side>
       </transition>
     </q-item>
-    <q-card-media class="widget__content" :class="[`bg-${item.color}-1`]" style="height: calc(100% - 29px);">
+    <q-card-media class="widget__content scroll" :class="[`bg-${item.color}-1`]" style="height: calc(100% - 29px);">
       <div style="width: 100%; height: 100%;">
         <iframe style="width: 100%;height: calc(100% - 8px);" src="https://flespi.io/mapview" frameborder="0" ref="map"></iframe>
       </div>

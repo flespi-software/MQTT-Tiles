@@ -67,7 +67,7 @@
               :i="currentLayout[index].i"
               :minW="widgets[widgetIndex].settings.minWidth || 1"
               :minH="widgets[widgetIndex].settings.minHeight || 1"
-              dragIgnoreFrom=".widget__content, i, button, a"
+              dragIgnoreFrom=".widget__content"
               @resized="resizeHandler"
             >
               <component

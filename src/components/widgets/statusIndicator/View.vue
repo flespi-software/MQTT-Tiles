@@ -14,7 +14,7 @@
     </div>
     <div class="ellipsis q-mt-sm">{{item.name}}</div>
   </div>
-  <q-card flat v-else inline class="widget__switcher q-pa-sm" style="width: 100%; height: 100%;" :class="[`bg-${item.color}-1`]">
+  <q-card flat v-else inline class="widget__status-indicator q-pa-sm" style="width: 100%; height: 100%;" :class="[`bg-${item.color}-1`]">
     <q-item class="q-pa-none" style="min-height: 22px;">
       <q-item-main class="ellipsis" :class="[`text-${item.color}-7`]" style="font-size: .9rem">
         {{item.name}}
@@ -47,7 +47,7 @@
         </q-item-side>
       </transition>
     </q-item>
-    <q-card-media class="widget__content" :class="[`bg-${item.color}-1`]" style="height: calc(100% - 22px);">
+    <q-card-media class="widget__content scroll" :class="[`bg-${item.color}-1`]" style="height: calc(100% - 22px);">
       <q-icon
         v-if="activeItem.icon || !activeItem.label"
         :style="{color: activeItem.color, fontSize: `${size}rem`}"
@@ -56,7 +56,7 @@
       />
       <div v-else style="width: 100%; height: 100%;" class="flex flex-center" :style="{color: activeItem.color}">{{activeItem.label}}</div>
     </q-card-media>
-    <div v-if="item.settings.isNeedTime" class="absolute-bottom-left q-px-xs q-pt-xs" style="font-size: 12px; border-top-right-radius: 5px; bottom: 1px; left: 1px; user-select: none;" :class="[`text-${item.color}-7`, `bg-${item.color}-1`]">
+    <div v-if="item.settings.isNeedTime" class="absolute-bottom-left q-px-xs q-pt-xs" style="font-size: 12px; border-top-right-radius: 5px; bottom: 1px; left: 1px;" :class="[`text-${item.color}-7`, `bg-${item.color}-1`]">
       {{timestamp}}
     </div>
   </q-card>
