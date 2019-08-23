@@ -36,13 +36,13 @@
         :value="board.activeVariables[variable.name]"
         @input="(value) => changeVaribleHandler(variable.name, value)"
         :float-label="variable.name"
-        :options="variable.values.map(value => ({label: value, value}))"
+        :options="getVariableValues(variable)"
         color="dark"
-        class="q-py-none q-mr-sm"
+        class="q-py-none q-mr-sm variable-selector"
         style="max-width: 150px;"
       />
     </q-toolbar>
-    <div class="widgets__wrapper scroll" :style="{height: wrapperHeight}">
+    <div class="widgets__wrapper scroll" :style="{height: wrapperHeight}" :class="{'q-px-sm': $q.platform.is.mobile}">
       <div style="width: 100%; position: relative;" v-if="board.widgetsIndexes.length">
         <grid-layout
           ref="grid"
@@ -97,6 +97,11 @@
 </template>
 
 <style lang="stylus">
+  .variable-selector
+    .q-if-inner
+      text-overflow ellipsis
+      white-space nowrap
+      overflow hidden
   .wrapper__items
     border 1px solid #ccc
   .wrapper__items--edited
@@ -153,7 +158,7 @@ function getBreakpoint (width) {
 
 export default {
   name: 'Board',
-  props: ['board', 'widgets', 'values', 'canShare', 'isFrized', 'hasConnection'],
+  props: ['board', 'widgets', 'values', 'canShare', 'isFrized', 'hasConnection', 'variablesValues'],
   data () {
     return {
       settingsModel: false,
@@ -285,6 +290,28 @@ export default {
       }
       widget.topics = uniq(allTopics.map(topic => topic.topicFilter))
       return widget
+    },
+    getVariableValues (variable) {
+      if (!variable.type || variable.type === 0) {
+        return variable.values.map(value => ({label: value, value}))
+      } else if (variable.type === 1) {
+        return this.naturalSort(Object.values(this.variablesValues[variable.name])).map(value => ({label: typeof value === 'string' ? value : JSON.stringify(value), value}))
+      }
+    },
+    naturalSort (arr) {
+      return arr.sort((a, b) => {
+        a = typeof a === 'string' ? a.toLowerCase() : a
+        b = typeof b === 'string' ? b.toLowerCase() : b
+        if (a !== b) {
+          let na = Number(a),
+            ba = Number(b)
+          if (na + '' === a && ba + '' === b) {
+            return na - ba
+          } else {
+            return (a > b) ? 1 : -1
+          }
+        }
+      })
     },
     actionHandler (data) {
       let variables = this.board.activeVariables

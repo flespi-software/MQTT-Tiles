@@ -120,7 +120,7 @@ export default {
     let defaultSettings = {
       name: 'New widget',
       color: 'grey',
-      type: 'switcher',
+      type: 'informer',
       topics: [],
       dataTopics: [], // topics for datasource
       settings: {},
@@ -130,10 +130,10 @@ export default {
       defaultSettings,
       currentSettings: this.settings ? merge({}, defaultSettings, this.settings) : merge({}, defaultSettings),
       typeOptions: [
-        {label: 'Toggle', value: 'switcher', rightIcon: 'mdi-toggle-switch-outline'},
         {label: 'Text', value: 'informer', rightIcon: 'mdi-format-color-text'},
         {label: 'Multi text', value: 'multi-informer', rightIcon: 'mdi-card-text-outline'},
         {label: 'Static text', value: 'static-informer', rightIcon: 'mdi-format-text'},
+        {label: 'Toggle', value: 'switcher', rightIcon: 'mdi-toggle-switch-outline'},
         {label: 'Button', value: 'clicker', rightIcon: 'mdi-send'},
         {label: 'Textarea', value: 'text-sender', rightIcon: 'mdi-text-subject'},
         {label: 'Slider', value: 'slider', rightIcon: 'mdi-ray-vertex'},

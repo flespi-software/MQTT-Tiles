@@ -1,5 +1,5 @@
 <template>
-  <q-card flat inline class="widget__informer" style="width: 100%; height: 100%;" :class="[`bg-${item.color}-1`]">
+  <q-card flat inline class="widget__frame" style="width: 100%; height: 100%;" :class="[`bg-${item.color}-1`, `${blocked ? 'scroll' : ''}`]">
     <q-item class="q-px-sm q-pt-sm q-pb-none" style="min-height: 29px;">
       <q-item-main class="ellipsis" :class="[`text-${item.color}-7`]" style="font-size: .9rem">
         {{item.name}}
@@ -82,6 +82,7 @@ export default {
       width: 0,
       height: 0,
       currentPayloads: [],
+      isReadyMap: false,
       IFRAME_MODE_INTEGRATION,
       IFRAME_MODE_SHOW
     }
@@ -115,6 +116,7 @@ export default {
     },
     update () {
       this.item.settings.items.forEach((item, index) => {
+        if (!this.isReadyMap) { return false }
         let payload = this.getPayload(index)
         if (this.currentPayloads[index] !== payload) {
           this.send(payload)
@@ -145,6 +147,7 @@ export default {
   created () {
     window.addEventListener('message', (e) => {
       if (e.data === 'MapView|state:{"ready": true}') {
+        this.isReadyMap = true
         this.update()
       }
     })

@@ -1,5 +1,5 @@
 <template>
-  <q-card flat inline class="widget__map-location absolute" style="width: 100%; height: 100%;" :class="[`bg-${item.color}-1`]">
+  <q-card flat inline class="widget__map-location absolute" style="width: 100%; height: 100%;" :class="[`bg-${item.color}-1`, `${blocked ? 'scroll' : ''}`]">
     <q-item class="q-px-sm q-pt-sm q-pb-none" style="min-height: 29px;">
       <q-item-main class="ellipsis" :class="[`text-${item.color}-7`]" style="font-size: .9rem">
         {{item.name}}

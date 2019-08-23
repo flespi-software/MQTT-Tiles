@@ -29,7 +29,8 @@ import {
   WIDGET_VALUE_FORMAT_DATE,
   WIDGET_VALUE_FORMAT_PRE,
   WIDGET_VALUE_FORMAT_MARKDOWN,
-  WIDGET_VALUE_FORMAT_JSON
+  WIDGET_VALUE_FORMAT_JSON,
+  WIDGET_VALUE_FORMAT_TIME
 } from '../../../constants'
 export default {
   name: 'InformerSchema',
@@ -54,6 +55,7 @@ export default {
         {label: 'String', value: WIDGET_VALUE_FORMAT_STRING},
         {label: 'Human readable size', value: WIDGET_VALUE_FORMAT_HUMAN_READABLE_SIZE},
         {label: 'Date', value: WIDGET_VALUE_FORMAT_DATE},
+        {label: 'Time', value: WIDGET_VALUE_FORMAT_TIME},
         {label: 'Preformated', value: WIDGET_VALUE_FORMAT_PRE},
         {label: 'Markdown', value: WIDGET_VALUE_FORMAT_MARKDOWN},
         {label: 'JSON', value: WIDGET_VALUE_FORMAT_JSON}

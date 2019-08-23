@@ -46,10 +46,14 @@
                 </template>
                 <div class="row">
                   <q-input class="col-12" color="dark" v-model="variable.name" float-label="Name" :error="!variable.name"/>
-                  <q-chips-input class="col-12" color="dark" v-model="variable.values" float-label="Values" :error="!variable.values.length || variable.values.includes('#')"/>
-                  <div class="col-12 text-red" v-if="!variable.values.length || variable.values.includes('#')" style="font-size: .8rem;">
-                    {{!variable.values.length ? 'Can`t be empty' : variable.values.includes('#') ? 'Value cannot be a #' : ''}}
-                  </div>
+                  <q-select class="col-12" :value="variable.type" :options="variableTypeOptions" color="dark" @change="(value) => changeTypeVariableHandler(index, value)" float-label="Type"/>
+                  <topic class="col-12" v-model="variable.topic" v-if="variable.type === VARIABLE_TYPE_SOURCE"/>
+                  <template v-if="variable.type === VARIABLE_TYPE_CUSTOM">
+                    <q-chips-input class="col-12" color="dark" v-model="variable.values" float-label="Values" :error="!variable.values.length || variable.values.includes('#')"/>
+                    <div class="col-12 text-red" v-if="!variable.values.length || variable.values.includes('#')" style="font-size: .8rem;">
+                      {{!variable.values.length ? 'Can`t be empty' : variable.values.includes('#') ? 'Value cannot be a #' : ''}}
+                    </div>
+                  </template>
                 </div>
               </q-collapsible>
             </q-list>
@@ -69,6 +73,9 @@
 <script>
 import merge from 'lodash/merge'
 import { uid } from 'quasar'
+import Topic from './widgets/Topic'
+const VARIABLE_TYPE_CUSTOM = 0,
+  VARIABLE_TYPE_SOURCE = 1
 export default {
   props: ['settings', 'value', 'boards'],
   data () {
@@ -86,19 +93,42 @@ export default {
         layouts: { lg: [], md: [], sm: [], xs: [], xxs: [] }
       }
     )
+    let defaultTopic = {
+      topicTemplate: '',
+      topicFilter: '',
+      payloadType: 0,
+      payloadField: ''
+    }
     let currentSettings = {}
     if (this.settings) {
       currentSettings = merge({}, defaultSettings, this.settings)
+      /* remove after some time 16.08.19 it`s a mutation for edited boards */
+      currentSettings.settings.variables && currentSettings.settings.variables.forEach((variable) => {
+        if (variable.type === undefined) {
+          variable.type = 0
+          variable.topic = Object.assign({}, defaultTopic)
+        }
+      })
+      /* end */
     } else {
       currentSettings = merge({}, defaultSettings)
       currentSettings.id = uid()
     }
     return {
       currentSettings,
+      defaultTopic,
       defaultVariable: {
         name: 'name',
+        type: VARIABLE_TYPE_CUSTOM,
+        topic: defaultTopic,
         values: []
-      }
+      },
+      VARIABLE_TYPE_CUSTOM,
+      VARIABLE_TYPE_SOURCE,
+      variableTypeOptions: [
+        { label: 'Custom', value: VARIABLE_TYPE_CUSTOM },
+        { label: 'Source', value: VARIABLE_TYPE_SOURCE }
+      ]
     }
   },
   computed: {
@@ -109,7 +139,7 @@ export default {
         !vars.length ||
         (
           vars.length && vars.reduce((res, variable, index) => {
-            return res && this.checkUniqueVariables(index) && variable.values.length
+            return res && ((!variable.type && this.checkUniqueVariables(index) && variable.values.length) || (variable.type && variable.topic.topicFilter))
           }, true)
         )
       )
@@ -137,6 +167,15 @@ export default {
     removeVar (index) {
       this.$delete(this.currentSettings.settings.variables, index)
     },
+    changeTypeVariableHandler (index, type) {
+      let variable = this.currentSettings.settings.variables[index]
+      if (type === VARIABLE_TYPE_CUSTOM) {
+        variable.topic = Object.assign({}, this.defaultTopic)
+      } else {
+        variable.values = []
+      }
+      this.$set(variable, 'type', type)
+    },
     checkUniqueVariables (index) {
       let variable = this.currentSettings.settings.variables[index],
         sameVarIndexes = this.currentSettings.settings.variables.reduce((res, currVar, index) => {
@@ -156,6 +195,7 @@ export default {
       let movedItem = this.currentSettings.settings.variables.splice(itemIndex, 1)[0]
       this.currentSettings.settings.variables.splice(itemIndex + 1, 0, movedItem)
     }
-  }
+  },
+  components: { Topic }
 }
 </script>

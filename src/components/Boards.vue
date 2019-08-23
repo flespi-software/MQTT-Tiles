@@ -149,6 +149,7 @@
       :boards="boards"
       @add="addBoardHandler"
       @edit="editBoardHandler"
+      @hide="hideModalHandler"
     />
   </div>
 </template>
@@ -233,6 +234,9 @@ export default {
     },
     addBoardHandler (boardModel) {
       this.$emit('add', boardModel)
+    },
+    hideModalHandler () {
+      this.editedBoardModel = null
     },
     modifyWidgetByVariables (widget, board) {
       let modifyTopics = (topic) => {
