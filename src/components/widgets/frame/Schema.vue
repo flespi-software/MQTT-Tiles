@@ -134,9 +134,13 @@ export default {
         sameTopicsIndexes.indexOf(itemIndex) === 0
     },
     validate () {
-      return this.currentSettings.items.length && this.currentSettings.items.reduce((res, _, index) => {
-        return res && this.checkUniqueTopic(index)
-      }, true)
+      return (
+        this.currentSettings.mode === IFRAME_MODE_INTEGRATION && this.currentSettings.items.length && this.currentSettings.items.reduce((res, _, index) => {
+          return res && this.checkUniqueTopic(index)
+        }, true)
+      ) || (
+        this.currentSettings.mode === IFRAME_MODE_SHOW
+      )
     }
   },
   created () {
