@@ -27,7 +27,7 @@
       </transition>
     </q-item>
     <q-card-media class="widget__content q-pa-sm" :class="[`bg-${item.color}-1`]" style="height: calc(100% - 22px);">
-      <div ref="itemsTop" class="items__top flex q-px-md q-py-xs fixed scroll" style="top: 38px; left: 8px; right: 8px; background-color: rgba(255,255,255,0.5); max-height: 33%" v-if="topItems.length">
+      <div ref="itemsTop" class="items__top flex q-px-md q-py-xs absolute scroll" style="top: 0px; left: 8px; right: 8px; background-color: rgba(255,255,255,0.5); max-height: 33%" v-if="topItems.length">
         <component
           v-for="(renderItem, layoutIndex) in topItems"
           :key="`top${layoutIndex}${renderItem.index}`"
@@ -38,7 +38,7 @@
         />
       </div>
       <div class="scroll row" :style="{ marginTop: `${mainMarginTop}px`, marginBottom: `${mainMarginBottom}px`, maxHeight: `calc(100% - ${mainMarginTop + mainMarginBottom}px)` }">
-        <div class="items__left flex q-pa-sm" v-if="leftItems.length" :class="{'col-6': leftItems.length && rightItems.length, 'col-12': !rightItems.length, 'justify-center': !rightItems.length}">
+        <div class="items__left flex q-pa-sm" v-if="leftItems.length" :class="{'col-6': leftItems.length && rightItems.length, 'col-12': !rightItems.length, 'justify-center': !rightItems.length}" style="overflow: hidden;">
           <component
             v-for="(renderItem, layoutIndex) in leftItems"
             :key="`left${layoutIndex}${renderItem.index}`"
@@ -59,7 +59,7 @@
           />
         </div>
       </div>
-      <div ref="itemsBottom" class="items__bottom flex q-px-md q-py-xs fixed scroll" style="bottom: 18px; left: 8px; right: 8px; background-color: rgba(255,255,255,0.5); max-height: 33%" v-if="bottomItems.length">
+      <div ref="itemsBottom" class="items__bottom flex q-px-md q-py-xs absolute scroll" style="bottom: 0px; left: 8px; right: 8px; background-color: rgba(255,255,255,0.5); max-height: 33%" v-if="bottomItems.length">
         <component
           v-for="(renderItem, layoutIndex) in bottomItems"
           :key="`bottom${layoutIndex}${renderItem.index}`"

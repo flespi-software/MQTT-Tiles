@@ -559,7 +559,7 @@ export default {
       if (newBoard.id) { this.bufferVarsValues[newBoard.id] = {} }
       oldTopics.forEach((oldTopic, oldIndex) => {
         if (newTopics.includes(oldTopic)) { return false }
-        if (!this.widgetsBySubscription[oldTopic].length && !this.hasBoardsVariableWithSameSubscription(oldBoard.id, oldTopic)) {
+        if (!(this.widgetsBySubscription[oldTopic] && this.widgetsBySubscription[oldTopic].length) && !this.hasBoardsVariableWithSameSubscription(oldBoard.id, oldTopic)) {
           this.unsubscribe(oldTopic)
         }
       })

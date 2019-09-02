@@ -30,7 +30,7 @@
       <div style="width: 100%; height: 100%;">
         <div class="frame__payload" style="height: 100%">
           <q-resize-observable @resize="onResize" />
-          <iframe v-if="link !== null" :src="link" frameborder="0" :height="height" :width="width" autoplay ref="frame"></iframe>
+          <iframe v-if="link !== null" :src="link" frameborder="0" :height="height" :width="width" autoplay ref="frame" allowfullscreen></iframe>
           <div v-else style="height: 95%;" class="bg-grey-5 text-grey-8 relative-position q-pt-xs">
             <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
               <q-icon name="mdi-block-helper" :size="`${height / 2}px`"/>
