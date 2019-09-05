@@ -70,7 +70,7 @@ export default {
   },
   methods: {
     setRoute (route) {
-      this.$refs.map && this.$refs.map.contentWindow.postMessage(`MapView|cmd:{"addgroutes": ${JSON.stringify(route)}, "clear": "all"}`, '*')
+      this.$refs.map && this.$refs.map.contentWindow.postMessage(`MapView|cmd:{"addgroutes": ${JSON.stringify(route)}, "clear": "all", "fullscreencontrol": true}`, '*')
     },
     getRoute () {
       let routeTopic = this.item.settings.topics[0],

@@ -361,6 +361,8 @@ export default {
           this.expireMessagesProcessing()
         }
         this.expireMessagesStore[packet.topic] = Date.now() + Math.floor(packet.properties.messageExpiryInterval * 1000)
+      } else if (this.expireMessagesStore[packet.topic]) {
+        this.$delete(this.expireMessagesStore, packet.topic)
       }
     },
     expireMessagesProcessing () {

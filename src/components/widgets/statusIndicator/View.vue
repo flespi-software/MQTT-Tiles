@@ -108,7 +108,11 @@ export default {
         if (value === null) {
           return null
         } else {
-          return `${this.mathProcessing(this.getValueByTopic(value, this.item.dataTopics[0]), this.item.settings.math)}`
+          if (this.item.settings.resetTimeout && Date.now() > this.time + this.item.settings.resetTimeout * 1000) {
+            return null
+          } else {
+            return `${this.mathProcessing(this.getValueByTopic(value, this.item.dataTopics[0]), this.item.settings.math)}`
+          }
         }
       },
       set (val) {

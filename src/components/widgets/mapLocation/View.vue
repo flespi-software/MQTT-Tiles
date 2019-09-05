@@ -28,9 +28,9 @@
     </q-item>
     <q-card-media class="widget__content scroll" :class="[`bg-${item.color}-1`]" style="height: calc(100% - 29px);">
       <div style="width: 100%; height: 100%;">
-        <iframe style="width: 100%;height: calc(100% - 8px);" src="https://flespi.io/mapview" frameborder="0" ref="map" allowfullscreen></iframe>
+        <iframe style="width: 100%;height: calc(100% - 18px);" src="https://flespi.io/mapview" frameborder="0" ref="map" allowfullscreen></iframe>
       </div>
-      <div class="absolute-top-right q-pa-xs" :class="[`text-${item.color}-7`, `bg-${item.color}-1`]" style="font-size: .8rem; border-bottom-left-radius: 4px;">{{position}}</div>
+      <div class="absolute-top-left q-pa-xs" :class="[`text-${item.color}-7`, `bg-${item.color}-1`]" style="font-size: .8rem; border-bottom-left-radius: 4px;">{{position}}</div>
       <div v-if="item.settings.isNeedTime" class="absolute-bottom-left q-px-xs q-pt-xs" style="font-size: 12px; border-top-right-radius: 5px;" :class="[`text-${item.color}-7`, `bg-${item.color}-1`]">
         {{timestamp}}
       </div>
@@ -81,7 +81,7 @@ export default {
   methods: {
     setPosition (position) {
       if (position[0] && position[1]) {
-        this.$refs.map && this.$refs.map.contentWindow.postMessage(`MapView|cmd:{"addmarkers": ${JSON.stringify([position])}, "clear": "all"}`, '*')
+        this.$refs.map && this.$refs.map.contentWindow.postMessage(`MapView|cmd:{"addmarkers": ${JSON.stringify([position])}, "clear": "all", "fullscreencontrol": true}`, '*')
       }
     }
   },

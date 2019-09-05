@@ -70,6 +70,7 @@
           </q-collapsible>
         </q-list>
       </div>
+      <q-input class="col-12" color="dark"  v-model="currentSettings.resetTimeout" type="number" float-label="Reset timeout, s"/>
       <div class="q-mt-sm col-12">
         <q-toggle color="dark" v-model="currentSettings.isNeedTime" label="Show last update time"/>
       </div>
@@ -109,6 +110,7 @@ export default {
       mode: DEFAULT_MODE,
       math: '',
       defaultIcon: 'circle',
+      resetTimeout: 0,
       height: 2,
       width: 1,
       maxTopicsLength: 1,
