@@ -409,9 +409,11 @@ export default {
     },
     setActiveBoard (boardId) {
       this.activeBoardId = boardId
+      this.$emit('change:title', `${this.boards[this.activeBoardId].name} - MQTT Tiles`)
     },
     clearActiveBoard () {
       this.activeBoardId = undefined
+      this.$emit('change:title', `MQTT Tiles`)
     },
     actionHandler ({topic, payload, settings}) {
       if (!settings.qos) {
@@ -1019,6 +1021,7 @@ export default {
         }
       })
     }
+    this.$emit('change:title', `MQTT Tiles`)
   },
   destroyed () {
     if (this.client) {

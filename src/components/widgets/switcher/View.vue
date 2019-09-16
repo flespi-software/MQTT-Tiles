@@ -129,7 +129,7 @@ export default {
       }
     },
     isActiveWidget () {
-      return this.actionTopic && ((this.item.settings.math && this.item.settings.mode === COMMAND_MODE) || (!this.item.settings.math && this.item.settings.mode === DEFAULT_MODE))
+      return this.actionTopic && ((this.item.settings.mode === COMMAND_MODE) || (!this.item.settings.math && this.item.settings.mode === DEFAULT_MODE))
     }
   },
   methods: {

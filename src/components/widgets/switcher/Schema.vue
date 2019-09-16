@@ -8,7 +8,6 @@
       <q-input class="col-12" v-if="currentSettings.mode === 0 && widget.topics.length > 1" color="dark" v-model="currentSettings.actionTopic" float-label="Action topic"/>
       <div class="col-6 q-pr-sm">
         <q-input color="dark" v-model="currentSettings.trueValue" float-label="True value"/>
-        <q-input color="dark" v-model="currentSettings.trueValueMath" float-label="True value math"/>
         <q-input class="q-mr-xs icon-input" color="dark" v-model="currentSettings.trueIcon" float-label="True value icon">
           <q-icon :name="`mdi-${currentSettings.trueIcon || 'toggle-switch-outline'}`" size="1.5rem" style="position: absolute; right: 0; bottom : 7px;"/>
         </q-input>
@@ -20,7 +19,6 @@
       </div>
       <div class="col-6 q-pl-sm">
         <q-input color="dark" v-model="currentSettings.falseValue" float-label="False value"/>
-        <q-input color="dark" v-model="currentSettings.falseValueMath" float-label="False value math"/>
         <q-input class="q-mr-xs icon-input" color="dark" v-model="currentSettings.falseIcon" float-label="False value icon">
           <q-icon :name="`mdi-${currentSettings.falseIcon || 'toggle-switch-off-outline'}`" size="1.5rem" style="position: absolute; right: 0; bottom : 7px;"/>
         </q-input>

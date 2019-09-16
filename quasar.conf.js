@@ -98,7 +98,8 @@ module.exports = function (ctx) {
         'LocalStorage',
         'SessionStorage',
         'Dialog',
-        'Loading'
+        'Loading',
+        'Meta'
       ]
       // iconSet: ctx.theme.mat ? 'material-icons' : 'ionicons'
       // i18n: 'de' // Quasar language
