@@ -30,17 +30,39 @@
     </q-toolbar>
     <q-toolbar color="white" class="q-py-none" style="flex-wrap: wrap" v-if="board.settings.variables && board.settings.variables.length">
       <q-resize-observable @resize="onVariablesWrapperResize" />
-      <q-select
-        v-for="variable in board.settings.variables"
-        :key="variable.name"
-        :value="board.activeVariables[variable.name]"
-        @input="(value) => changeVaribleHandler(variable.name, value)"
-        :float-label="variable.name"
-        :options="getVariableValues(variable)"
-        color="dark"
-        class="q-py-none q-mr-sm variable-selector"
-        style="max-width: 150px;"
-      />
+      <div v-for="(variable, varIndex) in board.settings.variables" :key="variable.name" class="q-mr-sm">
+        <div class="text-grey-6" style="font-size: .8rem;">{{variable.name}}</div>
+        <q-item class="no-padding" style="min-height: 35px;">
+          <q-item-main>
+            <q-item-tile label class="ellipsis overflow-hidden text-dark" :style="{maxWidth: '140px'}">{{board.activeVariables[variable.name] || variable.name}}</q-item-tile>
+          </q-item-main>
+          <q-item-side style="min-width: 25px;">
+            <q-item-tile style="display: inline-block" stamp size="2rem" icon="mdi-menu-down" />
+          </q-item-side>
+          <q-popover fit ref="popoverActive">
+            <q-list link separator class="scroll q-py-none" v-if="$refs.popoverActive && $refs.popoverActive[varIndex].showing">
+              <VirtualList
+                :size="40"
+                :remain="variablesListValues[varIndex].length > 6 ? 6 : variablesListValues[varIndex].length"
+              >
+                <q-item
+                  v-for="(variableModel, index) in variablesListValues[varIndex]"
+                  :key="index"
+                  v-close-overlay
+                  @click.native="changeVaribleHandler(variable.name, variableModel.value), $refs.popoverActive[varIndex].hide()"
+                  class="cursor-pointer"
+                  :class="{'bg-grey-3': variableModel.value === board.activeVariables[variable.name]}"
+                  highlight
+                >
+                  <q-item-main>
+                    <q-item-tile label class="ellipsis overflow-hidden">{{variableModel.label}}</q-item-tile>
+                  </q-item-main>
+                </q-item>
+              </VirtualList>
+            </q-list>
+          </q-popover>
+        </q-item>
+      </div>
     </q-toolbar>
     <div class="widgets__wrapper scroll" :style="{height: wrapperHeight}" :class="{'q-px-sm': $q.platform.is.mobile}">
       <div style="width: 100%; position: relative;" v-if="board.widgetsIndexes.length">
@@ -120,6 +142,7 @@
 
 <script>
 import Vue from 'vue'
+import VirtualList from 'vue-virtual-scroll-list'
 import cloneDeep from 'lodash/cloneDeep'
 import uniq from 'lodash/uniq'
 import Settings from './widgets/Settings'
@@ -192,6 +215,15 @@ export default {
         subtrahend += 50
       }
       return `calc(100% - ${subtrahend}px)`
+    },
+    variablesListValues () {
+      return this.board.settings.variables.map(variable => {
+        if (!variable.type || variable.type === 0) {
+          return variable.values.map(value => ({label: value, value}))
+        } else if (variable.type === 1) {
+          return this.naturalSort(Object.values(this.variablesValues[variable.name] || {})).map(value => ({label: typeof value === 'string' ? value : JSON.stringify(value), value}))
+        }
+      })
     }
   },
   methods: {
@@ -291,13 +323,6 @@ export default {
       widget.topics = uniq(allTopics.map(topic => topic.topicFilter))
       return widget
     },
-    getVariableValues (variable) {
-      if (!variable.type || variable.type === 0) {
-        return variable.values.map(value => ({label: value, value}))
-      } else if (variable.type === 1) {
-        return this.naturalSort(Object.values(this.variablesValues[variable.name])).map(value => ({label: typeof value === 'string' ? value : JSON.stringify(value), value}))
-      }
-    },
     naturalSort (arr) {
       return arr.sort((a, b) => {
         a = typeof a === 'string' ? a.toLowerCase() : a
@@ -341,7 +366,8 @@ export default {
     MapRoute,
     TextSender,
     GridLayout: VueGridLayout.GridLayout,
-    GridItem: VueGridLayout.GridItem
+    GridItem: VueGridLayout.GridItem,
+    VirtualList
   }
 }
 </script>

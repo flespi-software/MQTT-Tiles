@@ -118,7 +118,7 @@
               <template v-if="board.shortcutsIndexes.length">
                 <div class="col-3 q-px-xs" v-for="(item, index) in [0, 1, 2, 3]" :key="index" style="margin-bottom: 2px;">
                   <component
-                    v-if="widgets[board.shortcutsIndexes[index]]"
+                    v-if="widgets[board.shortcutsIndexes[index]] && values[board.shortcutsIndexes[index]] !== undefined"
                     :is="widgets[board.shortcutsIndexes[index]].type"
                     :item="widgets[board.shortcutsIndexes[index]]"
                     :value="values[board.shortcutsIndexes[index]]"

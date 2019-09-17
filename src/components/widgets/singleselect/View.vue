@@ -104,7 +104,8 @@ export default {
       if (value === null) {
         return 'N/A'
       } else {
-        return this.item.settings.items.filter(item => item.val === this.currentValue)[0].label
+        let activeVal = this.item.settings.items.filter(item => item.val === this.currentValue)[0]
+        return activeVal ? activeVal.label : 'N/A'
       }
     },
     stringLength () {

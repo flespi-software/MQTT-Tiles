@@ -28,7 +28,8 @@
     </q-item>
     <q-card-media class="widget__content scroll" :class="[`bg-${item.color}-1`]" style="height: calc(100% - 22px);">
       <div style="width: 100%; position: relative;">
-        <div  v-for="(widget, widgetIndex) in widgets"
+        <div
+          v-for="(widget, widgetIndex) in renderedWidgets"
           :key="widgetIndex"
           style="display: inline-block; position: relative;"
           :style="{width: widgetsWidth, minHeight: item.settings.type === 'radial' || item.settings.type === 'linear' ? `${50 * item.settings.widgetSettings.height}px` : ''}"
@@ -43,6 +44,9 @@
             :blocked="true"
             @action="(data) => { $emit('action', data) }"
           />
+        </div>
+        <div class="flex flex-center" v-if="widgetsIds.length > limit">
+          <q-pagination v-model="batch" :max="Math.ceil(widgetsIds.length / limit)" :max-pages="item.settings.width" direction-links :color="item.color"/>
         </div>
       </div>
     </q-card-media>
@@ -66,10 +70,10 @@
 
 <script>
 import get from 'lodash/get'
+import uniq from 'lodash/uniq'
 import cloneDeep from 'lodash/cloneDeep'
 import { WIDGET_STATUS_DISABLED } from '../../../constants'
 import getValueByTopic from '../../../mixins/getValueByTopic.js'
-import VueGridLayout from 'vue-grid-layout'
 import Switcher from '../switcher/View'
 import Informer from '../informer/View'
 import Radial from '../radial/View'
@@ -83,7 +87,8 @@ export default {
     return {
       WIDGET_STATUS_DISABLED,
       widgets: {},
-      layout: []
+      batch: 1,
+      limit: 100
     }
   },
   computed: {
@@ -92,6 +97,19 @@ export default {
       let pathByGroup = topic.split('/').slice(0, this.item.settings.groupLayout + 1)
       let topicByGroup = pathByGroup.join('/')
       return topicByGroup
+    },
+    renderedWidgets () {
+      let min = (this.batch - 1) * this.limit,
+        max = this.batch * this.limit
+      return this.widgetsIds.reduce((widgets, widgetId, widgetIndex) => {
+        if (widgetIndex >= min && widgetIndex < max) {
+          widgets[widgetId] = this.widgets[widgetId]
+        }
+        return widgets
+      }, {})
+    },
+    widgetsIds () {
+      return Object.keys(this.widgets)
     },
     currentValue () {
       if (!this.value) { return {} }
@@ -171,15 +189,29 @@ export default {
       let value = this.currentValue
       if (!value) { return false }
       this.widgets = {}
-      this.layout = []
       Object.keys(value).forEach(name => {
         if (!this.widgets[name]) {
           this.initWidget(name)
-          this.initWidgetInLayout(name)
         }
       })
     },
-    initWidget (name) {
+    processingMultiplier () {
+      let value = this.currentValue,
+        widgets = this.widgets,
+        valueKeys = Object.keys(value),
+        widgetsKeys = Object.keys(widgets),
+        allKeys = uniq([...valueKeys, ...widgetsKeys])
+      allKeys.forEach((name, keyIndex) => {
+        if (value[name] && !widgets[name]) {
+          // add
+          this.initWidget(name)
+        } else if (!value[name] && widgets[name]) {
+          // remove
+          this.$delete(widgets, name)
+        }
+      })
+    },
+    getWidgetByName (name) {
       let topics = [this.item.dataTopics[0].topicFilter]
       if (this.item.settings.widgetSettings.topics) {
         topics = [this.item.dataTopics[0].topicFilter, ...this.item.settings.widgetSettings.topics.map(topic => topic.topicFilter)]
@@ -194,46 +226,23 @@ export default {
         settings: cloneDeep(this.item.settings.widgetSettings),
         status: WIDGET_STATUS_DISABLED
       }
-      this.$set(this.widgets, name, widget)
+      return widget
     },
-    initWidgetInLayout (name) {
-      let colNum = this.item.settings.width,
-        layout = this.layout,
-        {x, y} = freeSpace(),
-        width = this.item.settings.widgetSettings.width,
-        height = this.item.settings.widgetSettings.height
-      function freeSpace () {
-        let max = layout.reduce((max, widget) => {
-          if ((max.y === widget.y && max.x <= widget.x) || max.y < widget.y) {
-            max = widget
-          }
-          return max
-        }, {y: 0, x: 0, h: 0, w: 0})
-        if (max.x + max.w + width <= colNum) {
-          // todo check if w > colNum => w = col.num
-          return { x: max.x + max.w, y: max.y }
-        } else {
-          return { x: 0, y: max.y + 1 }
-        }
-      }
-      layout.push({
-        h: height,
-        w: width,
-        i: name,
-        x,
-        y
-      })
+    initWidget (name) {
+      this.$set(this.widgets, name, this.getWidgetByName(name))
     }
+  },
+  created () {
+    this.initMultiplier()
   },
   watch: {
     value: {
       deep: true,
-      immediate: true,
       handler (value) {
-        this.initMultiplier()
+        this.processingMultiplier()
       }
     },
-    item: {
+    'item.dataTopics': {
       deep: true,
       handler () {
         this.initMultiplier()
@@ -247,9 +256,7 @@ export default {
     Radial,
     Linear,
     Singleselect,
-    Complex,
-    GridLayout: VueGridLayout.GridLayout,
-    GridItem: VueGridLayout.GridItem
+    Complex
   }
 }
 </script>

@@ -1,11 +1,12 @@
 import setWith from 'lodash/setWith'
 import get from 'lodash/get'
+import cloneDeep from 'lodash/cloneDeep'
 import Vue from 'vue'
-export default function getMultiplierValue (packet, initValue, subscriptionTopic, widget) {
-  if (!packet || subscriptionTopic !== widget.dataTopics[0].topicFilter) { return packet }
+
+function getMultiplierValueByPacket (packet, initValue, subscriptionTopic, widget) {
   let path = subscriptionTopic.split('/')
   let currentPath = packet.topic.split('/')
-  let value = initValue || {}
+  let value = initValue
   let setPath = []
   path.forEach((pathItem, index) => {
     setPath.push(currentPath[index])
@@ -32,5 +33,13 @@ export default function getMultiplierValue (packet, initValue, subscriptionTopic
       value = null
     }
   }
+  return value
+}
+export default function getMultiplierValue (packets, initValue, subscriptionTopic, widget) {
+  if (!packets || subscriptionTopic !== widget.dataTopics[0].topicFilter) { return packets }
+  let value = initValue ? cloneDeep(initValue) : {}
+  packets.forEach((packet) => {
+    value = getMultiplierValueByPacket(packet, value, subscriptionTopic, widget)
+  })
   return value
 }

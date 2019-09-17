@@ -95,7 +95,6 @@ import remove from 'lodash/remove'
 import difference from 'lodash/difference'
 import uniq from 'lodash/uniq'
 import get from 'lodash/get'
-import Vue from 'vue'
 import { Base64 } from 'js-base64'
 import Board from './Board'
 import Boards from './Boards'
@@ -149,48 +148,27 @@ export default {
       boards: {},
       widgets: {},
       subscriptions: {},
+      subscriptionsStatuses: {},
       widgetsBySubscription: {},
       activeBoardId: undefined,
       colsByBreakpoint: { lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 },
       boardsFromConnection: {},
       exportBoardId: '',
-      bufferValues: {},
       expireMessagesProcess: 0,
       expireMessagesStore: {},
       importExportMode: undefined,
       importExportData: undefined,
-      bufferVarsValues: {}
+      values: {},
+      boardsVariablesValues: {}
     }
   },
   computed: {
-    values () {
-      let values = Object.keys(this.widgets).reduce((values, widgetId) => {
-        let value = values[widgetId] = {},
-          widget = this.widgets[widgetId]
-        widget.topics.forEach(topic => {
-          value[topic] = messagesProcessing(widget.type)(this.subscriptions[topic], get(this.bufferValues, `${widgetId}.${topic}`, undefined), topic, widget)
-        })
-        return values
-      }, {})
-      this.setBufferValues(values)
-      return values
+    title () {
+      let title = `${this.activeBoardId ? `${this.boards[this.activeBoardId].name} - ` : ''}MQTT Tiles`
+      this.$emit('change:title', `${this.activeBoardId ? `${this.boards[this.activeBoardId].name} - ` : ''}MQTT Tiles`)
+      return title
     },
     boardsIds () { return Object.keys(this.boards) },
-    boardsVariablesValues () {
-      let values = this.boardsIds.reduce((values, boardId) => {
-        let board = this.boards[boardId],
-          sourceVariables = (board.settings.variables && board.settings.variables.filter(variable => variable.type === 1)) || []
-        if (!values[boardId]) { values[boardId] = {} }
-        sourceVariables.forEach((variable, varIndex) => {
-          let topic = variable.topic.topicFilter
-          let parsedValue = this.getValueByTopic(this.subscriptions[topic] && this.subscriptions[topic].payload, variable.topic)
-          values[boardId][variable.name] = this.getBufferVariableValue(boardId, variable, parsedValue)
-        })
-        return values
-      }, {})
-      this.setBufferVariablesValues(values)
-      return values
-    },
     subscriptionsTopics () { return Object.keys(this.subscriptions) },
     canShare () {
       return !!this.clientSettings && this.clientSettings.host.indexOf('flespi') !== -1 &&
@@ -206,16 +184,71 @@ export default {
   },
   methods: {
     uid,
-    setBufferValues (values) {
-      this.bufferValues = values
+    valuesProcessing () {
+      let values = this.values
+      Object.keys(this.widgets).forEach((widgetId) => {
+        if (!this.values[widgetId]) { this.$set(this.values, widgetId, {}) }
+        let value = values[widgetId],
+          widget = this.widgets[widgetId],
+          isWidgetValueChanged = false
+        let widgetValue = widget.topics.reduce((widgetValue, topic) => {
+          let messages = this.subscriptionsStatuses[topic] && this.subscriptions[topic]
+          let hasValue = !!value[topic]
+          if (!hasValue) {
+            widgetValue[topic] = {}
+          }
+          if (hasValue && messages && messages.length === 1) { messages = [] } // not processing last state
+          let messagesValue = messagesProcessing(widget.type)(messages, get(this.values, `${widgetId}.${topic}`, undefined), topic, widget)
+          if (value[topic] !== messagesValue) { isWidgetValueChanged = true }
+          widgetValue[topic] = messagesValue
+          return widgetValue
+        }, {})
+        isWidgetValueChanged && this.$set(this.values, widgetId, widgetValue)
+      })
     },
-    getBufferVariableValue (boardId, variable, parsedValue) {
-      if (!this.bufferVarsValues[boardId]) { this.bufferVarsValues[boardId] = {} }
-      if (!this.bufferVarsValues[boardId][variable.name]) { this.bufferVarsValues[boardId][variable.name] = {} }
-      let varValue = this.bufferVarsValues[boardId][variable.name] || {}
+    boardsVariablesValuesProcessing () {
+      let values = this.boardsVariablesValues
+      this.boardsIds.forEach((boardId) => {
+        let board = this.boards[boardId],
+          sourceVariables = (board.settings.variables && board.settings.variables.filter(variable => variable.type === 1)) || []
+        if (!values[boardId]) { this.$set(values, boardId, {}) }
+        values[boardId] = sourceVariables.reduce((boardVarValues, variable, varIndex) => {
+          let topic = variable.topic.topicFilter
+          let packets = this.subscriptionsStatuses[topic] && this.subscriptions[topic] ? this.subscriptions[topic] : []
+          if (!boardVarValues[variable.name]) { boardVarValues[variable.name] = {} }
+          packets.forEach(packet => {
+            let topic = variable.topic.topicFilter
+            if (!this.subscriptions[topic]) { return false }
+            let parsedValue = this.getValueByTopic(packet.payload, variable.topic)
+            let subTopic = packet.topic
+            if (!parsedValue || parsedValue === 'N/A') {
+              boardVarValues[variable.name][subTopic] && delete boardVarValues[variable.name][subTopic]
+            } else {
+              boardVarValues[variable.name][subTopic] = parsedValue
+            }
+          })
+          return boardVarValues
+        }, Object.assign({}, values[boardId]))
+      })
+    },
+    busMessagesProcessing () {
+      this.valuesProcessing()
+      this.boardsVariablesValuesProcessing()
+      this.clearMessages()
+    },
+    clearMessages () {
+      this.subscriptionsTopics.forEach(topic => {
+        if (Array.isArray(this.subscriptions[topic])) {
+          this.subscriptions[topic].splice(0, this.subscriptions[topic].length - 1) // last message stay in array for storing last state
+        }
+      })
+    },
+    getVariableValue (boardId, variable, packet) {
+      let varValue = {}
       let topic = variable.topic.topicFilter
       if (!this.subscriptions[topic]) { return varValue }
-      let subTopic = this.subscriptions[topic].topic
+      let parsedValue = this.getValueByTopic(packet.payload, variable.topic)
+      let subTopic = packet.topic
       if (!parsedValue || parsedValue === 'N/A') {
         varValue[subTopic] && this.$delete(varValue, subTopic)
       } else {
@@ -223,8 +256,15 @@ export default {
       }
       return varValue
     },
-    setBufferVariablesValues (values) {
-      this.bufferVarsValues = values
+    boardsVariablesValuesClear () {
+      this.boardsIds.forEach((boardId) => {
+        let board = this.boards[boardId],
+          sourceVariables = (board.settings.variables && board.settings.variables.filter(variable => variable.type === 1)) || []
+        this.boardsVariablesValues[boardId] = {}
+        sourceVariables.forEach((variable, varIndex) => {
+          this.boardsVariablesValues[boardId][variable.name] = {}
+        })
+      })
     },
     checkTopic (topic, mask) {
       if (topic === mask) { return true }
@@ -317,6 +357,7 @@ export default {
         }
         this.setValueByTopic(topic, {...packet, timestamp: Date.now()})
         this.expireMessagesHandler(packet)
+        this.debouncedBusMessagesProcessing()
       })
 
       client.on('connect', (connack) => {
@@ -345,13 +386,17 @@ export default {
     setValueByTopic (topic, value) {
       /* init value in store */
       if (value === null) {
-        Vue.set(this.subscriptions, topic, value)
+        this.$set(this.subscriptions, topic, value)
         return true
       }
       /* write value */
       this.subscriptionsTopics.forEach((subTopic) => {
         if (this.checkTopic(topic, subTopic)) {
-          Vue.set(this.subscriptions, subTopic, value)
+          if (!Array.isArray(this.subscriptions[subTopic])) {
+            this.$set(this.subscriptions, subTopic, [value])
+          } else {
+            this.subscriptions[subTopic].push(value)
+          }
         }
       })
     },
@@ -373,7 +418,7 @@ export default {
           if (timestamp < currentTimestamp) {
             this.subscriptionsTopics.forEach((subTopic) => {
               if (this.checkTopic(topic, subTopic)) {
-                Vue.set(this.subscriptions[subTopic], 'payload', bl().slice(0, -1))
+                this.subscriptions[subTopic].push({ payload: bl().slice(0, -1) })
               }
             })
             this.$delete(this.expireMessagesStore, timestamp)
@@ -389,12 +434,33 @@ export default {
     async subscribe () {
       if (this.client) {
         return this.client.subscribe(...arguments)
+          .then(() => {
+            let topics = arguments[0]
+            if (Array.isArray(topics)) {
+              topics.forEach((topic) => {
+                this.subscriptionsStatuses[topic] = true
+              })
+            } else {
+              this.subscriptionsStatuses[topics] = true
+            }
+            return arguments
+          })
           .catch(err => { this.errorHandler(err) })
       }
     },
     async unsubscribe (topic) {
       if (this.client) {
         return this.client.unsubscribe(...arguments)
+          .then(() => {
+            let topics = arguments[0]
+            if (Array.isArray(topics)) {
+              topics.forEach((topic) => {
+                delete this.subscriptionsStatuses[topic]
+              })
+            } else {
+              delete this.subscriptionsStatuses[topics]
+            }
+          })
           .catch(err => { this.errorHandler(err) })
       }
     },
@@ -406,6 +472,7 @@ export default {
     },
     async destroyClient () {
       await this.client.end(true)
+      this.subscriptionsStatuses = {}
     },
     setActiveBoard (boardId) {
       this.activeBoardId = boardId
@@ -422,7 +489,7 @@ export default {
       this.publish(topic, payload, settings)
     },
     addBoard (board) {
-      Vue.set(this.boards, board.id, board)
+      this.$set(this.boards, board.id, board)
       this.resolveBoardVariables(board)
       this.setModifyTimeBoardHandler(board.id)
     },
@@ -437,15 +504,15 @@ export default {
           if (!widgetsIndexesBySubscription.length) {
             if (!this.hasBoardsVariableWithSameSubscription(boardId, topic)) {
               this.unsubscribe(topic)
-              Vue.delete(this.subscriptions, topic)
+              this.$delete(this.subscriptions, topic)
             }
-            Vue.delete(this.widgetsBySubscription, topic)
+            this.$delete(this.widgetsBySubscription, topic)
           }
         })
-        Vue.delete(this.widgets, widgetIndex)
+        this.$delete(this.widgets, widgetIndex)
       })
 
-      Vue.delete(this.boards, boardId)
+      this.$delete(this.boards, boardId)
     },
     deleteBoardDialogHandler (boardId) {
       this.$q.dialog({
@@ -483,26 +550,26 @@ export default {
     },
     replaceBoardHandler (boardId) {
       let board = this.boards[boardId]
-      Vue.set(this.boards, board.id, board)
+      this.$set(this.boards, board.id, board)
       if (this.activeBoardId === boardId) {
         this.clearActiveBoard()
         this.$nextTick(() => { this.setActiveBoard(board.id) })
       }
-      Vue.delete(this.boards, boardId)
+      this.$delete(this.boards, boardId)
       /* update widgets ids */
       board.widgetsIndexes.forEach((widgetId, index) => {
         let newId = uid()
-        Vue.set(this.widgets, newId, this.widgets[widgetId])
-        Vue.set(board.widgetsIndexes, index, newId)
-        Vue.set(this.widgets[newId], 'id', newId)
-        Vue.delete(this.widgets, widgetId)
+        this.$set(this.widgets, newId, this.widgets[widgetId])
+        this.$set(board.widgetsIndexes, index, newId)
+        this.$set(this.widgets[newId], 'id', newId)
+        this.$delete(this.widgets, widgetId)
         let shortcutIndex = board.shortcutsIndexes.indexOf(widgetId)
         if (shortcutIndex !== -1) {
-          Vue.set(board.shortcutsIndexes, shortcutIndex, newId)
+          this.$set(board.shortcutsIndexes, shortcutIndex, newId)
         }
         this.widgets[newId].topics.forEach((topic, index) => {
           let widgetsBySubscription = this.widgetsBySubscription[topic]
-          Vue.set(widgetsBySubscription, widgetsBySubscription.indexOf(widgetId), newId)
+          this.$set(widgetsBySubscription, widgetsBySubscription.indexOf(widgetId), newId)
         })
         Object.keys(board.layouts).forEach(layoutName => {
           board.layouts[layoutName][index].i = newId
@@ -511,7 +578,7 @@ export default {
     },
     blockBoardHandler () {
       let board = this.boards[this.activeBoardId]
-      Vue.set(board.settings, 'blocked', !board.settings.blocked)
+      this.$set(board.settings, 'blocked', !board.settings.blocked)
     },
     initBoard (board) {
       board = cloneDeep(board)
@@ -524,7 +591,7 @@ export default {
         return widgets
       })
       board.widgetsIndexes = indexes
-      Vue.set(this.boards, board.id, board)
+      this.$set(this.boards, board.id, board)
       this.resolveBoardVariables(board)
       Object.keys(widgets).forEach(widgetId => {
         this.addWidget(widgets[widgetId])
@@ -559,8 +626,8 @@ export default {
       let newVariables = (newBoard.settings.variables && newBoard.settings.variables.filter(variable => variable.type === 1)) || []
       let oldTopics = oldVariables.map(variable => variable.topic.topicFilter)
       let newTopics = newVariables.map(variable => variable.topic.topicFilter)
-      if (oldBoard.id) { this.bufferVarsValues[oldBoard.id] = undefined }
-      if (newBoard.id) { this.bufferVarsValues[newBoard.id] = {} }
+      if (oldBoard.id) { this.boardsVariablesValues[oldBoard.id] = undefined }
+      if (newBoard.id) { this.boardsVariablesValues[newBoard.id] = {} }
       oldTopics.forEach((oldTopic, oldIndex) => {
         if (newTopics.includes(oldTopic)) { return false }
         if (!(this.widgetsBySubscription[oldTopic] && this.widgetsBySubscription[oldTopic].length) && !this.hasBoardsVariableWithSameSubscription(oldBoard.id, oldTopic)) {
@@ -607,7 +674,7 @@ export default {
     initWidgets () {
       let widgetsIndexes = Object.keys(this.widgets)
       widgetsIndexes.forEach(widgetIndex => {
-        Vue.set(this.widgets[widgetIndex], 'status', WIDGET_STATUS_ENABLED)
+        this.$set(this.widgets[widgetIndex], 'status', WIDGET_STATUS_ENABLED)
       })
       let topics = Object.keys(this.subscriptions)
       if (topics.length) {
@@ -618,6 +685,7 @@ export default {
           settings.properties.userProperties = userProperties
         }
         this.subscribe(topics, settings)
+          .then((topics) => { this.clientInited = true })
       }
     },
     widgetLayoutSetup (width, height, id, breakpoint) {
@@ -653,13 +721,13 @@ export default {
       })
     },
     layoutUpdateHandler ({layout, breakpoint}) {
-      Vue.set(this.boards[this.activeBoardId].layouts, breakpoint, layout)
+      this.$set(this.boards[this.activeBoardId].layouts, breakpoint, layout)
     },
     deleteWidgetFromLayout (widgetIndex) {
       let board = this.boards[this.activeBoardId],
         layouts = board.layouts
       Object.keys(this.colsByBreakpoint).forEach(breakpoint => {
-        Vue.delete(layouts[breakpoint], widgetIndex)
+        this.$delete(layouts[breakpoint], widgetIndex)
       })
     },
     addWidget (widget) {
@@ -692,7 +760,7 @@ export default {
       if (this.clientStatus) {
         widget.status = WIDGET_STATUS_ENABLED
       }
-      Vue.set(this.widgets, widget.id, widget)
+      this.$set(this.widgets, widget.id, widget)
     },
     editWidget ({widgetId, settings, topics}) {
       if (difference(settings.topics, topics).length || difference(topics, settings.topics).length) {
@@ -702,9 +770,9 @@ export default {
           if (!this.widgetsBySubscription[oldTopic].length) {
             if (!this.hasBoardsVariableWithSameSubscription(undefined, oldTopic)) {
               this.unsubscribe(oldTopic)
-              Vue.delete(this.subscriptions, oldTopic)
+              this.$delete(this.subscriptions, oldTopic)
             }
-            Vue.delete(this.widgetsBySubscription, oldTopic)
+            this.$delete(this.widgetsBySubscription, oldTopic)
           }
         })
         settings.topics.forEach(topic => {
@@ -730,7 +798,7 @@ export default {
           this.widgetsBySubscription[topic].push(widgetId)
         })
       }
-      Vue.set(this.widgets, widgetId, settings)
+      this.$set(this.widgets, widgetId, settings)
     },
     deleteWidget ({widgetId, settings}) {
       this.$q.dialog({
@@ -744,7 +812,7 @@ export default {
         /* remove from board link index */
         let widgetsIndexes = this.boards[this.activeBoardId].widgetsIndexes,
           widgetIndex = widgetsIndexes.indexOf(widgetId)
-        Vue.delete(widgetsIndexes, widgetIndex)
+        this.$delete(widgetsIndexes, widgetIndex)
         this.deleteWidgetFromLayout(widgetIndex)
 
         settings.topics.forEach(topic => {
@@ -753,12 +821,12 @@ export default {
           if (!widgetsBySubscription.length) {
             if (!this.hasBoardsVariableWithSameSubscription(undefined, topic)) {
               this.unsubscribe(topic)
-              Vue.delete(this.subscriptions, topic)
+              this.$delete(this.subscriptions, topic)
             }
-            Vue.delete(this.widgetsBySubscription, topic)
+            this.$delete(this.widgetsBySubscription, topic)
           }
         })
-        Vue.delete(this.widgets, widgetId)
+        this.$delete(this.widgets, widgetId)
       })
         .catch(() => {})
     },
@@ -766,7 +834,7 @@ export default {
       let shortcutsIndexes = this.boards[this.activeBoardId].shortcutsIndexes,
         index = shortcutsIndexes.indexOf(widgetId)
       if (index !== -1) {
-        Vue.delete(shortcutsIndexes, index)
+        this.$delete(shortcutsIndexes, index)
       } else {
         if (shortcutsIndexes.length === 4) {
           this.$q.notify({
@@ -786,14 +854,14 @@ export default {
           index = shortcutsIndexes.indexOf(widgetId)
 
         if (index !== -1) {
-          Vue.delete(shortcutsIndexes, index)
+          this.$delete(shortcutsIndexes, index)
         }
       })
     },
     resizeHandler ({index, height, width}) {
       let widget = this.widgets[index]
-      Vue.set(widget.settings, 'height', height)
-      Vue.set(widget.settings, 'width', width)
+      this.$set(widget.settings, 'height', height)
+      this.$set(widget.settings, 'width', width)
       /* modify all layouts */
       let board = this.boards[this.activeBoardId]
       let layouts = board.layouts
@@ -810,12 +878,12 @@ export default {
     },
     savedBoardProcess (id, board) {
       if (!board.length) {
-        Vue.delete(this.boardsFromConnection, id)
+        this.$delete(this.boardsFromConnection, id)
         return false
       }
       board = JSON.parse(board)
       if (typeof board === 'object') {
-        Vue.set(this.boardsFromConnection, id, board)
+        this.$set(this.boardsFromConnection, id, board)
         if (id === this.activeBoardId && this.clientSettings.flespiBoard) {
           this.activeBoardId = null
           this.deleteBoardHandler(id)
@@ -838,7 +906,7 @@ export default {
                 let newId = uid()
                 let shortcutIndex = board.shortcutsIndexes.indexOf(board.widgetsIndexes[index].id)
                 if (shortcutIndex !== -1) {
-                  Vue.set(board.shortcutsIndexes, shortcutIndex, newId)
+                  this.$set(board.shortcutsIndexes, shortcutIndex, newId)
                 }
                 board.widgetsIndexes[index].id = newId
                 Object.keys(board.layouts).forEach(layoutName => {
@@ -1006,6 +1074,8 @@ export default {
     }
   },
   created () {
+    this.debouncedBusMessagesProcessing = debounce(this.busMessagesProcessing, 500, { trailing: true })
+    this.valuesProcessing()
     if (this.clientSettings) {
       if (this.clientSettings.flespiBoard) {
         this.shareSync()
@@ -1038,27 +1108,38 @@ export default {
         Object.keys(this.subscriptions).forEach(topic => {
           this.setValueByTopic(topic, null)
         })
+        oldClient && this.debouncedBusMessagesProcessing()
         if (!client) {
           this.client = undefined
           return false
         }
-        this.bufferVarsValues = {}
+        this.boardsVariablesValuesClear()
         this.createClient()
       },
       immediate: true
     },
-    boards: {
-      deep: true,
-      handler (boards) {
-        this.fullView && saveBoardsToLocalStorage(boards, this.widgets)
+    boards: [
+      {
+        deep: true,
+        handler (boards) {
+          this.fullView && saveBoardsToLocalStorage(boards, this.widgets)
+        }
+      },
+      {
+        handler: 'boardsVariablesValuesProcessing'
       }
-    },
-    widgets: {
-      deep: true,
-      handler (widgets) {
-        this.fullView && saveBoardsToLocalStorage(this.boards, widgets)
+    ],
+    widgets: [
+      {
+        deep: true,
+        handler (widgets) {
+          this.fullView && saveBoardsToLocalStorage(this.boards, widgets)
+        }
+      },
+      {
+        handler: 'valuesProcessing'
       }
-    }
+    ]
   },
   components: { Board, Boards, CopyReplaceDialog, ImportExportModal },
   mixins: [ getValueByTopic ]
