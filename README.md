@@ -88,7 +88,8 @@ framework: {
     'QKnob',
     'QSlider',
     'QColorPicker',
-    'QBtnDropdown'
+    'QBtnDropdown',
+    'QPagination'
   ],
   directives: [
     'Ripple',
