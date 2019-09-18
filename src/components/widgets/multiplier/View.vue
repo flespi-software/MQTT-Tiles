@@ -126,7 +126,7 @@ export default {
               let keys = Object.keys(item.value)
               keys.forEach((key) => {
                 let nestItem = {
-                  name: `${item.name ? `${item.name}.` : ''}${key}`,
+                  name: `${item.name ? `${item.name}[` : ''}${key}${item.name ? `]` : ''}`,
                   value: item.value[key]
                 }
                 resultItems.push(nestItem)

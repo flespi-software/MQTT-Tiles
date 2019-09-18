@@ -27,7 +27,7 @@
       </transition>
     </q-item>
     <q-card-media class="widget__content q-pa-sm" :class="[`bg-${item.color}-1`]" style="height: calc(100% - 22px);">
-      <div ref="itemsTop" class="items__top flex q-px-md q-py-xs absolute scroll" style="top: 0px; left: 8px; right: 8px; background-color: rgba(255,255,255,0.5); max-height: 33%" v-if="topItems.length">
+      <div ref="itemsTop" class="items__top flex q-px-md q-py-xs absolute scroll" style="top: 0px; left: 8px; right: 8px; background-color: rgba(255,255,255,0.5); max-height: 33%; min-height: 50px;" v-if="topItems.length">
         <component
           v-for="(renderItem, layoutIndex) in topItems"
           :key="`top${layoutIndex}${renderItem.index}`"
@@ -59,7 +59,7 @@
           />
         </div>
       </div>
-      <div ref="itemsBottom" class="items__bottom flex q-px-md q-py-xs absolute scroll" style="bottom: 0px; left: 8px; right: 8px; background-color: rgba(255,255,255,0.5); max-height: 33%" v-if="bottomItems.length">
+      <div ref="itemsBottom" class="items__bottom flex q-px-md q-py-xs absolute scroll" style="bottom: 0px; left: 8px; right: 8px; background-color: rgba(255,255,255,0.5); max-height: 33%; min-height: 50px;" v-if="bottomItems.length">
         <component
           v-for="(renderItem, layoutIndex) in bottomItems"
           :key="`bottom${layoutIndex}${renderItem.index}`"
