@@ -42,6 +42,7 @@
             :value="values[widgetIndex]"
             :index="widgetIndex"
             :blocked="true"
+            :integration="true"
             @action="(data) => { $emit('action', data) }"
           />
         </div>
@@ -80,6 +81,8 @@ import Radial from '../radial/View'
 import Linear from '../linear/View'
 import Singleselect from '../singleselect/View'
 import Complex from '../complex/View'
+import MapLocation from '../mapLocation/View'
+import MapRoute from '../mapRoute/View'
 export default {
   name: 'Multiplier',
   props: ['item', 'index', 'value', 'mini', 'in-shortcuts', 'blocked'],
@@ -116,6 +119,8 @@ export default {
       let topic = this.item.dataTopics[0].topicFilter
       if (!topic || !this.value[topic]) { return {} }
       let path = this.currentTopic.split('/')
+      /* update path by flespi enum (comma separated) subscriptions */
+      path.forEach((pathPart, index) => { if (pathPart.indexOf(',') !== -1) { path[index] = '+' } })
       let value = null
       if (path.indexOf('+') === -1) {
         value = path.length === 1 ? this.value[topic] : get(this.value[topic], path.slice(0, -1).join('.'), null)
@@ -163,7 +168,7 @@ export default {
         widget.topics.forEach((currentTopic) => {
           if (topic === currentTopic) { return false }
           value[currentTopic] = {}
-          value[currentTopic].payload = this.value[currentTopic].payload
+          value[currentTopic].payload = this.value[currentTopic] && this.value[currentTopic].payload
         })
         values[widgetId] = value
         return values
@@ -216,13 +221,16 @@ export default {
       if (this.item.settings.widgetSettings.topics) {
         topics = [this.item.dataTopics[0].topicFilter, ...this.item.settings.widgetSettings.topics.map(topic => topic.topicFilter)]
       }
+      let widgetName = this.item.dataTopics[0].payloadType === 1 && this.item.settings.nameField
+        ? this.getValueByTopic(this.currentValue[name] && this.currentValue[name].payload, {...this.item.dataTopics[0], payloadField: this.item.settings.nameField})
+        : name
       let widget = {
-        name,
+        name: widgetName,
         id: name,
         color: this.item.settings.color,
         type: this.item.settings.type,
         topics,
-        dataTopics: [{payloadField: this.item.dataTopics[0].payloadField, payloadType: this.item.dataTopics[0].payloadType, topicFilter: this.item.dataTopics[0].topicFilter}], // topics for datasource
+        dataTopics: [{...this.item.dataTopics[0]}], // topics for datasource
         settings: cloneDeep(this.item.settings.widgetSettings),
         status: WIDGET_STATUS_DISABLED
       }
@@ -256,7 +264,9 @@ export default {
     Radial,
     Linear,
     Singleselect,
-    Complex
+    Complex,
+    MapLocation,
+    MapRoute
   }
 }
 </script>

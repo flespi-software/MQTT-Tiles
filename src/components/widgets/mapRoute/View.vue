@@ -1,6 +1,6 @@
 <template>
-  <q-card flat inline class="widget__map-route absolute" style="width: 100%; height: 100%;" :class="[`bg-${item.color}-1`, `${blocked ? 'scroll' : ''}`]">
-    <q-item class="q-px-sm q-pt-sm q-pb-none" style="min-height: 29px;">
+  <q-card flat inline class="widget__map-route " style="width: 100%; height: 100%;" :class="[`bg-${item.color}-1`, `${blocked ? 'scroll' : ''}`, `${integration ? '' : 'absolute'}`]">
+    <q-item class="q-px-sm q-pt-sm q-pb-none" style="min-height: 0px;">
       <q-item-main class="ellipsis" :class="[`text-${item.color}-7`]" style="font-size: .9rem">
         {{item.name}}
         <q-tooltip>{{item.name}}</q-tooltip>
@@ -26,7 +26,7 @@
         </q-item-side>
       </transition>
     </q-item>
-    <q-card-media class="widget__content scroll" :class="[`bg-${item.color}-1`]" style="height: calc(100% - 29px);">
+    <q-card-media class="widget__content scroll" :class="[`bg-${item.color}-1`]" :style="{height: integration ? '' : 'calc(100% - 29px)'}">
       <div style="width: 100%; height: 100%;">
         <div style="width: 100%; height: 100%;">
           <iframe style="width: 100%;height: calc(100% - 8px);" src="https://flespi.io/mapview" frameborder="0" ref="map" allowfullscreen></iframe>
@@ -62,19 +62,24 @@ import getValueByTopic from '../../../mixins/getValueByTopic.js'
 import timestamp from '../../../mixins/timestamp.js'
 export default {
   name: 'MapRoute',
-  props: ['item', 'index', 'mini', 'in-shortcuts', 'value', 'blocked'],
+  props: ['item', 'index', 'mini', 'in-shortcuts', 'value', 'blocked', 'integration'],
   data () {
     return {
-      WIDGET_STATUS_DISABLED
+      WIDGET_STATUS_DISABLED,
+      prevRoute: []
     }
   },
   methods: {
     setRoute (route) {
       this.$refs.map && this.$refs.map.contentWindow.postMessage(`MapView|cmd:{"addgroutes": ${JSON.stringify(route)}, "clear": "all", "fullscreencontrol": true}`, '*')
+      this.prevRoute = route
     },
     getRoute () {
-      let routeTopic = this.item.settings.topics[0],
-        value = this.getValueByTopic(this.value[routeTopic.topicFilter] && this.value[routeTopic.topicFilter].payload, routeTopic),
+      let routeTopic = this.integration ? this.item.dataTopics[0] : this.item.settings.topics[0]
+      if (this.integration) {
+        routeTopic = {...routeTopic, payloadField: this.item.settings.routeField}
+      }
+      let value = this.getValueByTopic(this.value[routeTopic.topicFilter] && this.value[routeTopic.topicFilter].payload, routeTopic),
         values = []
       value = value === 'N/A' ? '' : value
       if (Array.isArray(value)) {
@@ -97,7 +102,10 @@ export default {
     value: {
       deep: true,
       handler (value) {
-        this.setRoute(this.getRoute())
+        let route = this.getRoute()
+        if (route.length !== this.prevRoute.length || this.prevRoute.some((el, index) => el !== route[index])) {
+          this.setRoute(this.getRoute())
+        }
       }
     },
     'item.settings.topics' () {

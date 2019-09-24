@@ -17,6 +17,9 @@ let timeFormat = (value) => {
   let seconds = Math.floor(value / 1000)
   return (days ? days + ' days ' : '') + (hours ? hours + ' hours ' : '') + (minutes ? minutes + ' minutes ' : '') + (seconds ? seconds + ' seconds ' : '')
 }
+math.import({
+  equal: function (a, b) { return a === b }
+}, {override: true})
 export default {
   methods: {
     mathProcessing (value, mathTemplate) {

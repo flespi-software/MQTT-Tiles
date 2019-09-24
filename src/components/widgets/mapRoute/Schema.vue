@@ -1,7 +1,9 @@
 <template>
   <div>
     <div class="row">
+      <q-input v-if="integration" v-model="currentSettings.routeField" float-label="Route`s field" class="col-12" color="dark"/>
       <q-collapsible
+        v-else
         class="col-12 q-mt-sm"
         :opened="true"
         label="Route settings"
@@ -27,7 +29,7 @@ import Topic from '../Topic'
 import validateTopic from '../../../mixins/validateTopic.js'
 export default {
   name: 'MapRouteSchema',
-  props: ['widget', 'board'],
+  props: ['widget', 'board', 'integration'],
   data () {
     let defaultSettings = {
       topics: [
@@ -43,6 +45,10 @@ export default {
       minWidth: 3,
       minHeight: 6,
       isNeedTime: true
+    }
+    if (this.integration) {
+      delete defaultSettings.topics
+      defaultSettings.routeField = 'route'
     }
     return {
       defaultSettings,
@@ -64,8 +70,11 @@ export default {
       }
     },
     isValidRouteValue () {
-      return !this.widget.dataTopics.map(topic => topic.topicFilter).includes(this.routeValue.topicFilter) &&
+      return this.integration || (
+        !this.integration &&
+        !this.widget.dataTopics.map(topic => topic.topicFilter).includes(this.routeValue.topicFilter) &&
         this.validateTopic(this.routeValue.topicFilter)
+      )
     }
   },
   methods: {

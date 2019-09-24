@@ -149,6 +149,8 @@ export default {
       widgets: {},
       subscriptions: {},
       subscriptionsStatuses: {},
+      subscriptionsIndetifiers: {},
+      currentSubscriptionIndetifier: 0,
       widgetsBySubscription: {},
       activeBoardId: undefined,
       colsByBreakpoint: { lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 },
@@ -198,7 +200,7 @@ export default {
             widgetValue[topic] = {}
           }
           if (hasValue && messages && messages.length === 1) { messages = [] } // not processing last state
-          let messagesValue = messagesProcessing(widget.type)(messages, get(this.values, `${widgetId}.${topic}`, undefined), topic, widget)
+          let messagesValue = messagesProcessing(widget.type)(messages, get(this.values, `${widgetId}['${topic}']`, undefined), topic, widget)
           if (value[topic] !== messagesValue) { isWidgetValueChanged = true }
           widgetValue[topic] = messagesValue
           return widgetValue
@@ -390,15 +392,27 @@ export default {
         return true
       }
       /* write value */
-      this.subscriptionsTopics.forEach((subTopic) => {
-        if (this.checkTopic(topic, subTopic)) {
-          if (!Array.isArray(this.subscriptions[subTopic])) {
-            this.$set(this.subscriptions, subTopic, [value])
-          } else {
-            this.subscriptions[subTopic].push(value)
+      let subIdentifier = value && value.properties && value.properties.subscriptionIdentifier
+      if (subIdentifier) {
+        if (!Array.isArray(subIdentifier)) { subIdentifier = [subIdentifier] }
+        subIdentifier.forEach(subId => {
+          let subTopic = this.subscriptionsIndetifiers[subId]
+          this.writeValueByTopic(subTopic, value)
+        })
+      } else {
+        this.subscriptionsTopics.forEach((subTopic) => {
+          if (this.checkTopic(topic, subTopic)) {
+            this.writeValueByTopic(subTopic, value)
           }
-        }
-      })
+        })
+      }
+    },
+    writeValueByTopic (topic, value) {
+      if (!Array.isArray(this.subscriptions[topic])) {
+        this.$set(this.subscriptions, topic, [value])
+      } else {
+        this.subscriptions[topic].push(value)
+      }
     },
     expireMessagesHandler (packet) {
       if (packet.properties && packet.properties.messageExpiryInterval) {
@@ -433,16 +447,17 @@ export default {
     },
     async subscribe () {
       if (this.client) {
-        return this.client.subscribe(...arguments)
+        let [topic, options] = arguments
+        if (this.clientSettings.protocolVersion === 5) {
+          if (!options) { options = {} }
+          if (!options.properties) { options.properties = {} }
+          options.properties.subscriptionIdentifier = ++this.currentSubscriptionIndetifier
+          this.subscriptionsIndetifiers[this.currentSubscriptionIndetifier] = topic
+        }
+        return this.client.subscribe(topic, options)
           .then(() => {
             let topics = arguments[0]
-            if (Array.isArray(topics)) {
-              topics.forEach((topic) => {
-                this.subscriptionsStatuses[topic] = true
-              })
-            } else {
-              this.subscriptionsStatuses[topics] = true
-            }
+            this.subscriptionsStatuses[topics] = true
             return arguments
           })
           .catch(err => { this.errorHandler(err) })
@@ -450,16 +465,17 @@ export default {
     },
     async unsubscribe (topic) {
       if (this.client) {
-        return this.client.unsubscribe(...arguments)
+        let [topic, options] = arguments
+        if (this.clientSettings.protocolVersion === 5) {
+          let subIdentifier = Object.keys(this.subscriptionsIndetifiers).find(key => this.subscriptionsIndetifiers[key] === topic)
+          if (subIdentifier !== -1) {
+            delete this.subscriptionsIndetifiers[subIdentifier]
+          }
+        }
+        return this.client.unsubscribe(topic, options)
           .then(() => {
             let topics = arguments[0]
-            if (Array.isArray(topics)) {
-              topics.forEach((topic) => {
-                delete this.subscriptionsStatuses[topic]
-              })
-            } else {
-              delete this.subscriptionsStatuses[topics]
-            }
+            delete this.subscriptionsStatuses[topics]
           })
           .catch(err => { this.errorHandler(err) })
       }
@@ -684,7 +700,7 @@ export default {
           settings.properties = {}
           settings.properties.userProperties = userProperties
         }
-        this.subscribe(topics, settings)
+        Promise.all(topics.map(topic => this.subscribe(topic, settings)))
           .then((topics) => { this.clientInited = true })
       }
     },
@@ -1114,7 +1130,7 @@ export default {
           return false
         }
         this.boardsVariablesValuesClear()
-        this.createClient()
+        setTimeout(() => { this.createClient() }, 500)
       },
       immediate: true
     },

@@ -1,7 +1,9 @@
 <template>
   <div>
     <div class="row">
+      <q-input v-if="integration" v-model="currentSettings.latField" float-label="Latitude`s field" class="col-12" color="dark"/>
       <q-collapsible
+        v-else
         class="col-12 q-mt-sm"
         :opened="true"
         label="Latitude settings"
@@ -14,7 +16,9 @@
           </div>
         </div>
       </q-collapsible>
+      <q-input v-if="integration" v-model="currentSettings.lonField" float-label="Longetude`s field" class="col-12" color="dark"/>
       <q-collapsible
+        v-else
         class="col-12 q-mt-sm"
         :opened="true"
         label="Longitude settings"
@@ -40,7 +44,7 @@ import Topic from '../Topic'
 import validateTopic from '../../../mixins/validateTopic.js'
 export default {
   name: 'MapLocationSchema',
-  props: ['widget', 'board'],
+  props: ['widget', 'board', 'integration'],
   data () {
     let defaultSettings = {
       topics: [
@@ -61,6 +65,11 @@ export default {
       minWidth: 3,
       minHeight: 6,
       isNeedTime: true
+    }
+    if (this.integration) {
+      delete defaultSettings.topics
+      defaultSettings.latField = 'position.latitude'
+      defaultSettings.lonField = 'position.longitude'
     }
     return {
       defaultSettings,
@@ -90,12 +99,18 @@ export default {
       }
     },
     isValidLatValue () {
-      return !this.widget.dataTopics.map(topic => topic.topicFilter).includes(this.latValue.topicFilter) &&
+      return this.integration || (
+        !this.integration &&
+        !this.widget.dataTopics.map(topic => topic.topicFilter).includes(this.latValue.topicFilter) &&
         this.validateTopic(this.latValue.topicFilter)
+      )
     },
     isValidLonValue () {
-      return !this.widget.dataTopics.map(topic => topic.topicFilter).includes(this.lonValue.topicFilter) &&
+      return this.integration || (
+        !this.integration &&
+        !this.widget.dataTopics.map(topic => topic.topicFilter).includes(this.lonValue.topicFilter) &&
         this.validateTopic(this.lonValue.topicFilter)
+      )
     }
   },
   methods: {

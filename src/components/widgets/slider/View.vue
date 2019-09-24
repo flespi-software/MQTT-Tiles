@@ -11,7 +11,7 @@
     <div class="ellipsis q-mt-sm">{{item.name}}</div>
   </div>
   <q-card flat v-else inline class="widget__slider absolute" style="width: 100%; height: 100%;" :class="[`bg-${item.color}-1`]">
-    <q-item class="q-px-sm q-pt-sm q-pb-none" style="min-height: 29px;">
+    <q-item class="q-px-sm q-pt-sm q-pb-none" style="min-height: 0px;">
       <q-item-main class="ellipsis" :class="[`text-${item.color}-7`]" style="font-size: .9rem">
         {{item.name}}
         <q-tooltip>{{item.name}}</q-tooltip>

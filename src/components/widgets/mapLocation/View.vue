@@ -1,6 +1,6 @@
 <template>
-  <q-card flat inline class="widget__map-location absolute" style="width: 100%; height: 100%;" :class="[`bg-${item.color}-1`, `${blocked ? 'scroll' : ''}`]">
-    <q-item class="q-px-sm q-pt-sm q-pb-none" style="min-height: 29px;">
+  <q-card flat inline class="widget__map-location" style="width: 100%; height: 100%;" :class="[`bg-${item.color}-1`, `${blocked ? 'scroll' : ''}`, `${integration ? '' : 'absolute'}`]">
+    <q-item class="q-px-sm q-pt-sm q-pb-none" style="min-height: 0;">
       <q-item-main class="ellipsis" :class="[`text-${item.color}-7`]" style="font-size: .9rem">
         {{item.name}}
         <q-tooltip>{{item.name}}</q-tooltip>
@@ -26,7 +26,7 @@
         </q-item-side>
       </transition>
     </q-item>
-    <q-card-media class="widget__content scroll" :class="[`bg-${item.color}-1`]" style="height: calc(100% - 29px);">
+    <q-card-media class="widget__content scroll" :class="[`bg-${item.color}-1`]" :style="{height: integration ? '' : 'calc(100% - 29px)'}">
       <div style="width: 100%; height: 100%;">
         <iframe style="width: 100%;height: calc(100% - 18px);" src="https://flespi.io/mapview" frameborder="0" ref="map" allowfullscreen></iframe>
       </div>
@@ -61,20 +61,34 @@ import getValueByTopic from '../../../mixins/getValueByTopic.js'
 import timestamp from '../../../mixins/timestamp.js'
 export default {
   name: 'MapLocation',
-  props: ['item', 'index', 'mini', 'in-shortcuts', 'value', 'blocked'],
+  props: ['item', 'index', 'mini', 'in-shortcuts', 'value', 'blocked', 'integration'],
   data () {
     return {
-      WIDGET_STATUS_DISABLED
+      WIDGET_STATUS_DISABLED,
+      prevPosition: []
     }
   },
   computed: {
     position () {
-      let latTopic = this.item.settings.topics[0],
-        lonTopic = this.item.settings.topics[1],
-        lat = parseFloat(this.getValueByTopic(this.value[latTopic.topicFilter] && this.value[latTopic.topicFilter].payload, latTopic)),
-        lon = parseFloat(this.getValueByTopic(this.value[lonTopic.topicFilter] && this.value[lonTopic.topicFilter].payload, lonTopic)),
+      let values = []
+      if (this.integration) {
+        let dataTopic = this.item.dataTopics[0],
+          topicFilter = dataTopic.topicFilter,
+          latDataTopic = {...dataTopic, payloadField: this.item.settings.latField},
+          lonDataTopic = {...dataTopic, payloadField: this.item.settings.lonField}
+        values = [
+          parseFloat(this.getValueByTopic(this.value[topicFilter] && this.value[topicFilter].payload, latDataTopic)),
+          parseFloat(this.getValueByTopic(this.value[topicFilter] && this.value[topicFilter].payload, lonDataTopic))
+        ]
+      } else {
+        let latTopic = this.item.settings.topics[0],
+          lonTopic = this.item.settings.topics[1],
+          lat = parseFloat(this.getValueByTopic(this.value[latTopic.topicFilter] && this.value[latTopic.topicFilter].payload, latTopic)),
+          lon = parseFloat(this.getValueByTopic(this.value[lonTopic.topicFilter] && this.value[lonTopic.topicFilter].payload, lonTopic))
         values = [lat, lon]
-      this.setPosition(values)
+      }
+      let isValueSame = values[0] === this.prevPosition[0] && values[1] === this.prevPosition[1]
+      !isValueSame && this.setPosition(values)
       return values
     }
   },
@@ -83,6 +97,7 @@ export default {
       if (position[0] && position[1]) {
         this.$refs.map && this.$refs.map.contentWindow.postMessage(`MapView|cmd:{"addmarkers": ${JSON.stringify([position])}, "clear": "all", "fullscreencontrol": true}`, '*')
       }
+      this.prevPosition = position
     }
   },
   created () {

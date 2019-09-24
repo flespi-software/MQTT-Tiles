@@ -13,6 +13,7 @@
           {{path}}
         </div>
       </div>
+      <q-input v-model="currentSettings.nameField" v-if="widget.dataTopics[0] && widget.dataTopics[0].payloadType === 1" float-label="Widget`s name field" class="col-12" color="dark"/>
       <div class="q-mt-sm col-12">
         <q-select color="dark" v-model="currentSettings.type" :options="typeOptions" @input="currentSettings.widgetSettings = {}" float-label="Widget multiplier type" />
       </div>
@@ -35,6 +36,7 @@
           :is="currentSettings.type"
           :widget="schemaWidget"
           :board="board"
+          :integration="true"
           @update="updateSettingsHandler"
           @validate="validateSchemas"
         />
@@ -52,6 +54,8 @@ import Radial from '../radial/Schema'
 import Linear from '../linear/Schema'
 import Singleselect from '../singleselect/Schema'
 import Complex from '../complex/Schema'
+import MapLocation from '../mapLocation/Schema'
+import MapRoute from '../mapRoute/Schema'
 import { WIDGET_STATUS_DISABLED } from '../../../constants'
 export default {
   name: 'MultiplierSchema',
@@ -62,6 +66,7 @@ export default {
       groupLayout: 0,
       widgetSettings: {},
       topics: [],
+      nameField: '',
       height: 8,
       width: 5,
       maxTopicsLength: 1,
@@ -78,7 +83,9 @@ export default {
         {label: 'Radial gauge', value: 'radial'},
         {label: 'Linear gauge', value: 'linear'},
         {label: 'Radio button', value: 'singleselect'},
-        {label: 'Complex', value: 'complex'}
+        {label: 'Complex', value: 'complex'},
+        {label: 'Location', value: 'map-location'},
+        {label: 'Route', value: 'map-route'}
       ],
       colors: ['grey', 'red', 'green', 'orange', 'blue', 'light-blue']
     }
@@ -92,7 +99,7 @@ export default {
         color: this.currentSettings.color,
         type: this.currentSettings.type,
         topics: [],
-        dataTopics: [], // topics for datasource
+        dataTopics: this.widget.dataTopics, // topics for datasource
         settings: this.currentSettings.widgetSettings,
         status: WIDGET_STATUS_DISABLED
       }
@@ -127,7 +134,7 @@ export default {
   },
   mixins: [validateTopic],
   components: {
-    Switcher, Informer, Radial, Linear, Singleselect, Complex
+    Switcher, Informer, Radial, Linear, Singleselect, Complex, MapLocation, MapRoute
   }
 }
 </script>
