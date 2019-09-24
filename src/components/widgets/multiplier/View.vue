@@ -75,6 +75,7 @@ import uniq from 'lodash/uniq'
 import cloneDeep from 'lodash/cloneDeep'
 import { WIDGET_STATUS_DISABLED } from '../../../constants'
 import getValueByTopic from '../../../mixins/getValueByTopic.js'
+import formatValue from '../../../mixins/formatValue.js'
 import Switcher from '../switcher/View'
 import Informer from '../informer/View'
 import Radial from '../radial/View'
@@ -163,6 +164,7 @@ export default {
     values () {
       return Object.keys(this.currentValue).reduce((values, widgetId) => {
         let widget = this.widgets[widgetId]
+        if (!widget) { return values }
         let topic = this.item.dataTopics[0].topicFilter
         let value = {[topic]: this.currentValue[widgetId]}
         widget.topics.forEach((currentTopic) => {
@@ -190,12 +192,16 @@ export default {
     }
   },
   methods: {
+    needRender (value) {
+      return this.item.settings.math ? this.mathProcessing(value, this.item.settings.math) : true
+    },
     initMultiplier () {
       let value = this.currentValue
       if (!value) { return false }
       this.widgets = {}
       Object.keys(value).forEach(name => {
-        if (!this.widgets[name]) {
+        let needRender = this.needRender(value[name] && value[name].payload)
+        if (!this.widgets[name] && needRender) {
           this.initWidget(name)
         }
       })
@@ -207,10 +213,11 @@ export default {
         widgetsKeys = Object.keys(widgets),
         allKeys = uniq([...valueKeys, ...widgetsKeys])
       allKeys.forEach((name, keyIndex) => {
-        if (value[name] && !widgets[name]) {
+        let needRender = this.needRender(value[name] && value[name].payload)
+        if (value[name] && !widgets[name] && needRender) {
           // add
           this.initWidget(name)
-        } else if (!value[name] && widgets[name]) {
+        } else if ((!value[name] && widgets[name]) || !needRender) {
           // remove
           this.$delete(widgets, name)
         }
@@ -257,7 +264,7 @@ export default {
       }
     }
   },
-  mixins: [getValueByTopic],
+  mixins: [getValueByTopic, formatValue],
   components: {
     Switcher,
     Informer,

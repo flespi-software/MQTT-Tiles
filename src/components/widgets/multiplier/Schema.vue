@@ -14,6 +14,13 @@
         </div>
       </div>
       <q-input v-model="currentSettings.nameField" v-if="widget.dataTopics[0] && widget.dataTopics[0].payloadType === 1" float-label="Widget`s name field" class="col-12" color="dark"/>
+      <div class="col-12">
+        <q-field helper="You can use math logic to define what values to show in the widget. Example: `%value% > 1000` or `<%jsons-some-field%> != nill`, where %value% is a payload and <%jsons-some-field%> is a JSON field from your subscription.">
+          <div class="row">
+            <q-input v-model="currentSettings.math" float-label="Multiplied widget render logic" class="col-12" color="dark"/>
+          </div>
+        </q-field>
+      </div>
       <div class="q-mt-sm col-12">
         <q-select color="dark" v-model="currentSettings.type" :options="typeOptions" @input="currentSettings.widgetSettings = {}" float-label="Widget multiplier type" />
       </div>
@@ -67,6 +74,7 @@ export default {
       widgetSettings: {},
       topics: [],
       nameField: '',
+      math: '',
       height: 8,
       width: 5,
       maxTopicsLength: 1,

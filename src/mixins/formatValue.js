@@ -7,6 +7,7 @@ import {
 import { format, date } from 'quasar'
 const { humanStorageSize } = format
 import math from 'mathjs'
+import get from 'lodash/get'
 let timeFormat = (value) => {
   let days = Math.floor(value / 86400000)
   value = value % 86400000
@@ -18,7 +19,8 @@ let timeFormat = (value) => {
   return (days ? days + ' days ' : '') + (hours ? hours + ' hours ' : '') + (minutes ? minutes + ' minutes ' : '') + (seconds ? seconds + ' seconds ' : '')
 }
 math.import({
-  equal: function (a, b) { return a === b }
+  equal: function (a, b) { return a === b },
+  unequal: function (a, b) { return a !== b }
 }, {override: true})
 export default {
   methods: {
@@ -26,6 +28,13 @@ export default {
       if (mathTemplate && value !== 'N/A') {
         try {
           let mathExp = mathTemplate.replace(/%value%/g, value)
+          mathExp = mathExp.replace(/<%([a-zA-Z0-9-+&@#/%?=~_|!:,.;]*)%>/gim, (match, name) => {
+            let val = get(value, name, undefined)
+              ? typeof value[name] === 'string' ? `"${value[name]}"` : value[name]
+              : 'nill'
+            return val
+          })
+          mathExp = mathExp.replace(/nill/gim, '"nill"')
           value = math.eval(mathExp)
         } catch (e) {}
       }
