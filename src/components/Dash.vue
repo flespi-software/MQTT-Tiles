@@ -1117,6 +1117,7 @@ export default {
   watch: {
     clientSettings: {
       handler (client, oldClient) {
+        let firstInit = !!client && !oldClient
         if (isEqual(client, oldClient)) { return false }
         if (this.client) { this.destroyClient() }
         clearWidgets(this.widgets)
@@ -1130,7 +1131,9 @@ export default {
           return false
         }
         this.boardsVariablesValuesClear()
-        setTimeout(() => { this.createClient() }, 500)
+        firstInit
+          ? this.createClient()
+          : setTimeout(() => { this.createClient() }, 500)
       },
       immediate: true
     },
