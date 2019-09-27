@@ -15,7 +15,13 @@ export default {
           case WIDGET_PAYLOAD_TYPE_JSON: {
             try {
               if (topic.payloadField) {
-                value = get(isPacket ? JSON.parse(value.toString()) : value, topic.payloadField, 'N/A')
+                let val = get(isPacket ? JSON.parse(value.toString()) : value, topic.payloadField, 'N/A')
+                if (topic.payloadNameField) {
+                  let name = get(isPacket ? JSON.parse(value.toString()) : value, topic.payloadNameField, 'N/A')
+                  value = [name, val]
+                } else {
+                  value = val
+                }
               } else {
                 value = JSON.parse(isPacket ? value.toString() : JSON.stringify(value))
               }

@@ -92,7 +92,9 @@ export default {
       DEFAULT_MODE,
       COMMAND_MODE,
       actionTopic: null,
-      actionPayload: ''
+      actionPayload: '',
+      valueExpired: false,
+      expireValueTimeoutId: 0
     }
   },
   computed: {
@@ -105,14 +107,20 @@ export default {
     currentValue: {
       get () {
         let value = this.value[this.item.dataTopics[0].topicFilter] && this.value[this.item.dataTopics[0].topicFilter].payload
-        if (value === null) {
+        if (this.item.settings.resetTimeout) {
+          this.setExpireLogic()
+        } else {
+          this.clearExpireLogic()
+        }
+        if (value === null || this.valueExpired) {
           return null
         } else {
-          if (this.item.settings.resetTimeout && Date.now() > this.time + this.item.settings.resetTimeout * 1000) {
-            return null
-          } else {
-            return `${this.mathProcessing(this.getValueByTopic(value, this.item.dataTopics[0]), this.item.settings.math)}`
-          }
+          return `${this.mathProcessing(this.getValueByTopic(value, this.item.dataTopics[0]), this.item.settings.math)}`
+          // if (this.item.settings.resetTimeout && Date.now() > this.time + this.item.settings.resetTimeout * 1000) {
+          //   return null
+          // } else {
+          //   return `${this.mathProcessing(this.getValueByTopic(value, this.item.dataTopics[0]), this.item.settings.math)}`
+          // }
         }
       },
       set (val) {
@@ -145,6 +153,29 @@ export default {
       if (this.actionTopic !== null) {
         let data = {topic: this.actionTopic, payload: this.actionPayload, settings: {retain: this.item.settings.save}}
         this.$emit('action', data)
+      }
+    },
+    setExpireLogic () {
+      if (this.expireValueTimeoutId) {
+        clearTimeout(this.expireValueTimeoutId)
+        this.expireValueTimeoutId = 0
+      }
+      let now = Date.now(),
+        expiredTime = this.time + this.item.settings.resetTimeout * 1000
+      if (now > expiredTime) {
+        this.valueExpired = true
+      } else {
+        this.valueExpired = false
+        this.expireValueTimeoutId = setTimeout(() => {
+          this.valueExpired = true
+        }, expiredTime - now)
+      }
+    },
+    clearExpireLogic () {
+      this.valueExpired = false
+      if (this.expireValueTimeoutId) {
+        clearTimeout(this.expireValueTimeoutId)
+        this.expireValueTimeoutId = 0
       }
     }
   },

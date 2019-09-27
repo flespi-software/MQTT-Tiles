@@ -34,9 +34,19 @@
         <div class="text-grey-6" style="font-size: .8rem;">{{variable.name}}</div>
         <q-item class="no-padding" style="min-height: 35px;">
           <q-item-main>
-            <q-item-tile label class="ellipsis overflow-hidden text-dark" :style="{maxWidth: '140px'}">{{board.activeVariables[variable.name] || variable.name}}</q-item-tile>
+            <q-item-tile label class="ellipsis overflow-hidden text-dark" :style="{maxWidth: '140px'}">
+              {{(variablesListValues[varIndex][board.activeVariables[variable.name]] && variablesListValues[varIndex][board.activeVariables[variable.name]].label) || `*empty*`}}
+            </q-item-tile>
           </q-item-main>
           <q-item-side style="min-width: 25px;">
+            <q-item-tile
+              style="display: inline-block"
+              stamp
+              size="2rem"
+              v-if="variablesListValues[varIndex][board.activeVariables[variable.name]] && variablesListValues[varIndex][board.activeVariables[variable.name]].value != variablesListValues[varIndex][board.activeVariables[variable.name]].label"
+            >
+              {{(variablesListValues[varIndex][board.activeVariables[variable.name]] && variablesListValues[varIndex][board.activeVariables[variable.name]].value) || ''}}
+            </q-item-tile>
             <q-item-tile style="display: inline-block" stamp size="2rem" icon="mdi-menu-down" />
           </q-item-side>
           <q-popover fit ref="popoverActive">
@@ -57,6 +67,9 @@
                   <q-item-main>
                     <q-item-tile label class="ellipsis overflow-hidden">{{variableModel.label}}</q-item-tile>
                   </q-item-main>
+                  <q-item-side v-if="variableModel.label != variableModel.value">
+                    <q-item-tile label class="ellipsis overflow-hidden">{{variableModel.value}}</q-item-tile>
+                  </q-item-side>
                 </q-item>
               </VirtualList>
             </q-list>
@@ -218,11 +231,24 @@ export default {
     },
     variablesListValues () {
       return this.board.settings.variables.map(variable => {
+        let variablesListValues = {}
         if (!variable.type || variable.type === 0) {
-          return variable.values.map(value => ({label: value, value}))
+          variablesListValues = variable.values.reduce((result, varValue) => {
+            let { label, value } = this.getVariableModel(varValue)
+            result[value] = { label, value }
+            return result
+          }, {})
+          Object.defineProperty(variablesListValues, 'length', { enumerable: false, value: variable.values.length })
         } else if (variable.type === 1) {
-          return this.naturalSort(Object.values(this.variablesValues[variable.name] || {})).map(value => ({label: typeof value === 'string' ? value : JSON.stringify(value), value}))
+          let varKeys = Object.values(this.variablesValues[variable.name] || {})
+          variablesListValues = this.naturalSort(varKeys).reduce((result, varValue) => {
+            let { label, value } = this.getVariableModel(varValue)
+            result[value] = { label, value }
+            return result
+          }, {})
+          Object.defineProperty(variablesListValues, 'length', { enumerable: false, value: varKeys.length })
         }
+        return variablesListValues
       })
     }
   },
@@ -344,6 +370,17 @@ export default {
         return variables[name] || match
       })
       this.$emit('action', data)
+    },
+    getVariableModel (value) {
+      let label, val
+      if (Array.isArray(value)) {
+        [label, val] = value
+      } else {
+        val = value
+        label = value
+      }
+      label = typeof label === 'string' ? label : JSON.stringify(label)
+      return {label, value: val}
     }
   },
   components: {

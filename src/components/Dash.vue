@@ -101,11 +101,12 @@ import Boards from './Boards'
 import { BOARDS_LOCALSTORAGE_NAME, WIDGET_STATUS_DISABLED, WIDGET_STATUS_ENABLED } from '../constants'
 import getActionTopics from './widgets/getActionTopics.js'
 import messagesProcessing from './widgets/messagesProcessing.js'
-import migrate from './widgets/migrations'
+import migrateWidgets from './widgets/migrations'
 import CopyReplaceDialog from './CopyReplaceDialog'
 import ImportExportModal from './ImportExportModal'
 import {version} from '../../package.json'
 import getValueByTopic from '../mixins/getValueByTopic'
+import boardsMigrations from '../mixins/boardsMigrations'
 
 let clearWidgets = function clearWidgets (widgets) {
     Object.keys(widgets).forEach((widgetId) => {
@@ -209,12 +210,12 @@ export default {
       })
     },
     boardsVariablesValuesProcessing () {
-      let values = this.boardsVariablesValues
-      this.boardsIds.forEach((boardId) => {
+      // let values = this.boardsVariablesValues
+      this.boardsVariablesValues = this.boardsIds.reduce((values, boardId) => {
         let board = this.boards[boardId],
           sourceVariables = (board.settings.variables && board.settings.variables.filter(variable => variable.type === 1)) || []
-        if (!values[boardId]) { this.$set(values, boardId, {}) }
-        values[boardId] = sourceVariables.reduce((boardVarValues, variable, varIndex) => {
+        if (!values[boardId]) { values[boardId] = {} }
+        let boardValue = sourceVariables.reduce((boardVarValues, variable, varIndex) => {
           let topic = variable.topic.topicFilter
           let packets = this.subscriptionsStatuses[topic] && this.subscriptions[topic] ? this.subscriptions[topic] : []
           if (!boardVarValues[variable.name]) { boardVarValues[variable.name] = {} }
@@ -231,7 +232,9 @@ export default {
           })
           return boardVarValues
         }, Object.assign({}, values[boardId]))
-      })
+        this.$set(values, boardId, boardValue)
+        return values
+      }, Object.assign({}, this.boardsVariablesValues))
     },
     busMessagesProcessing () {
       this.valuesProcessing()
@@ -432,7 +435,7 @@ export default {
           if (timestamp < currentTimestamp) {
             this.subscriptionsTopics.forEach((subTopic) => {
               if (this.checkTopic(topic, subTopic)) {
-                this.subscriptions[subTopic].push({ payload: bl().slice(0, -1) })
+                this.subscriptions[subTopic].push({ topic, payload: bl().slice(0, -1) })
               }
             })
             this.$delete(this.expireMessagesStore, timestamp)
@@ -451,8 +454,9 @@ export default {
         if (this.clientSettings.protocolVersion === 5) {
           if (!options) { options = {} }
           if (!options.properties) { options.properties = {} }
-          options.properties.subscriptionIdentifier = ++this.currentSubscriptionIndetifier
-          this.subscriptionsIndetifiers[this.currentSubscriptionIndetifier] = topic
+          let subIdentifier = Object.keys(this.subscriptionsIndetifiers).find(k => this.subscriptionsIndetifiers[k] === topic) || ++this.currentSubscriptionIndetifier
+          options.properties.subscriptionIdentifier = subIdentifier
+          this.subscriptionsIndetifiers[subIdentifier] = topic
         }
         return this.client.subscribe(topic, options)
           .then(() => {
@@ -597,10 +601,10 @@ export default {
       this.$set(board.settings, 'blocked', !board.settings.blocked)
     },
     initBoard (board) {
-      board = cloneDeep(board)
+      board = this.migrateBoard(cloneDeep(board), board.appVersion, version)
       let widgets = {}
       let indexes = []
-      board.widgetsIndexes = migrate(board.widgetsIndexes, board.appVersion, version)
+      board.widgetsIndexes = migrateWidgets(board.widgetsIndexes, board.appVersion, version)
       board.widgetsIndexes.forEach((widget) => {
         indexes.push(widget.id)
         widgets[widget.id] = widget
@@ -619,7 +623,7 @@ export default {
         Object.keys(savedBoards).forEach(boardId => {
           let board = savedBoards[boardId]
           let indexes = []
-          board.widgetsIndexes = migrate(board.widgetsIndexes, board.appVersion, version)
+          board.widgetsIndexes = migrateWidgets(board.widgetsIndexes, board.appVersion, version)
           board.widgetsIndexes.forEach((widget) => {
             indexes.push(widget.id)
             widgets[widget.id] = widget
@@ -627,6 +631,7 @@ export default {
           })
           board.widgetsIndexes = indexes
           this.resolveBoardVariables(board)
+          savedBoards[boardId] = this.migrateBoard(board, board.appVersion, version)
         })
         this.boards = savedBoards
         if (widgets) {
@@ -694,13 +699,16 @@ export default {
       })
       let topics = Object.keys(this.subscriptions)
       if (topics.length) {
-        let settings = { qos: 1 }
-        let userProperties = this.clientSettings && this.clientSettings.userProperties
-        if (userProperties) {
-          settings.properties = {}
-          settings.properties.userProperties = userProperties
+        let getSettings = () => {
+          let settings = { qos: 1 }
+          let userProperties = this.clientSettings && this.clientSettings.userProperties
+          if (userProperties) {
+            settings.properties = {}
+            settings.properties.userProperties = userProperties
+          }
+          return settings
         }
-        Promise.all(topics.map(topic => this.subscribe(topic, settings)))
+        Promise.all(topics.map(topic => this.subscribe(topic, getSettings())))
           .then((topics) => { this.clientInited = true })
       }
     },
@@ -909,6 +917,7 @@ export default {
       }
     },
     importBoardHandler (board) {
+      // board = this.migrateBoard(board, board.appVersion, version)
       let id = board.id
       this.exportBoardId = id
       if (this.boards[id]) {
@@ -1161,6 +1170,6 @@ export default {
     ]
   },
   components: { Board, Boards, CopyReplaceDialog, ImportExportModal },
-  mixins: [ getValueByTopic ]
+  mixins: [ getValueByTopic, boardsMigrations ]
 }
 </script>

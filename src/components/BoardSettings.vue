@@ -47,11 +47,44 @@
                 <div class="row">
                   <q-input class="col-12" color="dark" v-model="variable.name" float-label="Name" :error="!variable.name"/>
                   <q-select class="col-12" :value="variable.type" :options="variableTypeOptions" color="dark" @change="(value) => changeTypeVariableHandler(index, value)" float-label="Type"/>
-                  <topic class="col-12" v-model="variable.topic" v-if="variable.type === VARIABLE_TYPE_SOURCE"/>
+                  <topic class="col-12" v-model="variable.topic" v-if="variable.type === VARIABLE_TYPE_SOURCE" :config="{ needLabel: true }"/>
                   <template v-if="variable.type === VARIABLE_TYPE_CUSTOM">
-                    <q-chips-input class="col-12" color="dark" v-model="variable.values" float-label="Values" :error="!variable.values.length || variable.values.includes('#')"/>
-                    <div class="col-12 text-red" v-if="!variable.values.length || variable.values.includes('#')" style="font-size: .8rem;">
+                    <!-- <q-chips-input class="col-12" color="dark" v-model="variable.values" float-label="Values" :error="!variable.values.length || variable.values.includes('#')"/> -->
+                    <!-- <div class="col-12 text-red" v-if="!variable.values.length || variable.values.includes('#')" style="font-size: .8rem;">
                       {{!variable.values.length ? 'Can`t be empty' : variable.values.includes('#') ? 'Value cannot be a #' : ''}}
+                    </div> -->
+                    <div class="variable__items-wrapper col-12 relative-position q-mt-lg">
+                      <q-list>
+                        <q-btn color="dark" style="top: -20px; right: 8px; position: absolute; z-index: 1130;" class="col-12" fab-mini @click="addVarItem(variable)" icon="mdi-plus"/>
+                        <q-list-header :class="{'text-red-6': !variable.values.length}">Items{{variable.values.length ? '' : ' are empty'}}</q-list-header>
+                        <q-collapsible
+                          v-for="(item, index) in variable.values"
+                          :key="`${index}`"
+                          group="singleselect-items"
+                          :header-class="[`bg-${item[1].indexOf('#') === -1 ? 'grey-4' : 'red-2'}`]"
+                          collapse-icon="mdi-settings"
+                          :opened="true"
+                        >
+                          <template slot="header">
+                            <q-item-side right>
+                              <q-btn :disabled="index === 0" round dense flat class="col-1" @click.stop="upVarItem(variable, index)" icon="mdi-arrow-up"/>
+                              <q-btn :disabled="index === (variable.values.length - 1)" round dense flat class="col-1" @click.stop="downVarItem(variable, index)" icon="mdi-arrow-down"/>
+                            </q-item-side>
+                            <q-item-main :label="item[0] ? `${item[0]} [${item[1]}]` : item[1] || `item ${index + 1}`" />
+                            <q-item-side right>
+                              <q-btn flat color="red-6" round dense @click="removeVarItem(variable, index)" icon="mdi-delete"/>
+                            </q-item-side>
+                          </template>
+                          <div class="row">
+                            <div class="col-6">
+                              <q-input autofocus class="q-mr-xs" color="dark" v-model="item[0]" float-label="Label"/>
+                            </div>
+                            <div class="col-6">
+                              <q-input class="q-ml-xs" color="dark" v-model="item[1]" float-label="Value" :error="item[1].indexOf('#') !== -1"/>
+                            </div>
+                          </div>
+                        </q-collapsible>
+                      </q-list>
                     </div>
                   </template>
                 </div>
@@ -194,6 +227,20 @@ export default {
     downItem (itemIndex) {
       let movedItem = this.currentSettings.settings.variables.splice(itemIndex, 1)[0]
       this.currentSettings.settings.variables.splice(itemIndex + 1, 0, movedItem)
+    },
+    addVarItem (variable) {
+      variable.values.push(['', ''])
+    },
+    removeVarItem (variable, itemIndex) {
+      this.$delete(variable.values, itemIndex)
+    },
+    upVarItem (variable, itemIndex) {
+      let movedItem = variable.values.splice(itemIndex, 1)[0]
+      variable.values.splice(itemIndex - 1, 0, movedItem)
+    },
+    downVarItem (variable, itemIndex) {
+      let movedItem = variable.values.splice(itemIndex, 1)[0]
+      variable.values.splice(itemIndex + 1, 0, movedItem)
     }
   },
   components: { Topic }

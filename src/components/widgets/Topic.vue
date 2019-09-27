@@ -6,6 +6,9 @@
     <q-field class="col-12" helper="You can set path in result JSON. Path started from root of object. Example: names[0].value" v-if="currentValue.payloadType === WIDGET_PAYLOAD_TYPE_JSON" >
       <q-input color="dark" v-model="currentValue.payloadField" float-label="Payload path"/>
     </q-field>
+    <q-field class="col-12" helper="Value`s label gets from resilt JSON by path. Example: names[0].label" v-if="config && config.needLabel && currentValue.payloadType === WIDGET_PAYLOAD_TYPE_JSON" >
+      <q-input color="dark" v-model="currentValue.payloadNameField" float-label="Value`s label"/>
+    </q-field>
   </div>
 </template>
 
@@ -18,13 +21,15 @@ import {
 } from '../../constants'
 export default {
   name: 'Topic',
-  props: ['value', 'board'],
+  props: ['value', 'board', 'config'],
+  /* config = { needLabel } */
   data () {
     let defaultTopic = {
         topicTemplate: '',
         topicFilter: '',
         payloadType: 0,
-        payloadField: ''
+        payloadField: '',
+        payloadNameField: ''
       },
       currentValue = Object.assign({}, this.defaultTopic, this.value)
     if (!currentValue.topicTemplate) {

@@ -141,7 +141,7 @@ export default {
             }, [])
           } else {
             val = val.reduce((val, item, index) => {
-              val[index].value = item.value[pathPart]
+              val[index].value = item.value && item.value[pathPart]
               return val
             }, val)
           }
