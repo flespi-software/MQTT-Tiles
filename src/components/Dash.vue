@@ -434,7 +434,7 @@ export default {
           if (timestamp < currentTimestamp) {
             this.subscriptionsTopics.forEach((subTopic) => {
               if (this.checkTopic(topic, subTopic)) {
-                this.subscriptions[subTopic].push({ topic, payload: bl().slice(0, -1) })
+                this.subscriptions[subTopic] && this.subscriptions[subTopic].push({ topic, payload: bl().slice(0, -1) })
               }
             })
             this.$delete(this.expireMessagesStore, timestamp)

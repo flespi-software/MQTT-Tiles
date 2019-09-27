@@ -153,6 +153,8 @@ export default {
             break
           }
           case 'text': {
+            resItem.math = item.math || ''
+            resItem.valueFormat = item.valueFormat || 0
             break
           }
         }

@@ -2,7 +2,7 @@ import compareVersions from 'compare-versions'
 
 let migrateHandlers = {
   '1.6.5': (board) => {
-    let variables = board.settings.variables
+    let variables = board.settings.variables || []
     variables.forEach((variable, index) => {
       if (variable.type) {
         variable.topic.payloadNameField = ''

@@ -111,6 +111,14 @@
                 </div>
               </div>
             </q-collapsible>
+            <div v-if="editedItem.type === 'text'">
+              <q-field helper="You can use math expressions to calculate the final value. Example: (%value% * 1000) / 1024, where %value% is the payload from your subscription.">
+                <div class="row">
+                  <q-input class="col-8" color="dark" v-model="editedItem.math" float-label="Math expression" placeholder="%value%"/>
+                  <q-select class="col-4" color="dark" v-model="editedItem.valueFormat" :options="formatOptions" float-label="Format value as"/>
+                </div>
+              </q-field>
+            </div>
           </div>
         </q-collapsible>
       </div>
@@ -133,7 +141,14 @@ import isEqual from 'lodash/isEqual'
 import validateTopic from '../../../mixins/validateTopic.js'
 import {
   WIDGET_RANGE_VALUE_CURRENT_MODE,
-  WIDGET_RANGE_VALUE_DATASOURCE_MODE
+  WIDGET_RANGE_VALUE_DATASOURCE_MODE,
+  WIDGET_VALUE_FORMAT_STRING,
+  WIDGET_VALUE_FORMAT_HUMAN_READABLE_SIZE,
+  WIDGET_VALUE_FORMAT_DATE,
+  WIDGET_VALUE_FORMAT_PRE,
+  WIDGET_VALUE_FORMAT_MARKDOWN,
+  WIDGET_VALUE_FORMAT_JSON,
+  WIDGET_VALUE_FORMAT_TIME
 } from '../../../constants'
 import AddMenu from './AddMenu'
 import Text from './Text'
@@ -185,6 +200,15 @@ export default {
       rangeValueModeOptions: [
         {label: 'Manual', value: WIDGET_RANGE_VALUE_CURRENT_MODE},
         {label: 'Broker', value: WIDGET_RANGE_VALUE_DATASOURCE_MODE}
+      ],
+      formatOptions: [
+        {label: 'String', value: WIDGET_VALUE_FORMAT_STRING},
+        {label: 'Human readable size', value: WIDGET_VALUE_FORMAT_HUMAN_READABLE_SIZE},
+        {label: 'Date', value: WIDGET_VALUE_FORMAT_DATE},
+        {label: 'Time', value: WIDGET_VALUE_FORMAT_TIME},
+        {label: 'Preformated', value: WIDGET_VALUE_FORMAT_PRE},
+        {label: 'Markdown', value: WIDGET_VALUE_FORMAT_MARKDOWN},
+        {label: 'JSON', value: WIDGET_VALUE_FORMAT_JSON}
       ],
       defaultTopic: {
         topicFilter: '',
