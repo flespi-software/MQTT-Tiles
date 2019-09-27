@@ -210,7 +210,6 @@ export default {
       })
     },
     boardsVariablesValuesProcessing () {
-      // let values = this.boardsVariablesValues
       this.boardsVariablesValues = this.boardsIds.reduce((values, boardId) => {
         let board = this.boards[boardId],
           sourceVariables = (board.settings.variables && board.settings.variables.filter(variable => variable.type === 1)) || []
@@ -454,7 +453,7 @@ export default {
         if (this.clientSettings.protocolVersion === 5) {
           if (!options) { options = {} }
           if (!options.properties) { options.properties = {} }
-          let subIdentifier = Object.keys(this.subscriptionsIndetifiers).find(k => this.subscriptionsIndetifiers[k] === topic) || ++this.currentSubscriptionIndetifier
+          let subIdentifier = Number(Object.keys(this.subscriptionsIndetifiers).find(k => this.subscriptionsIndetifiers[k] === topic)) || ++this.currentSubscriptionIndetifier
           options.properties.subscriptionIdentifier = subIdentifier
           this.subscriptionsIndetifiers[subIdentifier] = topic
         }
@@ -823,6 +822,7 @@ export default {
         })
       }
       this.$set(this.widgets, widgetId, settings)
+      this.valuesProcessing()
     },
     deleteWidget ({widgetId, settings}) {
       this.$q.dialog({
@@ -917,7 +917,6 @@ export default {
       }
     },
     importBoardHandler (board) {
-      // board = this.migrateBoard(board, board.appVersion, version)
       let id = board.id
       this.exportBoardId = id
       if (this.boards[id]) {
