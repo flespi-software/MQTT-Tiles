@@ -123,7 +123,7 @@ let clearWidgets = function clearWidgets (widgets) {
     })
     return boards
   },
-  getBoardToSave = function getBoardsToSave (board, widgets) {
+  getBoardToSave = function getBoardToSave (board, widgets) {
     board = cloneDeep(board)
     widgets = cloneDeep(widgets)
     clearWidgets(widgets)
@@ -175,14 +175,14 @@ export default {
     subscriptionsTopics () { return Object.keys(this.subscriptions) },
     canShare () {
       return !!this.clientSettings && this.clientSettings.host.indexOf('flespi') !== -1 &&
-        !this.clientSettings.flespiBoard &&
+        !this.clientSettings.flespiBoard // &&
         /* check for not master token used for flespi connection */
-        (
-          this.connack && this.connack.properties &&
-          this.connack.properties.userProperties &&
-          this.connack.properties.userProperties.token &&
-          JSON.parse(this.connack.properties.userProperties.token).access.type !== 1
-        )
+        // (
+        //   this.connack && this.connack.properties &&
+        //   this.connack.properties.userProperties &&
+        //   this.connack.properties.userProperties.token &&
+        //   JSON.parse(this.connack.properties.userProperties.token).access.type !== 1
+        // )
     }
   },
   methods: {

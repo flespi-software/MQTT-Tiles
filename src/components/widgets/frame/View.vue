@@ -108,7 +108,7 @@ export default {
         payload = this.item.settings.items[itemIndex].template
         payload = payload.replace('<{topic}>', this.value && this.value.topic)
         payload = payload.replace('<{payload}>', JSON.stringify(value))
-        payload = payload.replace(/<%([a-zA-Z0-9-+&@#/%?=~_|!:,.;]*)%>/gim, (_, name) => {
+        payload = payload.replace(/<%([a-zA-Z0-9-+&@#/%?=~_|!:,.;\s]*)%>/gim, (_, name) => {
           return JSON.stringify(get(value, name, null))
         })
       }

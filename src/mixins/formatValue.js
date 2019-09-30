@@ -2,7 +2,7 @@ import {
   WIDGET_VALUE_FORMAT_STRING,
   WIDGET_VALUE_FORMAT_HUMAN_READABLE_SIZE,
   WIDGET_VALUE_FORMAT_DATE,
-  WIDGET_VALUE_FORMAT_TIME
+  WIDGET_VALUE_FORMAT_DURATION
 } from '../constants'
 import { format, date } from 'quasar'
 const { humanStorageSize } = format
@@ -28,7 +28,7 @@ export default {
       if (mathTemplate && value !== 'N/A') {
         try {
           let mathExp = mathTemplate.replace(/%value%/g, value)
-          mathExp = mathExp.replace(/<%([a-zA-Z0-9-+&@#/%?=~_|!:,.;]*)%>/gim, (match, name) => {
+          mathExp = mathExp.replace(/<%([a-zA-Z0-9-+&@#/%?=~_|!:,.;\s]*)%>/gim, (match, name) => {
             let val = get(value, name, undefined)
               ? typeof value[name] === 'string' ? `"${value[name]}"` : value[name]
               : 'nill'
@@ -53,11 +53,12 @@ export default {
               break
             }
             case WIDGET_VALUE_FORMAT_DATE: {
-              value = value !== 'N/A' ? date.formatDate(value, 'DD/MM/YYYY HH:mm:ss.SSS') : value
+              let format = settings.dateFormat || 'DD/MM/YYYY HH:mm:ss.SSS'
+              value = value !== 'N/A' ? date.formatDate(value * 1000, format) : value
               break
             }
-            case WIDGET_VALUE_FORMAT_TIME: {
-              value = value !== 'N/A' ? timeFormat(value) : value
+            case WIDGET_VALUE_FORMAT_DURATION: {
+              value = value !== 'N/A' ? timeFormat(value * 1000) : value
             }
           }
         } catch (e) {}

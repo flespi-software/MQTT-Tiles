@@ -116,6 +116,7 @@
                 <div class="row">
                   <q-input class="col-8" color="dark" v-model="editedItem.math" float-label="Math expression" placeholder="%value%"/>
                   <q-select class="col-4" color="dark" v-model="editedItem.valueFormat" :options="formatOptions" float-label="Format value as"/>
+                  <q-input class="col-12" color="dark" v-if="editedItem.valueFormat === constants.WIDGET_VALUE_FORMAT_DATE" v-model="editedItem.dateFormat" float-label="Datetime format" placeholder="DD/MM/YYYY HH:mm:ss.SSS"/>
                 </div>
               </q-field>
             </div>
@@ -148,7 +149,7 @@ import {
   WIDGET_VALUE_FORMAT_PRE,
   WIDGET_VALUE_FORMAT_MARKDOWN,
   WIDGET_VALUE_FORMAT_JSON,
-  WIDGET_VALUE_FORMAT_TIME
+  WIDGET_VALUE_FORMAT_DURATION
 } from '../../../constants'
 import AddMenu from './AddMenu'
 import Text from './Text'
@@ -180,6 +181,15 @@ export default {
     }
     return {
       defaultSettings,
+      constants: {
+        WIDGET_VALUE_FORMAT_STRING,
+        WIDGET_VALUE_FORMAT_HUMAN_READABLE_SIZE,
+        WIDGET_VALUE_FORMAT_DATE,
+        WIDGET_VALUE_FORMAT_PRE,
+        WIDGET_VALUE_FORMAT_MARKDOWN,
+        WIDGET_VALUE_FORMAT_JSON,
+        WIDGET_VALUE_FORMAT_DURATION
+      },
       defaultItem,
       currentItem: Object.assign({}, defaultItem),
       currentSettings: Object.assign({}, defaultSettings, this.widget.settings),
@@ -203,9 +213,9 @@ export default {
       ],
       formatOptions: [
         {label: 'String', value: WIDGET_VALUE_FORMAT_STRING},
-        {label: 'Human readable size', value: WIDGET_VALUE_FORMAT_HUMAN_READABLE_SIZE},
-        {label: 'Date', value: WIDGET_VALUE_FORMAT_DATE},
-        {label: 'Time', value: WIDGET_VALUE_FORMAT_TIME},
+        {label: 'Human readable size, B', value: WIDGET_VALUE_FORMAT_HUMAN_READABLE_SIZE},
+        {label: 'Datetime, s', value: WIDGET_VALUE_FORMAT_DATE},
+        {label: 'Duration, s', value: WIDGET_VALUE_FORMAT_DURATION},
         {label: 'Preformated', value: WIDGET_VALUE_FORMAT_PRE},
         {label: 'Markdown', value: WIDGET_VALUE_FORMAT_MARKDOWN},
         {label: 'JSON', value: WIDGET_VALUE_FORMAT_JSON}

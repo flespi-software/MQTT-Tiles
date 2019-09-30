@@ -244,7 +244,7 @@ export default {
           topic.topicTemplate = topic.topicFilter
         }
         let variables = board.activeVariables
-        topic.topicFilter = topic.topicTemplate.replace(/<%([a-zA-Z0-9-+&@#/%?=~_|!:,.;]*)%>/gim, (match, name) => {
+        topic.topicFilter = topic.topicTemplate.replace(/<%([a-zA-Z0-9-+&@#/%?=~_|!:,.;\s]*)%>/gim, (match, name) => {
           return variables[name] || match
         })
       }
@@ -262,7 +262,7 @@ export default {
     },
     actionHandler (boardId, data) {
       let variables = this.boards[boardId].activeVariables
-      data.topic = data.topic.replace(/<%([a-zA-Z0-9-+&@#/%?=~_|!:,.;]*)%>/gim, (match, name) => {
+      data.topic = data.topic.replace(/<%([a-zA-Z0-9-+&@#/%?=~_|!:,.;\s]*)%>/gim, (match, name) => {
         return variables[name] || match
       })
       this.$emit('action', data)
