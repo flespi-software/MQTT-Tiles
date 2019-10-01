@@ -27,8 +27,11 @@
         </q-list-header>
         <q-item class="cursor-pointer" :class="{'active': index === activeClientId}" @click.native="setActiveClient(index)" v-for="(client, index) in clients" :key="index">
           <q-item-side>
-            <q-icon :name="connected ? 'mdi-lan-connect' : 'mdi-lan-disconnect'">
-              <q-tooltip v-if="index === activeClientId">{{`${connected ? 'Connected' : 'Disconnected'}`}}</q-tooltip>
+            <q-btn @click.stop="setActiveClient()" v-if="connected && index === activeClientId" icon="mdi-lan-connect" dense flat>
+              <q-tooltip>Disconnect</q-tooltip>
+            </q-btn>
+            <q-icon v-else name="mdi-lan-disconnect" size="1.3rem" class="q-ma-xs">
+              <q-tooltip v-if="index === activeClientId"></q-tooltip>
             </q-icon>
           </q-item-side>
           <q-item-main>

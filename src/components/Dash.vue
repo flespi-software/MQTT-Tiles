@@ -87,7 +87,7 @@
 <script>
 import isEqual from 'lodash/isEqual'
 import mqtt from '../plugins/async-mqtt.js'
-import { uid, LocalStorage } from 'quasar'
+import { uid } from 'quasar'
 import bl from 'bl'
 import debounce from 'lodash/debounce'
 import cloneDeep from 'lodash/cloneDeep'
@@ -98,7 +98,7 @@ import get from 'lodash/get'
 import { Base64 } from 'js-base64'
 import Board from './Board'
 import Boards from './Boards'
-import { BOARDS_LOCALSTORAGE_NAME, WIDGET_STATUS_DISABLED, WIDGET_STATUS_ENABLED } from '../constants'
+import { WIDGET_STATUS_DISABLED, WIDGET_STATUS_ENABLED } from '../constants'
 import getActionTopics from './widgets/getActionTopics.js'
 import messagesProcessing from './widgets/messagesProcessing.js'
 import migrateWidgets from './widgets/migrations'
@@ -131,14 +131,11 @@ let clearWidgets = function clearWidgets (widgets) {
     board.appVersion = version
     return board
   },
-  saveBoardsToLocalStorage = debounce((boards, widgets) => {
-    LocalStorage.set(BOARDS_LOCALSTORAGE_NAME, getBoardsToSave(boards, widgets))
-  }, 500, { trailing: true }),
   removeFromArrayByValue = (array, value) => remove(array, (el) => { return el === value })
 
 export default {
   name: 'Dash',
-  props: ['clientSettings'],
+  props: ['clientSettings', 'initBoards'],
   data () {
     return {
       fullView: !(this.clientSettings && this.clientSettings.flespiBoard),
@@ -1095,10 +1092,15 @@ export default {
         boardModel = JSON.parse(Base64.decode(data))
       }
       this.importBoardHandler(boardModel)
+    },
+    /* events */
+    updateBoards (boards, widgets) {
+      this.$emit('update:boards', getBoardsToSave(boards, widgets))
     }
   },
   created () {
     this.debouncedBusMessagesProcessing = debounce(this.busMessagesProcessing, 500, { trailing: true })
+    this.debouncedUpdateBoards = debounce(this.updateBoards, 500, { trailing: true })
     this.valuesProcessing()
     if (this.clientSettings) {
       if (this.clientSettings.flespiBoard) {
@@ -1106,8 +1108,7 @@ export default {
       }
       return true
     }
-    let savedBoards = LocalStorage.get.item(BOARDS_LOCALSTORAGE_NAME)
-    this.initSavedBoards(savedBoards)
+    this.initBoards && this.initSavedBoards(this.initBoards)
     if (window) {
       window.addEventListener('beforeunload', () => {
         if (this.client) {
@@ -1134,11 +1135,11 @@ export default {
           this.setValueByTopic(topic, null)
         })
         oldClient && this.debouncedBusMessagesProcessing()
+        this.boardsVariablesValuesClear()
         if (!client) {
           this.client = undefined
           return false
         }
-        this.boardsVariablesValuesClear()
         firstInit
           ? this.createClient()
           : setTimeout(() => { this.createClient() }, 500)
@@ -1149,7 +1150,7 @@ export default {
       {
         deep: true,
         handler (boards) {
-          this.fullView && saveBoardsToLocalStorage(boards, this.widgets)
+          this.fullView && this.debouncedUpdateBoards(boards, this.widgets)
         }
       },
       {
@@ -1160,7 +1161,7 @@ export default {
       {
         deep: true,
         handler (widgets) {
-          this.fullView && saveBoardsToLocalStorage(this.boards, widgets)
+          this.fullView && this.debouncedUpdateBoards(this.boards, widgets)
         }
       },
       {
