@@ -112,13 +112,20 @@ export default {
 }
 ```
 ```html
-<dash :clientSettings="clientSettings" @change:status="changeStatusHandler" @share="shareHandler"/>
+<dash
+  :clientSettings="clientSettings"
+  @change:status="changeStatusHandler"
+  @share="shareHandler"
+  @change:title="t => title = t"
+  @update:boards="saveBoardsToLocalStorage"
+/>
 ```
 Props:
 
 | Name  | Description  | Default |
 |---|---|---|
 | clientSettings | Connection client settings | undefined |
+| initBoards | Your saved boards | undefined |
 
 clientSettings structure:
 ```js
@@ -145,6 +152,8 @@ Events:
 |---|---|---|
 | change:status | connect client status changes | status: <Boolean> |
 | share | share board | <Share_model> |
+| change:title | generated title | `{active-board-name} - MQTT Tiles`: <String> |
+| update:boards | updated boards configuration | boards collection: <Object> |
 
 share model structure:
 ```js
