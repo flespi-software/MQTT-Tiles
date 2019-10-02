@@ -53,7 +53,7 @@ export default {
               break
             }
             case WIDGET_VALUE_FORMAT_DATE: {
-              let format = settings.dateFormat || 'DD/MM/YYYY HH:mm:ss.SSS'
+              let format = settings.dateFormat || 'DD/MM/YYYY HH:mm:ss'
               value = value !== 'N/A' ? date.formatDate(value * 1000, format) : value
               break
             }
