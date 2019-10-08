@@ -87,7 +87,10 @@ module.exports = function (ctx) {
         'QColorPicker',
         'QBtnDropdown',
         'QUploader',
-        'QPagination'
+        'QPagination',
+        'QStepper',
+        'QStep',
+        'QStepperNavigation'
       ],
       directives: [
         'Ripple',

@@ -170,16 +170,18 @@ export default {
     },
     boardsIds () { return Object.keys(this.boards) },
     subscriptionsTopics () { return Object.keys(this.subscriptions) },
+    canShareByClientToken () {
+      return this.connack && this.connack.properties &&
+          this.connack.properties.userProperties &&
+          this.connack.properties.userProperties.token &&
+          JSON.parse(this.connack.properties.userProperties.token).access.type !== 1
+    },
     canShare () {
+      let hasCreds = (this.clientSettings && this.clientSettings.syncCreds && this.clientSettings.syncCreds.length)
       return !!this.clientSettings && this.clientSettings.host.indexOf('flespi') !== -1 &&
-        !this.clientSettings.flespiBoard // &&
+        !this.clientSettings.flespiBoard &&
         /* check for not master token used for flespi connection */
-        // (
-        //   this.connack && this.connack.properties &&
-        //   this.connack.properties.userProperties &&
-        //   this.connack.properties.userProperties.token &&
-        //   JSON.parse(this.connack.properties.userProperties.token).access.type !== 1
-        // )
+        (hasCreds || this.canShareByClientToken)
     }
   },
   methods: {
@@ -951,34 +953,36 @@ export default {
       this.exportBoardId = id
       if (this.boardsFromConnection[id]) {
         return this.$refs.copyReplaceDialog.open()
-          .then((id) => this.exportBoardHandler(id))
+          .then((id) => this.exportBoardHandler(id, this.exportBoardId))
           .catch(() => {})
       } else {
-        return Promise.resolve(this.exportBoardHandler(id))
+        return Promise.resolve(this.exportBoardHandler(id, this.exportBoardId))
       }
     },
-    exportBoardHandler (id) {
+    exportBoardHandler (id, newId) {
       let board, currentId
-      if (id === this.exportBoardId) {
+      if (id === newId) {
         board = this.boards[id]
         currentId = id
       } else {
         board = this.boards[id]
-        board.id = this.exportBoardId
+        board.id = newId
         this.replaceBoardHandler(id)
-        currentId = this.exportBoardId
+        currentId = newId
       }
       let topic = `${this.clientSettings.syncNamespace}/${currentId}`
       this.publish(topic, JSON.stringify(getBoardToSave(board, this.widgets)), { qos: 1, retain: true })
       this.closeExportHandler()
       return currentId
     },
+    uploadBoardToConnection (id, newId) {
+      this.exportBoardHandler(id, newId)
+    },
     closeExportHandler () {
       this.exportBoardId = ''
     },
-    shareHandler (boardId) {
-      let board = this.boards[boardId],
-        widgets = board.widgetsIndexes.map(widgetId => this.widgets[widgetId]),
+    getShareModel (board, isRemoteBoard) {
+      let widgets = isRemoteBoard ? board.widgetsIndexes : board.widgetsIndexes.map(widgetId => this.widgets[widgetId]),
         subscribeTopics = uniq(widgets.reduce((topics, widget) => { return [...topics, ...widget.topics] }, [])),
         publishTopics = uniq(getActionTopics(widgets))
       let topics = {}
@@ -1001,41 +1005,39 @@ export default {
         model.push(shareObj)
         return model
       }, [])
-      if (!this.canShare) { return false }
-      this.exportPrepareBoardHandler(boardId)
-        .then((id) => {
-          if (id) {
-            this.$emit('share', { boardId: id, share: shareModel })
-          }
-        })
-        .catch(() => {})
+      return shareModel
+    },
+    shareHandler (boardId) {
+      let shareWizardConfig = {
+        boardId,
+        tokens: [{label: '<Connection token>', credentions: { username: this.clientSettings.username }, accessable: this.canShareByClientToken}],
+        hasRemote: !!this.boardsFromConnection[boardId],
+        currentRemoteBoards: Object.keys(this.boardsFromConnection),
+        syncNamespace: this.clientSettings.syncNamespace
+      }
+      if (this.clientSettings.syncCreds) {
+        let creds = cloneDeep(this.clientSettings.syncCreds)
+        shareWizardConfig.tokens = [...shareWizardConfig.tokens, ...creds]
+      }
+      this.$emit('share:prepare', shareWizardConfig)
     },
     shareUploadedHandler (boardId) {
-      let board = this.boardsFromConnection[boardId],
-        widgets = board.widgetsIndexes,
-        subscribeTopics = uniq(widgets.reduce((topics, widget) => { return [...topics, ...widget.topics] }, [])),
-        publishTopics = uniq(getActionTopics(widgets))
-      let topics = {}
-      subscribeTopics.forEach((subTopic) => {
-        if (!topics[subTopic]) {
-          topics[subTopic] = ['subscribe']
-        }
-      })
-      publishTopics.forEach((pubTopic) => {
-        if (!topics[pubTopic]) {
-          topics[pubTopic] = ['publish']
-        } else {
-          topics[pubTopic].push('publish')
-        }
-      })
-      let shareModel = Object.keys(topics).reduce((model, topic) => {
-        let shareObj = { uri: 'mqtt' }
-        shareObj.topic = topic
-        shareObj.actions = topics[topic]
-        model.push(shareObj)
-        return model
-      }, [])
-      this.$emit('share', { boardId, share: shareModel })
+      let shareWizardConfig = {
+        boardId,
+        tokens: [{label: '<Connection token>', credentions: { username: this.clientSettings.username }, accessable: this.canShareByClientToken}],
+        hasRemote: false,
+        isRemote: true,
+        syncNamespace: this.clientSettings.syncNamespace
+      }
+      if (this.clientSettings.syncCreds) {
+        let creds = cloneDeep(this.clientSettings.syncCreds)
+        shareWizardConfig.tokens = [...shareWizardConfig.tokens, ...creds]
+      }
+      this.$emit('share:prepare', shareWizardConfig)
+    },
+    shareBoard (config) {
+      let {boardId, isRemote} = config
+      this.$emit('share', { boardId, share: this.getShareModel(isRemote ? this.boardsFromConnection[boardId] : this.boards[boardId], isRemote) })
     },
     shareSync () {
       let boardId = this.clientSettings.flespiBoard,

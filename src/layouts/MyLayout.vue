@@ -139,43 +139,43 @@ export default {
       this.connected = status
     },
     shareHandler (data) {
-      let token = this.clients[this.activeClientId].username,
-        topic = this.clients[this.activeClientId].syncNamespace,
-        shareObj = { token, topic, boardId: data.boardId },
-        link = `${window.location.href}${Base64.encode(JSON.stringify(shareObj))}`
-      this.$q.notify({
-        message: 'Link generated!',
-        timeout: 0,
-        type: 'info',
-        icon: 'mdi-link',
-        position: 'bottom-left',
-        closeBtn: true,
-        actions: [
-          {
-            label: 'Copy',
-            handler: () => {
-              this.$copyText(link)
-                .then((e) => {
-                  this.$q.notify({
-                    type: 'positive',
-                    icon: 'content_copy',
-                    message: `Link copied`,
-                    timeout: 1000,
-                    position: 'bottom-left'
-                  })
-                }, (e) => {
-                  this.$q.notify({
-                    type: 'negative',
-                    icon: 'content_copy',
-                    message: `Error coping link`,
-                    timeout: 1000,
-                    position: 'bottom-left'
-                  })
-                })
-            }
-          }
-        ]
-      })
+      // let token = this.clients[this.activeClientId].username,
+      //   topic = this.clients[this.activeClientId].syncNamespace,
+      //   shareObj = { token, topic, boardId: data.boardId },
+      //   link = `${window.location.href}${Base64.encode(JSON.stringify(shareObj))}`
+      // this.$q.notify({
+      //   message: 'Link generated!',
+      //   timeout: 0,
+      //   type: 'info',
+      //   icon: 'mdi-link',
+      //   position: 'bottom-left',
+      //   closeBtn: true,
+      //   actions: [
+      //     {
+      //       label: 'Copy',
+      //       handler: () => {
+      //         this.$copyText(link)
+      //           .then((e) => {
+      //             this.$q.notify({
+      //               type: 'positive',
+      //               icon: 'content_copy',
+      //               message: `Link copied`,
+      //               timeout: 1000,
+      //               position: 'bottom-left'
+      //             })
+      //           }, (e) => {
+      //             this.$q.notify({
+      //               type: 'negative',
+      //               icon: 'content_copy',
+      //               message: `Error coping link`,
+      //               timeout: 1000,
+      //               position: 'bottom-left'
+      //             })
+      //           })
+      //       }
+      //     }
+      //   ]
+      // })
     }
   },
   created () {
