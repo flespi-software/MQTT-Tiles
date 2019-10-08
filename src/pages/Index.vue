@@ -14,7 +14,6 @@
       v-if="shareWizardConfig"
       v-model="shareWizardOpened"
       :config="shareWizardConfig"
-      @update:board-id="updateBoardInConnection"
       @hide="shareWizardConfig = undefined, shareWizardOpened = false"
       @share="shareBoard"
     />
@@ -46,9 +45,6 @@ export default {
   methods: {
     saveBoardsToLocalStorage (boards) {
       this.$q.localStorage.set(BOARDS_LOCALSTORAGE_NAME, boards)
-    },
-    updateBoardInConnection ({boardId, oldBoardId}) {
-      this.$refs.dash.exportBoardHandler(oldBoardId, boardId)
     },
     sharePrepareHandler (shareWizardConfig) {
       this.shareWizardConfig = shareWizardConfig

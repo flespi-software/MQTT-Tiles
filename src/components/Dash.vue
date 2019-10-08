@@ -178,7 +178,7 @@ export default {
     },
     canShare () {
       let hasCreds = (this.clientSettings && this.clientSettings.syncCreds && this.clientSettings.syncCreds.length)
-      return !!this.clientSettings && this.clientSettings.host.indexOf('flespi') !== -1 &&
+      return this.clientStatus && !!this.clientSettings && this.clientSettings.host.indexOf('flespi') !== -1 &&
         !this.clientSettings.flespiBoard &&
         /* check for not master token used for flespi connection */
         (hasCreds || this.canShareByClientToken)
@@ -485,7 +485,10 @@ export default {
     async publish () {
       if (this.client) {
         return this.client.publish(...arguments)
-          .catch(err => { this.errorHandler(err, true) })
+          .catch(err => {
+            this.errorHandler(err, true)
+            return err
+          })
       } else { this.showError(new Error('You have no active clients'), true) }
     },
     async destroyClient () {
@@ -971,9 +974,14 @@ export default {
         currentId = newId
       }
       let topic = `${this.clientSettings.syncNamespace}/${currentId}`
-      this.publish(topic, JSON.stringify(getBoardToSave(board, this.widgets)), { qos: 1, retain: true })
-      this.closeExportHandler()
-      return currentId
+      return this.publish(topic, JSON.stringify(getBoardToSave(board, this.widgets)), { qos: 1, retain: true })
+        .then((resp) => {
+          if (resp instanceof Error) {
+            return resp
+          }
+          this.closeExportHandler()
+          return currentId
+        })
     },
     uploadBoardToConnection (id, newId) {
       this.exportBoardHandler(id, newId)
@@ -1013,7 +1021,8 @@ export default {
         tokens: [{label: '<Connection token>', credentions: { username: this.clientSettings.username }, accessable: this.canShareByClientToken}],
         hasRemote: !!this.boardsFromConnection[boardId],
         currentRemoteBoards: Object.keys(this.boardsFromConnection),
-        syncNamespace: this.clientSettings.syncNamespace
+        syncNamespace: this.clientSettings.syncNamespace,
+        updateBoardMethod: this.exportBoardHandler
       }
       if (this.clientSettings.syncCreds) {
         let creds = cloneDeep(this.clientSettings.syncCreds)
@@ -1027,7 +1036,8 @@ export default {
         tokens: [{label: '<Connection token>', credentions: { username: this.clientSettings.username }, accessable: this.canShareByClientToken}],
         hasRemote: false,
         isRemote: true,
-        syncNamespace: this.clientSettings.syncNamespace
+        syncNamespace: this.clientSettings.syncNamespace,
+        updateBoardMethod: this.exportBoardHandler
       }
       if (this.clientSettings.syncCreds) {
         let creds = cloneDeep(this.clientSettings.syncCreds)

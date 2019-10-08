@@ -41,18 +41,34 @@
             />
           </q-step>
           <q-step name="link" title="Link" :active-icon="isLinkCopied ? 'mdi-check' : undefined">
-            <q-input type="textarea" v-model="link" readonly/>
-            <div class="text-center q-mt-md">
-              <q-btn @click="copyLink" flat icon="mdi-content-copy" size="1.2rem">Copy</q-btn>
-            </div>
+            <template v-if="updatedBoardFlag">
+              <q-input type="textarea" v-model="link" readonly/>
+              <div class="text-center q-mt-md">
+                <q-btn @click="copyLink" flat icon="mdi-content-copy" size="1.2rem">Copy</q-btn>
+              </div>
+            </template>
+            <template v-else-if="updatedBoardFlag === false">
+              <div class="rounded-borders bg-red-1 q-pa-md">
+                <div class="q-title text-red-8 q-mb-sm">
+                  <q-icon name="mdi-alert-outline"/>
+                  Share error
+                </div>
+                <div class="text-grey-8">Link can`t be generated without updating the board in connection. (<span class="text-grey-7">{{updateBoardError.message}}</span>)</div>
+              </div>
+            </template>
+            <template v-else-if="updatedBoardFlag === undefined">
+              <div>
+                Generating...
+              </div>
+            </template>
           </q-step>
         </q-stepper>
       </div>
       <q-toolbar slot="footer" color="dark">
         <q-btn flat dense class="q-mr-sm absolute" @click="closeHandler">Close</q-btn>
         <q-toolbar-title></q-toolbar-title>
-        <q-btn flat v-if="currentStep !== steps[0].value" @click="prevStepHandler">Back</q-btn>
-        <q-btn flat class="q-ml-sm" @click="nextStepHandler" :disable="!isValidStep">{{ currentStep === 'link' ? 'Done' : 'Next' }}</q-btn>
+        <q-btn flat v-if="currentStep !== steps[0].value && !updateBoardError" @click="prevStepHandler">Back</q-btn>
+        <q-btn flat class="q-ml-sm" v-if="!updateBoardError" @click="nextStepHandler" :disable="!isValidStep">{{ currentStep === 'link' ? 'Done' : 'Next' }}</q-btn>
       </q-toolbar>
     </q-modal-layout>
   </q-modal>
@@ -61,6 +77,7 @@
 <script>
 import { Base64 } from 'js-base64'
 import get from 'lodash/get'
+import cloneDeep from 'lodash/cloneDeep'
 
 export default {
   name: 'ShareWizard',
@@ -83,7 +100,11 @@ export default {
       },
       link: '',
       isNeedCopy: false,
-      isLinkCopied: false
+      isLinkCopied: false,
+      currentConfig: cloneDeep(this.config),
+      steps: [],
+      updatedBoardFlag: undefined,
+      updateBoardError: undefined
     }
   },
   computed: {
@@ -91,41 +112,50 @@ export default {
       get () { return this.value },
       set (val) { this.$emit('input', val) }
     },
-    steps () {
-      let steps = {},
-        stepIndex = 0
-      if (this.config.tokens.length > 1) {
-        steps[stepIndex] = { label: 'Token', value: this.stepsConst.STEP_TOKEN }
-        stepIndex++
-      } else {
-        this.setToken(this.config.tokens[0])
-      }
-      if (this.config.hasRemote) {
-        steps[stepIndex] = { label: 'Replace', value: this.stepsConst.STEP_REPLACE }
-        stepIndex++
-      } else {
-        this.setboardId(this.config.boardId, this.config.boardId)
-      }
-      steps[stepIndex] = { label: 'Link', value: this.stepsConst.STEP_LINK }
-      return steps
-    },
     isValidStep () {
       switch (this.currentStep) {
         case 'tokens': {
           return this.shareBoardModel.token
         }
         case 'replace': {
-          return !this.isNeedCopy || (this.isNeedCopy && this.shareBoardModel.boardId !== this.config.boardId && this.config.currentRemoteBoards && !this.config.currentRemoteBoards.includes(this.shareBoardModel.boardId))
+          return !this.isNeedCopy ||
+            (
+              this.isNeedCopy &&
+              this.shareBoardModel.boardId !== this.config.boardId &&
+              this.config.currentRemoteBoards &&
+              !this.config.currentRemoteBoards.includes(this.shareBoardModel.boardId)
+            )
         }
         default: { return true }
       }
     }
+  },
+  created () {
+    let steps = {},
+      stepIndex = 0
+    if (this.config.tokens.length > 1) {
+      steps[stepIndex] = { label: 'Token', value: this.stepsConst.STEP_TOKEN }
+      stepIndex++
+    } else {
+      this.setToken(this.config.tokens[0])
+    }
+    if (this.config.hasRemote) {
+      steps[stepIndex] = { label: 'Replace', value: this.stepsConst.STEP_REPLACE }
+      stepIndex++
+    } else {
+      this.setboardId(this.config.boardId, this.config.boardId)
+    }
+    steps[stepIndex] = { label: 'Link', value: this.stepsConst.STEP_LINK }
+    this.steps = steps
   },
   methods: {
     closeHandler () {
       this.link = ''
       this.shareBoardModel = {}
       this.currentStep = this.stepsConst.STEP_TOKEN
+      this.steps = []
+      this.updatedBoardFlag = undefined
+      this.updateBoardError = undefined
       this.$emit('input', false)
       this.$emit('hide')
     },
@@ -184,10 +214,22 @@ export default {
     },
     setboardId (boardId, oldBoardId) {
       this.$set(this.shareBoardModel, 'boardId', boardId)
-      !this.config.isRemote && this.$emit('update:board-id', {boardId, oldBoardId})
-      this.$emit('share', this.shareBoardModel)
-      this.generateLink()
-      return Promise.resolve(true)
+      let resp = Promise.resolve(true)
+      if (!this.config.isRemote) {
+        resp = this.config.updateBoardMethod(oldBoardId, boardId)
+          .then((resp) => {
+            if (resp instanceof Error) {
+              this.updatedBoardFlag = false
+              this.updateBoardError = resp
+              return true
+            }
+            this.updatedBoardFlag = true
+            this.$emit('share', this.shareBoardModel)
+            this.generateLink()
+            return true
+          })
+      }
+      return resp
     },
     generateLink () {
       let token = get(this.shareBoardModel, 'token.credentions.username', ''),
