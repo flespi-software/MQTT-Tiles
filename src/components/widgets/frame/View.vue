@@ -26,7 +26,7 @@
         </q-item-side>
       </transition>
     </q-item>
-    <q-card-media class="widget__content scroll" :class="[`bg-${item.color}-1`]" style="height: calc(100% - 29px);">
+    <q-card-media class="widget__content scroll" :class="[`bg-${item.color}-1`]" :style="{height: contentHeight}">
       <div style="width: 100%; height: 100%;">
         <div class="frame__payload" style="height: 100%">
           <q-resize-observable @resize="onResize" />
@@ -134,6 +134,13 @@ export default {
         let linkValue = this.getValueByTopic(this.value[this.item.dataTopics[0].topicFilter] && this.value[this.item.dataTopics[0].topicFilter].payload, this.item.dataTopics[0])
         return linkValue && linkValue.toString().match(urlPattern) ? linkValue : null
       }
+    },
+    contentHeight () {
+      let height = 'calc(100% - 29px)'
+      if (!this.item.name && this.blocked) {
+        height = 'calc(100% - 11px)'
+      }
+      return height
     }
   },
   watch: {

@@ -4,7 +4,7 @@
     :class="{ 'bg-grey-3': selected, 'round-borders': selected, [`text-${color}-7`]: true }"
   >
     <div style="word-break: break-all;" class="text-bold">{{item.label}}</div>
-    <div style="word-break: break-all; font-size: .8rem;">{{computedValue || 'value'}}</div>
+    <div style="word-break: break-all; font-size: .8rem;">{{computedValue}}</div>
   </div>
 </template>
 <script>
@@ -14,7 +14,8 @@ export default {
   props: ['item', 'value', 'selected', 'color'],
   computed: {
     computedValue () {
-      return this.formatValue(this.value, this.item)
+      let value = this.formatValue(this.value, this.item)
+      return value === 'N/A' || value === undefined ? '*novalue*' : value
     }
   },
   mixins: [ formatValue ]

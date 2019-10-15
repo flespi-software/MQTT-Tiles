@@ -43,7 +43,7 @@
         </q-item-side>
       </transition>
     </q-item>
-    <q-card-media class="widget__content" :class="[`bg-${item.color}-1`]" style="height: calc(100% - 29px);">
+    <q-card-media class="widget__content" :class="[`bg-${item.color}-1`]" :style="{height: contentHeight}">
       <div style="width: 100%; height: 100%;">
         <div class="linear__payload" style="height: 100%">
           <q-resize-observable @resize="onResize" />
@@ -242,6 +242,13 @@ export default {
           { 'from': settings.highLevel, 'to': this.maxValue, 'color': 'rgba(244,81,30,1)' }
         ]
       }
+    },
+    contentHeight () {
+      let height = 'calc(100% - 29px)'
+      if (!this.item.name && this.blocked) {
+        height = 'calc(100% - 11px)'
+      }
+      return height
     }
   },
   components: { LinearGauge },

@@ -39,7 +39,7 @@
         </q-item-side>
       </transition>
     </q-item>
-    <q-card-media class="widget__content scroll" :class="[`bg-${item.color}-1`]" style="height: calc(100% - 44px);">
+    <q-card-media class="widget__content scroll" :class="[`bg-${item.color}-1`]" :style="{height: contentHeight}">
       <div class="color__payload-wrapper flex flex-center">
         <color-picker v-if="item.settings.mode === COLOR_MODE_SIMPLE" :hue="color.h" @input="actionHandler" :disabled="disable"/>
         <q-color-picker
@@ -54,7 +54,7 @@
         />
       </div>
     </q-card-media>
-    <div v-if="item.settings.isNeedTime" class="absolute-bottom-left q-px-xs q-pt-xs" style="font-size: 12px; border-top-right-radius: 5px;" :class="[`text-${item.color}-7`, `bg-${item.color}-1`]">
+    <div v-if="item.settings.isNeedTime" class="absolute-bottom-left q-px-xs q-pt-xs" style="font-size: 12px; border-top-right-radius: 5px; bottom: 1px; left: 1px;" :class="[`text-${item.color}-7`, `bg-${item.color}-1`]">
       {{timestamp}}
     </div>
   </q-card>
@@ -251,6 +251,11 @@ export default {
         color = hsvToRgb(color)
         return `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a === undefined ? 100 : color.a})`
       }
+    },
+    contentHeight () {
+      let height = 'calc(100% - 44px)'
+      if (!this.item.name && this.blocked) { height = 'calc(100% - 24px)' }
+      return height
     }
   },
   components: { ColorPicker },

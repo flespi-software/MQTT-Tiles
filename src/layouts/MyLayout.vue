@@ -65,7 +65,14 @@
       </div>
     </q-layout-drawer>
     <q-page-container>
-      <router-view :client="clients[activeClientId]" @change:status="changeStatus" @share="shareHandler" />
+      <router-view
+        :client="clients[activeClientId]"
+        @change:status="changeStatus"
+        @share="shareHandler"
+        @change:attach="changeAttachedBoards"
+        @delete:boards="deleteBoardsHandler"
+        @add:boards="addBoardsHandler"
+      />
     </q-page-container>
   </q-layout>
 </template>
@@ -121,8 +128,8 @@ export default {
     },
     removeClient (clientId) {
       this.$q.dialog({
-        title: 'Warning',
-        message: `Do you really want to delete ${this.clients[clientId].clientName} client?`,
+        title: 'Delete client?',
+        message: `Do you really want to delete «${this.clients[clientId].clientName}» client?`,
         color: 'dark',
         ok: true,
         cancel: true
@@ -138,44 +145,60 @@ export default {
     changeStatus (status) {
       this.connected = status
     },
-    shareHandler (data) {
-      // let token = this.clients[this.activeClientId].username,
-      //   topic = this.clients[this.activeClientId].syncNamespace,
-      //   shareObj = { token, topic, boardId: data.boardId },
-      //   link = `${window.location.href}${Base64.encode(JSON.stringify(shareObj))}`
-      // this.$q.notify({
-      //   message: 'Link generated!',
-      //   timeout: 0,
-      //   type: 'info',
-      //   icon: 'mdi-link',
-      //   position: 'bottom-left',
-      //   closeBtn: true,
-      //   actions: [
-      //     {
-      //       label: 'Copy',
-      //       handler: () => {
-      //         this.$copyText(link)
-      //           .then((e) => {
-      //             this.$q.notify({
-      //               type: 'positive',
-      //               icon: 'content_copy',
-      //               message: `Link copied`,
-      //               timeout: 1000,
-      //               position: 'bottom-left'
-      //             })
-      //           }, (e) => {
-      //             this.$q.notify({
-      //               type: 'negative',
-      //               icon: 'content_copy',
-      //               message: `Error coping link`,
-      //               timeout: 1000,
-      //               position: 'bottom-left'
-      //             })
-      //           })
-      //       }
-      //     }
-      //   ]
-      // })
+    shareHandler (data) {},
+    clearAttachMode (client) {
+      this.$q.notify({
+        message: 'No boards attached to the connection. Showing all available boards.',
+        timeout: 3000,
+        type: 'info',
+        icon: 'mdi-link-variant',
+        position: 'bottom-left'
+      })
+      this.$delete(client, 'attachedBoards')
+    },
+    changeAttachedBoards (attachedBoardsIds) {
+      if (attachedBoardsIds.length) {
+        this.$set(this.clients[this.activeClientId], 'attachedBoards', [...attachedBoardsIds])
+      } else if (this.clients[this.activeClientId].attachedBoards) {
+        this.clearAttachMode(this.clients[this.activeClientId])
+      }
+    },
+    deleteBoardsHandler (boardsIds) {
+      Object.keys(this.clients).forEach(clientId => {
+        if (this.clients[clientId].attachedBoards) {
+          this.clients[clientId].attachedBoards.forEach((attachedBoardId, index) => {
+            if (boardsIds.includes(attachedBoardId)) {
+              this.$delete(this.clients[clientId].attachedBoards, index)
+            }
+          })
+          if (!this.clients[clientId].attachedBoards.length) {
+            this.clearAttachMode(this.clients[clientId])
+          }
+        }
+      })
+    },
+    addBoardsHandler (boardsIds) {
+      if (!this.activeClientId) { return false }
+      let client = this.clients[this.activeClientId],
+        hasAttachedBoards = !!client.attachedBoards
+      if (hasAttachedBoards) {
+        this.$q.notify({
+          message: 'Attach new board to the connection?',
+          timeout: 0,
+          type: 'info',
+          icon: 'mdi-link-variant',
+          position: 'bottom-left',
+          closeBtn: true,
+          actions: [
+            {
+              label: 'Attach',
+              handler: () => {
+                this.$set(this.clients[this.activeClientId], 'attachedBoards', [...this.clients[this.activeClientId].attachedBoards, ...boardsIds])
+              }
+            }
+          ]
+        })
+      }
     }
   },
   created () {

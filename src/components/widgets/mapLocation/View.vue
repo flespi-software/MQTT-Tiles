@@ -26,7 +26,7 @@
         </q-item-side>
       </transition>
     </q-item>
-    <q-card-media class="widget__content scroll" :class="[`bg-${item.color}-1`]" :style="{height: integration ? '' : 'calc(100% - 29px)'}">
+    <q-card-media class="widget__content scroll" :class="[`bg-${item.color}-1`]" :style="{height: integration ? '' : contentHeight}">
       <div style="width: 100%; height: 100%;">
         <iframe style="width: 100%;height: calc(100% - 18px);" src="https://flespi.io/mapview" frameborder="0" ref="map" allowfullscreen></iframe>
       </div>
@@ -90,6 +90,13 @@ export default {
       let isValueSame = values[0] === this.prevPosition[0] && values[1] === this.prevPosition[1]
       !isValueSame && this.setPosition(values)
       return values
+    },
+    contentHeight () {
+      let height = 'calc(100% - 29px)'
+      if (!this.item.name && this.blocked) {
+        height = 'calc(100% - 11px)'
+      }
+      return height
     }
   },
   methods: {

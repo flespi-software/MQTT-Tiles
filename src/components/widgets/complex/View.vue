@@ -1,6 +1,6 @@
 <template>
   <q-card flat inline class="widget__complex q-py-sm" style="width: 100%; height: 100%;" :class="[`bg-${item.color}-1`]">
-    <q-item class="q-pa-none q-px-sm" style="min-height: 22px;">
+    <q-item class="q-pa-none q-px-sm" style="min-height: 0px;">
       <q-item-main class="ellipsis" :class="[`text-${item.color}-7`]" style="font-size: .9rem">
         {{item.name}}
         <q-tooltip>{{item.name}}</q-tooltip>
@@ -26,7 +26,7 @@
         </q-item-side>
       </transition>
     </q-item>
-    <q-card-media class="widget__content q-pa-sm" :class="[`bg-${item.color}-1`]" style="height: calc(100% - 22px);">
+    <q-card-media class="widget__content q-pa-sm" :class="[`bg-${item.color}-1`]" :style="{height: contentHeight}">
       <div ref="itemsTop" class="items__top flex q-px-md q-py-xs absolute scroll" style="top: 0px; left: 8px; right: 8px; background-color: rgba(255,255,255,0.5); max-height: 33%; min-height: 50px;" v-if="topItems.length">
         <component
           v-for="(renderItem, layoutIndex) in topItems"
@@ -173,6 +173,11 @@ export default {
     },
     bottomItems () {
       return this.renderItems.filter(item => item.position === 'bottom')
+    },
+    contentHeight () {
+      let height = 'calc(100% - 24px)'
+      if (!this.item.name && this.blocked) { height = 'calc(100% - 6px)' }
+      return height
     }
   },
   methods: {

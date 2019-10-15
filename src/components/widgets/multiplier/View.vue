@@ -1,6 +1,6 @@
 <template>
   <q-card flat inline class="widget__multiplier q-pa-sm" style="width: 100%; height: 100%;" :class="[`bg-${item.color}-1`]">
-    <q-item class="q-pa-none" style="min-height: 22px;">
+    <q-item class="q-pa-none" style="min-height: 0px;">
       <q-item-main class="ellipsis" :class="[`text-${item.color}-7`]" style="font-size: .9rem">
         {{item.name}}
         <q-tooltip>{{item.name}}</q-tooltip>
@@ -26,7 +26,7 @@
         </q-item-side>
       </transition>
     </q-item>
-    <q-card-media class="widget__content scroll" :class="[`bg-${item.color}-1`]" style="height: calc(100% - 22px);">
+    <q-card-media class="widget__content scroll" :class="[`bg-${item.color}-1`]" :style="{height: contentHeight}">
       <div style="width: 100%; position: relative;">
         <div
           v-for="(widget, widgetIndex) in renderedWidgets"
@@ -189,6 +189,11 @@ export default {
         width = 100
       }
       return `calc(${width}% - 16px)`
+    },
+    contentHeight () {
+      let height = 'calc(100% - 22px)'
+      if (!this.item.name && this.blocked) { height = 'calc(100% - 4px)' }
+      return height
     }
   },
   methods: {

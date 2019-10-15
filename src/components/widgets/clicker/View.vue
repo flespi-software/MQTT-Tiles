@@ -14,7 +14,7 @@
     <div class="ellipsis q-mt-sm">{{item.name}}</div>
   </div>
   <q-card flat v-else inline class="widget__informer q-pa-sm" style="width: 100%; height: 100%;" :class="[`bg-${item.color}-1`]">
-    <q-item class="q-py-none q-px-sm" style="min-height: 22px;">
+    <q-item class="q-py-none q-px-sm" style="min-height: 0px;">
       <q-item-main class="ellipsis text-white" :class="[`text-${item.color}-7`]" style="font-size: .9rem">
         {{item.name}}
         <q-tooltip>{{item.name}}</q-tooltip>
@@ -46,7 +46,7 @@
         </q-item-side>
       </transition>
     </q-item>
-    <q-card-media :class="[`bg-${item.color}-1`]" class="widget__content clicker__payload q-px-sm scroll" style="height: calc(100% - 22px);">
+    <q-card-media :class="[`bg-${item.color}-1`]" class="widget__content clicker__payload q-px-sm scroll" :style="{height: contentHeight}">
       <q-btn
         class="payload__button"
         :disabled="item.status === WIDGET_STATUS_DISABLED"
@@ -101,6 +101,11 @@ export default {
   computed: {
     actionTopic () {
       return this.item.settings.topic
+    },
+    contentHeight () {
+      let height = 'calc(100% - 22px)'
+      if (!this.item.name && this.blocked) { height = '100%' }
+      return height
     }
   },
   methods: {

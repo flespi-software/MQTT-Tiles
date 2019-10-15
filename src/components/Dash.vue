@@ -17,6 +17,7 @@
       @fast-bind="fastBindWidgetHandler"
       @resized="resizeHandler"
       @block="blockBoardHandler"
+      @prevent="preventBoardHandler"
       @update:layout="layoutUpdateHandler"
       @share="shareHandler(activeBoardId)"
       @upload="exportPrepareBoardHandler(activeBoardId)"
@@ -26,13 +27,14 @@
     <boards
       v-else
       :boards="boards"
+      :boards-configs="boardsConfigs"
       :widgets="widgets"
       :values="values"
       :variables-values="boardsVariablesValues"
       :remoteBoards="boardsFromConnection"
       :canShare="canShare"
       :isFrized="!fullView"
-      :hasConnection="!!clientSettings"
+      :connection-settings="clientSettings"
       @add="addBoard"
       @edit="editBoardHandler"
       @edit:widget="editWidget"
@@ -46,6 +48,7 @@
       @export:string="exportBoardAsStringHandler"
       @export:file="exportBoardAsFileHandler"
       @import="importBoardFromConnectionHandler"
+      @change:attach="changeAttachedBoards"
       :style="{height: `${clientSettings ? 'calc(100vh - 50px)' : 'calc(100vh - 110px)'}`}"
     >
       <div slot="actions">
@@ -144,6 +147,7 @@ export default {
       clientStatus: false,
       clientErrors: [],
       boards: {},
+      boardsConfigs: {},
       widgets: {},
       subscriptions: {},
       subscriptionsStatuses: {},
@@ -182,6 +186,9 @@ export default {
         !this.clientSettings.flespiBoard &&
         /* check for not master token used for flespi connection */
         (hasCreds || this.canShareByClientToken)
+    },
+    isAttachedBoardsMode () {
+      return !!this.clientSettings.attachedBoards
     }
   },
   methods: {
@@ -343,6 +350,18 @@ export default {
         icon: 'mdi-alert-outline',
         timeout: 2000
       })
+    },
+    isConnectivityIsEqual (newConnectionSettings, oldConnectionSettings) {
+      return !!newConnectionSettings && !!oldConnectionSettings &&
+        newConnectionSettings.clientId === oldConnectionSettings.clientId &&
+        newConnectionSettings.host === oldConnectionSettings.host &&
+        newConnectionSettings.clean === oldConnectionSettings.clean &&
+        newConnectionSettings.keapalive === oldConnectionSettings.keapalive &&
+        newConnectionSettings.username === oldConnectionSettings.username &&
+        newConnectionSettings.password === oldConnectionSettings.password &&
+        newConnectionSettings.protocolVersion === oldConnectionSettings.protocolVersion &&
+        newConnectionSettings.syncNamespace === oldConnectionSettings.syncNamespace &&
+        isEqual(newConnectionSettings.properties, oldConnectionSettings.properties)
     },
     initClient () {
       let endHandler = () => {
@@ -510,9 +529,13 @@ export default {
       this.publish(topic, payload, settings)
     },
     addBoard (board) {
-      this.$set(this.boards, board.id, board)
-      this.resolveBoardVariables(board)
-      this.setModifyTimeBoardHandler(board.id)
+      if (this.isAttachedBoardsMode) {
+        this.$set(this.boardsConfigs, board.id, this.packBoard(board, this.widgets))
+      } else {
+        this.$set(this.boards, board.id, board)
+        this.resolveBoardVariables(board)
+        this.setModifyTimeBoardHandler(board.id)
+      }
     },
     deleteBoardHandler (boardId) {
       this.resolveBoardVariables(undefined, this.boards[boardId])
@@ -537,8 +560,8 @@ export default {
     },
     deleteBoardDialogHandler (boardId) {
       this.$q.dialog({
-        title: 'Warning',
-        message: `Do you really want to delete ${this.boards[boardId].name} board?`,
+        title: `Delete «${this.boards[boardId].name || '*No name*'}» board?`,
+        message: `You are about to delete the «${this.boards[boardId].name || '*No name*'}» board. The board will be removed from all connections. Continue?`,
         color: 'dark',
         ok: true,
         cancel: true
@@ -547,7 +570,7 @@ export default {
     },
     deleteUploadedBoard (boardId) {
       this.$q.dialog({
-        title: 'Warning',
+        title: 'Delete remote board?',
         message: `Do you really want to delete remote board?`,
         color: 'dark',
         ok: true,
@@ -601,8 +624,14 @@ export default {
       let board = this.boards[this.activeBoardId]
       this.$set(board.settings, 'blocked', !board.settings.blocked)
     },
-    initBoard (board) {
-      board = this.migrateBoard(cloneDeep(board), board.appVersion, version)
+    preventBoardHandler () {
+      let board = this.boards[this.activeBoardId]
+      this.$set(board.settings, 'preventCollision', !board.settings.preventCollision)
+    },
+    packBoard (board, widgets) {
+      return getBoardToSave(board, widgets)
+    },
+    unpackBoard (board) {
       let widgets = {}
       let indexes = []
       board.widgetsIndexes = migrateWidgets(board.widgetsIndexes, board.appVersion, version)
@@ -612,6 +641,15 @@ export default {
         return widgets
       })
       board.widgetsIndexes = indexes
+      return {
+        widgets,
+        board
+      }
+    },
+    initBoard (board) {
+      board = this.migrateBoard(cloneDeep(board), board.appVersion, version)
+      let {board: currentBoard, widgets} = this.unpackBoard(board)
+      board = currentBoard
       this.$set(this.boards, board.id, board)
       this.resolveBoardVariables(board)
       Object.keys(widgets).forEach(widgetId => {
@@ -623,14 +661,9 @@ export default {
         let widgets = {}
         Object.keys(savedBoards).forEach(boardId => {
           let board = savedBoards[boardId]
-          let indexes = []
-          board.widgetsIndexes = migrateWidgets(board.widgetsIndexes, board.appVersion, version)
-          board.widgetsIndexes.forEach((widget) => {
-            indexes.push(widget.id)
-            widgets[widget.id] = widget
-            return widgets
-          })
-          board.widgetsIndexes = indexes
+          let {board: unpackedBoard, widgets: currentWidgets} = this.unpackBoard(board)
+          widgets = {...widgets, ...currentWidgets}
+          board = unpackedBoard
           this.resolveBoardVariables(board)
           savedBoards[boardId] = this.migrateBoard(board, board.appVersion, version)
         })
@@ -828,8 +861,8 @@ export default {
     },
     deleteWidget ({widgetId, settings}) {
       this.$q.dialog({
-        title: 'Warning',
-        message: `Do you really want to delete ${settings.name} widget?`,
+        title: 'Delete widget?',
+        message: `Do you really want to delete «${settings.name}» widget?`,
         color: 'dark',
         ok: true,
         cancel: true
@@ -940,12 +973,20 @@ export default {
                 })
               })
             }
-            this.initBoard(board)
+            if (this.isAttachedBoardsMode) {
+              this.$set(this.boardsConfigs, board.id, board)
+            } else {
+              this.initBoard(board)
+            }
             this.exportBoardId = ''
           })
           .catch(() => {})
       } else {
-        this.initBoard(board)
+        if (this.isAttachedBoardsMode) {
+          this.$set(this.boardsConfigs, board.id, board)
+        } else {
+          this.initBoard(board)
+        }
       }
     },
     importBoardFromConnectionHandler (id) {
@@ -1107,7 +1148,10 @@ export default {
     },
     /* events */
     updateBoards (boards, widgets) {
-      this.$emit('update:boards', getBoardsToSave(boards, widgets))
+      this.$emit('update:boards', {...this.boardsConfigs, ...getBoardsToSave(boards, widgets)})
+    },
+    changeAttachedBoards (attachedBoards) {
+      this.$emit('change:attach', attachedBoards)
     }
   },
   created () {
@@ -1120,7 +1164,23 @@ export default {
       }
       return true
     }
-    this.initBoards && this.initSavedBoards(this.initBoards)
+    if (this.initBoards) {
+      let initBoards = {...this.initBoards},
+        boardsConfigs = {...this.initBoards}
+      if (this.clientSettings && this.clientSettings.attachedBoards) {
+        initBoards = this.clientSettings.attachedBoards.reduce((res, boardId) => {
+          if (initBoards[boardId]) {
+            res[boardId] = initBoards[boardId]
+            delete boardsConfigs[boardId]
+          }
+          return res
+        }, {})
+      } else {
+        boardsConfigs = {}
+      }
+      this.boardsConfigs = boardsConfigs
+      this.initSavedBoards(initBoards)
+    }
     if (window) {
       window.addEventListener('beforeunload', () => {
         if (this.client) {
@@ -1139,7 +1199,7 @@ export default {
     clientSettings: {
       handler (client, oldClient) {
         let firstInit = !!client && !oldClient
-        if (isEqual(client, oldClient)) { return false }
+        if (this.isConnectivityIsEqual(client, oldClient)) { return false }
         if (this.client) { this.destroyClient() }
         clearWidgets(this.widgets)
         this.boardsFromConnection = {}
@@ -1157,6 +1217,37 @@ export default {
           : setTimeout(() => { this.createClient() }, 500)
       },
       immediate: true
+    },
+    'clientSettings.attachedBoards' (boards, oldBoards) {
+      if (boards && !oldBoards) {
+        oldBoards = Object.keys(this.boards)
+      } else if (!boards && oldBoards) {
+        boards = [...Object.keys(this.boardsConfigs), ...Object.keys(this.boards)]
+        oldBoards = []
+      } else if (!boards && !oldBoards) {
+        oldBoards = []
+        boards = []
+      }
+      oldBoards.forEach(boardId => {
+        if (this.boards[boardId] && !boards.includes(boardId)) {
+          let boardConfig = this.packBoard(this.boards[boardId], this.widgets)
+          if (this.activeBoardId === boardId) { this.clearActiveBoard() }
+          this.deleteBoardHandler(boardId)
+          this.$set(this.boardsConfigs, boardId, boardConfig)
+        }
+      })
+      boards.forEach(boardId => {
+        if (!this.boards[boardId] && this.boardsConfigs[boardId]) {
+          this.initBoard(this.boardsConfigs[boardId])
+          this.$delete(this.boardsConfigs, boardId)
+        }
+      })
+    },
+    boardsConfigs: {
+      deep: true,
+      handler () {
+        this.fullView && this.debouncedUpdateBoards(this.boards, this.widgets)
+      }
     },
     boards: [
       {

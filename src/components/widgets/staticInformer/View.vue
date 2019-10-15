@@ -25,7 +25,7 @@
         </q-item-side>
       </transition>
     </q-item>
-    <q-card-media class="widget__content scroll" :class="[`bg-${item.color}-1`]" style="height: calc(100% - 44px);">
+    <q-card-media class="widget__content scroll" :class="[`bg-${item.color}-1`]" :style="{height: contentHeight}">
       <div class="sattic-informer__payload-wrapper">
         <text-view class="static-informer__payload text-dark" :text="text" :title="text" :settings="item.settings" :show-tooltip="false" />
       </div>
@@ -80,6 +80,13 @@ export default {
   computed: {
     text () {
       return this.item.settings.text
+    },
+    contentHeight () {
+      let height = 'calc(100% - 29px)'
+      if (!this.item.name && this.blocked) {
+        height = 'calc(100% - 11px)'
+      }
+      return height
     }
   },
   components: { TextView },

@@ -24,6 +24,9 @@
       <q-btn v-if="canShare" @click="uploadHandler" icon="mdi-cloud-upload-outline" color="dark" flat round>
         <q-tooltip>Upload board</q-tooltip>
       </q-btn>
+      <q-btn @click="preventCollisionBoardHandler" :icon="board.settings.preventCollision ? 'mdi-pin' : 'mdi-pin-outline'" color="dark" flat round v-if="!isFrized">
+        <q-tooltip>{{board.settings.preventCollision ? 'Unlock widgets positions' : 'Lock widgets positions'}}</q-tooltip>
+      </q-btn>
       <q-btn @click="blockBoardHandler" :icon="board.settings.blocked ? 'mdi-lock' : 'mdi-lock-open'" color="dark" flat round v-if="!isFrized">
         <q-tooltip>{{board.settings.blocked ? 'Unlock your board' : 'Lock your board'}}</q-tooltip>
       </q-btn>
@@ -91,6 +94,7 @@
           :margin="[10, 10]"
           :use-css-transforms="true"
           :responsive="true"
+          :prevent-collision="board.settings.preventCollision"
         >
             <grid-item
               v-for="(widgetIndex, index) in board.widgetsIndexes"
@@ -309,6 +313,10 @@ export default {
     },
     blockBoardHandler () {
       this.$emit('block')
+      this.setLastModifyBoard()
+    },
+    preventCollisionBoardHandler () {
+      this.$emit('prevent')
       this.setLastModifyBoard()
     },
     setLastModifyBoard () {

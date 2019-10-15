@@ -3,7 +3,8 @@
     class="markdown-block"
     table-class="markdown-table"
     :source="source"
-    :postrender="(str) => { return str.replace(/\*\*\s\*\s\*\*/g, '*') }"
+    :prerender="prerenderHandler"
+    :postrender="postrenderHandler"
   >
     <slot/>
   </markdown>
@@ -11,11 +12,20 @@
 
 <script>
 import Markdown from 'vue-markdown'
+import xss from 'xss'
 export default {
   name: 'flespi-markdown',
   props: ['source'],
   data () {
     return {}
+  },
+  methods: {
+    prerenderHandler (str) {
+      return xss(str)
+    },
+    postrenderHandler (str) {
+      return str.replace(/\*\*\s\*\s\*\*/g, '*')
+    }
   },
   mounted () { this.$prism.highlightAll() },
   updated () { this.$prism.highlightAll() },

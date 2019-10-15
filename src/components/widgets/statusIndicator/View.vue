@@ -15,7 +15,7 @@
     <div class="ellipsis q-mt-sm">{{item.name}}</div>
   </div>
   <q-card flat v-else inline class="widget__status-indicator q-pa-sm" style="width: 100%; height: 100%;" :class="[`bg-${item.color}-1`]">
-    <q-item class="q-pa-none" style="min-height: 22px;">
+    <q-item class="q-pa-none" style="min-height: 0px;">
       <q-item-main class="ellipsis" :class="[`text-${item.color}-7`]" style="font-size: .9rem">
         {{item.name}}
         <q-tooltip>{{item.name}}</q-tooltip>
@@ -47,7 +47,7 @@
         </q-item-side>
       </transition>
     </q-item>
-    <q-card-media class="widget__content scroll" :class="[`bg-${item.color}-1`]" style="height: calc(100% - 22px);">
+    <q-card-media class="widget__content scroll" :class="[`bg-${item.color}-1`]" :style="{height: contentHeight}">
       <q-icon
         v-if="activeItem.icon || !activeItem.label"
         :style="{color: activeItem.color, fontSize: `${size}rem`}"
@@ -116,11 +116,6 @@ export default {
           return null
         } else {
           return `${this.mathProcessing(this.getValueByTopic(value, this.item.dataTopics[0]), this.item.settings.math)}`
-          // if (this.item.settings.resetTimeout && Date.now() > this.time + this.item.settings.resetTimeout * 1000) {
-          //   return null
-          // } else {
-          //   return `${this.mathProcessing(this.getValueByTopic(value, this.item.dataTopics[0]), this.item.settings.math)}`
-          // }
         }
       },
       set (val) {
@@ -132,6 +127,13 @@ export default {
       let defaultItem = this.item.settings.items[0]
       let activeItem = this.item.settings.items.slice(1).filter(item => item.val === `${this.mathProcessing(this.currentValue, item.math)}`)
       return activeItem[0] || defaultItem
+    },
+    contentHeight () {
+      let height = 'calc(100% - 22px)'
+      if (!this.item.name && this.blocked) {
+        height = 'calc(100% - 4px)'
+      }
+      return height
     }
   },
   methods: {

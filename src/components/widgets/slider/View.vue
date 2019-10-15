@@ -43,7 +43,7 @@
         </q-item-side>
       </transition>
     </q-item>
-    <q-card-media class="widget__content" :class="[`bg-${item.color}-1`]" style="height: calc(100% - 29px);">
+    <q-card-media class="widget__content" :class="[`bg-${item.color}-1`]" :style="{height: contentHeight}">
       <div style="width: 100%; height: 100%;">
         <div class="slider__payload q-px-md flex flex-center" style="height: 100%">
           <div style="width: 100%">
@@ -155,6 +155,13 @@ export default {
       return this.item.settings.minValueMode === WIDGET_RANGE_VALUE_CURRENT_MODE
         ? this.item.settings.minValue
         : this.valuesBySettings[this.item.settings.topics[0].topicFilter]
+    },
+    contentHeight () {
+      let height = 'calc(100% - 29px)'
+      if (!this.item.name && this.blocked) {
+        height = 'calc(100% - 11px)'
+      }
+      return height
     }
   },
   mixins: [getValueByTopic, timestamp]

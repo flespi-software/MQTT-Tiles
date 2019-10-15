@@ -8,7 +8,8 @@
       @share="model => $emit('share', model)"
       @share:prepare="sharePrepareHandler"
       @change:title="t => title = t"
-      @update:boards="saveBoardsToLocalStorage"
+      @update:boards="updateBoards"
+      @change:attach="changeAttachedBoards"
     />
     <share-wizard
       v-if="shareWizardConfig"
@@ -24,6 +25,7 @@
 </style>
 
 <script>
+import diff from 'lodash/difference'
 import Dash from '../components/Dash'
 import ShareWizard from '../components/ShareWizard'
 import { BOARDS_LOCALSTORAGE_NAME } from '../constants'
@@ -43,8 +45,15 @@ export default {
     }
   },
   methods: {
-    saveBoardsToLocalStorage (boards) {
+    updateBoards (boards) {
+      let newBoardsKeys = boards ? Object.keys(boards) : [],
+        oldBoardsKeys = this.initBoards ? Object.keys(this.initBoards) : [],
+        boardsToRemove = diff(oldBoardsKeys, newBoardsKeys),
+        boardsToAdd = diff(newBoardsKeys, oldBoardsKeys)
+      if (boardsToRemove.length) { this.$emit('delete:boards', boardsToRemove) }
+      if (boardsToAdd.length) { this.$emit('add:boards', boardsToAdd) }
       this.$q.localStorage.set(BOARDS_LOCALSTORAGE_NAME, boards)
+      this.initBoards = boards
     },
     sharePrepareHandler (shareWizardConfig) {
       this.shareWizardConfig = shareWizardConfig
@@ -52,6 +61,9 @@ export default {
     },
     shareBoard (config) {
       this.$refs.dash.shareBoard(config)
+    },
+    changeAttachedBoards (attachedBoards) {
+      this.$emit('change:attach', attachedBoards)
     }
   },
   props: [ 'client' ],

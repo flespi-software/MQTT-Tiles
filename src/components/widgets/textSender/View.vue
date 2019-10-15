@@ -6,11 +6,11 @@
         <q-tooltip>{{item.name}}</q-tooltip>
       </q-item-main>
       <transition name="block">
-        <q-item-side v-if="!blocked" style="min-width: 20px;">
+        <q-item-side style="min-width: 20px;">
           <q-btn size="0.9rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" icon="mdi-send" @click="sendHandler" dense flat :color="inShortcuts ? 'yellow-9' : `${item.color}-7`">
             <q-tooltip>Send</q-tooltip>
           </q-btn>
-          <q-btn size="0.9rem" class="q-pa-none" style="min-height: 1rem;" dense flat icon="mdi-dots-vertical" :color="`${item.color}-7`">
+          <q-btn size="0.9rem" v-if="!blocked" class="q-pa-none" style="min-height: 1rem;" dense flat icon="mdi-dots-vertical" :color="`${item.color}-7`">
             <q-popover anchor="top right" self="top right" :offset="[8, 8]" style="box-shadow: none;">
               <div class="q-pa-sm" :class="[`bg-${item.color}-1`]">
                 <q-btn v-close-overlay size="0.9rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" icon="mdi-content-duplicate" @click="$emit('duplicate')" dense flat :color="`${item.color}-7`">
@@ -29,7 +29,7 @@
         </q-item-side>
       </transition>
     </q-item>
-    <q-card-media class="widget__content scroll" :class="[`bg-${item.color}-1`]" style="height: calc(100% - 44px);">
+    <q-card-media class="widget__content scroll" :class="[`bg-${item.color}-1`]" :style="{height: contentHeight}">
       <div class="text-sender__payload-wrapper relative-position" style="height: 100%;">
         <textarea style="border: none; outline: 0; width: 100%; height: 100%; resize: none; border: 1px solid rgba(0, 0, 0, .1)" class="absolute-top-left absolute-bottom-right" placeholder="Type your text here" v-model="textModel"/>
       </div>
@@ -98,6 +98,10 @@ export default {
         value = this.getValueByTopic(this.value[topic.topicFilter] && this.value[topic.topicFilter].payload, topic)
       this.setTextModel(value)
       return value
+    },
+    contentHeight () {
+      let height = 'calc(100% - 44px)'
+      return height
     }
   },
   watch: {

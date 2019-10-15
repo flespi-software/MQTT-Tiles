@@ -228,6 +228,10 @@ export default {
             this.generateLink()
             return true
           })
+      } else {
+        this.updatedBoardFlag = true
+        this.$emit('share', this.shareBoardModel)
+        this.generateLink()
       }
       return resp
     },
