@@ -24,7 +24,7 @@
       <q-btn v-if="canShare" @click="uploadHandler" icon="mdi-cloud-upload-outline" color="dark" flat round>
         <q-tooltip>Upload board</q-tooltip>
       </q-btn>
-      <q-btn @click="preventCollisionBoardHandler" :icon="board.settings.preventCollision ? 'mdi-pin' : 'mdi-pin-outline'" color="dark" flat round v-if="!isFrized">
+      <q-btn @click="preventCollisionBoardHandler" :icon="board.settings.preventCollision ? 'mdi-pin' : 'mdi-pin-outline'" color="dark" flat round v-if="!isFrized && !board.settings.blocked">
         <q-tooltip>{{board.settings.preventCollision ? 'Unlock widgets positions' : 'Lock widgets positions'}}</q-tooltip>
       </q-btn>
       <q-btn @click="blockBoardHandler" :icon="board.settings.blocked ? 'mdi-lock' : 'mdi-lock-open'" color="dark" flat round v-if="!isFrized">

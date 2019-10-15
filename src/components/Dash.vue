@@ -167,11 +167,6 @@ export default {
     }
   },
   computed: {
-    title () {
-      let title = `${this.activeBoardId ? `${this.boards[this.activeBoardId].name} - ` : ''}MQTT Tiles`
-      this.$emit('change:title', `${this.activeBoardId ? `${this.boards[this.activeBoardId].name} - ` : ''}MQTT Tiles`)
-      return title
-    },
     boardsIds () { return Object.keys(this.boards) },
     subscriptionsTopics () { return Object.keys(this.subscriptions) },
     canShareByClientToken () {
@@ -516,11 +511,11 @@ export default {
     },
     setActiveBoard (boardId) {
       this.activeBoardId = boardId
-      this.$emit('change:title', `${this.boards[this.activeBoardId].name} - MQTT Tiles`)
+      this.$emit('change:title', this.getTitle())
     },
     clearActiveBoard () {
       this.activeBoardId = undefined
-      this.$emit('change:title', `MQTT Tiles`)
+      this.$emit('change:title', this.getTitle())
     },
     actionHandler ({topic, payload, settings}) {
       if (!settings.qos) {
@@ -1152,6 +1147,10 @@ export default {
     },
     changeAttachedBoards (attachedBoards) {
       this.$emit('change:attach', attachedBoards)
+    },
+    getTitle () {
+      let title = `${this.activeBoardId && this.boards[this.activeBoardId].name ? `${this.boards[this.activeBoardId].name} - ` : ''}MQTT Tiles`
+      return title
     }
   },
   created () {
@@ -1188,7 +1187,7 @@ export default {
         }
       })
     }
-    this.$emit('change:title', `MQTT Tiles`)
+    this.$emit('change:title', this.getTitle())
   },
   destroyed () {
     if (this.client) {
