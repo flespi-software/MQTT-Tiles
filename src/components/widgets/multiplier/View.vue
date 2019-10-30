@@ -222,7 +222,7 @@ export default {
         if (value[name] && !widgets[name] && needRender) {
           // add
           this.initWidget(name)
-        } else if ((!value[name] && widgets[name]) || !needRender) {
+        } else if ((!(value[name] && value[name].payload) && widgets[name]) || !needRender) {
           // remove
           this.$delete(widgets, name)
         }
