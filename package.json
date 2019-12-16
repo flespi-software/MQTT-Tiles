@@ -1,45 +1,42 @@
 {
   "name": "mqtttiles",
-  "version": "1.7.2",
+  "version": "1.9.0",
   "description": "MQTT-based IoT dashboard visualization tool",
   "productName": "MQTT Tiles",
   "cordovaId": "org.cordova.quasar.app",
-  "author": "Siarhei Buntsevich <sebu@gurtam.com>",
-  "main": "index.js",
+  "capacitorId": "",
+  "author": "Sergey Buntsevich <scarry92@yandex.ru>",
   "private": true,
+  "main": "index.js",
   "scripts": {
-    "deploy": "quasar build -m spa && mkdir -p deploy && cp -R dist/spa-mat/* misc LICENSE package.json README.md deploy && node_modules/git-directory-deploy/bin/git-directory-deploy.sh -ddeploy -bgh-pages -rhttps://git.gurtam.net/flespi/frontend/MQTTTiles.git && rm -rf deploy && git push github gh-pages"
+    "deploy": "quasar build -m spa && mkdir -p deploy && cp -R dist/spa/* misc LICENSE package.json README.md deploy && node_modules/git-directory-deploy/bin/git-directory-deploy.sh -ddeploy -bgh-pages -rhttps://git.gurtam.net/flespi/frontend/MQTTTiles.git && rm -rf deploy && git push github gh-pages"
   },
   "dependencies": {
+    "@quasar/extras": "^1.0.0",
     "@radial-color-picker/vue-color-picker": "^2.1.0",
     "canvas-gauges": "^2.1.5",
     "compare-versions": "^3.5.0",
     "js-base64": "^2.5.1",
     "lodash": "^4.17.15",
     "mathjs": "^5.10.3",
-    "mqtt": "git+https://github.com/scarry1992/MQTT.js.git#cork-fix",
+    "mqtt": "git+https://github.com/scarry1992/MQTT.js.git",
     "prismjs": "^1.16.0",
-    "vue-clipboard2": "^0.3.0",
-    "vue-grid-layout": "^2.3.6",
+    "quasar": "^1.5.9",
+    "vue-grid-layout": "^2.3.7",
+    "vue-i18n": "^8.15.1",
     "vue-markdown": "^2.2.4",
-    "vue-virtual-scroll-list": "^1.4.2",
+    "vue-virtual-scroll-list": "^1.4.4",
     "workbox-webpack-plugin": "^4.3.0",
     "xss": "^1.0.6"
   },
   "devDependencies": {
-    "babel-eslint": "^8.2.1",
-    "eslint": "^4.18.2",
-    "eslint-config-standard": "^11.0.0",
-    "eslint-friendly-formatter": "^4.0.1",
-    "eslint-loader": "^2.0.0",
-    "eslint-plugin-import": "^2.9.0",
-    "eslint-plugin-node": "^6.0.1",
-    "eslint-plugin-promise": "^3.7.0",
-    "eslint-plugin-standard": "^3.0.1",
-    "eslint-plugin-vue": "^4.3.0",
-    "git-directory-deploy": "^1.5.1",
-    "quasar-cli": "^0.17.26",
-    "strip-ansi": "=3.0.1"
+    "@quasar/app": "^1.4.1",
+    "@vue/eslint-config-standard": "^4.0.0",
+    "babel-eslint": "^10.0.1",
+    "eslint": "^5.10.0",
+    "eslint-loader": "^2.1.1",
+    "eslint-plugin-vue": "^5.0.0",
+    "git-directory-deploy": "^1.5.1"
   },
   "engines": {
     "node": ">= 8.9.0",
@@ -47,8 +44,6 @@
     "yarn": ">= 1.6.0"
   },
   "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not ie <= 10"
+    "last 1 version, not dead, ie >= 11"
   ]
 }
