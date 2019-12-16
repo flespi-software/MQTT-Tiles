@@ -1,78 +1,80 @@
 <template>
   <div>
     <div class="row">
-      <div class="col-xs-12">
-        <q-input class="q-mr-xs icon-input" color="dark" v-model="currentSettings.defaultIcon" float-label="Default icon" :error="!currentSettings.defaultIcon">
-          <q-icon :name="`mdi-${currentSettings.defaultIcon}`" size="1.5rem" style="position: absolute; right: 0; bottom : 7px;"/>
+      <div class="col-xs-12 q-mb-sm">
+        <q-input outlined hide-bottom-space class="q-mr-xs icon-input" color="grey-9" v-model="currentSettings.defaultIcon" label="Default icon" :error="!currentSettings.defaultIcon">
+          <q-icon slot="after" :name="`mdi-${currentSettings.defaultIcon}`" size="1.5rem" style="position: absolute; right: 0; bottom : 7px;"/>
         </q-input>
       </div>
-      <q-input class="col-12" color="dark" v-model="currentSettings.math" float-label="Math expression" placeholder="%value%"/>
-      <div class="text-dark" style="font-size: .8rem;">You can use math expressions to calculate the final value. Example: (%value% * 1000) / 1024, where %value% is the payload from your subscription.</div>
+      <q-input outlined hide-bottom-space class="col-12" color="grey-9" v-model="currentSettings.math" label="Math expression" placeholder="%value%"/>
+      <div class="text-grey-9" style="font-size: .8rem;">You can use math expressions to calculate the final value. Example: (%value% * 1000) / 1024, where %value% is the payload from your subscription.</div>
       <div class="status-indicator__items-wrapper col-12 relative-position q-mb-sm q-mt-lg">
-        <q-list>
-          <q-btn color="dark" style="top: -20px; right: 8px; position: absolute; z-index: 1130;" class="col-12" fab-mini @click="addItem" icon="mdi-plus"/>
-          <q-list-header :class="{'text-red-6': !currentSettings.items.length}">Items{{currentSettings.items.length ? '' : ' are empty'}}</q-list-header>
-          <q-collapsible
+        <q-list bordered>
+          <q-btn color="grey-9" style="top: -20px; right: 8px; position: absolute; z-index: 1130;" class="col-12" fab-mini @click="addItem" icon="mdi-plus"/>
+          <q-item-label class="q-py-md q-px-sm" :class="{'text-red-6': !currentSettings.items.length}">Items{{currentSettings.items.length ? '' : ' are empty'}}</q-item-label>
+          <q-expansion-item
             v-for="(item, index) in currentSettings.items"
             :key="`${index}${item.value}`"
             group="status-indicator-items"
             :header-class="[`bg-${checkUniqueItem(item, index) && !!item.actionTopic ? 'grey-4' : 'red-2'}`]"
-            collapse-icon="mdi-settings"
-            :opened="true"
+            expand-icon="mdi-settings"
+            default-opened
           >
             <template slot="header">
-              <q-item-side right>
-                <q-btn :disabled="index === 0" round dense flat class="col-1" @click.stop="upItem(index)" icon="mdi-arrow-up"/>
-                <q-btn :disabled="index === (currentSettings.items.length - 1)" round dense flat class="col-1" @click.stop="downItem(index)" icon="mdi-arrow-down"/>
-              </q-item-side>
-              <q-item-main :label="getItemLabel(item, index)" />
-              <q-item-side right v-if="!item.default">
+              <q-item-section side>
+                <div>
+                  <q-btn :disabled="index === 0" round dense flat class="col-1" @click.stop="upItem(index)" icon="mdi-arrow-up"/>
+                  <q-btn :disabled="index === (currentSettings.items.length - 1)" round dense flat class="col-1" @click.stop="downItem(index)" icon="mdi-arrow-down"/>
+                </div>
+              </q-item-section>
+              <q-item-section>{{getItemLabel(item, index)}}</q-item-section>
+              <q-item-section side v-if="!item.default">
                 <q-btn flat color="red-6" round dense @click="removeItem(index)" icon="mdi-delete"/>
-              </q-item-side>
+              </q-item-section>
             </template>
-            <div class="row">
+            <div class="row q-pa-sm">
               <div class="col-12 text-grey-8 q-mt-sm" style="font-size: .9rem;" v-if="item.default">
                 Default item. Used if there is no data in the source or data doesn't match the specified items.
               </div>
-              <div :class="[`col-${item.default ? '12' : '6'}`]">
-                <q-input autofocus class="q-mr-xs" color="dark" v-model="item.label" float-label="Label"/>
+              <div :class="[`col-${item.default ? '12' : '6'}`]" class="q-mb-sm">
+                <q-input outlined hide-bottom-space autofocus class="q-mr-xs" color="grey-9" v-model="item.label" label="Label"/>
               </div>
               <div class="col-6" v-if="!item.default">
-                <q-input class="q-ml-xs" color="dark" v-model="item.val" float-label="Value" :error="!checkUniqueItem(item, index)"/>
+                <q-input outlined hide-bottom-space class="q-ml-xs" color="grey-9" v-model="item.val" label="Value" :error="!checkUniqueItem(item, index)"/>
               </div>
-              <div class="col-10">
-                <q-input class="q-mr-xs icon-input" :style="{color: item.color}" color="dark" v-model="item.icon" float-label="Icon">
-                  <q-icon :name="`mdi-${item.icon || currentSettings.defaultIcon}`" size="1.5rem" :style="{color: item.color}" style="position: absolute; right: 0; bottom : 7px;"/>
+              <div class="col-10 q-mb-sm">
+                <q-input outlined hide-bottom-space class="q-mr-xs icon-input" :style="{color: item.color}" color="grey-9" v-model="item.icon" label="Icon">
+                  <q-icon slot="append" :name="`mdi-${item.icon || currentSettings.defaultIcon}`" size="1.5rem" :style="{color: item.color}"/>
                 </q-input>
               </div>
               <div class="col-2 relative-position">
-                <q-btn flat :style="{backgroundColor: item.color}" style="position: absolute; bottom: 4px; right: 0;">
-                  <q-popover class="q-pa-sm" anchor="top right" self="bottom right">
-                    <q-color-picker
+                <q-btn flat :style="{backgroundColor: item.color}" style="position: absolute; bottom: 18px; right: 0;">
+                  <q-menu class="q-pa-sm" anchor="top right" self="bottom right">
+                    <q-color
                       v-model="item.color"
                       format-model='hex'
                     />
-                  </q-popover>
+                  </q-menu>
                 </q-btn>
               </div>
               <div class="col-12 text-grey-6 q-mt-sm" style="font-size: .8rem;" v-if="item.default">
                 You can find more icons on <a href="https://materialdesignicons.com/" target="blank">MDI</a>
               </div>
-              <q-input class="col-12" color="dark" v-model="item.math" float-label="Math expression" placeholder="%value%" v-if="!item.default" :error="!checkUniqueItem(item, index)"/>
-              <div class="text-dark" v-if="!item.default" style="font-size: .8rem;">You can use math expressions to calculate the final value. Example: (%value% * 1000) / 1024, where %value% is the payload from your subscription.</div>
+              <q-input outlined hide-bottom-space class="col-12" color="grey-9" v-model="item.math" label="Math expression" placeholder="%value%" v-if="!item.default" :error="!checkUniqueItem(item, index)"/>
+              <div class="text-grey-9" v-if="!item.default" style="font-size: .8rem;">You can use math expressions to calculate the final value. Example: (%value% * 1000) / 1024, where %value% is the payload from your subscription.</div>
               <div v-if="currentSettings.mode === 1" class="col-6">
-                <q-input class="q-mr-xs" color="dark" v-model="item.actionTopic" float-label="Action topic" :error="!item.actionTopic"/>
+                <q-input outlined hide-bottom-space class="q-mr-xs" color="grey-9" v-model="item.actionTopic" label="Action topic" :error="!item.actionTopic"/>
               </div>
               <div v-if="currentSettings.mode === 1" class="col-6">
-                <q-input class="q-ml-xs" color="dark" v-model="item.actionPayload" float-label="Action payload"/>
+                <q-input outlined hide-bottom-space class="q-ml-xs" color="grey-9" v-model="item.actionPayload" label="Action payload"/>
               </div>
             </div>
-          </q-collapsible>
+          </q-expansion-item>
         </q-list>
       </div>
-      <q-input class="col-12" color="dark"  v-model="currentSettings.resetTimeout" type="number" float-label="Reset timeout, s"/>
+      <q-input outlined hide-bottom-space class="col-12" color="grey-9" v-model.number="currentSettings.resetTimeout" type="number" label="Reset timeout, s"/>
       <div class="q-mt-sm col-12">
-        <q-toggle color="dark" v-model="currentSettings.isNeedTime" label="Show last update time"/>
+        <q-toggle color="grey-9" v-model="currentSettings.isNeedTime" label="Show last update time"/>
       </div>
     </div>
   </div>
@@ -124,8 +126,8 @@ export default {
       currentItem: Object.assign({}, defaultItem),
       currentSettings: Object.assign({}, defaultSettings, this.widget.settings),
       modeOptions: [
-        {label: 'Default mode', value: DEFAULT_MODE},
-        {label: 'Command mode', value: COMMAND_MODE}
+        { label: 'Default mode', value: DEFAULT_MODE },
+        { label: 'Command mode', value: COMMAND_MODE }
       ]
     }
   },

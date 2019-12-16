@@ -1,32 +1,32 @@
 <template>
   <q-card flat inline class="widget__multiplier q-pa-sm" style="width: 100%; height: 100%;" :class="[`bg-${item.color}-1`]">
     <q-item class="q-pa-none" style="min-height: 0px;">
-      <q-item-main class="ellipsis" :class="[`text-${item.color}-7`]" style="font-size: .9rem">
-        {{item.name}}
+      <q-item-section class="ellipsis" :class="[`text-${item.color}-7`]" style="font-size: .9rem">
+        <q-item-label class="ellipsis">{{item.name}}</q-item-label>
         <q-tooltip>{{item.name}}</q-tooltip>
-      </q-item-main>
+      </q-item-section>
       <transition name="block">
-        <q-item-side v-if="!blocked" style="min-width: 20px;">
-          <q-btn size="0.9rem" class="q-pa-none" style="min-height: 1rem;" dense flat icon="mdi-dots-vertical" :color="`${item.color}-7`">
-            <q-popover anchor="top right" self="top right" :offset="[8, 8]" style="box-shadow: none;">
+        <q-item-section side v-if="!blocked" style="min-width: 20px;">
+          <q-btn size="0.7rem" class="q-pa-none" style="min-height: 1rem;" dense flat icon="mdi-dots-vertical" :color="`${item.color}-7`">
+            <q-menu anchor="top right" self="top right" :offset="[8, 8]" style="box-shadow: none;">
               <div class="q-pa-sm" :class="[`bg-${item.color}-1`]">
-                <q-btn v-close-overlay size="0.9rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" icon="mdi-content-duplicate" @click="$emit('duplicate')" dense flat :color="`${item.color}-7`">
+                <q-btn v-close-popup size="0.7rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" icon="mdi-content-duplicate" @click="$emit('duplicate')" dense flat :color="`${item.color}-7`">
                   <q-tooltip>Duplicate</q-tooltip>
                 </q-btn>
-                <q-btn v-close-overlay size="0.9rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" icon="mdi-settings" @click="$emit('update')" dense flat :color="`${item.color}-7`">
+                <q-btn v-close-popup size="0.7rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" icon="mdi-settings" @click="$emit('update')" dense flat :color="`${item.color}-7`">
                   <q-tooltip>Edit</q-tooltip>
                 </q-btn>
-                <q-btn v-close-overlay size="0.9rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" icon="mdi-delete-outline" @click="$emit('delete')" dense flat color="red">
+                <q-btn v-close-popup size="0.7rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" icon="mdi-delete-outline" @click="$emit('delete')" dense flat color="red">
                   <q-tooltip>Remove</q-tooltip>
                 </q-btn>
-                <q-btn v-close-overlay size="0.9rem" class="q-pa-none" style="min-height: 1rem;" icon="mdi-close" dense flat :color="`${item.color}-7`"/>
+                <q-btn v-close-popup size="0.7rem" class="q-pa-none" style="min-height: 1rem;" icon="mdi-close" dense flat :color="`${item.color}-7`"/>
               </div>
-            </q-popover>
+            </q-menu>
           </q-btn>
-        </q-item-side>
+        </q-item-section>
       </transition>
     </q-item>
-    <q-card-media class="widget__content scroll" :class="[`bg-${item.color}-1`]" :style="{height: contentHeight}">
+    <q-card-section class="widget__content scroll q-pa-none" :class="[`bg-${item.color}-1`]" :style="{height: contentHeight}">
       <div style="width: 100%; position: relative;">
         <div
           v-for="(widget, widgetIndex) in renderedWidgets"
@@ -50,7 +50,7 @@
           <q-pagination v-model="batch" :max="Math.ceil(widgetsIds.length / limit)" :max-pages="item.settings.width" direction-links :color="item.color"/>
         </div>
       </div>
-    </q-card-media>
+    </q-card-section>
   </q-card>
 </template>
 
@@ -146,7 +146,7 @@ export default {
             }, val)
           }
           return val
-        }, [{name: '', value: this.value[topic]}])
+        }, [{ name: '', value: this.value[topic] }])
 
         value = value.reduce((value, item) => {
           value[item.name] = item.value
@@ -166,7 +166,7 @@ export default {
         let widget = this.widgets[widgetId]
         if (!widget) { return values }
         let topic = this.item.dataTopics[0].topicFilter
-        let value = {[topic]: this.currentValue[widgetId]}
+        let value = { [topic]: this.currentValue[widgetId] }
         widget.topics.forEach((currentTopic) => {
           if (topic === currentTopic) { return false }
           value[currentTopic] = {}
@@ -234,7 +234,7 @@ export default {
         topics = [this.item.dataTopics[0].topicFilter, ...this.item.settings.widgetSettings.topics.map(topic => topic.topicFilter)]
       }
       let widgetName = this.item.dataTopics[0].payloadType === 1 && this.item.settings.nameField
-        ? this.getValueByTopic(this.currentValue[name] && this.currentValue[name].payload, {...this.item.dataTopics[0], payloadField: this.item.settings.nameField})
+        ? this.getValueByTopic(this.currentValue[name] && this.currentValue[name].payload, { ...this.item.dataTopics[0], payloadField: this.item.settings.nameField })
         : name
       let widget = {
         name: widgetName,
@@ -242,7 +242,7 @@ export default {
         color: this.item.settings.color,
         type: this.item.settings.type,
         topics,
-        dataTopics: [{...this.item.dataTopics[0]}], // topics for datasource
+        dataTopics: [{ ...this.item.dataTopics[0] }], // topics for datasource
         settings: cloneDeep(this.item.settings.widgetSettings),
         status: WIDGET_STATUS_DISABLED
       }

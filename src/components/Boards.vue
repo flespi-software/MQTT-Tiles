@@ -1,10 +1,10 @@
 <template>
   <div class="dash__boards">
-    <q-btn fab color="dark" @click="openSettingsHandler" icon="mdi-plus" class="absolute button--add" v-if="!isFrized">
+    <q-btn fab color="grey-9" @click="openSettingsHandler" icon="mdi-plus" class="absolute button--add" v-if="!isFrized">
       <q-tooltip>Add new board</q-tooltip>
     </q-btn>
     <div v-if="Object.keys(remoteBoards).length" class="remote-control text-center">
-      <span @click="isPanelShowed = !isPanelShowed" class="remote-control__button text-dark bg-orange q-px-sm text-bold uppercase cursor-pointer shadow-3">{{isPanelShowed ? 'hide' : 'saved boards'}}</span>
+      <span @click="isPanelShowed = !isPanelShowed" class="remote-control__button text-grey-9 bg-orange q-px-sm text-bold text-uppercase cursor-pointer shadow-3">{{isPanelShowed ? 'hide' : 'saved boards'}}</span>
     </div>
     <transition
       appear
@@ -14,8 +14,8 @@
       <div class="boards__remote scroll bg-grey-3 q-pb-md q-pt-lg flex no-wrap" v-if="Object.keys(remoteBoards).length && isPanelShowed">
         <div class="q-my-xs q-px-sm q-my-sm remote__board" v-for="(board, id) in remoteBoards" :key="`remote-${id}`">
           <q-card>
-            <q-item class="q-py-none q-pl-sm q-pr-none bg-grey-4">
-              <q-item-main class="ellipsis">
+            <q-item class="q-py-none q-pl-sm q-pr-none bg-grey-4" style="min-height: 20px;">
+              <q-item-section class="ellipsis">
                 <div class="ellipsis" style="height: 24px; line-height: 24px;">
                   {{board.name || '*No name*'}}
                   <q-tooltip v-if="board.name">{{board.name}}</q-tooltip>
@@ -23,40 +23,44 @@
                 <div class="ellipsis text-grey-9" style="height: 14px; line-height: 14px; font-size: 14px;">
                   {{board.id}}
                 </div>
-              </q-item-main>
-              <q-item-side>
-                <q-btn round dense flat icon="mdi-dots-vertical" color="dark">
-                  <q-popover anchor="bottom right" self="top right">
+              </q-item-section>
+              <q-item-section side>
+                <q-btn round dense flat icon="mdi-dots-vertical" color="grey-9">
+                  <q-menu anchor="bottom right" self="top right">
                     <q-list dense>
-                      <q-item class="cursor-pointer" v-close-overlay highlight @click.native.stop="$emit('share:uploaded', id)" v-if="canShare">
-                        <q-item-side icon="mdi-link" />
-                        <q-item-main label="Get link"/>
+                      <q-item v-close-popup @click.stop="$emit('share:uploaded', id)" v-if="canShare" clickable>
+                        <q-item-section avatar>
+                          <q-icon name="mdi-link"/>
+                        </q-item-section>
+                        <q-item-section>Get link</q-item-section>
                       </q-item>
-                      <q-item-separator v-if="canShare"/>
-                      <q-item class="cursor-pointer" v-close-overlay highlight @click.native.stop="$emit('delete:uploaded', id)">
-                        <q-item-side color="red" icon="mdi-delete-outline" />
-                        <q-item-main label="Remove"/>
+                      <q-separator v-if="canShare"/>
+                      <q-item v-close-popup @click.stop="$emit('delete:uploaded', id)" clickable>
+                        <q-item-section avatar>
+                          <q-icon name="mdi-delete-outline" color="red"/>
+                        </q-item-section>
+                        <q-item-section>Remove</q-item-section>
                       </q-item>
                     </q-list>
-                  </q-popover>
+                  </q-menu>
                 </q-btn>
-              </q-item-side>
+              </q-item-section>
             </q-item>
-            <q-card-separator />
-            <q-card-main class="text-center relative-position">
+            <q-separator />
+            <q-card-section class="text-center relative-position">
               <div v-if="board.settings.lastModify" class="absolute-top-right text-grey-5 q-pr-xs" style="font-size: .7rem;">{{date(board.settings.lastModify, 'DD-MM-YYYY HH:mm:ss')}}</div>
-              <q-icon name="mdi-download" size="20px" color="dark" class="cursor-pointer" @click.native="$emit('import', id)" />
+              <q-icon name="mdi-download" size="20px" color="grey-9" class="cursor-pointer" @click.native="$emit('import', id)" />
               <span class="text-grey-5 absolute" style="font-size: 10px; bottom: 4px; left: 4px; cursor: default;" v-if='board.appVersion' title="MQTT Tiles version">v.{{board.appVersion}}</span>
-              <span class="text-bold text-white absolute bg-purple-6 round-borders q-px-xs" style="font-size: 10px; bottom: 4px; right: 4px; cursor: default;" title="Widgets count">{{board.widgetsIndexes.length}}</span>
-            </q-card-main>
+              <span class="text-bold text-white absolute bg-purple-6 rounded-borders q-px-xs" style="font-size: 10px; bottom: 4px; right: 4px; cursor: default;" title="Widgets count">{{board.widgetsIndexes.length}}</span>
+            </q-card-section>
           </q-card>
         </div>
       </div>
     </transition>
-    <q-toolbar color="white">
-      <q-toolbar-title class="text-dark">Boards</q-toolbar-title>
+    <q-toolbar class="bg-white">
+      <q-toolbar-title class="text-grey-9">Boards</q-toolbar-title>
       <template v-if="connectionSettings">
-        <q-btn v-if="!attachMode" @click="attachMode = true" icon="mdi-link-variant" flat color="dark">
+        <q-btn v-if="!attachMode" @click="attachMode = true" icon="mdi-link-variant" flat color="grey-9">
           <q-tooltip>Attach boards to connection</q-tooltip>
         </q-btn>
         <q-btn v-else @click="attachHandler" flat color="green">
@@ -75,8 +79,8 @@
             <q-btn @click="changeAttachedBoards(id)" icon="mdi-check" :color="currentAttachedBoard.includes(id) ? 'green' : 'grey'" size="4rem" flat class="absolute-top-left absolute-bottom-right" style="width: 100%;"/>
           </div>
           <q-card>
-            <q-item class="q-py-none q-px-sm bg-grey-4">
-              <q-item-main class="ellipsis">
+            <q-item class="q-py-none q-px-sm bg-grey-4" style="min-height: 40px;">
+              <q-item-section class="ellipsis">
                 <div class="ellipsis" style="height: 24px; line-height: 24px;">
                   {{board.name || '*No name*'}}
                   <q-tooltip v-if="board.name">{{board.name}}</q-tooltip>
@@ -84,56 +88,68 @@
                 <div class="ellipsis text-grey-9" style="height: 14px; line-height: 14px; font-size: 14px;">
                   {{board.id}}
                 </div>
-              </q-item-main>
-              <q-item-side>
-                <q-btn round dense flat icon="mdi-link" color="dark" @click.native="$emit('share', id)" v-if="canShare">
-                  <q-tooltip>Get link</q-tooltip>
-                </q-btn>
-                <q-btn round dense flat icon="mdi-fullscreen" color="dark" @click.native="$emit('select', id)">
-                  <q-tooltip>Show full board</q-tooltip>
-                </q-btn>
-                <q-btn round dense flat icon="mdi-dots-vertical" color="dark">
-                  <q-popover anchor="bottom right" self="top right">
-                    <q-list dense>
-                      <!-- <q-item style="padding: 0 0;">
-                        <q-item-main/>
-                        <q-item-side>
-                          <q-btn size="0.8rem" icon="mdi-settings" v-close-overlay @click="openEditSettingsHandler(id)" flat round>
-                            <q-tooltip>Settings</q-tooltip>
-                          </q-btn>
-                          <q-btn size="0.8rem" color="red" icon="mdi-delete-outline" v-close-overlay @click="$emit('delete', id)" flat round>
-                            <q-tooltip>Remove</q-tooltip>
-                          </q-btn>
-                        </q-item-side>
-                      </q-item> -->
-                      <q-item class="cursor-pointer" v-close-overlay highlight @click.native.stop="$emit('export', id)" v-if="!!connectionSettings">
-                        <q-item-side icon="mdi-cloud-upload-outline" />
-                        <q-item-main label="Save to broker"/>
-                      </q-item>
-                      <q-item class="cursor-pointer" v-close-overlay highlight @click.native.stop="$emit('export:string', id)">
-                        <q-item-side icon="mdi-export-variant" />
-                        <q-item-main label="Export as string"/>
-                      </q-item>
-                      <q-item class="cursor-pointer" v-close-overlay highlight @click.native.stop="$emit('export:file', id)">
-                        <q-item-side icon="mdi-file-export" />
-                        <q-item-main label="Export as file"/>
-                      </q-item>
-                      <q-item class="cursor-pointer" v-close-overlay highlight @click.native.stop="openEditSettingsHandler(id)">
-                        <q-item-side icon="mdi-settings" />
-                        <q-item-main label="Settings"/>
-                      </q-item>
-                      <q-item-separator/>
-                      <q-item class="cursor-pointer" v-close-overlay highlight @click.native.stop="$emit('delete', id)">
-                        <q-item-side color="red" icon="mdi-delete-outline" />
-                        <q-item-main label="Remove"/>
-                      </q-item>
-                    </q-list>
-                  </q-popover>
-                </q-btn>
-              </q-item-side>
+              </q-item-section>
+              <q-item-section side>
+                <div>
+                  <q-btn round dense flat icon="mdi-link" color="grey-9" @click.native="$emit('share', id)" v-if="canShare">
+                    <q-tooltip>Get link</q-tooltip>
+                  </q-btn>
+                  <q-btn round dense flat icon="mdi-fullscreen" color="grey-9" @click.native="$emit('select', id)">
+                    <q-tooltip>Show full board</q-tooltip>
+                  </q-btn>
+                  <q-btn round dense flat icon="mdi-dots-vertical" color="grey-9">
+                    <q-menu anchor="bottom right" self="top right">
+                      <q-list dense>
+                        <!-- <q-item style="padding: 0 0;">
+                          <q-item-section/>
+                          <q-item-section side>
+                            <q-btn size="0.8rem" icon="mdi-settings" v-close-popup @click="openEditSettingsHandler(id)" flat round>
+                              <q-tooltip>Settings</q-tooltip>
+                            </q-btn>
+                            <q-btn size="0.8rem" color="red" icon="mdi-delete-outline" v-close-popup @click="$emit('delete', id)" flat round>
+                              <q-tooltip>Remove</q-tooltip>
+                            </q-btn>
+                          </q-item-section>
+                        </q-item> -->
+                        <q-item clickable v-close-popup @click.stop="$emit('export', id)" v-if="!!connectionSettings">
+                          <q-item-section avatar>
+                            <q-icon name="mdi-cloud-upload-outline" />
+                          </q-item-section>
+                          <q-item-section>Save to broker</q-item-section>
+                        </q-item>
+                        <q-item v-close-popup clickable @click.stop="$emit('export:string', id)">
+                          <q-item-section avatar>
+                            <q-icon name="mdi-export-variant" />
+                          </q-item-section>
+                          <q-item-section>Export as string</q-item-section>
+                        </q-item>
+                        <q-item v-close-popup clickable @click.stop="$emit('export:file', id)">
+                          <q-item-section avatar>
+                            <q-icon name="mdi-file-export" />
+                          </q-item-section>
+                          <q-item-section>Export as file</q-item-section>
+                        </q-item>
+                        <q-item v-close-popup clickable @click.stop="openEditSettingsHandler(id)">
+                          <q-item-section avatar>
+                            <q-icon name="mdi-settings" />
+                          </q-item-section>
+                          <q-item-section>Settings</q-item-section>
+                        </q-item>
+                        <q-separator/>
+                        <q-item v-close-popup clickable @click.stop="$emit('delete', id)">
+                          <q-item-section avatar>
+                            <q-icon name="mdi-delete-outline" color="red"/>
+                          </q-item-section>
+                          <q-item-section>Remove</q-item-section>
+                        </q-item>
+                      </q-list>
+                    </q-menu>
+                  </q-btn>
+                </div>
+              </q-item-section>
             </q-item>
-            <q-card-separator />
-            <q-card-main class="row relative-position" :class="{ 'bg-grey-2': !board.shortcutsIndexes.length }">
+            <q-separator />
+            <q-card-section class="row relative-position" :class="{ 'bg-grey-2': !board.shortcutsIndexes.length }">
               <div class="text-grey-8 col-12 q-mb-sm" style="font-size: 15px;">Shortcuts</div>
               <template v-if="board.shortcutsIndexes.length">
                 <div class="col-3 q-px-xs" v-for="(item, index) in [0, 1, 2, 3]" :key="index" style="margin-bottom: 2px;">
@@ -148,13 +164,13 @@
                   />
                 </div>
               </template>
-              <div v-else class='shortcuts--empty col-12' style="min-height: 84px; margin-bottom: 2px;">
+              <div v-else class='shortcuts--empty col-12' style="min-height: 89px; margin-bottom: 2px;">
                 <div class="text-center text-grey-8 q-mb-sm q-mt-sm" style="font-size: 1.2rem;">You have no shortcuts</div>
                 <div class="text-center text-grey-8">You can add one on <q-btn icon="mdi-fullscreen" color="grey-8" size="sm" dense label="full board view" @click="$emit('select', id)" /></div>
               </div>
               <div v-if="board.settings.lastModify" class="absolute-top-right text-grey-5 q-pr-xs" style="font-size: .7rem;">{{date(board.settings.lastModify, 'DD-MM-YYYY HH:mm:ss')}}</div>
-              <span class="text-bold text-white absolute bg-purple-6 round-borders q-px-xs" style="font-size: 10px; bottom: 4px; right: 4px; cursor: default;" title="Widgets count">{{board.widgetsIndexes.length}}</span>
-            </q-card-main>
+              <span class="text-bold text-white absolute bg-purple-6 rounded-borders q-px-xs" style="font-size: 10px; bottom: 4px; right: 4px; cursor: default;" title="Widgets count">{{board.widgetsIndexes.length}}</span>
+            </q-card-section>
           </q-card>
         </div>
         <template v-if="attachMode">
@@ -164,7 +180,7 @@
             </div>
             <q-card>
               <q-item class="q-py-none q-px-sm bg-grey-4">
-                <q-item-main class="ellipsis">
+                <q-item-section class="ellipsis">
                   <div class="ellipsis" style="height: 24px; line-height: 24px;">
                     {{board.name || '*No name*'}}
                     <q-tooltip v-if="board.name">{{board.name}}</q-tooltip>
@@ -172,10 +188,10 @@
                   <div class="ellipsis text-grey-9" style="height: 14px; line-height: 14px; font-size: 14px;">
                     {{board.id}}
                   </div>
-                </q-item-main>
+                </q-item-section>
               </q-item>
-              <q-card-separator />
-              <q-card-main class="row relative-position" :class="{ 'bg-grey-2': !board.shortcutsIndexes.length }">
+              <q-separator />
+              <q-card-section class="row relative-position" :class="{ 'bg-grey-2': !board.shortcutsIndexes.length }">
                 <div class="text-grey-8 col-12 q-mb-sm" style="font-size: 15px;">Shortcuts</div>
                 <template v-if="board.shortcutsIndexes.length">
                   <div class="col-3 q-px-xs" v-for="(widget, index) in board.shortcutsIndexes.map(index => board.widgetsIndexes.filter(widget => widget.id === index)[0])" :key="index" style="margin-bottom: 2px;">
@@ -189,20 +205,20 @@
                     </div>
                   </div>
                 </template>
-                <div v-else class='shortcuts--empty col-12' style="min-height: 84px; margin-bottom: 2px;">
+                <div v-else class='shortcuts--empty col-12' style="min-height: 89px; margin-bottom: 2px;">
                   <div class="text-center text-grey-8 q-mb-sm q-mt-sm" style="font-size: 1.2rem;">You have no shortcuts</div>
                   <div class="text-center text-grey-8">You can add one on <q-btn icon="mdi-fullscreen" color="grey-8" size="sm" dense label="full board view" @click="$emit('select', id)" /></div>
                 </div>
                 <div v-if="board.settings.lastModify" class="absolute-top-right text-grey-5 q-pr-xs" style="font-size: .7rem;">{{date(board.settings.lastModify, 'DD-MM-YYYY HH:mm:ss')}}</div>
-                <span class="text-bold text-white absolute bg-purple-6 round-borders q-px-xs" style="font-size: 10px; bottom: 4px; right: 4px; cursor: default;" title="Widgets count">{{board.widgetsIndexes.length}}</span>
-              </q-card-main>
+                <span class="text-bold text-white absolute bg-purple-6 rounded-borders q-px-xs" style="font-size: 10px; bottom: 4px; right: 4px; cursor: default;" title="Widgets count">{{board.widgetsIndexes.length}}</span>
+              </q-card-section>
             </q-card>
           </div>
         </template>
       </div>
-      <div v-else class="text-dark text-bold wrapper--empty">
+      <div v-else class="text-grey-9 text-bold wrapper--empty">
         <div class="q-mb-sm">No boards</div>
-        <div v-if="!isFrized"><q-btn color="dark" icon="mdi-plus-circle-outline" label="New board" @click="openSettingsHandler" /></div>
+        <div v-if="!isFrized"><q-btn color="grey-9" icon="mdi-plus-circle-outline" label="New board" @click="openSettingsHandler" /></div>
       </div>
     </div>
     <board-settings
@@ -229,6 +245,7 @@
     font-size 13px
     height 15px
     z-index 1
+    line-height 15px
     .remote-control__button
       border-radius 0px 0px 5px 5px
       line-height 15px
@@ -300,9 +317,9 @@ export default {
           }
         })
         widget = this.modifyWidgetByVariables(widget, boardModel)
-        this.$emit('edit:widget', {settings: widget, widgetId: widget.id, topics: [...this.widgets[widgetIndex].topics]})
+        this.$emit('edit:widget', { settings: widget, widgetId: widget.id, topics: [...this.widgets[widgetIndex].topics] })
       })
-      this.$emit('edit', {id: this.editedBoardModel.id, board: boardModel})
+      this.$emit('edit', { id: this.editedBoardModel.id, board: boardModel })
       this.editedBoardModel = null
     },
     addBoardHandler (boardModel) {

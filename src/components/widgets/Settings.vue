@@ -1,16 +1,30 @@
 <template>
-  <q-modal v-model='status' @hide="closeHandler" no-esc-dismiss no-backdrop-dismiss>
-    <q-modal-layout>
-      <q-toolbar slot="header" color='dark'>
+  <q-dialog v-model='status' @hide="closeHandler" no-esc-dismiss no-backdrop-dismiss>
+    <div :style="{ width: $q.platform.is.mobile ? 'calc(100% - 40px)' : '50vw' }" class="bg-white">
+      <q-toolbar class="bg-grey-9 text-white">
         <q-toolbar-title>
           Widget
         </q-toolbar-title>
       </q-toolbar>
-      <div style="margin: 20px;" :style="{ height: $q.platform.is.mobile ? 'calc(100% - 100px)' : '50vh', width: $q.platform.is.mobile ? 'calc(100% - 40px)' : '50vw'}">
-        <q-input color="dark"  v-model="currentSettings.name" float-label="Name"/>
-        <q-select color="dark" @input="typeChangeHandler" :value="currentSettings.type" :options="typeOptions" float-label="Type"/>
-        <div class="color-palette">
-          <div class="text-grey-6 q-pb-sm color-palette__label">Color</div>
+      <div :style="{ height: $q.platform.is.mobile ? 'calc(100% - 100px)' : '50vh' }" class="scroll q-pa-md">
+        <q-input outlined hide-bottom-space color="grey-9 q-mb-sm" v-model="currentSettings.name" label="Name"/>
+        <q-select outlined hide-bottom-space color="grey-9  q-mb-sm" @input="typeChangeHandler" :value="currentSettings.type" :options="typeOptions" emit-value map-options label="Type">
+          <template v-slot:option="scope">
+          <q-item
+            v-bind="scope.itemProps"
+            v-on="scope.itemEvents"
+          >
+            <q-item-section>
+              <q-item-label v-html="scope.opt.label" />
+            </q-item-section>
+            <q-item-section avatar>
+              <q-icon :name="scope.opt.rightIcon" />
+            </q-item-section>
+          </q-item>
+        </template>
+        </q-select>
+        <div class="color-palette q-pa-sm rounded-borders q-mb-lg">
+          <div class="text-grey-9 q-pb-sm color-palette__label">Color</div>
           <div class="row color-palette__wrapper">
             <span
               v-for="color in colors"
@@ -23,9 +37,9 @@
             </span>
           </div>
         </div>
-        <q-list class="relative-position" v-if="currentSettings.settings.maxTopicsLength !== 0">
+        <q-list class="relative-position q-mb-sm" v-if="currentSettings.settings.maxTopicsLength !== 0" bordered>
           <q-btn
-            color="dark"
+            color="grey-9"
             style="top: -20px; right: 8px; position: absolute; z-index: 1130;"
             class="col-12"
             fab-mini
@@ -33,22 +47,22 @@
             icon="mdi-plus"
             v-if="!(this.currentSettings.settings.maxTopicsLength && this.currentSettings.dataTopics.length >= this.currentSettings.settings.maxTopicsLength) || this.currentSettings.settings.maxTopicsLength === undefined"
           />
-          <q-list-header :class="{'text-red-6': !currentSettings.dataTopics.length}">Topics{{currentSettings.dataTopics.length ? '' : ' are empty'}}</q-list-header>
-          <q-collapsible
+          <q-item-label class="q-py-md q-px-sm" :class="{'text-red-6': !currentSettings.dataTopics.length}">Topics{{currentSettings.dataTopics.length ? '' : ' are empty'}}</q-item-label>
+          <q-expansion-item
             v-for="(topic, index) in currentSettings.dataTopics"
             :key="index"
             :header-class="[`bg-${topicsHighlight[index]}`]"
-            collapse-icon="mdi-settings"
-            :opened="true"
+            expand-icon="mdi-settings"
+            default-opened
           >
             <template slot="header">
-              <q-item-main :label="topic.topicTemplate || 'Empty'" />
-              <q-item-side right>
+              <q-item-section>{{topic.topicTemplate || 'Empty'}}</q-item-section>
+              <q-item-section side>
                 <q-btn flat color="red-6" round dense @click="removeTopicHandler(index)" icon="mdi-delete"/>
-              </q-item-side>
+              </q-item-section>
             </template>
-            <topic v-model="currentSettings.dataTopics[index]" :board="board"/>
-          </q-collapsible>
+            <topic v-model="currentSettings.dataTopics[index]" :board="board" class="q-pa-sm"/>
+          </q-expansion-item>
         </q-list>
         <component
           :is="currentSettings.type"
@@ -58,19 +72,19 @@
           @validate="validateSchemas"
         />
       </div>
-      <q-toolbar slot="footer" color='dark'>
+      <q-toolbar class="bg-grey-9 text-white">
         <q-toolbar-title>
         </q-toolbar-title>
         <q-btn flat dense class="q-mr-sm" @click="closeHandler">Close</q-btn>
         <q-btn flat dense :disable="!validateCurrentSettings || !isValideSchema" @click="saveSettingsHandler">{{saveButtonLabels[mode]}}</q-btn>
       </q-toolbar>
-    </q-modal-layout>
-  </q-modal>
+    </div>
+  </q-dialog>
 </template>
 
 <style lang="stylus">
   .color-palette
-    padding: 8px 0;
+    border 1px solid $grey-5
     .color-palette__label
       font-size .75rem
     .color-palette__wrapper
@@ -130,23 +144,23 @@ export default {
       defaultSettings,
       currentSettings: this.settings ? merge({}, defaultSettings, this.settings) : merge({}, defaultSettings),
       typeOptions: [
-        {label: 'Text', value: 'informer', rightIcon: 'mdi-format-color-text'},
-        {label: 'Multi text', value: 'multi-informer', rightIcon: 'mdi-card-text-outline'},
-        {label: 'Static text', value: 'static-informer', rightIcon: 'mdi-format-text'},
-        {label: 'Toggle', value: 'switcher', rightIcon: 'mdi-toggle-switch-outline'},
-        {label: 'Button', value: 'clicker', rightIcon: 'mdi-send'},
-        {label: 'Textarea', value: 'text-sender', rightIcon: 'mdi-text-subject'},
-        {label: 'Slider', value: 'slider', rightIcon: 'mdi-ray-vertex'},
-        {label: 'Color', value: 'color', rightIcon: 'mdi-palette'},
-        {label: 'Map (Location)', value: 'map-location', rightIcon: 'mdi-map-marker-outline'},
-        {label: 'Map (Route)', value: 'map-route', rightIcon: 'mdi-map-marker-distance'},
-        {label: 'Status Indicator', value: 'status-indicator', rightIcon: 'mdi-lightbulb-outline'},
-        {label: 'Radial gauge', value: 'radial', rightIcon: 'mdi-gauge'},
-        {label: 'Linear gauge', value: 'linear', rightIcon: 'mdi-oil-temperature'},
-        {label: 'Iframe', value: 'frame', rightIcon: 'mdi-window-maximize'},
-        {label: 'Radio button', value: 'singleselect', rightIcon: 'mdi-radiobox-marked'},
-        {label: 'Multiplier', value: 'multiplier', rightIcon: 'mdi-monitor-multiple'},
-        {label: 'Complex', value: 'complex', rightIcon: 'mdi-card-bulleted-outline'}
+        { label: 'Text', value: 'informer', rightIcon: 'mdi-format-color-text' },
+        { label: 'Multi text', value: 'multi-informer', rightIcon: 'mdi-card-text-outline' },
+        { label: 'Static text', value: 'static-informer', rightIcon: 'mdi-format-text' },
+        { label: 'Toggle', value: 'switcher', rightIcon: 'mdi-toggle-switch-outline' },
+        { label: 'Button', value: 'clicker', rightIcon: 'mdi-send' },
+        { label: 'Textarea', value: 'text-sender', rightIcon: 'mdi-text-subject' },
+        { label: 'Slider', value: 'slider', rightIcon: 'mdi-ray-vertex' },
+        { label: 'Color', value: 'color', rightIcon: 'mdi-palette' },
+        { label: 'Map (Location)', value: 'map-location', rightIcon: 'mdi-map-marker-outline' },
+        { label: 'Map (Route)', value: 'map-route', rightIcon: 'mdi-map-marker-distance' },
+        { label: 'Status Indicator', value: 'status-indicator', rightIcon: 'mdi-lightbulb-outline' },
+        { label: 'Radial gauge', value: 'radial', rightIcon: 'mdi-gauge' },
+        { label: 'Linear gauge', value: 'linear', rightIcon: 'mdi-oil-temperature' },
+        { label: 'Iframe', value: 'frame', rightIcon: 'mdi-window-maximize' },
+        { label: 'Radio button', value: 'singleselect', rightIcon: 'mdi-radiobox-marked' },
+        { label: 'Multiplier', value: 'multiplier', rightIcon: 'mdi-monitor-multiple' },
+        { label: 'Complex', value: 'complex', rightIcon: 'mdi-card-bulleted-outline' }
       ],
       colors: ['grey', 'red', 'green', 'orange', 'blue', 'light-blue', 'purple', 'deep-orange', 'cyan', 'brown', 'blue-grey'],
       isValideSchema: true,

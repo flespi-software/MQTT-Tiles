@@ -1,11 +1,11 @@
 <template>
   <div>
     <div class="row">
-      <q-input v-if="integration" v-model="currentSettings.latField" float-label="Latitude`s field" class="col-12" color="dark"/>
-      <q-collapsible
+      <q-input outlined hide-bottom-space v-if="integration" v-model="currentSettings.latField" label="Latitude`s field" class="col-12" color="grey-9"/>
+      <q-expansion-item
         v-else
         class="col-12 q-mt-sm"
-        :opened="true"
+        default-opened
         label="Latitude settings"
         :header-class="[`bg-${isValidLatValue ? 'grey-4' : 'red-2'}`]"
         style="border: solid #e0e0e0 1px"
@@ -15,12 +15,12 @@
             <topic v-model="latValue" label="Latitude value" :board="board"/>
           </div>
         </div>
-      </q-collapsible>
-      <q-input v-if="integration" v-model="currentSettings.lonField" float-label="Longetude`s field" class="col-12" color="dark"/>
-      <q-collapsible
+      </q-expansion-item>
+      <q-input outlined hide-bottom-space v-if="integration" v-model="currentSettings.lonField" label="Longetude`s field" class="col-12" color="grey-9"/>
+      <q-expansion-item
         v-else
         class="col-12 q-mt-sm"
-        :opened="true"
+        default-opened
         label="Longitude settings"
         :header-class="[`bg-${isValidLonValue ? 'grey-4' : 'red-2'}`]"
         style="border: solid #e0e0e0 1px"
@@ -30,9 +30,9 @@
             <topic v-model="lonValue" label="Longitude value" :board="board"/>
           </div>
         </div>
-      </q-collapsible>
+      </q-expansion-item>
       <div class="q-mt-sm col-12">
-        <q-toggle color="dark" v-model="currentSettings.isNeedTime" label="Show last update time"/>
+        <q-toggle color="grey-9" v-model="currentSettings.isNeedTime" label="Show last update time"/>
       </div>
     </div>
   </div>
@@ -122,7 +122,7 @@ export default {
     this.$emit('update', this.currentSettings)
   },
   mixins: [validateTopic],
-  components: {Topic},
+  components: { Topic },
   watch: {
     widget: {
       deep: true,

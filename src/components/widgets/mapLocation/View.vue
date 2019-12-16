@@ -1,32 +1,32 @@
 <template>
   <q-card flat inline class="widget__map-location" style="width: 100%; height: 100%;" :class="[`bg-${item.color}-1`, `${blocked ? 'scroll' : ''}`, `${integration ? '' : 'absolute'}`]">
     <q-item class="q-px-sm q-pt-sm q-pb-none" style="min-height: 0;">
-      <q-item-main class="ellipsis" :class="[`text-${item.color}-7`]" style="font-size: .9rem">
-        {{item.name}}
+      <q-item-section class="ellipsis" :class="[`text-${item.color}-7`]" style="font-size: .9rem">
+        <q-item-label class="ellipsis">{{item.name}}</q-item-label>
         <q-tooltip>{{item.name}}</q-tooltip>
-      </q-item-main>
+      </q-item-section>
       <transition name="block">
-        <q-item-side v-if="!blocked" style="min-width: 20px;">
-          <q-btn size="0.9rem" class="q-pa-none" style="min-height: 1rem;" dense flat icon="mdi-dots-vertical" :color="`${item.color}-7`">
-            <q-popover anchor="top right" self="top right" :offset="[8, 8]" style="box-shadow: none;">
+        <q-item-section side v-if="!blocked" style="min-width: 20px;">
+          <q-btn size="0.7rem" class="q-pa-none" style="min-height: 1rem;" dense flat icon="mdi-dots-vertical" :color="`${item.color}-7`">
+            <q-menu anchor="top right" self="top right" :offset="[8, 8]" style="box-shadow: none;">
               <div class="q-pa-sm" :class="[`bg-${item.color}-1`]">
-                <q-btn v-close-overlay size="0.9rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" icon="mdi-content-duplicate" @click="$emit('duplicate')" dense flat :color="`${item.color}-7`">
+                <q-btn v-close-popup size="0.7rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" icon="mdi-content-duplicate" @click="$emit('duplicate')" dense flat :color="`${item.color}-7`">
                   <q-tooltip>Duplicate</q-tooltip>
                 </q-btn>
-                <q-btn v-close-overlay size="0.9rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" icon="mdi-settings" @click="$emit('update')" dense flat :color="`${item.color}-7`">
+                <q-btn v-close-popup size="0.7rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" icon="mdi-settings" @click="$emit('update')" dense flat :color="`${item.color}-7`">
                   <q-tooltip>Edit</q-tooltip>
                 </q-btn>
-                <q-btn v-close-overlay size="0.9rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" icon="mdi-delete-outline" @click="$emit('delete')" dense flat color="red">
+                <q-btn v-close-popup size="0.7rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" icon="mdi-delete-outline" @click="$emit('delete')" dense flat color="red">
                   <q-tooltip>Remove</q-tooltip>
                 </q-btn>
-                <q-btn v-close-overlay size="0.9rem" class="q-pa-none" style="min-height: 1rem;" icon="mdi-close" dense flat :color="`${item.color}-7`"/>
+                <q-btn v-close-popup size="0.7rem" class="q-pa-none" style="min-height: 1rem;" icon="mdi-close" dense flat :color="`${item.color}-7`"/>
               </div>
-            </q-popover>
+            </q-menu>
           </q-btn>
-        </q-item-side>
+        </q-item-section>
       </transition>
     </q-item>
-    <q-card-media class="widget__content scroll" :class="[`bg-${item.color}-1`]" :style="{height: integration ? '' : contentHeight}">
+    <q-card-section class="widget__content scroll q-pa-none" :class="[`bg-${item.color}-1`]" :style="{height: integration ? '' : contentHeight}">
       <div style="width: 100%; height: 100%;">
         <iframe style="width: 100%;height: calc(100% - 18px);" src="https://flespi.io/mapview" frameborder="0" ref="map" allowfullscreen></iframe>
       </div>
@@ -34,7 +34,7 @@
       <div v-if="item.settings.isNeedTime" class="absolute-bottom-left q-px-xs q-pt-xs" style="font-size: 12px; border-top-right-radius: 5px;" :class="[`text-${item.color}-7`, `bg-${item.color}-1`]">
         {{timestamp}}
       </div>
-    </q-card-media>
+    </q-card-section>
   </q-card>
 </template>
 
@@ -74,8 +74,8 @@ export default {
       if (this.integration) {
         let dataTopic = this.item.dataTopics[0],
           topicFilter = dataTopic.topicFilter,
-          latDataTopic = {...dataTopic, payloadField: this.item.settings.latField},
-          lonDataTopic = {...dataTopic, payloadField: this.item.settings.lonField}
+          latDataTopic = { ...dataTopic, payloadField: this.item.settings.latField },
+          lonDataTopic = { ...dataTopic, payloadField: this.item.settings.lonField }
         values = [
           parseFloat(this.getValueByTopic(this.value[topicFilter] && this.value[topicFilter].payload, latDataTopic)),
           parseFloat(this.getValueByTopic(this.value[topicFilter] && this.value[topicFilter].payload, lonDataTopic))
@@ -92,7 +92,7 @@ export default {
       return values
     },
     contentHeight () {
-      let height = 'calc(100% - 29px)'
+      let height = 'calc(100% - 44px)'
       if (!this.item.name && this.blocked) {
         height = 'calc(100% - 11px)'
       }

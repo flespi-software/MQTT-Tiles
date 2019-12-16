@@ -52,7 +52,7 @@
       :style="{height: `${clientSettings ? 'calc(100vh - 50px)' : 'calc(100vh - 110px)'}`}"
     >
       <div slot="actions">
-        <q-btn label="import" @click="importClickHandler" flat color="dark"/>
+        <q-btn label="import" @click="importClickHandler" flat color="grey-9"/>
       </div>
     </boards>
     <div v-if="!clientSettings" class="bg-red-2 text-red-8 text-center absolute connections--empty">
@@ -89,7 +89,7 @@
 
 <script>
 import isEqual from 'lodash/isEqual'
-import mqtt from '../plugins/async-mqtt.js'
+import mqtt from '../boot/async-mqtt.js'
 import { uid } from 'quasar'
 import bl from 'bl'
 import debounce from 'lodash/debounce'
@@ -107,7 +107,7 @@ import messagesProcessing from './widgets/messagesProcessing.js'
 import migrateWidgets from './widgets/migrations'
 import CopyReplaceDialog from './CopyReplaceDialog'
 import ImportExportModal from './ImportExportModal'
-import {version} from '../../package.json'
+import { version } from '../../package.json'
 import getValueByTopic from '../mixins/getValueByTopic'
 import boardsMigrations from '../mixins/boardsMigrations'
 
@@ -372,7 +372,7 @@ export default {
           this.savedBoardProcess(topic.split('/').slice(-1)[0], message)
           return false
         }
-        this.setValueByTopic(topic, {...packet, timestamp: Date.now()})
+        this.setValueByTopic(topic, { ...packet, timestamp: Date.now() })
         this.expireMessagesHandler(packet)
         this.debouncedBusMessagesProcessing()
       })
@@ -517,7 +517,7 @@ export default {
       this.activeBoardId = undefined
       this.$emit('change:title', this.getTitle())
     },
-    actionHandler ({topic, payload, settings}) {
+    actionHandler ({ topic, payload, settings }) {
       if (!settings.qos) {
         settings.qos = 1
       }
@@ -557,26 +557,24 @@ export default {
       this.$q.dialog({
         title: `Delete «${this.boards[boardId].name || '*No name*'}» board?`,
         message: `You are about to delete the «${this.boards[boardId].name || '*No name*'}» board. The board will be removed from all connections. Continue?`,
-        color: 'dark',
+        color: 'grey-9',
         ok: true,
         cancel: true
-      }).then(() => { this.deleteBoardHandler(boardId) })
-        .catch(() => {})
+      }).onOk(() => { this.deleteBoardHandler(boardId) })
     },
     deleteUploadedBoard (boardId) {
       this.$q.dialog({
         title: 'Delete remote board?',
         message: `Do you really want to delete remote board?`,
-        color: 'dark',
+        color: 'grey-9',
         ok: true,
         cancel: true
       })
-        .then(() => {
+        .onOk(() => {
           this.publish(`${this.clientSettings.syncNamespace}/${boardId}`, '', { qos: 1, retain: true })
         })
-        .catch(() => {})
     },
-    editBoardHandler ({id: boardId, board: newBoard}) {
+    editBoardHandler ({ id: boardId, board: newBoard }) {
       this.resolveBoardVariables(newBoard, this.boards[boardId])
       this.$set(this.boards, boardId, newBoard)
       if (boardId !== newBoard.id) {
@@ -643,7 +641,7 @@ export default {
     },
     initBoard (board) {
       board = this.migrateBoard(cloneDeep(board), board.appVersion, version)
-      let {board: currentBoard, widgets} = this.unpackBoard(board)
+      let { board: currentBoard, widgets } = this.unpackBoard(board)
       board = currentBoard
       this.$set(this.boards, board.id, board)
       this.resolveBoardVariables(board)
@@ -656,8 +654,8 @@ export default {
         let widgets = {}
         Object.keys(savedBoards).forEach(boardId => {
           let board = savedBoards[boardId]
-          let {board: unpackedBoard, widgets: currentWidgets} = this.unpackBoard(board)
-          widgets = {...widgets, ...currentWidgets}
+          let { board: unpackedBoard, widgets: currentWidgets } = this.unpackBoard(board)
+          widgets = { ...widgets, ...currentWidgets }
           board = unpackedBoard
           this.resolveBoardVariables(board)
           savedBoards[boardId] = this.migrateBoard(board, board.appVersion, version)
@@ -745,14 +743,14 @@ export default {
       let board = this.boards[this.activeBoardId],
         colNum = this.colsByBreakpoint[breakpoint],
         layout = board.layouts[breakpoint],
-        {x, y} = freeSpace()
+        { x, y } = freeSpace()
       function freeSpace () {
         let max = layout.reduce((max, widget) => {
           if ((max.y === widget.y && max.x <= widget.x) || max.y < widget.y) {
             max = widget
           }
           return max
-        }, {y: 0, x: 0, h: 0, w: 0})
+        }, { y: 0, x: 0, h: 0, w: 0 })
         if (max.x + max.w + width <= colNum) {
           // todo check if w > colNum => w = col.num
           return { x: max.x + max.w, y: max.y }
@@ -773,7 +771,7 @@ export default {
         this.widgetLayoutSetup(width, height, id, breakpoint)
       })
     },
-    layoutUpdateHandler ({layout, breakpoint}) {
+    layoutUpdateHandler ({ layout, breakpoint }) {
       this.$set(this.boards[this.activeBoardId].layouts, breakpoint, layout)
     },
     deleteWidgetFromLayout (widgetIndex) {
@@ -815,7 +813,7 @@ export default {
       }
       this.$set(this.widgets, widget.id, widget)
     },
-    editWidget ({widgetId, settings, topics}) {
+    editWidget ({ widgetId, settings, topics }) {
       if (difference(settings.topics, topics).length || difference(topics, settings.topics).length) {
         topics.forEach(oldTopic => {
           if (settings.topics.includes(oldTopic)) { return false }
@@ -854,14 +852,14 @@ export default {
       this.$set(this.widgets, widgetId, settings)
       this.valuesProcessing()
     },
-    deleteWidget ({widgetId, settings}) {
+    deleteWidget ({ widgetId, settings }) {
       this.$q.dialog({
         title: 'Delete widget?',
         message: `Do you really want to delete «${settings.name}» widget?`,
-        color: 'dark',
+        color: 'grey-9',
         ok: true,
         cancel: true
-      }).then(() => {
+      }).onOk(() => {
         this.removeFromShortcuts(widgetId)
         /* remove from board link index */
         let widgetsIndexes = this.boards[this.activeBoardId].widgetsIndexes,
@@ -882,7 +880,6 @@ export default {
         })
         this.$delete(this.widgets, widgetId)
       })
-        .catch(() => {})
     },
     fastBindWidgetHandler (widgetId) {
       let shortcutsIndexes = this.boards[this.activeBoardId].shortcutsIndexes,
@@ -894,7 +891,7 @@ export default {
           this.$q.notify({
             message: 'Shortcuts can contain four widgets maximum',
             detail: 'Delete something to add a new widget.',
-            type: 'warning',
+            color: 'warning',
             delay: 1000
           })
           return false
@@ -912,7 +909,7 @@ export default {
         }
       })
     },
-    resizeHandler ({index, height, width}) {
+    resizeHandler ({ index, height, width }) {
       let widget = this.widgets[index]
       this.$set(widget.settings, 'height', height)
       this.$set(widget.settings, 'width', width)
@@ -1054,7 +1051,7 @@ export default {
     shareHandler (boardId) {
       let shareWizardConfig = {
         boardId,
-        tokens: [{label: '<Connection token>', credentions: { username: this.clientSettings.username }, accessable: this.canShareByClientToken}],
+        tokens: [{ label: '<Connection token>', credentions: { username: this.clientSettings.username }, accessable: this.canShareByClientToken }],
         hasRemote: !!this.boardsFromConnection[boardId],
         currentRemoteBoards: Object.keys(this.boardsFromConnection),
         syncNamespace: this.clientSettings.syncNamespace,
@@ -1069,7 +1066,7 @@ export default {
     shareUploadedHandler (boardId) {
       let shareWizardConfig = {
         boardId,
-        tokens: [{label: '<Connection token>', credentions: { username: this.clientSettings.username }, accessable: this.canShareByClientToken}],
+        tokens: [{ label: '<Connection token>', credentions: { username: this.clientSettings.username }, accessable: this.canShareByClientToken }],
         hasRemote: false,
         isRemote: true,
         syncNamespace: this.clientSettings.syncNamespace,
@@ -1082,7 +1079,7 @@ export default {
       this.$emit('share:prepare', shareWizardConfig)
     },
     shareBoard (config) {
-      let {boardId, isRemote} = config
+      let { boardId, isRemote } = config
       this.$emit('share', { boardId, share: this.getShareModel(isRemote ? this.boardsFromConnection[boardId] : this.boards[boardId], isRemote) })
     },
     shareSync () {
@@ -1098,7 +1095,7 @@ export default {
             this.setActiveBoard(boardId)
           } else {
             this.$q.notify({
-              type: 'negative',
+              color: 'negative',
               message: `Board ${boardId} not found`,
               timeout: 1000,
               position: 'bottom-left'
@@ -1143,7 +1140,7 @@ export default {
     },
     /* events */
     updateBoards (boards, widgets) {
-      this.$emit('update:boards', {...this.boardsConfigs, ...getBoardsToSave(boards, widgets)})
+      this.$emit('update:boards', { ...this.boardsConfigs, ...getBoardsToSave(boards, widgets) })
     },
     changeAttachedBoards (attachedBoards) {
       this.$emit('change:attach', attachedBoards)
@@ -1164,8 +1161,8 @@ export default {
       return true
     }
     if (this.initBoards) {
-      let initBoards = {...this.initBoards},
-        boardsConfigs = {...this.initBoards}
+      let initBoards = { ...this.initBoards },
+        boardsConfigs = { ...this.initBoards }
       if (this.clientSettings && this.clientSettings.attachedBoards) {
         initBoards = this.clientSettings.attachedBoards.reduce((res, boardId) => {
           if (initBoards[boardId]) {

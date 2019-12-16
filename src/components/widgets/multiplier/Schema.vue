@@ -1,31 +1,25 @@
 <template>
   <div>
     <div class="row">
-      <div class="q-mt-sm col-12" v-if="widget.topics.length && widget.topics[0].split('/')">
-        <div class="q-mb-sm text-dark">Group layer</div>
+      <div class="q-mb-sm col-12" v-if="widget.topics.length && widget.topics[0].split('/')">
+        <div class="q-mb-sm text-grey-9">Group layer</div>
         <div
           v-for="(path, index) in widget.topics[0].split('/')"
           :key="`${index}${path}`"
-          :class="{'bg-dark text-white': currentSettings.groupLayout >= index, 'text-dark bg-grey-3': currentSettings.groupLayout < index}"
-          class="q-mr-xs q-pa-xs round-borders cursor-pointer inline-block"
+          :class="{'bg-grey-9 text-white': currentSettings.groupLayout >= index, 'text-grey-9 bg-grey-3': currentSettings.groupLayout < index}"
+          class="q-mr-xs q-pa-xs rounded-borders cursor-pointer inline-block"
           @click="setGroupLayer(index)"
         >
           {{path}}
         </div>
       </div>
-      <q-input v-model="currentSettings.nameField" v-if="widget.dataTopics[0] && widget.dataTopics[0].payloadType === 1" float-label="Widget`s name field" class="col-12" color="dark"/>
-      <div class="col-12">
-        <q-field helper="You can use math logic to define what values to show in the widget. Example: `%value% > 1000` or `<%jsons-some-field%> != nill`, where %value% is a payload and <%jsons-some-field%> is a JSON field from your subscription.">
-          <div class="row">
-            <q-input v-model="currentSettings.math" float-label="Multiplied widget render logic" class="col-12" color="dark"/>
-          </div>
-        </q-field>
+      <q-input outlined hide-bottom-space v-model="currentSettings.nameField" v-if="widget.dataTopics[0] && widget.dataTopics[0].payloadType === 1" label="Widget`s name field" class="col-12 q-mb-sm" color="grey-9"/>
+      <q-input outlined hide-bottom-space v-model="currentSettings.math" label="Multiplied widget render logic" class="col-12 q-mb-sm" color="grey-9" hint="You can use math logic to define what values to show in the widget. Example: `%value% > 1000` or `<%jsons-some-field%> != nill`, where %value% is a payload and <%jsons-some-field%> is a JSON field from your subscription."/>
+      <div class="q-mb-sm col-12">
+        <q-select outlined hide-bottom-space color="grey-9" v-model="currentSettings.type" :options="typeOptions" @input="currentSettings.widgetSettings = {}" emit-value map-options label="Widget multiplier type" />
       </div>
-      <div class="q-mt-sm col-12">
-        <q-select color="dark" v-model="currentSettings.type" :options="typeOptions" @input="currentSettings.widgetSettings = {}" float-label="Widget multiplier type" />
-      </div>
-      <div class="color-palette col-12">
-        <div class="text-grey-6 q-pb-sm color-palette__label">Color</div>
+      <div class="color-palette q-pa-sm rounded-borders q-mb-lg col-12">
+        <div class="text-grey-9 q-pb-sm color-palette__label">Widgets color</div>
         <div class="row color-palette__wrapper">
           <span
             v-for="color in colors"
@@ -86,16 +80,16 @@ export default {
       defaultSettings,
       currentSettings: Object.assign({}, defaultSettings, this.widget.settings),
       typeOptions: [
-        {label: 'Toggle', value: 'switcher'},
-        {label: 'Text', value: 'informer'},
-        {label: 'Radial gauge', value: 'radial'},
-        {label: 'Linear gauge', value: 'linear'},
-        {label: 'Radio button', value: 'singleselect'},
-        {label: 'Complex', value: 'complex'},
-        {label: 'Location', value: 'map-location'},
-        {label: 'Route', value: 'map-route'}
+        { label: 'Toggle', value: 'switcher' },
+        { label: 'Text', value: 'informer' },
+        { label: 'Radial gauge', value: 'radial' },
+        { label: 'Linear gauge', value: 'linear' },
+        { label: 'Radio button', value: 'singleselect' },
+        { label: 'Complex', value: 'complex' },
+        { label: 'Location', value: 'map-location' },
+        { label: 'Route', value: 'map-route' }
       ],
-      colors: ['grey', 'red', 'green', 'orange', 'blue', 'light-blue']
+      colors: ['grey', 'red', 'green', 'orange', 'blue', 'light-blue', 'purple', 'deep-orange', 'cyan', 'brown', 'blue-grey']
     }
   },
   computed: {

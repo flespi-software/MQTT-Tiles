@@ -21,7 +21,7 @@ let timeFormat = (value) => {
 math.import({
   equal: function (a, b) { return a === b },
   unequal: function (a, b) { return a !== b }
-}, {override: true})
+}, { override: true })
 export default {
   methods: {
     mathProcessing (value, mathTemplate) {

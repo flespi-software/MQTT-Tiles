@@ -3,21 +3,20 @@
     v-model="dialogModel"
     prevent-close
   >
-    <!-- This or use "title" prop on <q-dialog> -->
-    <span slot="title">{{title}}</span>
-
-    <!-- This or use "message" prop on <q-dialog> -->
-    <span slot="message">{{message}}</span>
-
-    <div slot="body" style="min-width: 300px; min-height: 80px;">
-      <q-checkbox v-model="isNeedCopy" color="dark" label="Rename to save a copy"/>
-      <q-input color="dark" v-model="nameModel" :disable="!isNeedCopy" float-label="Name" :error="isNeedCopy && oldName === name"/>
+    <div class="bg-white" style="min-width: 300px">
+      <div class="q-pa-md">
+        <div class="text-h5 text-bold q-mb-sm">{{title}}</div>
+        <div class="text-grey-6">{{message}}</div>
+        <div class="text-grey-6">
+          <q-checkbox v-model="isNeedCopy" color="grey-9" label="Rename to save a copy"/>
+          <q-input outlined hide-bottom-space color="grey-9" v-model="nameModel" :disable="!isNeedCopy" label="Name" :error="isNeedCopy && oldName === name"/>
+        </div>
+      </div>
+      <div class="flex justify-end q-mt-md q-pa-sm">
+        <q-btn color="grey-9" flat label="Close" @click="mode = 'cancel'" />
+        <q-btn color="grey-9" flat :label="!isNeedCopy ? replaceLabel : loadLabel" @click="mode = 'ok'" :disabled="isNeedCopy && oldName === name"/>
+      </div>
     </div>
-
-    <template slot="buttons" slot-scope="props">
-      <q-btn color="dark" flat label="Close" @click="props.cancel, mode = 'cancel'" />
-      <q-btn color="dark" flat :label="!isNeedCopy ? replaceLabel : loadLabel" @click="mode = 'ok'" :disabled="isNeedCopy && oldName === name"/>
-    </template>
   </q-dialog>
 </template>
 

@@ -1,35 +1,27 @@
 <template>
   <div>
     <div class="row">
-      <div class="col-12 q-mt-lg">
+      <div class="col-12 q-mb-sm">
         <q-btn-toggle
           v-model="currentSettings.mode"
           rounded
-          toggle-text-color="dark"
+          toggle-text-color="grey-9"
           text-color="grey-6"
           flat
           :options="modeOptions"
         />
       </div>
-      <div class="col-12">
-        <q-select color="dark" v-model="currentSettings.format" float-label="Format" :options="formatOptions"/>
+      <div class="col-12 q-mb-sm">
+        <q-select outlined hide-bottom-space color="grey-9" v-model="currentSettings.format" label="Format" :options="formatOptions" emit-value map-options/>
       </div>
-      <div class="col-12">
-        <q-field :helper="valueTemplateHelper">
-          <div>
-            <q-input :error="!isValueTemplateValide" type="textarea" color="dark" v-model="currentSettings.valueTemplate" float-label="Value template"/>
-          </div>
-        </q-field>
+      <div class="col-12 q-mb-sm">
+        <q-input outlined hide-bottom-space :error="!isValueTemplateValide" :hint="valueTemplateHelper" type="textarea" color="grey-9" v-model="currentSettings.valueTemplate" label="Value template"/>
       </div>
-      <div class="col-12" v-if="widget.dataTopics[0] && widget.dataTopics[0].payloadType">
-        <q-field helper="You can set publish template. %value% is variable of your color.">
-          <div>
-            <q-input type="textarea" color="dark" v-model="currentSettings.publishTemplate" float-label="Publish template"/>
-          </div>
-        </q-field>
+      <div class="col-12 q-mb-sm" v-if="widget.dataTopics[0] && widget.dataTopics[0].payloadType">
+        <q-input outlined hide-bottom-space type="textarea" input-style="resize: none;" color="grey-9" hint="You can set publish template. %value% is variable of your color." v-model="currentSettings.publishTemplate" label="Publish template"/>
       </div>
-      <q-toggle class="q-mt-sm col-12" color="dark" v-model="currentSettings.save" label="Save last status on server (retained message)"/>
-      <q-toggle class="q-mt-sm col-12" color="dark" v-model="currentSettings.isNeedTime" label="Show last update time"/>
+      <q-toggle class="q-mt-sm col-12" color="grey-9" v-model="currentSettings.save" label="Save last status on server (retained message)"/>
+      <q-toggle class="q-mt-sm col-12" color="grey-9" v-model="currentSettings.isNeedTime" label="Show last update time"/>
     </div>
   </div>
 </template>
@@ -64,13 +56,13 @@ export default {
       defaultSettings,
       currentSettings: Object.assign({}, defaultSettings, this.widget.settings),
       modeOptions: [
-        {label: 'Simple', value: COLOR_MODE_SIMPLE},
-        {label: 'Advanced', value: COLOR_MODE_FULL}
+        { label: 'Simple', value: COLOR_MODE_SIMPLE },
+        { label: 'Advanced', value: COLOR_MODE_FULL }
       ],
       formatOptions: [
-        {label: 'HEX', value: COLOR_FORMAT_HEX},
-        {label: 'RGB', value: COLOR_FORMAT_RGB},
-        {label: 'HSV', value: COLOR_FORMAT_HSV}
+        { label: 'HEX', value: COLOR_FORMAT_HEX },
+        { label: 'RGB', value: COLOR_FORMAT_RGB },
+        { label: 'HSV', value: COLOR_FORMAT_HSV }
       ]
     }
   },
@@ -95,16 +87,18 @@ export default {
     },
     isValueTemplateValide () {
       if (!this.currentSettings.valueTemplate) { return true }
-      let vars = this.currentSettings.valueTemplate.match(/%.{1,3}%/g)
+      let vars = this.currentSettings.valueTemplate.match(/%[hex|r|g|b|h|s|v|a]{1,3}%/g)
       if (!vars) { return false }
       vars = vars.map(v => v.slice(1, -1))
+      let flag = false
       if (this.currentSettings.format === COLOR_FORMAT_HEX) {
-        return vars.includes('hex') && vars.length === 1
+        flag = vars.includes('hex') && vars.length === 1
       } else if (this.currentSettings.format === COLOR_FORMAT_RGB) {
-        return vars.reduce((res, v) => res && ['r', 'g', 'b', 'a'].includes(v), true) && vars.length > 2 && vars.length < 5
+        flag = vars.reduce((res, v) => res && ['r', 'g', 'b', 'a'].includes(v), true) && vars.length > 2 && vars.length < 5
       } else if (this.currentSettings.format === COLOR_FORMAT_HSV) {
-        return vars.reduce((res, v) => res && ['h', 's', 'v', 'a'].includes(v), true) && vars.length > 2 && vars.length < 5
+        flag = vars.reduce((res, v) => res && ['h', 's', 'v', 'a'].includes(v), true) && vars.length > 2 && vars.length < 5
       }
+      return flag
     }
   },
   methods: {

@@ -2,41 +2,45 @@
   <div>
     <div class="row">
       <div class="q-mt-sm col-12">
-        <q-toggle color="dark" v-model="currentSettings.save" label="Save last status on server (retained message)"/>
+        <q-toggle color="grey-9" v-model="currentSettings.save" label="Save last status on server (retained message)"/>
       </div>
-      <q-btn-toggle class='q-mt-md col-12' rounded toggle-text-color="dark" text-color="grey-6" flat v-model="currentSettings.mode" :options="modeOptions"/>
-      <q-input class="col-12" v-if="currentSettings.mode === 0 && widget.topics.length > 1" color="dark" v-model="currentSettings.actionTopic" float-label="Action topic"/>
+      <q-btn-toggle class='q-my-sm col-12' rounded toggle-text-color="grey-9" text-color="grey-6" flat v-model="currentSettings.mode" :options="modeOptions"/>
+      <q-input outlined hide-bottom-space class="col-12" v-if="currentSettings.mode === 0 && widget.topics.length > 1" color="grey-9" v-model="currentSettings.actionTopic" label="Action topic"/>
       <div class="col-6 q-pr-sm">
-        <q-input color="dark" v-model="currentSettings.trueValue" float-label="True value"/>
-        <q-input class="q-mr-xs icon-input" color="dark" v-model="currentSettings.trueIcon" float-label="True value icon">
-          <q-icon :name="`mdi-${currentSettings.trueIcon || 'toggle-switch-outline'}`" size="1.5rem" style="position: absolute; right: 0; bottom : 7px;"/>
+        <q-input outlined hide-bottom-space color="grey-9" class="q-mb-sm" v-model="currentSettings.trueValue" label="True value"/>
+        <q-input outlined hide-bottom-space class="q-mb-sm icon-input" color="grey-9" v-model="currentSettings.trueIcon" label="True value icon">
+          <q-icon slot="append" :name="`mdi-${currentSettings.trueIcon || 'toggle-switch-outline'}`" size="1.5rem"/>
         </q-input>
-        <div v-if="currentSettings.mode === 1">
-          <q-input color="dark" v-model="currentSettings.trueActionTopic" float-label="True action topic" :after="[{icon: 'mdi-arrow-right', handler () { currentSettings.falseActionTopic = currentSettings.trueActionTopic }, content: true}]"/>
+        <div v-if="currentSettings.mode === 1" class="q-mb-sm">
+          <q-input outlined hide-bottom-space color="grey-9" v-model="currentSettings.trueActionTopic" label="True action topic">
+            <q-btn slot="after" icon="mdi-arrow-right" dense flat @click="currentSettings.falseActionTopic = currentSettings.trueActionTopic" v-if="!!currentSettings.trueActionTopic"/>
+          </q-input>
           <variables-helper v-if="board.settings.variables && board.settings.variables.length" :variables="board.settings.variables" @add="(variable) => currentSettings.trueActionTopic += variable"/>
         </div>
-        <q-input v-if="currentSettings.mode === 1" color="dark" v-model="currentSettings.truePayload" float-label="True action payload" :after="[{icon: 'mdi-arrow-right', handler () { currentSettings.falsePayload = currentSettings.truePayload }, content: true}]"/>
+        <q-input outlined hide-bottom-space v-if="currentSettings.mode === 1" color="grey-9" v-model="currentSettings.truePayload" label="True action payload">
+          <q-btn slot="after" icon="mdi-arrow-right" dense flat @click="currentSettings.falsePayload = currentSettings.truePayload" v-if="!!currentSettings.truePayload" />
+        </q-input>
       </div>
       <div class="col-6 q-pl-sm">
-        <q-input color="dark" v-model="currentSettings.falseValue" float-label="False value"/>
-        <q-input class="q-mr-xs icon-input" color="dark" v-model="currentSettings.falseIcon" float-label="False value icon">
-          <q-icon :name="`mdi-${currentSettings.falseIcon || 'toggle-switch-off-outline'}`" size="1.5rem" style="position: absolute; right: 0; bottom : 7px;"/>
+        <q-input outlined hide-bottom-space color="grey-9" class="q-mb-sm" v-model="currentSettings.falseValue" label="False value"/>
+        <q-input outlined hide-bottom-space class="q-mb-sm icon-input" color="grey-9" v-model="currentSettings.falseIcon" label="False value icon">
+          <q-icon slot="append" :name="`mdi-${currentSettings.falseIcon || 'toggle-switch-off-outline'}`" size="1.5rem"/>
         </q-input>
-        <div v-if="currentSettings.mode === 1">
-          <q-input color="dark" v-model="currentSettings.falseActionTopic" float-label="False action topic"/>
+        <div v-if="currentSettings.mode === 1" class="q-mb-sm">
+          <q-input outlined hide-bottom-space color="grey-9" v-model="currentSettings.falseActionTopic" label="False action topic"/>
           <variables-helper v-if="board.settings.variables && board.settings.variables.length" :variables="board.settings.variables" @add="(variable) => currentSettings.falseActionTopic += variable"/>
         </div>
-        <q-input v-if="currentSettings.mode === 1" color="dark" v-model="currentSettings.falsePayload" float-label="False action payload"/>
+        <q-input outlined hide-bottom-space v-if="currentSettings.mode === 1" color="grey-9" v-model="currentSettings.falsePayload" label="False action payload"/>
       </div>
-      <q-input class="col-12" color="dark" v-model="currentSettings.math" float-label="Math expression" placeholder="%value%"/>
-      <div class="text-dark" style="font-size: .8rem;">You can use math expressions to calculate the final value. Example: (%value% * 1000) / 1024, where %value% is the payload from your subscription.</div>
+      <q-input outlined hide-bottom-space class="col-12 q-mt-sm" color="grey-9" v-model="currentSettings.math" label="Math expression" placeholder="%value%"/>
+      <div class="text-grey-9" style="font-size: .8rem;">You can use math expressions to calculate the final value. Example: (%value% * 1000) / 1024, where %value% is the payload from your subscription.</div>
       <div class='q-my-md col-12' v-if="widget.topics.length > 1">
         <div class="text-grey-6" style="font-size: 0.75rem">Accumulate logic</div>
-        <q-btn-toggle rounded toggle-text-color="dark" text-color="grey-6" flat v-model="currentSettings.accumulateLogic" :options="accumulateLogicOptions"/>
+        <q-btn-toggle rounded toggle-text-color="grey-9" text-color="grey-6" flat v-model="currentSettings.accumulateLogic" :options="accumulateLogicOptions"/>
         <div class="text-grey-6" style="font-size: 0.75rem">How value will be accumulating*</div>
       </div>
       <div class="q-mt-sm col-12">
-        <q-toggle color="dark" v-model="currentSettings.isNeedTime" label="Show last update time"/>
+        <q-toggle color="grey-9" v-model="currentSettings.isNeedTime" label="Show last update time"/>
       </div>
     </div>
   </div>
@@ -73,12 +77,12 @@ export default {
       defaultSettings,
       currentSettings: Object.assign({}, defaultSettings, this.widget.settings),
       modeOptions: [
-        {label: 'Default mode', value: DEFAULT_MODE},
-        {label: 'Command mode', value: COMMAND_MODE}
+        { label: 'Default mode', value: DEFAULT_MODE },
+        { label: 'Command mode', value: COMMAND_MODE }
       ],
       accumulateLogicOptions: [
-        {label: 'AND', value: ACCUMULATE_AND_MODE},
-        {label: 'OR', value: ACCUMULATE_OR_MODE}
+        { label: 'AND', value: ACCUMULATE_AND_MODE },
+        { label: 'OR', value: ACCUMULATE_OR_MODE }
       ]
     }
   },

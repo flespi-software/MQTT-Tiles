@@ -1,13 +1,13 @@
 <template>
   <div>
-    <q-toggle class="q-mt-sm" color="dark" v-model="currentSettings.save" label="Save last status on server (retained message)"/>
-    <q-input color="dark" v-model="currentSettings.label" :float-label="currentSettings.label.length <= 25 ? 'Button label' : 'Button label (25 symbols max)'" :error="currentSettings.label.length > 25"/>
-    <q-input class="q-mr-xs icon-input" color="dark" v-model="currentSettings.icon" float-label="Icon">
-      <q-icon :name="`mdi-${currentSettings.icon || 'send'}`" size="1.5rem" style="position: absolute; right: 0; bottom : 7px;"/>
+    <q-toggle class="q-mt-sm" color="grey-9" v-model="currentSettings.save" label="Save last status on server (retained message)"/>
+    <q-input color="grey-9" class="q-mb-sm" outlined hide-bottom-space v-model="currentSettings.label" :label="currentSettings.label.length <= 25 ? 'Button label' : 'Button label (25 symbols max)'" :error="currentSettings.label.length > 25"/>
+    <q-input outlined hide-bottom-space class="q-mb-sm" color="grey-9" v-model="currentSettings.icon" label="Icon">
+      <q-icon slot="append" :name="`mdi-${currentSettings.icon || 'send'}`" size="1.5rem"/>
     </q-input>
-    <q-input color="dark" v-model="currentSettings.topic" float-label="Topic"/>
+    <q-input color="grey-9" outlined hide-bottom-space v-model="currentSettings.topic" label="Topic"/>
     <variables-helper v-if="board.settings.variables && board.settings.variables.length" :variables="board.settings.variables" @add="(variable) => currentSettings.topic += variable"/>
-    <q-input type="textarea" color="dark" v-model="currentSettings.payload" float-label="Payload"/>
+    <q-input type="textarea" outlined hide-bottom-space color="grey-9" class="q-mt-sm" v-model="currentSettings.payload" label="Payload" input-style="resize: none;"/>
   </div>
 </template>
 

@@ -1,106 +1,118 @@
 <template>
-  <q-modal v-model='value' @hide="closeHandler">
-    <q-modal-layout>
-      <q-toolbar slot="header" color='dark'>
+  <q-dialog v-model='value' @hide="closeHandler" :maximized="$q.platform.is.mobile">
+    <div :style="{width: $q.platform.is.mobile ? '100%' : '50vw'}">
+      <q-toolbar class="bg-grey-9 text-white">
         <q-toolbar-title>
           Board settings
         </q-toolbar-title>
       </q-toolbar>
-      <div style="margin: 20px;" :style="{ height: $q.platform.is.mobile ? 'calc(100% - 100px)' : '50vh', width: $q.platform.is.mobile ? 'calc(100% - 40px)' : '50vw'}">
+      <div :style="{ height: $q.platform.is.mobile ? 'calc(100% - 100px)' : '50vh' }" class="q-pa-md scroll bg-white">
         <div class="row">
           <q-input
-            class="col-12"
+            outlined hide-bottom-space
+            class="col-12 q-mb-sm"
             autofocus
             v-model="currentSettings.name"
-            color="dark"
-            float-label="Name"
+            color="grey-9"
+            label="Name"
           />
           <q-input
-            class="col-12"
+            class="col-12 q-mb-sm"
+            outlined hide-bottom-space
             v-model="currentSettings.id"
-            color="dark"
+            color="grey-9"
             :error="!currentSettings.id || !!currentSettings.id.match(/[/+#\s]/g) || (boards[currentSettings.id] && settings && settings.id !== currentSettings.id)"
-            float-label="Sync alias"
+            label="Sync alias"
           />
           <div class="board-settings__variables col-12 q-mt-lg relative-position">
-            <q-list>
-              <q-btn color="dark" style="top: -20px; right: 8px; position: absolute; z-index: 1130;" class="col-12" fab-mini @click="addVar" icon="mdi-plus"/>
-              <q-list-header>Variables{{currentSettings.settings.variables.length ? '' : ' are empty'}}</q-list-header>
-              <q-collapsible
+            <q-list bordered>
+              <q-btn color="grey-9" style="top: -20px; right: 8px; position: absolute; z-index: 1130;" class="col-12" fab-mini @click="addVar" icon="mdi-plus"/>
+              <q-item-label class="q-py-md q-px-sm">
+                <div>Variables{{currentSettings.settings.variables.length ? '' : ' are empty'}}</div>
+              </q-item-label>
+              <q-expansion-item
                 v-for="(variable, index) in currentSettings.settings.variables"
                 :key="`${index}`"
                 group="variables"
                 :header-class="[`bg-${checkUniqueVariables(index) ? 'grey-4' : 'red-2'}`]"
-                collapse-icon="mdi-settings"
-                :opened="true"
+                expand-icon="mdi-settings"
+                default-opened
               >
                 <template slot="header">
-                  <q-item-side right>
-                    <q-btn :disabled="index === 0" round dense flat class="col-1" @click.stop="upItem(index)" icon="mdi-arrow-up"/>
-                    <q-btn :disabled="index === (currentSettings.settings.variables.length - 1)" round dense flat class="col-1" @click.stop="downItem(index)" icon="mdi-arrow-down"/>
-                  </q-item-side>
-                  <q-item-main :label="variable.name" />
-                  <q-item-side right>
+                  <q-item-section avatar>
+                    <div>
+                      <q-btn :disabled="index === 0" round dense flat class="col-1" @click.stop="upItem(index)" icon="mdi-arrow-up"/>
+                      <q-btn :disabled="index === (currentSettings.settings.variables.length - 1)" round dense flat class="col-1" @click.stop="downItem(index)" icon="mdi-arrow-down"/>
+                    </div>
+                  </q-item-section>
+                  <q-item-section>{{variable.name}}</q-item-section>
+                  <q-item-section side>
                     <q-btn flat color="red-6" round dense @click="removeVar(index)" icon="mdi-delete"/>
-                  </q-item-side>
+                  </q-item-section>
                 </template>
-                <div class="row">
-                  <q-input class="col-12" color="dark" v-model="variable.name" float-label="Name" :error="!variable.name"/>
-                  <q-select class="col-12" :value="variable.type" :options="variableTypeOptions" color="dark" @change="(value) => changeTypeVariableHandler(index, value)" float-label="Type"/>
-                  <topic class="col-12" v-model="variable.topic" v-if="variable.type === VARIABLE_TYPE_SOURCE" :config="{ needLabel: true }"/>
+                <div class="row q-pa-sm">
+                  <q-input outlined hide-bottom-space class="col-12 q-my-sm" color="grey-9" v-model="variable.name" label="Name" :error="!variable.name"/>
+                  <q-select outlined hide-bottom-space class="col-12 q-mb-sm" :value="variable.type" emit-value map-options :options="variableTypeOptions" color="grey-9" @input="(value) => changeTypeVariableHandler(index, value)" label="Type"/>
+                  <topic class="col-12 q-mb-sm" v-model="variable.topic" v-if="variable.type === VARIABLE_TYPE_SOURCE" :config="{ needLabel: true }"/>
+                  <div v-if="variable.type === VARIABLE_TYPE_SOURCE">
+                    Sort variables by:
+                    <q-btn-toggle
+                      v-model="variable.sortVarsBy"
+                      :options="[{label: 'value', value: SORT_VARS_BY_VALUE}, {label: 'label', value: SORT_VARS_BY_LABEL}]"
+                      rounded toggle-text-color="grey-9" text-color="grey-6" flat color="grey-9"
+                    />
+                  </div>
                   <template v-if="variable.type === VARIABLE_TYPE_CUSTOM">
-                    <!-- <q-chips-input class="col-12" color="dark" v-model="variable.values" float-label="Values" :error="!variable.values.length || variable.values.includes('#')"/> -->
-                    <!-- <div class="col-12 text-red" v-if="!variable.values.length || variable.values.includes('#')" style="font-size: .8rem;">
-                      {{!variable.values.length ? 'Can`t be empty' : variable.values.includes('#') ? 'Value cannot be a #' : ''}}
-                    </div> -->
-                    <div class="variable__items-wrapper col-12 relative-position q-mt-lg">
-                      <q-list>
-                        <q-btn color="dark" style="top: -20px; right: 8px; position: absolute; z-index: 1130;" class="col-12" fab-mini @click="addVarItem(variable)" icon="mdi-plus"/>
-                        <q-list-header :class="{'text-red-6': !variable.values.length}">Items{{variable.values.length ? '' : ' are empty'}}</q-list-header>
-                        <q-collapsible
+                    <div class="variable__items-wrapper col-12 relative-position q-mt-sm">
+                      <q-list bordered>
+                        <q-btn color="grey-9" style="top: -20px; right: 8px; position: absolute; z-index: 1130;" class="col-12" fab-mini @click="addVarItem(variable)" icon="mdi-plus"/>
+                        <q-item-label class="q-py-md q-px-sm" :class="{'text-red-6': !variable.values.length}">Items{{variable.values.length ? '' : ' are empty'}}</q-item-label>
+                        <q-expansion-item
                           v-for="(item, index) in variable.values"
                           :key="`${index}`"
                           group="singleselect-items"
                           :header-class="[`bg-${item[1].indexOf('#') === -1 ? 'grey-4' : 'red-2'}`]"
-                          collapse-icon="mdi-settings"
-                          :opened="true"
+                          expand-icon="mdi-settings"
+                          default-opened
                         >
                           <template slot="header">
-                            <q-item-side right>
-                              <q-btn :disabled="index === 0" round dense flat class="col-1" @click.stop="upVarItem(variable, index)" icon="mdi-arrow-up"/>
-                              <q-btn :disabled="index === (variable.values.length - 1)" round dense flat class="col-1" @click.stop="downVarItem(variable, index)" icon="mdi-arrow-down"/>
-                            </q-item-side>
-                            <q-item-main :label="item[0] ? `${item[0]} [${item[1]}]` : item[1] || `item ${index + 1}`" />
-                            <q-item-side right>
+                            <q-item-section avatar>
+                              <div>
+                                <q-btn :disabled="index === 0" round dense flat class="col-1" @click.stop="upVarItem(variable, index)" icon="mdi-arrow-up"/>
+                                <q-btn :disabled="index === (variable.values.length - 1)" round dense flat class="col-1" @click.stop="downVarItem(variable, index)" icon="mdi-arrow-down"/>
+                              </div>
+                            </q-item-section>
+                            <q-item-section>{{item[0] ? `${item[0]} [${item[1]}]` : item[1] || `item ${index + 1}`}}</q-item-section>
+                            <q-item-section side>
                               <q-btn flat color="red-6" round dense @click="removeVarItem(variable, index)" icon="mdi-delete"/>
-                            </q-item-side>
+                            </q-item-section>
                           </template>
-                          <div class="row">
+                          <div class="row q-pa-sm">
                             <div class="col-6">
-                              <q-input autofocus class="q-mr-xs" color="dark" v-model="item[0]" float-label="Label"/>
+                              <q-input autofocus outlined hide-bottom-space class="q-mr-xs" color="grey-9" v-model="item[0]" label="Label"/>
                             </div>
                             <div class="col-6">
-                              <q-input class="q-ml-xs" color="dark" v-model="item[1]" float-label="Value" :error="item[1].indexOf('#') !== -1"/>
+                              <q-input outlined hide-bottom-space class="q-ml-xs" color="grey-9" v-model="item[1]" label="Value" :error="item[1].indexOf('#') !== -1"/>
                             </div>
                           </div>
-                        </q-collapsible>
+                        </q-expansion-item>
                       </q-list>
                     </div>
                   </template>
                 </div>
-              </q-collapsible>
+              </q-expansion-item>
             </q-list>
           </div>
         </div>
       </div>
-      <q-toolbar slot="footer" color='dark'>
+      <q-toolbar class="bg-grey-9 text-white">
         <q-toolbar-title>
         </q-toolbar-title>
         <q-btn flat dense class="q-mr-sm" @click="closeHandler">Close</q-btn>
         <q-btn flat dense :disable="!validateCurrentSettings" @click="saveBoardSettingsHandler">{{settings ? 'Update' : 'Save'}}</q-btn>
       </q-toolbar>
-    </q-modal-layout>
-  </q-modal>
+    </div>
+  </q-dialog>
 </template>
 
 <script>
@@ -108,7 +120,9 @@ import merge from 'lodash/merge'
 import { uid } from 'quasar'
 import Topic from './widgets/Topic'
 const VARIABLE_TYPE_CUSTOM = 0,
-  VARIABLE_TYPE_SOURCE = 1
+  VARIABLE_TYPE_SOURCE = 1,
+  SORT_VARS_BY_VALUE = 0,
+  SORT_VARS_BY_LABEL = 1
 export default {
   props: ['settings', 'value', 'boards'],
   data () {
@@ -141,6 +155,10 @@ export default {
           variable.type = 0
           variable.topic = Object.assign({}, defaultTopic)
         }
+        /* 04.12.19 */
+        if (variable.sortVarsBy === undefined) {
+          variable.sortVarsBy = 0
+        }
       })
       /* end */
     } else {
@@ -154,10 +172,13 @@ export default {
         name: 'name',
         type: VARIABLE_TYPE_CUSTOM,
         topic: defaultTopic,
+        sortVarsBy: SORT_VARS_BY_VALUE,
         values: []
       },
       VARIABLE_TYPE_CUSTOM,
       VARIABLE_TYPE_SOURCE,
+      SORT_VARS_BY_VALUE,
+      SORT_VARS_BY_LABEL,
       variableTypeOptions: [
         { label: 'Custom', value: VARIABLE_TYPE_CUSTOM },
         { label: 'Source', value: VARIABLE_TYPE_SOURCE }

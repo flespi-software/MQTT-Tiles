@@ -56,82 +56,78 @@
         </div>
       </q-card>
       <div class="complex__items-wrapper col-12 relative-position q-mb-sm" v-if="edited">
-        <q-collapsible
+        <q-expansion-item
           :header-class="[`bg-grey-4`]"
-          collapse-icon="mdi-settings"
-          :opened="true"
+          expand-icon="mdi-settings"
+          default-opened
           style="border: solid #e0e0e0 1px"
         >
           <template slot="header">
-            <q-item-main :label="editedItem.label ? `${editedItem.label} [${editedItem.type}]` : editedItem.type" />
-            <q-item-side right>
+            <q-item-section>{{editedItem.label ? `${editedItem.label} [${editedItem.type}]` : editedItem.type}}</q-item-section>
+            <q-item-section side>
               <q-btn flat color="red-6" round dense @click="removeItem(editedItem.index)" icon="mdi-delete"/>
-            </q-item-side>
+            </q-item-section>
           </template>
-          <div class="row">
-            <div class="col-6">
-              <q-input autofocus class="q-mr-xs" color="dark" v-model="editedItem.label" float-label="Label"/>
+          <div class="row q-pa-sm">
+            <div class="col-6 q-mb-sm">
+              <q-input outlined hide-bottom-space autofocus class="q-mr-xs" color="grey-9" v-model="editedItem.label" label="Label"/>
             </div>
-            <div class="col-6">
-              <q-input class="q-ml-xs" color="dark" v-model="editedItem.path" float-label="Path" placeholder="item[0].value"/>
+            <div class="col-6 q-mb-sm">
+              <q-input outlined hide-bottom-space class="q-ml-xs" color="grey-9" v-model="editedItem.path" label="Path" placeholder="item[0].value"/>
             </div>
-            <q-collapsible
+            <q-expansion-item
               v-if="editedItem.type === 'knob' || editedItem.type === 'progress'"
               class="col-12 q-mt-sm"
-              :opened="true"
+              default-opened
               label="Min value settings"
               :header-class="[`bg-${isValidMinValue(editedItem.index) ? 'grey-4' : 'red-2'}`]"
               style="border: solid #e0e0e0 1px"
             >
-              <div class="row">
-                <div class="col-5">
-                  <q-select color="dark" v-model="editedItem.minValueMode" float-label="Min value source" :options="rangeValueModeOptions" @input="changeRangeValueTypeHandler(editedItem.index, 'min')"/>
+              <div class="row q-pa-sm">
+                <div class="col-5 q-mb-sm">
+                  <q-select outlined hide-bottom-space color="grey-9" v-model="editedItem.minValueMode" label="Min value source" emit-value map-options :options="rangeValueModeOptions" @input="changeRangeValueTypeHandler(editedItem.index, 'min')"/>
                 </div>
                 <div class="col-12">
-                  <q-input v-if="editedItem.minValueMode === 0" type="number" color="dark" v-model="editedItem.minValue" float-label="Min value"/>
+                  <q-input outlined hide-bottom-space v-if="editedItem.minValueMode === 0" type="number" color="grey-9" v-model.number="editedItem.minValue" label="Min value"/>
                   <topic v-else v-model="editedItem.minValue" label="Min value" :board="board"/>
                 </div>
               </div>
-            </q-collapsible>
-            <q-collapsible
+            </q-expansion-item>
+            <q-expansion-item
               v-if="editedItem.type === 'knob' || editedItem.type === 'progress'"
               class="col-12 q-mt-sm"
-              :opened="true"
+              default-opened
               label="Max value settings"
               :header-class="[`bg-${isValidMaxValue(editedItem.index) ? 'grey-4' : 'red-2'}`]"
               style="border: solid #e0e0e0 1px"
             >
-              <div class="row">
-                <div class="col-5">
-                  <q-select color="dark" v-model="editedItem.maxValueMode" float-label="Max value source" :options="rangeValueModeOptions" @input="changeRangeValueTypeHandler(editedItem.index, 'max')"/>
+              <div class="row q-pa-sm">
+                <div class="col-5 q-mb-sm">
+                  <q-select outlined hide-bottom-space color="grey-9" v-model="editedItem.maxValueMode" emit-value map-options label="Max value source" :options="rangeValueModeOptions" @input="changeRangeValueTypeHandler(editedItem.index, 'max')"/>
                 </div>
                 <div class="col-12">
-                  <q-input v-if="editedItem.maxValueMode === 0" type="number" color="dark" v-model="editedItem.maxValue" float-label="Max value"/>
+                  <q-input outlined hide-bottom-space v-if="editedItem.maxValueMode === 0" type="number" color="grey-9" v-model.number="editedItem.maxValue" label="Max value"/>
                   <topic v-else v-model="editedItem.maxValue" label="Max value" :board="board"/>
                 </div>
               </div>
-            </q-collapsible>
-            <div v-if="editedItem.type === 'text'">
-              <q-field helper="You can use math expressions to calculate the final value. Example: (%value% * 1000) / 1024, where %value% is the payload from your subscription.">
-                <div class="row">
-                  <q-input class="col-8" color="dark" v-model="editedItem.math" float-label="Math expression" placeholder="%value%"/>
-                  <q-select class="col-4" color="dark" v-model="editedItem.valueFormat" :options="formatOptions" float-label="Format value as"/>
-                  <q-input class="col-12" color="dark" v-if="editedItem.valueFormat === constants.WIDGET_VALUE_FORMAT_DATE" v-model="editedItem.dateFormat" float-label="Datetime format" placeholder="DD/MM/YYYY HH:mm:ss.SSS"/>
-                </div>
-              </q-field>
+            </q-expansion-item>
+            <div v-if="editedItem.type === 'text'" class="row">
+              <q-input outlined hide-bottom-space class="col-8 q-mb-sm q-pr-xs" color="grey-9" v-model="editedItem.math" label="Math expression" placeholder="%value%"/>
+              <q-select outlined hide-bottom-space class="col-4 q-mb-sm" color="grey-9" v-model="editedItem.valueFormat" :options="formatOptions" emit-value map-options label="Format value as"/>
+              <q-input outlined hide-bottom-space class="col-12" color="grey-9" v-if="editedItem.valueFormat === constants.WIDGET_VALUE_FORMAT_DATE" v-model="editedItem.dateFormat" label="Datetime format" placeholder="DD/MM/YYYY HH:mm:ss.SSS"/>
+              <div class="text-grey-7 q-mt-xs" style="font-size: 12px; line-height: 1;">You can use math expressions to calculate the final value. Example: (%value% * 1000) / 1024, where %value% is the payload from your subscription.</div>
             </div>
           </div>
-        </q-collapsible>
+        </q-expansion-item>
       </div>
       <div class="q-mt-sm col-12">
-        <q-toggle color="dark" v-model="currentSettings.isNeedTime" label="Show last update time"/>
+        <q-toggle color="grey-9" v-model="currentSettings.isNeedTime" label="Show last update time"/>
       </div>
     </div>
   </div>
 </template>
 
 <style lang="stylus">
-  @import '~variables'
   .complex__element:hover
     background-color $grey-3
 </style>
@@ -208,17 +204,17 @@ export default {
         }
       ],
       rangeValueModeOptions: [
-        {label: 'Manual', value: WIDGET_RANGE_VALUE_CURRENT_MODE},
-        {label: 'Broker', value: WIDGET_RANGE_VALUE_DATASOURCE_MODE}
+        { label: 'Manual', value: WIDGET_RANGE_VALUE_CURRENT_MODE },
+        { label: 'Broker', value: WIDGET_RANGE_VALUE_DATASOURCE_MODE }
       ],
       formatOptions: [
-        {label: 'String', value: WIDGET_VALUE_FORMAT_STRING},
-        {label: 'Human readable size, B', value: WIDGET_VALUE_FORMAT_HUMAN_READABLE_SIZE},
-        {label: 'Datetime, s', value: WIDGET_VALUE_FORMAT_DATE},
-        {label: 'Duration, s', value: WIDGET_VALUE_FORMAT_DURATION},
-        {label: 'Preformated', value: WIDGET_VALUE_FORMAT_PRE},
-        {label: 'Markdown', value: WIDGET_VALUE_FORMAT_MARKDOWN},
-        {label: 'JSON', value: WIDGET_VALUE_FORMAT_JSON}
+        { label: 'String', value: WIDGET_VALUE_FORMAT_STRING },
+        { label: 'Human readable size, B', value: WIDGET_VALUE_FORMAT_HUMAN_READABLE_SIZE },
+        { label: 'Datetime, s', value: WIDGET_VALUE_FORMAT_DATE },
+        { label: 'Duration, s', value: WIDGET_VALUE_FORMAT_DURATION },
+        { label: 'Preformated', value: WIDGET_VALUE_FORMAT_PRE },
+        { label: 'Markdown', value: WIDGET_VALUE_FORMAT_MARKDOWN },
+        { label: 'JSON', value: WIDGET_VALUE_FORMAT_JSON }
       ],
       defaultTopic: {
         topicFilter: '',

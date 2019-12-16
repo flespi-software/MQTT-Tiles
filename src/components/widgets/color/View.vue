@@ -8,41 +8,43 @@
   </div>
   <q-card flat v-else inline class="widget__color" style="width: 100%; height: 100%;" :class="[`bg-${item.color}-1`]">
     <q-item class="q-px-sm q-pt-sm q-pb-none" style="min-height: 0px;">
-      <q-item-main class="ellipsis" :class="[`text-${item.color}-7`]" style="font-size: .9rem">
-        {{item.name}}
+      <q-item-section class="ellipsis" :class="[`text-${item.color}-7`]" style="font-size: .9rem">
+        <q-item-label class="ellipsis">{{item.name}}</q-item-label>
         <q-tooltip>{{item.name}}</q-tooltip>
-      </q-item-main>
+      </q-item-section>
       <transition name="block">
-        <q-item-side v-if="!blocked" style="min-width: 20px;">
-          <q-btn size="0.9rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" v-if="item.settings.width !== 1" :icon="inShortcuts ? 'mdi-star' : 'mdi-star-outline'" @click="$emit('fast-bind')" dense flat :color="inShortcuts ? 'yellow-9' : `${item.color}-7`">
-            <q-tooltip>{{`${inShortcuts ? 'Remove from' : 'Add to'} shortcuts`}}</q-tooltip>
-          </q-btn>
-          <q-btn size="0.9rem" class="q-pa-none" style="min-height: 1rem;" dense flat icon="mdi-dots-vertical" :color="`${item.color}-7`">
-            <q-popover anchor="top right" self="top right" :offset="[8, 8]" style="box-shadow: none;">
-              <div class="q-pa-sm" :class="[`bg-${item.color}-1`]">
-                <q-btn v-close-overlay v-if="item.settings.width === 1" size="0.9rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" :icon="inShortcuts ? 'mdi-star' : 'mdi-star-outline'" @click="$emit('fast-bind')" dense flat :color="inShortcuts ? 'yellow-9' : `${item.color}-7`">
-                  <q-tooltip>{{`${inShortcuts ? 'Remove from' : 'Add to'} shortcuts`}}</q-tooltip>
-                </q-btn>
-                <q-btn v-close-overlay size="0.9rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" icon="mdi-content-duplicate" @click="$emit('duplicate')" dense flat :color="`${item.color}-7`">
-                  <q-tooltip>Duplicate</q-tooltip>
-                </q-btn>
-                <q-btn v-close-overlay size="0.9rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" icon="mdi-settings" @click="$emit('update')" dense flat :color="`${item.color}-7`">
-                  <q-tooltip>Edit</q-tooltip>
-                </q-btn>
-                <q-btn v-close-overlay size="0.9rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" icon="mdi-delete-outline" @click="$emit('delete')" dense flat color="red">
-                  <q-tooltip>Remove</q-tooltip>
-                </q-btn>
-                <q-btn v-close-overlay size="0.9rem" class="q-pa-none" style="min-height: 1rem;" icon="mdi-close" dense flat :color="`${item.color}-7`"/>
-              </div>
-            </q-popover>
-          </q-btn>
-        </q-item-side>
+        <q-item-section side v-if="!blocked" style="min-width: 20px;">
+          <div>
+            <q-btn size="0.7rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" v-if="item.settings.width !== 1" :icon="inShortcuts ? 'mdi-star' : 'mdi-star-outline'" @click="$emit('fast-bind')" dense flat :color="inShortcuts ? 'yellow-9' : `${item.color}-7`">
+              <q-tooltip>{{`${inShortcuts ? 'Remove from' : 'Add to'} shortcuts`}}</q-tooltip>
+            </q-btn>
+            <q-btn size="0.7rem" class="q-pa-none" style="min-height: 1rem;" dense flat icon="mdi-dots-vertical" :color="`${item.color}-7`">
+              <q-menu anchor="top right" self="top right" :offset="[8, 8]" style="box-shadow: none;">
+                <div class="q-pa-sm" :class="[`bg-${item.color}-1`]">
+                  <q-btn v-close-popup v-if="item.settings.width === 1" size="0.7rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" :icon="inShortcuts ? 'mdi-star' : 'mdi-star-outline'" @click="$emit('fast-bind')" dense flat :color="inShortcuts ? 'yellow-9' : `${item.color}-7`">
+                    <q-tooltip>{{`${inShortcuts ? 'Remove from' : 'Add to'} shortcuts`}}</q-tooltip>
+                  </q-btn>
+                  <q-btn v-close-popup size="0.7rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" icon="mdi-content-duplicate" @click="$emit('duplicate')" dense flat :color="`${item.color}-7`">
+                    <q-tooltip>Duplicate</q-tooltip>
+                  </q-btn>
+                  <q-btn v-close-popup size="0.7rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" icon="mdi-settings" @click="$emit('update')" dense flat :color="`${item.color}-7`">
+                    <q-tooltip>Edit</q-tooltip>
+                  </q-btn>
+                  <q-btn v-close-popup size="0.7rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" icon="mdi-delete-outline" @click="$emit('delete')" dense flat color="red">
+                    <q-tooltip>Remove</q-tooltip>
+                  </q-btn>
+                  <q-btn v-close-popup size="0.7rem" class="q-pa-none" style="min-height: 1rem;" icon="mdi-close" dense flat :color="`${item.color}-7`"/>
+                </div>
+              </q-menu>
+            </q-btn>
+          </div>
+        </q-item-section>
       </transition>
     </q-item>
-    <q-card-media class="widget__content scroll" :class="[`bg-${item.color}-1`]" :style="{height: contentHeight}">
+    <q-card-section class="widget__content scroll q-pa-none" :class="[`bg-${item.color}-1`]" :style="{height: contentHeight}">
       <div class="color__payload-wrapper flex flex-center">
         <color-picker v-if="item.settings.mode === COLOR_MODE_SIMPLE" :hue="color.h" @input="actionHandler" :disabled="disable"/>
-        <q-color-picker
+        <q-color
           v-else
           :class="[`bg-${item.color}-1`]"
           style="border: none;"
@@ -53,7 +55,7 @@
           default-value="#FFF"
         />
       </div>
-    </q-card-media>
+    </q-card-section>
     <div v-if="item.settings.isNeedTime" class="absolute-bottom-left q-px-xs q-pt-xs" style="font-size: 12px; border-top-right-radius: 5px; bottom: 1px; left: 1px;" :class="[`text-${item.color}-7`, `bg-${item.color}-1`]">
       {{timestamp}}
     </div>
@@ -101,7 +103,7 @@ let debouncedAction = debounce((ctx, color) => {
   if (typeof color === 'object') {
     color = JSON.stringify(color)
   }
-  let data = {topic: ctx.item.dataTopics[0].topicFilter, payload: color, settings: {retain: ctx.item.settings.save}}
+  let data = { topic: ctx.item.dataTopics[0].topicFilter, payload: color, settings: { retain: ctx.item.settings.save } }
   ctx.$emit('action', data)
 }, 300)
 export default {
@@ -133,7 +135,7 @@ export default {
       let colorObj = {}
       let names = []
       template = template.replace(/\{|\}|\[|\]|\(|\)/g, (match) => `\\${match}`)
-      template = new RegExp(template.replace(/%(.{1,3})%/g, (match) => {
+      template = new RegExp(template.replace(/%[hex|r|g|b|h|s|v|a]{1,3}%/g, (match) => {
         names.push(match.slice(1, -1))
         return '([.#A-Za-z0-9]+)'
       }))
@@ -174,6 +176,7 @@ export default {
             color = rgbToHsv(hexToRgb(color))
           } else {
             color = hexToRgb(typeof color === 'string' ? color : '#ffffff')
+            color = `rgb(${color.r},${color.g},${color.b})`
           }
           break
         }
@@ -184,17 +187,23 @@ export default {
             let isHex = typeof color === 'string' && color.indexOf('#') === 0
             let isHsv = typeof color === 'object' && color.h !== undefined && color.s !== undefined && color.v !== undefined
             color = isHex ? hexToRgb(color) : isHsv ? hsvToRgb(color) : color
+            color = `rgb(${color.r},${color.g},${color.b})`
           }
           break
         }
         case COLOR_FORMAT_HSV: {
           if (this.item.settings.mode === COLOR_MODE_FULL) {
             color = hsvToRgb(color)
+            color = `rgb(${color.r},${color.g},${color.b})`
           }
           break
         }
       }
       return color
+    },
+    getRGBObj (str) {
+      let match = str.match(/rgba?\((\d{1,3}), ?(\d{1,3}), ?(\d{1,3})\)?(?:, ?(\d(?:\.\d?))\))?/)
+      return match ? { r: Number(match[1]), g: Number(match[2]), b: Number(match[3]) } : { r: 0, g: 0, b: 0 }
     },
     getActionColor (color) {
       if (this.item.settings.mode === COLOR_MODE_SIMPLE) {
@@ -213,6 +222,7 @@ export default {
           }
         }
       } else {
+        color = this.getRGBObj(color)
         if (this.item.settings.format === COLOR_FORMAT_HSV) {
           color = rgbToHsv(color)
         } else if (this.item.settings.format === COLOR_FORMAT_HEX) {
@@ -220,7 +230,7 @@ export default {
         }
       }
       if (this.item.settings.valueTemplate) {
-        color = this.item.settings.valueTemplate.replace(/(%.{1,3}%)/g, (match) => {
+        color = this.item.settings.valueTemplate.replace(/%[hex|r|g|b|h|s|v|a]{1,3}%/g, (match) => {
           let name = match.slice(1, -1)
           return color[name] === undefined ? (color || '') : color[name]
         })

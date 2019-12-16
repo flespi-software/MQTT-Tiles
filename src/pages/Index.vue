@@ -39,7 +39,7 @@ export default {
   data () {
     return {
       title: '',
-      initBoards: this.$q.localStorage.get.item(BOARDS_LOCALSTORAGE_NAME),
+      initBoards: this.$q.localStorage.getItem(BOARDS_LOCALSTORAGE_NAME),
       shareWizardOpened: false,
       shareWizardConfig: undefined
     }

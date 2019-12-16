@@ -1,14 +1,10 @@
 <template>
   <div class="row">
-    <q-input autofocus class="col-8" color="dark" v-model="currentValue.topicTemplate" @input="currentValue.topicFilter = currentValue.topicTemplate" float-label="Topic" :error="!validateTopic(currentValue.topicFilter)"/>
-    <q-select class="col-4" color="dark" v-model="currentValue.payloadType" float-label="Payload type" :options="payloadTypeOptions"/>
+    <q-input autofocus outlined hide-bottom-space class="col-8 q-pr-sm" color="grey-9" v-model="currentValue.topicTemplate" @input="currentValue.topicFilter = currentValue.topicTemplate" label="Topic" :error="!validateTopic(currentValue.topicFilter)"/>
+    <q-select class="col-4" outlined hide-bottom-space color="grey-9" v-model="currentValue.payloadType" emit-value map-options label="Payload type" :options="payloadTypeOptions"/>
     <variables-helper class="col-12" v-if="board && board.settings.variables && board.settings.variables.length" :variables="board.settings.variables" @add="(variable) => currentValue.topicTemplate += variable"/>
-    <q-field class="col-12" helper="You can set path in result JSON. Path started from root of object. Example: names[0].value" v-if="currentValue.payloadType === WIDGET_PAYLOAD_TYPE_JSON" >
-      <q-input color="dark" v-model="currentValue.payloadField" float-label="Payload path"/>
-    </q-field>
-    <q-field class="col-12" helper="Value`s label gets from resilt JSON by path. Example: names[0].label" v-if="config && config.needLabel && currentValue.payloadType === WIDGET_PAYLOAD_TYPE_JSON" >
-      <q-input color="dark" v-model="currentValue.payloadNameField" float-label="Value`s label"/>
-    </q-field>
+    <q-input outlined hide-bottom-space v-if="currentValue.payloadType === WIDGET_PAYLOAD_TYPE_JSON" color="grey-9" class="col-12 q-mt-sm" v-model="currentValue.payloadField" label="Payload path" hint="You can set path in result JSON. Path started from root of object. Example: names[0].value"/>
+    <q-input outlined hide-bottom-space v-if="config && config.needLabel && currentValue.payloadType === WIDGET_PAYLOAD_TYPE_JSON" color="grey-9" class="col-12 q-mt-sm" v-model="currentValue.payloadNameField" label="Value`s label" hint="Value`s label gets from resilt JSON by path. Example: names[0].label"/>
   </div>
 </template>
 

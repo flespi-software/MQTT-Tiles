@@ -1,6 +1,5 @@
 <template>
   <div class="dash__board">
-    <q-resize-observable @resize="onResize" />
     <settings
       v-if="settingsModel"
       v-model="settingsModel"
@@ -10,78 +9,70 @@
       @save="saveSettingsHandler"
       @hide="hideSettingsHandler"
     />
-    <q-btn v-if='!board.settings.blocked  && !isFrized' fab color="dark" @click="addWidgetHandler" icon="mdi-plus" class="absolute button--add">
+    <q-btn v-if='!board.settings.blocked  && !isFrized' fab color="grey-9" @click="addWidgetHandler" icon="mdi-plus" class="absolute button--add">
       <q-tooltip>Add new widget</q-tooltip>
     </q-btn>
-    <q-toolbar color="white" v-if="(isFrized && board.name) || !isFrized">
-      <q-btn round flat color="dark" icon="mdi-arrow-left" @click="$emit('close')" v-if="!isFrized">
+    <q-toolbar class="bg-white" v-if="(isFrized && board.name) || !isFrized">
+      <q-btn round flat color="grey-9" icon="mdi-arrow-left" @click="$emit('close')" v-if="!isFrized">
         <q-tooltip>Back to boards list</q-tooltip>
       </q-btn>
-      <q-toolbar-title class="text-dark">{{board.name || '*No name*'}}</q-toolbar-title>
-      <q-btn v-if="canShare" @click="shareHandler" icon="mdi-link" color="dark" flat round>
+      <q-toolbar-title class="text-grey-9">{{board.name || '*No name*'}}</q-toolbar-title>
+      <q-btn v-if="canShare" @click="shareHandler" icon="mdi-link" color="grey-9" flat round>
         <q-tooltip>Get link</q-tooltip>
       </q-btn>
-      <q-btn v-if="canShare" @click="uploadHandler" icon="mdi-cloud-upload-outline" color="dark" flat round>
+      <q-btn v-if="canShare" @click="uploadHandler" icon="mdi-cloud-upload-outline" color="grey-9" flat round>
         <q-tooltip>Upload board</q-tooltip>
       </q-btn>
-      <q-btn @click="preventCollisionBoardHandler" :icon="board.settings.preventCollision ? 'mdi-pin' : 'mdi-pin-outline'" color="dark" flat round v-if="!isFrized && !board.settings.blocked">
+      <q-btn @click="preventCollisionBoardHandler" :icon="board.settings.preventCollision ? 'mdi-pin' : 'mdi-pin-outline'" color="grey-9" flat round v-if="!isFrized && !board.settings.blocked">
         <q-tooltip>{{board.settings.preventCollision ? 'Unlock widgets positions' : 'Lock widgets positions'}}</q-tooltip>
       </q-btn>
-      <q-btn @click="blockBoardHandler" :icon="board.settings.blocked ? 'mdi-lock' : 'mdi-lock-open'" color="dark" flat round v-if="!isFrized">
+      <q-btn @click="blockBoardHandler" :icon="board.settings.blocked ? 'mdi-lock' : 'mdi-lock-open'" color="grey-9" flat round v-if="!isFrized">
         <q-tooltip>{{board.settings.blocked ? 'Unlock your board' : 'Lock your board'}}</q-tooltip>
       </q-btn>
     </q-toolbar>
-    <q-toolbar color="white" class="q-py-none" style="flex-wrap: wrap" v-if="board.settings.variables && board.settings.variables.length">
-      <q-resize-observable @resize="onVariablesWrapperResize" />
-      <div v-for="(variable, varIndex) in board.settings.variables" :key="variable.name" class="q-mr-sm">
-        <div class="text-grey-6" style="font-size: .8rem;">{{variable.name}}</div>
-        <q-item class="no-padding" style="min-height: 35px;">
-          <q-item-main>
-            <q-item-tile label class="ellipsis overflow-hidden text-dark" :style="{maxWidth: '140px'}">
-              {{(variablesListValues[varIndex][board.activeVariables[variable.name]] && variablesListValues[varIndex][board.activeVariables[variable.name]].label) || `*empty*`}}
-            </q-item-tile>
-          </q-item-main>
-          <q-item-side style="min-width: 25px;">
-            <q-item-tile
-              style="display: inline-block"
-              stamp
-              size="2rem"
-              v-if="variablesListValues[varIndex][board.activeVariables[variable.name]] && variablesListValues[varIndex][board.activeVariables[variable.name]].value != variablesListValues[varIndex][board.activeVariables[variable.name]].label"
+    <q-toolbar class="q-py-none bg-white" style="flex-wrap: wrap" v-if="board.settings.variables && board.settings.variables.length">
+      <q-resize-observer @resize="onVariablesWrapperResize" />
+      <template v-for="(variable, varIndex) in board.settings.variables">
+        <q-select
+          outlined hide-bottom-space color="grey-9" :key="variable.name" emit-value map-options dense class="q-mr-sm" style="min-width: 120px;"
+          :options="getVariableValues(varIndex)"
+          :value="(variablesListValues[varIndex][board.activeVariables[variable.name]] && variablesListValues[varIndex][board.activeVariables[variable.name]].value) || ''"
+          @input="(value) => { changeVaribleHandler(variable.name, value) }"
+          :label="variable.name"
+        >
+           <template v-slot:option="scope">
+            <q-item
+              v-bind="scope.itemProps"
+              v-on="scope.itemEvents"
             >
-              {{(variablesListValues[varIndex][board.activeVariables[variable.name]] && variablesListValues[varIndex][board.activeVariables[variable.name]].value) || ''}}
-            </q-item-tile>
-            <q-item-tile style="display: inline-block" stamp size="2rem" icon="mdi-menu-down" />
-          </q-item-side>
-          <q-popover fit ref="popoverActive">
-            <q-list link separator class="scroll q-py-none" v-if="$refs.popoverActive && $refs.popoverActive[varIndex].showing">
-              <VirtualList
-                :size="40"
-                :remain="variablesListValues[varIndex].length > 6 ? 6 : variablesListValues[varIndex].length"
-              >
-                <q-item
-                  v-for="(variableModel, index) in variablesListValues[varIndex]"
-                  :key="index"
-                  v-close-overlay
-                  @click.native="changeVaribleHandler(variable.name, variableModel.value), $refs.popoverActive[varIndex].hide()"
-                  class="cursor-pointer"
-                  :class="{'bg-grey-3': variableModel.value === board.activeVariables[variable.name]}"
-                  highlight
-                >
-                  <q-item-main>
-                    <q-item-tile label class="ellipsis overflow-hidden">{{variableModel.label}}</q-item-tile>
-                  </q-item-main>
-                  <q-item-side v-if="variableModel.label != variableModel.value">
-                    <q-item-tile label class="ellipsis overflow-hidden">{{variableModel.value}}</q-item-tile>
-                  </q-item-side>
-                </q-item>
-              </VirtualList>
-            </q-list>
-          </q-popover>
-        </q-item>
-      </div>
+              <q-item-section>
+                <q-item-label :class="{'text-grey-7': !scope.opt.label}">{{scope.opt.label || '*Empty*'}}</q-item-label>
+              </q-item-section>
+              <q-item-section side v-if="scope.opt.label != scope.opt.value">
+                <q-item-label>{{scope.opt.value}}</q-item-label>
+              </q-item-section>
+            </q-item>
+          </template>
+          <template v-slot:selected-item="scope">
+            <q-item
+              v-bind="scope.itemProps"
+              v-on="scope.itemEvents"
+              class="q-pa-none" style="min-height: 14px;"
+            >
+              <q-item-section>
+                <q-item-label>{{scope.opt.label && scope.opt.value ? scope.opt.label : scope.opt.value ? (scope.opt.label || '*Empty*') : ''}}</q-item-label>
+              </q-item-section>
+              <q-item-section side v-if="scope.opt.label != scope.opt.value">
+                <q-item-label>{{scope.opt.value}}</q-item-label>
+              </q-item-section>
+            </q-item>
+          </template>
+        </q-select>
+      </template>
     </q-toolbar>
     <div class="widgets__wrapper scroll" :style="{height: wrapperHeight}" :class="{'q-px-sm': $q.platform.is.mobile}">
       <div style="width: 100%; position: relative;" v-if="board.widgetsIndexes.length">
+        <q-resize-observer @resize="onResize" />
         <grid-layout
           ref="grid"
           :layout.sync="currentLayout"
@@ -95,6 +86,7 @@
           :use-css-transforms="true"
           :responsive="true"
           :prevent-collision="board.settings.preventCollision"
+          @layout-ready="$refs.grid.onWindowResize()"
         >
             <grid-item
               v-for="(widgetIndex, index) in board.widgetsIndexes"
@@ -129,7 +121,7 @@
       </div>
       <div v-else class="text-center text-grey-8 q-mt-md" style="font-size: 2rem;">
         <div class="text-bold">The board is empty</div>
-        <div><q-btn color="dark" icon="mdi-plus-circle-outline" label="Add widget" @click="addWidgetHandler" /></div>
+        <div><q-btn color="grey-9" icon="mdi-plus-circle-outline" label="Add widget" @click="addWidgetHandler" /></div>
       </div>
     </div>
   </div>
@@ -220,7 +212,7 @@ export default {
       },
       set (layout) {
         if (this.breakpoint !== this.$refs.grid && this.$refs.grid.lastBreakpoint) { return false }
-        this.$emit('update:layout', {layout, breakpoint: this.breakpoint})
+        this.$emit('update:layout', { layout, breakpoint: this.breakpoint })
       }
     },
     wrapperHeight () {
@@ -245,7 +237,7 @@ export default {
           Object.defineProperty(variablesListValues, 'length', { enumerable: false, value: variable.values.length })
         } else if (variable.type === 1) {
           let varKeys = Object.values(this.variablesValues[variable.name] || {})
-          variablesListValues = this.naturalSort(varKeys).reduce((result, varValue) => {
+          variablesListValues = varKeys.reduce((result, varValue) => {
             let { label, value } = this.getVariableModel(varValue)
             result[value] = { label, value }
             return result
@@ -268,7 +260,7 @@ export default {
     saveSettingsHandler (settings) {
       settings = this.modifyWidgetByVariables(settings)
       if (this.editedWidgetId !== undefined) {
-        this.$emit('edit:widget', {settings, widgetId: this.editedWidgetId, topics: this.editedWidgetTopics})
+        this.$emit('edit:widget', { settings, widgetId: this.editedWidgetId, topics: this.editedWidgetTopics })
       } else {
         this.$emit('add:widget', settings)
       }
@@ -290,7 +282,7 @@ export default {
       this.$emit('resized', { index, height, width })
       this.setLastModifyBoard()
     },
-    onResize ({width}) { this.breakpoint = getBreakpoint(width) },
+    onResize ({ width }) { this.breakpoint = getBreakpoint(width) },
     shareHandler () {
       this.$emit('share')
     },
@@ -304,7 +296,7 @@ export default {
       this.openSettings()
     },
     deleteWidgetHandler (widgetIndex) {
-      this.$emit('delete:widget', {widgetId: widgetIndex, settings: this.widgets[widgetIndex]})
+      this.$emit('delete:widget', { widgetId: widgetIndex, settings: this.widgets[widgetIndex] })
       this.setLastModifyBoard()
     },
     fastBindHandler (widgetIndex) {
@@ -322,7 +314,7 @@ export default {
     setLastModifyBoard () {
       this.$emit('modify')
     },
-    onVariablesWrapperResize ({height}) {
+    onVariablesWrapperResize ({ height }) {
       this.variablesWrapperHeight = height
     },
     changeVaribleHandler (variableName, value) {
@@ -332,7 +324,7 @@ export default {
       this.board.widgetsIndexes.forEach(widgetIndex => {
         let widget = cloneDeep(this.widgets[widgetIndex])
         widget = this.modifyWidgetByVariables(widget)
-        this.$emit('edit:widget', {settings: widget, widgetId: widget.id, topics: [...this.widgets[widgetIndex].topics]})
+        this.$emit('edit:widget', { settings: widget, widgetId: widget.id, topics: [...this.widgets[widgetIndex].topics] })
       })
     },
     modifyWidgetByVariables (widget) {
@@ -357,8 +349,12 @@ export default {
       widget.topics = uniq(allTopics.map(topic => topic.topicFilter))
       return widget
     },
-    naturalSort (arr) {
+    naturalSort (arr, objFieldName) {
       return arr.sort((a, b) => {
+        if (objFieldName) {
+          a = a[objFieldName]
+          b = b[objFieldName]
+        }
         a = typeof a === 'string' ? a.toLowerCase() : a
         b = typeof b === 'string' ? b.toLowerCase() : b
         if (a !== b) {
@@ -388,7 +384,15 @@ export default {
         label = value
       }
       label = typeof label === 'string' ? label : JSON.stringify(label)
-      return {label, value: val}
+      return { label, value: val }
+    },
+    getVariableValues (varIndex) {
+      let variableValues = this.variablesListValues[varIndex],
+        variableSettings = this.board.settings.variables[varIndex]
+      variableValues = variableSettings.sortVarsBy
+        ? this.naturalSort(Object.values(variableValues), 'label')
+        : this.naturalSort(Object.values(variableValues), 'value')
+      return variableValues
     }
   },
   components: {

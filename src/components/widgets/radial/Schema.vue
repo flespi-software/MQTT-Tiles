@@ -1,56 +1,56 @@
 <template>
   <div>
     <div class="row">
-      <q-input class="col-12" color="dark" v-model="currentSettings.math" float-label="Math expression" placeholder="%value%"/>
-      <div class="text-dark" style="font-size: .8rem;">You can use math expressions to calculate the final value. Example: (%value% * 1000) / 1024, where %value% is the payload from your subscription.</div>
-      <q-collapsible
+      <q-input outlined hide-bottom-space class="col-12" color="grey-9" v-model="currentSettings.math" label="Math expression" placeholder="%value%"/>
+      <div class="text-grey-9" style="font-size: .8rem;">You can use math expressions to calculate the final value. Example: (%value% * 1000) / 1024, where %value% is the payload from your subscription.</div>
+      <q-expansion-item
         class="col-12 q-mt-sm"
-        :opened="true"
+        default-opened
         label="Min value settings"
         :header-class="[`bg-${isValidMinValue ? 'grey-4' : 'red-2'}`]"
         style="border: solid #e0e0e0 1px"
       >
-        <div class="row">
-          <div class="col-5">
-            <q-select color="dark" v-model="currentSettings.minValueMode" float-label="Min value source" :options="rangeValueModeOptions" @input="changeRangeValueTypeHandler('min')"/>
+        <div class="row q-pa-sm">
+          <div class="col-5 q-mb-sm">
+            <q-select outlined hide-bottom-space color="grey-9" v-model="currentSettings.minValueMode" emit-value map-options label="Min value source" :options="rangeValueModeOptions" @input="changeRangeValueTypeHandler('min')"/>
           </div>
           <div class="col-12">
-            <q-input v-if="currentSettings.minValueMode === 0" type="number" color="dark" v-model="currentSettings.minValue" float-label="Min value"/>
+            <q-input outlined hide-bottom-space v-if="currentSettings.minValueMode === 0" type="number" color="grey-9" v-model.number="currentSettings.minValue" label="Min value"/>
             <topic v-else v-model="minValue" label="Min value" :board="board"/>
           </div>
         </div>
-      </q-collapsible>
-      <q-collapsible
-        class="col-12 q-mt-sm"
-        :opened="true"
+      </q-expansion-item>
+      <q-expansion-item
+        class="col-12 q-my-sm"
+        default-opened
         label="Max value settings"
         :header-class="[`bg-${isValidMaxValue ? 'grey-4' : 'red-2'}`]"
         style="border: solid #e0e0e0 1px"
       >
-        <div class="row">
-          <div class="col-5">
-            <q-select color="dark" v-model="currentSettings.maxValueMode" float-label="Max value source" :options="rangeValueModeOptions" @input="changeRangeValueTypeHandler('max')"/>
+        <div class="row q-pa-sm">
+          <div class="col-5 q-mb-sm">
+            <q-select outlined hide-bottom-space color="grey-9" v-model="currentSettings.maxValueMode" emit-value map-options label="Max value source" :options="rangeValueModeOptions" @input="changeRangeValueTypeHandler('max')"/>
           </div>
           <div class="col-12">
-            <q-input v-if="currentSettings.maxValueMode === 0" type="number" color="dark" v-model="currentSettings.maxValue" float-label="Max value"/>
+            <q-input outlined hide-bottom-space v-if="currentSettings.maxValueMode === 0" type="number" color="grey-9" v-model.number="currentSettings.maxValue" label="Max value"/>
             <topic v-else v-model="maxValue" label="Max value" :board="board"/>
           </div>
         </div>
-      </q-collapsible>
-      <div class="col-4">
-        <q-input class="q-mr-sm" type="number" color="dark" v-model="currentSettings.lowLevel" float-label="Low level"/>
+      </q-expansion-item>
+      <div class="col-4 q-mb-sm">
+        <q-input outlined hide-bottom-space class="q-mr-sm" type="number" color="grey-9" v-model.number="currentSettings.lowLevel" label="Low level"/>
       </div>
       <div class="col-4">
-        <q-input class="q-mx-sm" type="number" color="dark" v-model="currentSettings.midLevel" float-label="Mid level"/>
+        <q-input outlined hide-bottom-space class="q-mx-sm" type="number" color="grey-9" v-model.number="currentSettings.midLevel" label="Mid level"/>
       </div>
       <div class="col-4">
-        <q-input class="q-ml-sm" type="number" color="dark" v-model="currentSettings.highLevel" float-label="High level"/>
+        <q-input outlined hide-bottom-space class="q-ml-sm" type="number" color="grey-9" v-model.number="currentSettings.highLevel" label="High level"/>
       </div>
       <div class="col-4">
-        <q-input class="q-mr-sm" color="dark" v-model="currentSettings.units" float-label="Units"/>
+        <q-input outlined hide-bottom-space class="q-mr-sm" color="grey-9" v-model="currentSettings.units" label="Units"/>
       </div>
       <div class="q-mt-sm col-12">
-        <q-toggle color="dark" v-model="currentSettings.isNeedTime" label="Show last update time"/>
+        <q-toggle color="grey-9" v-model="currentSettings.isNeedTime" label="Show last update time"/>
       </div>
     </div>
   </div>
@@ -91,8 +91,8 @@ export default {
       defaultSettings,
       currentSettings: Object.assign({}, defaultSettings, this.widget.settings),
       rangeValueModeOptions: [
-        {label: 'Manual', value: WIDGET_RANGE_VALUE_CURRENT_MODE},
-        {label: 'Broker', value: WIDGET_RANGE_VALUE_DATASOURCE_MODE}
+        { label: 'Manual', value: WIDGET_RANGE_VALUE_CURRENT_MODE },
+        { label: 'Broker', value: WIDGET_RANGE_VALUE_DATASOURCE_MODE }
       ],
       defaultTopic: {
         topicFilter: '',
@@ -180,7 +180,7 @@ export default {
     this.$emit('update', this.currentSettings)
   },
   mixins: [validateTopic],
-  components: {Topic},
+  components: { Topic },
   watch: {
     widget: {
       deep: true,

@@ -2,51 +2,53 @@
   <div>
     <div class="row">
       <div class="q-mt-sm col-12">
-        <q-toggle color="dark" v-model="currentSettings.save" label="Save last status on server (retained message)"/>
+        <q-toggle color="grey-9" v-model="currentSettings.save" label="Save last status on server (retained message)"/>
       </div>
-      <q-btn-toggle class='q-mt-md col-12' rounded toggle-text-color="dark" text-color="grey-6" flat v-model="currentSettings.mode" :options="modeOptions" />
+      <q-btn-toggle class='q-mt-md col-12' rounded toggle-text-color="grey-9" text-color="grey-6" flat v-model="currentSettings.mode" :options="modeOptions" />
       <div class="singleselect__items-wrapper col-12 relative-position q-mb-sm">
-        <q-list>
-          <q-btn color="dark" style="top: -20px; right: 8px; position: absolute; z-index: 1130;" class="col-12" fab-mini @click="addItem" icon="mdi-plus"/>
-          <q-list-header :class="{'text-red-6': !currentSettings.items.length}">Items{{currentSettings.items.length ? '' : ' are empty'}}</q-list-header>
-          <q-collapsible
+        <q-list bordered>
+          <q-btn color="grey-9" style="top: -20px; right: 8px; position: absolute; z-index: 1130;" class="col-12" fab-mini @click="addItem" icon="mdi-plus"/>
+          <q-item-label class="q-py-md q-px-sm" :class="{'text-red-6': !currentSettings.items.length}">Items{{currentSettings.items.length ? '' : ' are empty'}}</q-item-label>
+          <q-expansion-item
             v-for="(item, index) in currentSettings.items"
             :key="`${index}${item.value}`"
             group="singleselect-items"
             :header-class="[`bg-${checkUniqueValue(item.val, index) && !!item.actionTopic ? 'grey-4' : 'red-2'}`]"
-            collapse-icon="mdi-settings"
-            :opened="true"
+            expand-icon="mdi-settings"
+            default-opened=""
           >
             <template slot="header">
-              <q-item-side right>
-                <q-btn :disabled="index === 0" round dense flat class="col-1" @click.stop="upItem(index)" icon="mdi-arrow-up"/>
-                <q-btn :disabled="index === (currentSettings.items.length - 1)" round dense flat class="col-1" @click.stop="downItem(index)" icon="mdi-arrow-down"/>
-              </q-item-side>
-              <q-item-main :label="item.label ? `${item.label} [${item.val}]` : item.val || `item ${index + 1}`" />
-              <q-item-side right>
+              <q-item-section avatar>
+                <div>
+                  <q-btn :disabled="index === 0" round dense flat class="col-1" @click.stop="upItem(index)" icon="mdi-arrow-up"/>
+                  <q-btn :disabled="index === (currentSettings.items.length - 1)" round dense flat class="col-1" @click.stop="downItem(index)" icon="mdi-arrow-down"/>
+                </div>
+              </q-item-section>
+              <q-item-section>{{item.label ? `${item.label} [${item.val}]` : item.val || `item ${index + 1}`}}</q-item-section>
+              <q-item-section side>
                 <q-btn flat color="red-6" round dense @click="removeItem(index)" icon="mdi-delete"/>
-              </q-item-side>
+              </q-item-section>
             </template>
-            <div class="row">
-              <div class="col-6">
-                <q-input autofocus class="q-mr-xs" color="dark" v-model="item.label" float-label="Label"/>
+            <div class="row q-pa-sm">
+              <div class="col-6 q-mb-sm">
+                <q-input outlined hide-bottom-space autofocus class="q-mr-xs" color="grey-9" v-model="item.label" label="Label"/>
               </div>
-              <div class="col-6">
-                <q-input class="q-ml-xs" color="dark" v-model="item.val" float-label="Value" :error="!checkUniqueValue(item.val, index)"/>
-              </div>
-              <div v-if="currentSettings.mode === 1" class="col-6">
-                <q-input class="q-mr-xs" color="dark" v-model="item.actionTopic" float-label="Action topic" :error="!item.actionTopic"/>
+              <div class="col-6  q-mb-sm">
+                <q-input outlined hide-bottom-space class="q-ml-xs" color="grey-9" v-model="item.val" label="Value" :error="!checkUniqueValue(item.val, index)"/>
               </div>
               <div v-if="currentSettings.mode === 1" class="col-6">
-                <q-input class="q-ml-xs" color="dark" v-model="item.actionPayload" float-label="Action payload"/>
+                <q-input outlined hide-bottom-space class="q-mr-xs" color="grey-9" v-model="item.actionTopic" label="Action topic" :error="!item.actionTopic"/>
+              </div>
+              <div v-if="currentSettings.mode === 1" class="col-6">
+                <q-input outlined hide-bottom-space class="q-ml-xs" color="grey-9" v-model="item.actionPayload" label="Action payload"/>
               </div>
               <variables-helper class="col-12" v-if="board.settings.variables && board.settings.variables.length" :variables="board.settings.variables" @add="(variable) => item.actionTopic += variable"/>
             </div>
-          </q-collapsible>
+          </q-expansion-item>
         </q-list>
       </div>
       <div class="q-mt-sm col-12">
-        <q-toggle color="dark" v-model="currentSettings.isNeedTime" label="Show last update time"/>
+        <q-toggle color="grey-9" v-model="currentSettings.isNeedTime" label="Show last update time"/>
       </div>
     </div>
   </div>
@@ -83,8 +85,8 @@ export default {
       currentItem: Object.assign({}, defaultItem),
       currentSettings: Object.assign({}, defaultSettings, this.widget.settings),
       modeOptions: [
-        {label: 'Default mode', value: DEFAULT_MODE},
-        {label: 'Command mode', value: COMMAND_MODE}
+        { label: 'Default mode', value: DEFAULT_MODE },
+        { label: 'Command mode', value: COMMAND_MODE }
       ]
     }
   },

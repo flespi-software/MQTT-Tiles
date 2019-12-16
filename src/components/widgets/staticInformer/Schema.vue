@@ -1,11 +1,11 @@
 <template>
   <div>
     <div class="row">
-      <div class="col-xs-12">
-        <q-select color="dark" v-model="currentSettings.valueFormat" :options="formatOptions" float-label="Format value as"/>
+      <div class="col-xs-12 q-mb-sm">
+        <q-select outlined hide-bottom-space color="grey-9" v-model="currentSettings.valueFormat" :options="formatOptions" emit-value map-options label="Format value as"/>
       </div>
       <div class="col-xs-12">
-        <q-input color="dark" :max-height="300" type="textarea" v-model="currentSettings.text" float-label="Text"/>
+        <q-input outlined hide-bottom-space color="grey-9" :max-height="300" type="textarea" v-model="currentSettings.text" label="Text" input-style="resize: none;"/>
       </div>
     </div>
   </div>
@@ -35,10 +35,10 @@ export default {
       defaultSettings,
       currentSettings: Object.assign({}, defaultSettings, this.widget.settings),
       formatOptions: [
-        {label: 'String', value: WIDGET_VALUE_FORMAT_STRING},
-        {label: 'Preformated', value: WIDGET_VALUE_FORMAT_PRE},
-        {label: 'Markdown', value: WIDGET_VALUE_FORMAT_MARKDOWN},
-        {label: 'JSON', value: WIDGET_VALUE_FORMAT_JSON}
+        { label: 'String', value: WIDGET_VALUE_FORMAT_STRING },
+        { label: 'Preformated', value: WIDGET_VALUE_FORMAT_PRE },
+        { label: 'Markdown', value: WIDGET_VALUE_FORMAT_MARKDOWN },
+        { label: 'JSON', value: WIDGET_VALUE_FORMAT_JSON }
       ]
     }
   },

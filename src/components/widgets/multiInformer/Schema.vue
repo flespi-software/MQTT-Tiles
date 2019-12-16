@@ -2,50 +2,47 @@
   <div>
     <div class="row">
       <div class="multi-informer__items-wrapper col-12 relative-position q-mb-sm">
-        <q-list>
-          <q-btn color="dark" style="top: -20px; right: 8px; position: absolute; z-index: 1130;" class="col-12" fab-mini @click="addItem" icon="mdi-plus"/>
-          <q-list-header :class="{'text-red-6': !currentSettings.items.length}">Items{{currentSettings.items.length ? '' : ' are empty'}}</q-list-header>
-          <q-collapsible
+        <q-list bordered>
+          <q-btn color="grey-9" style="top: -20px; right: 8px; position: absolute; z-index: 1130;" class="col-12" fab-mini @click="addItem" icon="mdi-plus"/>
+          <q-item-label class="q-py-md q-px-sm" :class="{'text-red-6': !currentSettings.items.length}">Items{{currentSettings.items.length ? '' : ' are empty'}}</q-item-label>
+          <q-expansion-item
             v-for="(item, index) in currentSettings.items"
             :key="`${index}${item.topic}`"
             group="singleselect-items"
             :header-class="[`bg-${!!item.topic.topicFilter ? 'grey-4' : 'red-2'}`]"
-            collapse-icon="mdi-settings"
-            :opened="true"
+            expand-icon="mdi-settings"
+            default-opened
           >
             <template slot="header">
-              <q-item-side right>
-                <q-btn :disabled="index === 0" round dense flat class="col-1" @click.stop="upItem(index)" icon="mdi-arrow-up"/>
-                <q-btn :disabled="index === (currentSettings.items.length - 1)" round dense flat class="col-1" @click.stop="downItem(index)" icon="mdi-arrow-down"/>
-              </q-item-side>
-              <q-item-main :label="item.topic.topicFilter || `item ${index + 1}`" />
-              <q-item-side right>
+              <q-item-section side>
+                <div>
+                  <q-btn :disabled="index === 0" round dense flat class="col-1" @click.stop="upItem(index)" icon="mdi-arrow-up"/>
+                  <q-btn :disabled="index === (currentSettings.items.length - 1)" round dense flat class="col-1" @click.stop="downItem(index)" icon="mdi-arrow-down"/>
+                </div>
+              </q-item-section>
+              <q-item-section>{{item.topic.topicFilter || `item ${index + 1}`}}</q-item-section>
+              <q-item-section side>
                 <q-btn flat color="red-6" round dense @click="removeItem(index)" icon="mdi-delete"/>
-              </q-item-side>
+              </q-item-section>
             </template>
-            <div class="row">
-              <topic class="col-12" v-model="item.topic" @input="updateTopics" :board="board"/>
-              <div class="col-6">
-                <q-input class="q-mr-sm" color="dark" v-model="item.prefix" float-label="Prefix"/>
+            <div class="row q-pa-sm">
+              <topic class="col-12 q-mb-sm" v-model="item.topic" @input="updateTopics" :board="board"/>
+              <div class="col-6 q-mb-sm">
+                <q-input outlined hide-bottom-space class="q-mr-sm" color="grey-9" v-model="item.prefix" label="Prefix"/>
               </div>
               <div class="col-6">
-                <q-input class="q-ml-sm" color="dark" v-model="item.postfix" float-label="Postfix"/>
+                <q-input outlined hide-bottom-space class="q-ml-sm" color="grey-9" v-model="item.postfix" label="Postfix"/>
               </div>
-              <div class="col-12">
-                <q-field helper="You can use math expressions to calculate the final value. Example: (%value% * 1000) / 1024, where %value% is the payload from your subscription.">
-                  <div class="row">
-                    <q-input class="col-8" color="dark" v-model="item.math" float-label="Math expression" placeholder="%value%"/>
-                    <q-select class="col-4" color="dark" v-model="item.valueFormat" :options="formatOptions" float-label="Format value as"/>
-                    <q-input class="col-12" color="dark" v-if="item.valueFormat === constants.WIDGET_VALUE_FORMAT_DATE" v-model="item.dateFormat" float-label="Datetime format" placeholder="DD/MM/YYYY HH:mm:ss.SSS"/>
-                  </div>
-                </q-field>
-              </div>
+              <q-input outlined hide-bottom-space class="col-8 q-pr-xs q-mb-sm" color="grey-9" v-model="item.math" label="Math expression" placeholder="%value%"/>
+              <q-select outlined hide-bottom-space class="col-4 q-mb-sm" color="grey-9" v-model="item.valueFormat" :options="formatOptions" emit-value map-options label="Format value as"/>
+              <q-input outlined hide-bottom-space class="col-12 q-mb-xs" color="grey-9" v-if="item.valueFormat === constants.WIDGET_VALUE_FORMAT_DATE" v-model="item.dateFormat" label="Datetime format" placeholder="DD/MM/YYYY HH:mm:ss.SSS"/>
+              <div class="col-12 text-grey-7 q-px-sm q-mb-sm" style="font-size: 12px; line-height: 1;">You can use math expressions to calculate the final value. Example: (%value% * 1000) / 1024, where %value% is the payload from your subscription.</div>
             </div>
-          </q-collapsible>
+          </q-expansion-item>
         </q-list>
       </div>
       <div class="q-mt-sm col-12">
-        <q-toggle color="dark" v-model="currentSettings.isNeedTime" label="Show last update time"/>
+        <q-toggle color="grey-9" v-model="currentSettings.isNeedTime" label="Show last update time"/>
       </div>
     </div>
   </div>
@@ -104,13 +101,13 @@ export default {
       currentItem: Object.assign({}, defaultItem),
       currentSettings: Object.assign({}, defaultSettings, this.widget.settings),
       formatOptions: [
-        {label: 'String', value: WIDGET_VALUE_FORMAT_STRING},
-        {label: 'Human readable size, B', value: WIDGET_VALUE_FORMAT_HUMAN_READABLE_SIZE},
-        {label: 'Datetime, s', value: WIDGET_VALUE_FORMAT_DATE},
-        {label: 'Duration, s', value: WIDGET_VALUE_FORMAT_DURATION},
-        {label: 'Preformated', value: WIDGET_VALUE_FORMAT_PRE},
-        {label: 'Markdown', value: WIDGET_VALUE_FORMAT_MARKDOWN},
-        {label: 'JSON', value: WIDGET_VALUE_FORMAT_JSON}
+        { label: 'String', value: WIDGET_VALUE_FORMAT_STRING },
+        { label: 'Human readable size, B', value: WIDGET_VALUE_FORMAT_HUMAN_READABLE_SIZE },
+        { label: 'Datetime, s', value: WIDGET_VALUE_FORMAT_DATE },
+        { label: 'Duration, s', value: WIDGET_VALUE_FORMAT_DURATION },
+        { label: 'Preformated', value: WIDGET_VALUE_FORMAT_PRE },
+        { label: 'Markdown', value: WIDGET_VALUE_FORMAT_MARKDOWN },
+        { label: 'JSON', value: WIDGET_VALUE_FORMAT_JSON }
       ],
       defaultTopic: {
         topicFilter: '',

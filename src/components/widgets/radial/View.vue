@@ -12,48 +12,50 @@
   </div>
   <q-card flat v-else inline class="widget__radial absolute" style="width: 100%; height: 100%;" :class="[`bg-${item.color}-1`]">
     <q-item class="q-px-sm q-pt-sm q-pb-none" style="min-height: 0px;">
-      <q-item-main class="ellipsis" :class="[`text-${item.color}-7`]" style="font-size: .9rem">
-        {{item.name}}
+      <q-item-section class="ellipsis" :class="[`text-${item.color}-7`]" style="font-size: .9rem">
+        <q-item-label class="ellipsis">{{item.name}}</q-item-label>
         <q-tooltip>{{item.name}}</q-tooltip>
-      </q-item-main>
+      </q-item-section>
       <transition name="block">
-        <q-item-side v-if="!blocked" style="min-width: 20px;">
-          <q-btn size="0.9rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" v-if="item.settings.width !== 1" :icon="inShortcuts ? 'mdi-star' : 'mdi-star-outline'" @click="$emit('fast-bind')" dense flat :color="inShortcuts ? 'yellow-9' : `${item.color}-7`">
-            <q-tooltip>{{`${inShortcuts ? 'Remove from' : 'Add to'} shortcuts`}}</q-tooltip>
-          </q-btn>
-          <q-btn size="0.9rem" class="q-pa-none" style="min-height: 1rem;" dense flat icon="mdi-dots-vertical" :color="`${item.color}-7`">
-            <q-popover anchor="top right" self="top right" :offset="[8, 8]" style="box-shadow: none;">
-              <div class="q-pa-sm" :class="[`bg-${item.color}-1`]">
-                <q-btn v-close-overlay v-if="item.settings.width === 1" size="0.9rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" :icon="inShortcuts ? 'mdi-star' : 'mdi-star-outline'" @click="$emit('fast-bind')" dense flat :color="inShortcuts ? 'yellow-9' : `${item.color}-7`">
-                  <q-tooltip>{{`${inShortcuts ? 'Remove from' : 'Add to'} shortcuts`}}</q-tooltip>
-                </q-btn>
-                <q-btn v-close-overlay size="0.9rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" icon="mdi-content-duplicate" @click="$emit('duplicate')" dense flat :color="`${item.color}-7`">
-                  <q-tooltip>Duplicate</q-tooltip>
-                </q-btn>
-                <q-btn v-close-overlay size="0.9rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" icon="mdi-settings" @click="$emit('update')" dense flat :color="`${item.color}-7`">
-                  <q-tooltip>Edit</q-tooltip>
-                </q-btn>
-                <q-btn v-close-overlay size="0.9rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" icon="mdi-delete-outline" @click="$emit('delete')" dense flat color="red">
-                  <q-tooltip>Remove</q-tooltip>
-                </q-btn>
-                <q-btn v-close-overlay size="0.9rem" class="q-pa-none" style="min-height: 1rem;" icon="mdi-close" dense flat :color="`${item.color}-7`"/>
-              </div>
-            </q-popover>
-          </q-btn>
-        </q-item-side>
+        <q-item-section side v-if="!blocked" style="min-width: 20px;">
+          <div>
+            <q-btn size="0.7rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" v-if="item.settings.width !== 1" :icon="inShortcuts ? 'mdi-star' : 'mdi-star-outline'" @click="$emit('fast-bind')" dense flat :color="inShortcuts ? 'yellow-9' : `${item.color}-7`">
+              <q-tooltip>{{`${inShortcuts ? 'Remove from' : 'Add to'} shortcuts`}}</q-tooltip>
+            </q-btn>
+            <q-btn size="0.7rem" class="q-pa-none" style="min-height: 1rem;" dense flat icon="mdi-dots-vertical" :color="`${item.color}-7`">
+              <q-menu anchor="top right" self="top right" :offset="[8, 8]" style="box-shadow: none;">
+                <div class="q-pa-sm" :class="[`bg-${item.color}-1`]">
+                  <q-btn v-close-popup v-if="item.settings.width === 1" size="0.7rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" :icon="inShortcuts ? 'mdi-star' : 'mdi-star-outline'" @click="$emit('fast-bind')" dense flat :color="inShortcuts ? 'yellow-9' : `${item.color}-7`">
+                    <q-tooltip>{{`${inShortcuts ? 'Remove from' : 'Add to'} shortcuts`}}</q-tooltip>
+                  </q-btn>
+                  <q-btn v-close-popup size="0.7rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" icon="mdi-content-duplicate" @click="$emit('duplicate')" dense flat :color="`${item.color}-7`">
+                    <q-tooltip>Duplicate</q-tooltip>
+                  </q-btn>
+                  <q-btn v-close-popup size="0.7rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" icon="mdi-settings" @click="$emit('update')" dense flat :color="`${item.color}-7`">
+                    <q-tooltip>Edit</q-tooltip>
+                  </q-btn>
+                  <q-btn v-close-popup size="0.7rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" icon="mdi-delete-outline" @click="$emit('delete')" dense flat color="red">
+                    <q-tooltip>Remove</q-tooltip>
+                  </q-btn>
+                  <q-btn v-close-popup size="0.7rem" class="q-pa-none" style="min-height: 1rem;" icon="mdi-close" dense flat :color="`${item.color}-7`"/>
+                </div>
+              </q-menu>
+            </q-btn>
+          </div>
+        </q-item-section>
       </transition>
     </q-item>
-    <q-card-media class="widget__content" :class="[`bg-${item.color}-1`]" :style="{height: contentHeight}">
+    <q-card-section class="widget__content q-pa-none" :class="[`bg-${item.color}-1`]" :style="{height: contentHeight}">
       <div style="width: 100%; height: 100%;">
         <div class="radial__payload" style="height: 100%">
-          <q-resize-observable @resize="onResize" />
+          <q-resize-observer @resize="onResize" />
           <radial-gauge :options="options" :value="currentValue"/>
         </div>
       </div>
       <div v-if="item.settings.isNeedTime" class="absolute-bottom-left q-px-xs q-pt-xs" style="font-size: 12px; border-top-right-radius: 5px;" :class="[`text-${item.color}-7`, `bg-${item.color}-1`]">
         {{timestamp}}
       </div>
-    </q-card-media>
+    </q-card-section>
   </q-card>
 </template>
 
@@ -160,7 +162,7 @@ export default {
         this.$refs.tooltip.toogle()
       }
     },
-    onResize ({width, height}) {
+    onResize ({ width, height }) {
       this.width = width
       this.height = height
     }
@@ -254,7 +256,7 @@ export default {
       }
     },
     contentHeight () {
-      let height = 'calc(100% - 29px)'
+      let height = 'calc(100% - 44px)'
       if (!this.item.name && this.blocked) {
         height = 'calc(100% - 11px)'
       }

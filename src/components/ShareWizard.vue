@@ -1,55 +1,57 @@
 <template>
-  <q-modal v-model="status" @hide="closeHandler">
-    <q-modal-layout>
-      <q-toolbar slot="header" color="dark">
+  <q-dialog v-model="status" @hide="closeHandler" :maximized="$q.platform.is.mobile">
+    <div :style="{width: $q.platform.is.mobile ? '100%' : '50vw'}">
+      <q-toolbar class="bg-grey-9 text-white">
         <q-toolbar-title>Share wizard</q-toolbar-title>
       </q-toolbar>
-      <div
-        style="margin: 0px;"
-        :style="{ height: $q.platform.is.mobile ? 'calc(100% - 100px)' : '50vh', width: $q.platform.is.mobile ? 'calc(100% - 40px)' : '50vw'}"
-      >
-        <q-stepper flat ref="stepper" v-model="currentStep" class="no-wrap" style="height: 100%" color="amber-8">
-          <q-step name="tokens" title="Tokens" v-if="config.tokens.length > 1" style="" :style="currentStep === 'tokens' ? {height: 'calc(100% - 72px)', position: 'relative'} : {}">
-            <q-list class="absolute q-py-none" style="max-height: calc(100% - 48px); width: calc(100% - 48px); overflow: auto;" highlight separator>
-              <q-item v-for="(token, index) in config.tokens" :key="token.credentions.username" @click.native="setToken(token), currentSelectedToken = index" :class="{active: token.label === shareBoardModel.token.label}" class="cursor-pointer">
-                <q-item-main>
-                  <q-item-tile class="text-dark text-weight-bold">{{token.label}}</q-item-tile>
-                  <q-item-tile style="font-size: .8rem" class="text-grey-8 ellipsis">{{token.credentions.username}}</q-item-tile>
-                </q-item-main>
-                <q-item-side v-if="token.accessable !== undefined">
+      <div :style="{ height: $q.platform.is.mobile ? 'calc(100% - 100px)' : '50vh'}" class="scroll bg-white">
+        <q-stepper flat ref="stepper" v-model="currentStep" animated class="share-stepper" done-color="green-6" active-color="amber-9" contracted>
+          <q-step name="tokens" title="Tokens" v-if="config.tokens.length > 1" icon="mdi-fingerprint" :done="currentStep === 'replace' || currentStep === 'link'">
+            <q-list separator bordered>
+              <q-item
+                v-for="(token, index) in config.tokens" :key="token.credentions.username"
+                @click="setToken(token), currentSelectedToken = index" :active="token.label === shareBoardModel.token.label"
+                clickable active-class="bg-amber-2"
+              >
+                <q-item-section>
+                  <q-item-label class="text-grey-9 text-weight-bold">{{token.label}}</q-item-label>
+                  <q-item-label style="font-size: .8rem" class="text-grey-8 ellipsis">{{token.credentions.username}}</q-item-label>
+                </q-item-section>
+                <q-item-section side v-if="token.accessable !== undefined">
                   <div v-if="token.accessable">
-                    <span class="text-white bg-green-8 round-borders text-weight-bold q-px-sm" style="font-size:.8rem;">valid</span>
+                    <span class="text-white bg-green-8 rounded-borders text-weight-bold q-px-sm" style="font-size:.8rem;">valid</span>
                     <q-tooltip>Validation pass</q-tooltip>
                   </div>
                   <div v-else>
-                    <span class="text-white bg-red-8 round-borders text-weight-bold q-px-xs" style="font-size: .8rem;">invalid</span>
+                    <span class="text-white bg-red-8 rounded-borders text-weight-bold q-px-xs" style="font-size: .8rem;">invalid</span>
                     <q-tooltip>You can`t share by this token</q-tooltip>
                   </div>
-                </q-item-side>
+                </q-item-section>
               </q-item>
             </q-list>
           </q-step>
-          <q-step name="replace" title="Upload" v-if="config.hasRemote">
+          <q-step name="replace" title="Upload" v-if="config.hasRemote" icon="mdi-file-replace-outline" :done="currentStep === 'link'">
             <div class="q-mx-sm q-my-md text-grey-8 text-center" style="font-size: 1.2rem;">Such board exists. Continue?</div>
-            <q-checkbox v-model="isNeedCopy" color="dark" label="Rename to save a copy"/>
+            <q-checkbox v-model="isNeedCopy" color="grey-9" label="Rename to save a copy"/>
             <q-input
-              color="dark"
+              color="grey-9"
+              outlined hide-bottom-space
               v-model="shareBoardModel.boardId"
               :disable="!isNeedCopy"
-              float-label="Name"
+              label="Name"
               :error="isNeedCopy && (shareBoardModel.boardId === config.boardId || ((config.currentRemoteBoards && config.currentRemoteBoards.includes(shareBoardModel.boardId) || !config.currentRemoteBoards)))"
             />
           </q-step>
-          <q-step name="link" title="Link" :active-icon="isLinkCopied ? 'mdi-check' : undefined">
+          <q-step name="link" title="Link" :active-icon="isLinkCopied && currentStep === 'link' ? 'mdi-check' : undefined" :active-color="isLinkCopied && currentStep === 'link' ? 'green' : undefined" icon="mdi-link" :done="isLinkCopied && currentStep === 'link'">
             <template v-if="updatedBoardFlag">
-              <q-input type="textarea" v-model="link" readonly/>
+              <q-input type="textarea" v-model="link" readonly outlined hide-bottom-space input-style="resize: none;"/>
               <div class="text-center q-mt-md">
                 <q-btn @click="copyLink" flat icon="mdi-content-copy" size="1.2rem">Copy</q-btn>
               </div>
             </template>
             <template v-else-if="updatedBoardFlag === false">
               <div class="rounded-borders bg-red-1 q-pa-md">
-                <div class="q-title text-red-8 q-mb-sm">
+                <div class="text-h6 text-red-8 q-mb-sm">
                   <q-icon name="mdi-alert-outline"/>
                   Share error
                 </div>
@@ -64,20 +66,21 @@
           </q-step>
         </q-stepper>
       </div>
-      <q-toolbar slot="footer" color="dark">
+      <q-toolbar class="bg-grey-9 text-white">
         <q-btn flat dense class="q-mr-sm absolute" @click="closeHandler">Close</q-btn>
         <q-toolbar-title></q-toolbar-title>
         <q-btn flat v-if="currentStep !== steps[0].value && !updateBoardError" @click="prevStepHandler">Back</q-btn>
         <q-btn flat class="q-ml-sm" v-if="!updateBoardError" @click="nextStepHandler" :disable="!isValidStep">{{ currentStep === 'link' ? 'Done' : 'Next' }}</q-btn>
       </q-toolbar>
-    </q-modal-layout>
-  </q-modal>
+    </div>
+  </q-dialog>
 </template>
 
 <script>
 import { Base64 } from 'js-base64'
 import get from 'lodash/get'
 import cloneDeep from 'lodash/cloneDeep'
+import { copyToClipboard } from 'quasar'
 
 export default {
   name: 'ShareWizard',
@@ -135,17 +138,20 @@ export default {
       stepIndex = 0
     if (this.config.tokens.length > 1) {
       steps[stepIndex] = { label: 'Token', value: this.stepsConst.STEP_TOKEN }
+      this.currentStep = this.stepsConst.STEP_TOKEN
       stepIndex++
     } else {
       this.setToken(this.config.tokens[0])
     }
     if (this.config.hasRemote) {
       steps[stepIndex] = { label: 'Replace', value: this.stepsConst.STEP_REPLACE }
+      if (!this.currentStep) { this.currentStep = this.stepsConst.STEP_REPLACE }
       stepIndex++
     } else {
       this.setboardId(this.config.boardId, this.config.boardId)
     }
     steps[stepIndex] = { label: 'Link', value: this.stepsConst.STEP_LINK }
+    if (!this.currentStep) { this.currentStep = this.stepsConst.STEP_LINK }
     this.steps = steps
   },
   methods: {
@@ -168,6 +174,7 @@ export default {
         })
     },
     prevStepHandler () {
+      if (this.isLinkCopied) { this.isLinkCopied = false }
       this.$refs.stepper.previous()
     },
     validateCurrentStep () {
@@ -243,10 +250,10 @@ export default {
       this.link = link
     },
     copyLink () {
-      this.$copyText(this.link)
+      copyToClipboard(this.link)
         .then((e) => {
           this.$q.notify({
-            type: 'positive',
+            color: 'positive',
             icon: 'content_copy',
             message: `Link copied`,
             timeout: 1000,
@@ -255,7 +262,7 @@ export default {
           this.isLinkCopied = true
         }, (e) => {
           this.$q.notify({
-            type: 'negative',
+            color: 'negative',
             icon: 'content_copy',
             message: `Error coping link`,
             timeout: 1000,
@@ -266,3 +273,11 @@ export default {
   }
 }
 </script>
+
+<style lang="stylus">
+  .share-stepper
+    overflow hidden
+    height 100%
+    .q-stepper__content
+      height calc(100% - 72px)
+</style>

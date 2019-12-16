@@ -1,38 +1,38 @@
 <template>
   <q-card flat inline class="widget__informer" style="width: 100%; height: 100%;" :class="[`bg-${item.color}-1`]">
     <q-item class="q-px-sm q-pt-sm q-pb-none" style="min-height: 0px;">
-      <q-item-main class="ellipsis" :class="[`text-${item.color}-7`]" style="font-size: .9rem">
-        {{item.name}}
+      <q-item-section class="ellipsis" :class="[`text-${item.color}-7`]" style="font-size: .9rem">
+        <q-item-label class="ellipsis">{{item.name}}</q-item-label>
         <q-tooltip>{{item.name}}</q-tooltip>
-      </q-item-main>
+      </q-item-section>
       <transition name="block">
-        <q-item-side v-if="!blocked" style="min-width: 20px;">
-          <q-btn size="0.9rem" class="q-pa-none" style="min-height: 1rem;" dense flat icon="mdi-dots-vertical" :color="`${item.color}-7`">
-            <q-popover anchor="top right" self="top right" :offset="[8, 8]" style="box-shadow: none;">
+        <q-item-section side v-if="!blocked" style="min-width: 20px;">
+          <q-btn size="0.7rem" class="q-pa-none" style="min-height: 1rem;" dense flat icon="mdi-dots-vertical" :color="`${item.color}-7`">
+            <q-menu anchor="top right" self="top right" :offset="[8, 8]" style="box-shadow: none;">
               <div class="q-pa-sm" :class="[`bg-${item.color}-1`]">
-                <q-btn v-close-overlay size="0.9rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" icon="mdi-content-duplicate" @click="$emit('duplicate')" dense flat :color="`${item.color}-7`">
+                <q-btn v-close-popup size="0.7rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" icon="mdi-content-duplicate" @click="$emit('duplicate')" dense flat :color="`${item.color}-7`">
                   <q-tooltip>Duplicate</q-tooltip>
                 </q-btn>
-                <q-btn v-close-overlay size="0.9rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" icon="mdi-settings" @click="$emit('update')" dense flat :color="`${item.color}-7`">
+                <q-btn v-close-popup size="0.7rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" icon="mdi-settings" @click="$emit('update')" dense flat :color="`${item.color}-7`">
                   <q-tooltip>Edit</q-tooltip>
                 </q-btn>
-                <q-btn v-close-overlay size="0.9rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" icon="mdi-delete-outline" @click="$emit('delete')" dense flat color="red">
+                <q-btn v-close-popup size="0.7rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" icon="mdi-delete-outline" @click="$emit('delete')" dense flat color="red">
                   <q-tooltip>Remove</q-tooltip>
                 </q-btn>
-                <q-btn v-close-overlay size="0.9rem" class="q-pa-none" style="min-height: 1rem;" icon="mdi-close" dense flat :color="`${item.color}-7`"/>
+                <q-btn v-close-popup size="0.7rem" class="q-pa-none" style="min-height: 1rem;" icon="mdi-close" dense flat :color="`${item.color}-7`"/>
               </div>
-            </q-popover>
+            </q-menu>
           </q-btn>
-        </q-item-side>
+        </q-item-section>
       </transition>
     </q-item>
-    <q-card-media class="widget__content scroll" :class="[`bg-${item.color}-1`]" :style="{height: contentHeight}">
+    <q-card-section class="widget__content scroll q-pa-none" :class="[`bg-${item.color}-1`]" :style="{height: contentHeight}">
       <div class="multi-informer__payload-wrapper" style="padding-bottom: 15px;">
         <text-view
           v-for="(text, index) in text"
           :key="index"
           class="multi-informer__payload"
-          :class="[`text-${value[item.settings.items[index].topic.topicFilter] !== null ? 'dark' : 'grey-5'}`]"
+          :class="[`text-${value[item.settings.items[index].topic.topicFilter] !== null ? 'grey-9' : 'grey-5'}`]"
           :text="text"
           :title="title[index]"
           :prefix="item.settings.items[index].prefix"
@@ -40,7 +40,7 @@
           :settings="item.settings.items[index]"
         />
       </div>
-    </q-card-media>
+    </q-card-section>
     <div v-if="item.settings.isNeedTime" class="absolute-bottom-left q-px-xs q-pt-xs" style="bottom: 1px; left: 1px; font-size: 12px; border-top-right-radius: 5px;" :class="[`text-${item.color}-7`, `bg-${item.color}-1`]">
       {{timestamp}}
     </div>
