@@ -32,7 +32,7 @@ export default {
   name: 'InformerSchema',
   props: ['widget', 'board'],
   data () {
-    let defaultSettings = {
+    const defaultSettings = {
       math: '',
       valueFormat: 0,
       prefix: '',

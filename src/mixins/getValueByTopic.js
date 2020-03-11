@@ -3,7 +3,7 @@ import get from 'lodash/get'
 export default {
   methods: {
     getValueByTopic (value, topic) {
-      let isPacket = value instanceof Uint8Array
+      const isPacket = value instanceof Uint8Array
       if (value === null) {
         value = 'N/A'
       } else {
@@ -15,9 +15,9 @@ export default {
           case WIDGET_PAYLOAD_TYPE_JSON: {
             try {
               if (topic.payloadField) {
-                let val = get(isPacket ? JSON.parse(value.toString()) : value, topic.payloadField, 'N/A')
+                const val = get(isPacket ? JSON.parse(value.toString()) : value, topic.payloadField, 'N/A')
                 if (topic.payloadNameField) {
-                  let name = get(isPacket ? JSON.parse(value.toString()) : value, topic.payloadNameField, 'N/A')
+                  const name = get(isPacket ? JSON.parse(value.toString()) : value, topic.payloadNameField, 'N/A')
                   value = [name, val]
                 } else {
                   value = val

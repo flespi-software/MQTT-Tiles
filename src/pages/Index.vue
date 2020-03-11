@@ -46,7 +46,7 @@ export default {
   },
   methods: {
     updateBoards (boards) {
-      let newBoardsKeys = boards ? Object.keys(boards) : [],
+      const newBoardsKeys = boards ? Object.keys(boards) : [],
         oldBoardsKeys = this.initBoards ? Object.keys(this.initBoards) : [],
         boardsToRemove = diff(oldBoardsKeys, newBoardsKeys),
         boardsToAdd = diff(newBoardsKeys, oldBoardsKeys)
@@ -66,7 +66,7 @@ export default {
       this.$emit('change:attach', attachedBoards)
     }
   },
-  props: [ 'client' ],
+  props: ['client'],
   components: { Dash, ShareWizard }
 }
 </script>

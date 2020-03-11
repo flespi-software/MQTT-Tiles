@@ -134,8 +134,8 @@ export default {
     }
   },
   created () {
-    let steps = {},
-      stepIndex = 0
+    const steps = {}
+    let stepIndex = 0
     if (this.config.tokens.length > 1) {
       steps[stepIndex] = { label: 'Token', value: this.stepsConst.STEP_TOKEN }
       this.currentStep = this.stepsConst.STEP_TOKEN
@@ -194,19 +194,19 @@ export default {
       /*
         getAuthInfo then setToken
       */
-      let flespiToken = token.credentions.username.indexOf('FlespiToken ') === 0
+      const flespiToken = token.credentions.username.indexOf('FlespiToken ') === 0
         ? token.credentions.username
         : `FlespiToken ${token.credentions.username}`
       return fetch('https://flespi.io/auth/info', {
         mode: 'cors',
         headers: {
-          'Authorization': flespiToken
+          Authorization: flespiToken
         }
       }).then(response => response.json())
         .then((accessData) => {
-          let access = get(accessData, 'result[0].access.type', 1)
-          let errors = !!accessData.errors
-          let accessGranted = access !== 1
+          const access = get(accessData, 'result[0].access.type', 1)
+          const errors = !!accessData.errors
+          const accessGranted = access !== 1
           if (accessGranted) {
             this.setToken(token)
             this.$set(token, 'accessable', true)
@@ -243,7 +243,7 @@ export default {
       return resp
     },
     generateLink () {
-      let token = get(this.shareBoardModel, 'token.credentions.username', ''),
+      const token = get(this.shareBoardModel, 'token.credentions.username', ''),
         topic = this.config.syncNamespace,
         shareObj = { token, topic, boardId: this.shareBoardModel.boardId },
         link = `${window.location.href}${Base64.encode(JSON.stringify(shareObj))}`
@@ -255,7 +255,7 @@ export default {
           this.$q.notify({
             color: 'positive',
             icon: 'content_copy',
-            message: `Link copied`,
+            message: 'Link copied',
             timeout: 1000,
             position: 'bottom-left'
           })
@@ -264,7 +264,7 @@ export default {
           this.$q.notify({
             color: 'negative',
             icon: 'content_copy',
-            message: `Error coping link`,
+            message: 'Error coping link',
             timeout: 1000,
             position: 'bottom-left'
           })

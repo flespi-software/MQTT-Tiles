@@ -95,11 +95,11 @@ export default {
   },
   computed: {
     currentValue () {
-      let mode = this.item.settings.accumulateLogic
-      let initValue = mode === ACCUMULATE_AND_MODE
+      const mode = this.item.settings.accumulateLogic
+      const initValue = mode === ACCUMULATE_AND_MODE
       return this.item.dataTopics.reduce((result, topicObj) => {
         if (result === null) { return result }
-        let value = this.value[topicObj.topicFilter] !== null
+        const value = this.value[topicObj.topicFilter] !== null
           ? `${this.mathProcessing(this.getValueByTopic(this.value[topicObj.topicFilter].payload, topicObj), this.item.settings.math)}`
           : this.value[topicObj.topicFilter]
         switch (mode) {
@@ -149,7 +149,7 @@ export default {
         return this.currentValue ? this.item.settings.falsePayload : this.item.settings.truePayload
       } else {
         return this.item.dataTopics.reduce((result, topicObj) => {
-          let value = this.value[topicObj.topicFilter] !== null
+          const value = this.value[topicObj.topicFilter] !== null
             ? this.getValueByTopic(this.value[topicObj.topicFilter].payload, topicObj)
             : this.value[topicObj.topicFilter]
           return (value === this.item.settings.trueValue) && (result === this.item.settings.trueValue)
@@ -161,7 +161,7 @@ export default {
     },
     actionHandler () {
       if (this.currentValue !== null && this.isActiveWidget) {
-        let data = { topic: this.actionTopic, payload: this.getValue(), settings: { retain: this.item.settings.save } }
+        const data = { topic: this.actionTopic, payload: this.getValue(), settings: { retain: this.item.settings.save } }
         this.$emit('action', data)
       }
     }

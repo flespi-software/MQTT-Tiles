@@ -31,7 +31,7 @@ export default {
   name: 'MapRouteSchema',
   props: ['widget', 'board', 'integration'],
   data () {
-    let defaultSettings = {
+    const defaultSettings = {
       topics: [
         {
           topicFilter: 'topic/to/route',

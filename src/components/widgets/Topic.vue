@@ -20,7 +20,7 @@ export default {
   props: ['value', 'board', 'config'],
   /* config = { needLabel } */
   data () {
-    let defaultTopic = {
+    const defaultTopic = {
         topicTemplate: '',
         topicFilter: '',
         payloadType: 0,

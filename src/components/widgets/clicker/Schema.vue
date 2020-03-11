@@ -17,7 +17,7 @@ export default {
   name: 'ClickerSchema',
   props: ['widget', 'board'],
   data () {
-    let defaultSettings = {
+    const defaultSettings = {
       label: '',
       icon: '',
       topic: 'button/topic/publish',

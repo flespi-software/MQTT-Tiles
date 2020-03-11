@@ -22,7 +22,7 @@ export default {
   name: 'StaticInformerSchema',
   props: ['widget', 'board'],
   data () {
-    let defaultSettings = {
+    const defaultSettings = {
       valueFormat: 0,
       text: '',
       height: 2,

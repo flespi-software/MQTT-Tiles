@@ -46,7 +46,7 @@ export default {
   name: 'MapLocationSchema',
   props: ['widget', 'board', 'integration'],
   data () {
-    let defaultSettings = {
+    const defaultSettings = {
       topics: [
         {
           topicFilter: 'topic/to/lat',

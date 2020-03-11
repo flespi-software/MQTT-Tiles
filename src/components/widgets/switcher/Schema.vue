@@ -53,7 +53,7 @@ export default {
   name: 'SwitcherSchema',
   props: ['widget', 'board'],
   data () {
-    let defaultSettings = {
+    const defaultSettings = {
       math: '',
       actionTopic: '',
       trueValue: '1',

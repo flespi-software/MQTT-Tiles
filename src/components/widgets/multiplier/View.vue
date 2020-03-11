@@ -97,13 +97,13 @@ export default {
   },
   computed: {
     currentTopic () {
-      let topic = this.item.dataTopics[0].topicFilter
-      let pathByGroup = topic.split('/').slice(0, this.item.settings.groupLayout + 1)
-      let topicByGroup = pathByGroup.join('/')
+      const topic = this.item.dataTopics[0].topicFilter
+      const pathByGroup = topic.split('/').slice(0, this.item.settings.groupLayout + 1)
+      const topicByGroup = pathByGroup.join('/')
       return topicByGroup
     },
     renderedWidgets () {
-      let min = (this.batch - 1) * this.limit,
+      const min = (this.batch - 1) * this.limit,
         max = this.batch * this.limit
       return this.widgetsIds.reduce((widgets, widgetId, widgetIndex) => {
         if (widgetIndex >= min && widgetIndex < max) {
@@ -117,9 +117,9 @@ export default {
     },
     currentValue () {
       if (!this.value) { return {} }
-      let topic = this.item.dataTopics[0].topicFilter
+      const topic = this.item.dataTopics[0].topicFilter
       if (!topic || !this.value[topic]) { return {} }
-      let path = this.currentTopic.split('/')
+      const path = this.currentTopic.split('/')
       /* update path by flespi enum (comma separated) subscriptions */
       path.forEach((pathPart, index) => { if (pathPart.indexOf(',') !== -1) { path[index] = '+' } })
       let value = null
@@ -129,10 +129,10 @@ export default {
         value = path.reduce((val, pathPart, index) => {
           if (pathPart === '+') {
             val = val.reduce((resultItems, item) => {
-              let keys = Object.keys(item.value)
+              const keys = Object.keys(item.value)
               keys.forEach((key) => {
-                let nestItem = {
-                  name: `${item.name ? `${item.name}[` : ''}${key}${item.name ? `]` : ''}`,
+                const nestItem = {
+                  name: `${item.name ? `${item.name}[` : ''}${key}${item.name ? ']' : ''}`,
                   value: item.value[key]
                 }
                 resultItems.push(nestItem)
@@ -163,10 +163,10 @@ export default {
     },
     values () {
       return Object.keys(this.currentValue).reduce((values, widgetId) => {
-        let widget = this.widgets[widgetId]
+        const widget = this.widgets[widgetId]
         if (!widget) { return values }
-        let topic = this.item.dataTopics[0].topicFilter
-        let value = { [topic]: this.currentValue[widgetId] }
+        const topic = this.item.dataTopics[0].topicFilter
+        const value = { [topic]: this.currentValue[widgetId] }
         widget.topics.forEach((currentTopic) => {
           if (topic === currentTopic) { return false }
           value[currentTopic] = {}
@@ -201,24 +201,24 @@ export default {
       return this.item.settings.math ? this.mathProcessing(value, this.item.settings.math) : true
     },
     initMultiplier () {
-      let value = this.currentValue
+      const value = this.currentValue
       if (!value) { return false }
       this.widgets = {}
       Object.keys(value).forEach(name => {
-        let needRender = this.needRender(value[name] && value[name].payload)
+        const needRender = this.needRender(value[name] && value[name].payload)
         if (!this.widgets[name] && needRender) {
           this.initWidget(name)
         }
       })
     },
     processingMultiplier () {
-      let value = this.currentValue,
+      const value = this.currentValue,
         widgets = this.widgets,
         valueKeys = Object.keys(value),
         widgetsKeys = Object.keys(widgets),
         allKeys = uniq([...valueKeys, ...widgetsKeys])
       allKeys.forEach((name, keyIndex) => {
-        let needRender = this.needRender(value[name] && value[name].payload)
+        const needRender = this.needRender(value[name] && value[name].payload)
         if (value[name] && !widgets[name] && needRender) {
           // add
           this.initWidget(name)
@@ -233,10 +233,10 @@ export default {
       if (this.item.settings.widgetSettings.topics) {
         topics = [this.item.dataTopics[0].topicFilter, ...this.item.settings.widgetSettings.topics.map(topic => topic.topicFilter)]
       }
-      let widgetName = this.item.dataTopics[0].payloadType === 1 && this.item.settings.nameField
+      const widgetName = this.item.dataTopics[0].payloadType === 1 && this.item.settings.nameField
         ? this.getValueByTopic(this.currentValue[name] && this.currentValue[name].payload, { ...this.item.dataTopics[0], payloadField: this.item.settings.nameField })
         : name
-      let widget = {
+      const widget = {
         name: widgetName,
         id: name,
         color: this.item.settings.color,

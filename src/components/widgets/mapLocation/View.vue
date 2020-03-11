@@ -72,7 +72,7 @@ export default {
     position () {
       let values = []
       if (this.integration) {
-        let dataTopic = this.item.dataTopics[0],
+        const dataTopic = this.item.dataTopics[0],
           topicFilter = dataTopic.topicFilter,
           latDataTopic = { ...dataTopic, payloadField: this.item.settings.latField },
           lonDataTopic = { ...dataTopic, payloadField: this.item.settings.lonField }
@@ -81,13 +81,13 @@ export default {
           parseFloat(this.getValueByTopic(this.value[topicFilter] && this.value[topicFilter].payload, lonDataTopic))
         ]
       } else {
-        let latTopic = this.item.settings.topics[0],
+        const latTopic = this.item.settings.topics[0],
           lonTopic = this.item.settings.topics[1],
           lat = parseFloat(this.getValueByTopic(this.value[latTopic.topicFilter] && this.value[latTopic.topicFilter].payload, latTopic)),
           lon = parseFloat(this.getValueByTopic(this.value[lonTopic.topicFilter] && this.value[lonTopic.topicFilter].payload, lonTopic))
         values = [lat, lon]
       }
-      let isValueSame = values[0] === this.prevPosition[0] && values[1] === this.prevPosition[1]
+      const isValueSame = values[0] === this.prevPosition[0] && values[1] === this.prevPosition[1]
       !isValueSame && this.setPosition(values)
       return values
     },

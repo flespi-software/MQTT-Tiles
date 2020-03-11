@@ -129,11 +129,11 @@ export default {
   computed: {
     currentValue: {
       get () {
-        let value = this.value[this.item.dataTopics[0].topicFilter] && this.value[this.item.dataTopics[0].topicFilter].payload
+        const value = this.value[this.item.dataTopics[0].topicFilter] && this.value[this.item.dataTopics[0].topicFilter].payload
         if (value === null) {
           return null
         } else {
-          let topic = this.item.dataTopics[0]
+          const topic = this.item.dataTopics[0]
           if (topic.payloadType === WIDGET_PAYLOAD_TYPE_STRING) {
             topic.payloadType = WIDGET_PAYLOAD_TYPE_JSON
           }
@@ -143,7 +143,7 @@ export default {
     },
     renderItems () {
       return this.item.settings.items.reduce((items, item) => {
-        let resItem = {
+        const resItem = {
           type: item.type,
           label: item.label,
           position: item.position,

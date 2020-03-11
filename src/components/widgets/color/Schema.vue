@@ -39,7 +39,7 @@ export default {
   name: 'ColorSchema',
   props: ['widget', 'board'],
   data () {
-    let defaultSettings = {
+    const defaultSettings = {
       publishTemplate: '',
       valueTemplate: '',
       format: COLOR_FORMAT_HEX,

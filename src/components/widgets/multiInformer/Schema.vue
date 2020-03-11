@@ -65,7 +65,7 @@ export default {
   name: 'MultiInformerSchema',
   props: ['widget', 'board'],
   data () {
-    let defaultSettings = {
+    const defaultSettings = {
       items: [],
       topics: [],
       height: 2,
@@ -75,7 +75,7 @@ export default {
       maxTopicsLength: 0,
       isNeedTime: true
     }
-    let defaultItem = {
+    const defaultItem = {
       topic: {
         topicFilter: '',
         payloadType: 0,
@@ -125,11 +125,11 @@ export default {
       this.$delete(this.currentSettings.items, itemIndex)
     },
     upItem (itemIndex) {
-      let movedItem = this.currentSettings.items.splice(itemIndex, 1)[0]
+      const movedItem = this.currentSettings.items.splice(itemIndex, 1)[0]
       this.currentSettings.items.splice(itemIndex - 1, 0, movedItem)
     },
     downItem (itemIndex) {
-      let movedItem = this.currentSettings.items.splice(itemIndex, 1)[0]
+      const movedItem = this.currentSettings.items.splice(itemIndex, 1)[0]
       this.currentSettings.items.splice(itemIndex + 1, 0, movedItem)
     },
     updateTopics () {

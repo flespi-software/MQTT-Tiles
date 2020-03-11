@@ -155,7 +155,7 @@ export default {
   name: 'ComplexSchema',
   props: ['widget', 'board'],
   data () {
-    let defaultItem = {
+    const defaultItem = {
       label: 'item',
       type: 'knob',
       path: '',
@@ -165,7 +165,7 @@ export default {
       maxValueMode: WIDGET_RANGE_VALUE_CURRENT_MODE,
       maxValue: 100
     }
-    let defaultSettings = {
+    const defaultSettings = {
       items: [],
       topics: [],
       height: 8,
@@ -245,7 +245,7 @@ export default {
       this.edited = { position, indexByPosition, index }
     },
     addItem (type, position) {
-      let index = this.currentSettings.items.length
+      const index = this.currentSettings.items.length
       this.currentItem.index = index
       this.currentItem.type = type
       this.currentItem.position = position
@@ -264,7 +264,7 @@ export default {
       this.$delete(this.currentSettings.items, itemIndex)
     },
     isValidMinValue (index) {
-      let item = this.currentSettings.items[index]
+      const item = this.currentSettings.items[index]
       return (
         item.minValueMode === WIDGET_RANGE_VALUE_CURRENT_MODE ||
         (
@@ -276,7 +276,7 @@ export default {
       )
     },
     isValidMaxValue (index) {
-      let item = this.currentSettings.items[index]
+      const item = this.currentSettings.items[index]
       return (
         item.maxValueMode === WIDGET_RANGE_VALUE_CURRENT_MODE ||
         (
@@ -288,7 +288,7 @@ export default {
       )
     },
     changeRangeValueTypeHandler (index, type) {
-      let item = this.currentSettings.items[index]
+      const item = this.currentSettings.items[index]
       if (type === 'min') {
         item.minValueMode ? this.$set(item, 'minValue', Object.assign({}, this.defaultTopic)) : this.$set(item, 'minValue', 0)
       } else if (type === 'max') {
@@ -314,7 +314,7 @@ export default {
     'currentSettings.items': {
       deep: true,
       handler (items) {
-        let topics = items.reduce((topics, item) => {
+        const topics = items.reduce((topics, item) => {
           if (item.minValueMode === WIDGET_RANGE_VALUE_DATASOURCE_MODE) {
             topics.push(item.minValue)
           }

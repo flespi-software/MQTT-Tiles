@@ -14,10 +14,10 @@ export default {
   props: ['item', 'value', 'selected', 'color'],
   computed: {
     computedValue () {
-      let value = this.formatValue(this.value, this.item)
+      const value = this.formatValue(this.value, this.item)
       return value === 'N/A' || value === undefined ? '*novalue*' : value
     }
   },
-  mixins: [ formatValue ]
+  mixins: [formatValue]
 }
 </script>

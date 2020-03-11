@@ -102,55 +102,55 @@ export default {
       height: 0,
       colors: {
         plate: {
-          'grey': '#bdbdbd',
-          'red': '#e57373',
-          'green': '#81c784',
-          'orange': '#ffb74d',
-          'blue': '#64b5f6',
+          grey: '#bdbdbd',
+          red: '#e57373',
+          green: '#81c784',
+          orange: '#ffb74d',
+          blue: '#64b5f6',
           'light-blue': '#4fc3f7',
-          'purple': '#ba68c8',
+          purple: '#ba68c8',
           'deep-orange': '#ff8a65',
-          'cyan': '#4dd0e1',
-          'brown': '#a1887f',
+          cyan: '#4dd0e1',
+          brown: '#a1887f',
           'blue-grey': '#90a4ae'
         },
         borderOuter: {
-          'grey': '#fafafa',
-          'red': '#ffebee',
-          'green': '#e8f5e9',
-          'orange': '#fff3e0',
-          'blue': '#e3f2fd',
+          grey: '#fafafa',
+          red: '#ffebee',
+          green: '#e8f5e9',
+          orange: '#fff3e0',
+          blue: '#e3f2fd',
           'light-blue': '#e1f5fe',
-          'purple': '#f3e5f5',
+          purple: '#f3e5f5',
           'deep-orange': '#fbe9e7',
-          'cyan': '#e0f7fa',
-          'brown': '#efebe9',
+          cyan: '#e0f7fa',
+          brown: '#efebe9',
           'blue-grey': '#eceff1'
         },
         borderMiddle: {
-          'grey': '#f5f5f5',
-          'red': '#ffcdd2',
-          'green': '#c8e6c9',
-          'orange': '#ffe0b2',
-          'blue': '#bbdefb',
+          grey: '#f5f5f5',
+          red: '#ffcdd2',
+          green: '#c8e6c9',
+          orange: '#ffe0b2',
+          blue: '#bbdefb',
           'light-blue': '#b3e5fc',
-          'purple': '#f3e5f5',
+          purple: '#f3e5f5',
           'deep-orange': '#ffccbc',
-          'cyan': '#b2ebf2',
-          'brown': '#d7ccc8',
+          cyan: '#b2ebf2',
+          brown: '#d7ccc8',
           'blue-grey': '#cfd8dc'
         },
         borderInner: {
-          'grey': '#eee',
-          'red': '#ef9a9a',
-          'green': '#a5d6a7',
-          'orange': '#ffcc80',
-          'blue': '#90caf9',
+          grey: '#eee',
+          red: '#ef9a9a',
+          green: '#a5d6a7',
+          orange: '#ffcc80',
+          blue: '#90caf9',
           'light-blue': '#81d4fa',
-          'purple': '#e1bee7',
+          purple: '#e1bee7',
           'deep-orange': '#ffab91',
-          'cyan': '#80deea',
-          'brown': '#bcaaa4',
+          cyan: '#80deea',
+          brown: '#bcaaa4',
           'blue-grey': '#b0bec5'
         }
       }
@@ -169,7 +169,7 @@ export default {
   },
   computed: {
     valuesBySettings () {
-      let valueTopic = this.item.dataTopics[0],
+      const valueTopic = this.item.dataTopics[0],
         minTopic = this.item.settings.topics[0],
         maxTopic = this.item.settings.topics[1],
         values = {
@@ -187,7 +187,7 @@ export default {
       return this.valuesBySettings[this.item.dataTopics[0].topicFilter]
     },
     currentValue () {
-      let value = this.valuesBySettings[this.item.dataTopics[0].topicFilter]
+      const value = this.valuesBySettings[this.item.dataTopics[0].topicFilter]
       return Number.isNaN(value) ? 0 : this.mathProcessing(value, this.item.settings.math)
     },
     stringLength () {
@@ -206,9 +206,9 @@ export default {
         : this.valuesBySettings[this.item.settings.topics[0].topicFilter]
     },
     options () {
-      let settings = this.item.settings,
+      const settings = this.item.settings,
         getMajorTicks = (settings) => {
-          let step = (this.maxValue - this.minValue) / 10
+          const step = (this.maxValue - this.minValue) / 10
           return new Array(11).fill(0).reduce((values, _, index, arr) => {
             if (index === 0) {
               values.push(this.minValue)
@@ -248,10 +248,10 @@ export default {
         colorNeedleEnd: '#d32f2f',
         colorUnits: '#616161',
         highlights: [
-          { 'from': this.minValue, 'to': settings.lowLevel, 'color': 'rgba(165,214,167,1)' },
-          { 'from': settings.lowLevel, 'to': settings.midLevel, 'color': 'rgba(220,231,117,1)' },
-          { 'from': settings.midLevel, 'to': settings.highLevel, 'color': 'rgba(255,179,0,1)' },
-          { 'from': settings.highLevel, 'to': this.maxValue, 'color': 'rgba(244,81,30,1)' }
+          { from: this.minValue, to: settings.lowLevel, color: 'rgba(165,214,167,1)' },
+          { from: settings.lowLevel, to: settings.midLevel, color: 'rgba(220,231,117,1)' },
+          { from: settings.midLevel, to: settings.highLevel, color: 'rgba(255,179,0,1)' },
+          { from: settings.highLevel, to: this.maxValue, color: 'rgba(244,81,30,1)' }
         ]
       }
     },

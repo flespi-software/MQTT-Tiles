@@ -7,7 +7,7 @@
         </q-toolbar-title>
       </q-toolbar>
       <div :style="{ height: $q.platform.is.mobile ? 'calc(100% - 100px)' : '50vh' }" class="scroll q-pa-md">
-        <q-input outlined hide-bottom-space color="grey-9 q-mb-sm" v-model="currentSettings.name" label="Name"/>
+        <q-input outlined hide-bottom-space color="grey-9 q-mb-sm" v-model.trim="currentSettings.name" label="Name"/>
         <q-select outlined hide-bottom-space color="grey-9  q-mb-sm" @input="typeChangeHandler" :value="currentSettings.type" :options="typeOptions" emit-value map-options label="Type">
           <template v-slot:option="scope">
           <q-item
@@ -131,7 +131,7 @@ export default {
   name: 'Settings',
   props: ['value', 'settings', 'mode', 'board'],
   data () {
-    let defaultSettings = {
+    const defaultSettings = {
       name: 'New widget',
       color: 'grey',
       type: 'informer',
@@ -237,7 +237,7 @@ export default {
     checkUniqueTopic (topic, index) {
       let isUnique = true
       this.currentSettings.dataTopics.map(topic => topic.topicFilter).some((currentTopic, currentTopicIndex) => {
-        let sameValue = currentTopic === topic
+        const sameValue = currentTopic === topic
         if (sameValue) { isUnique = currentTopicIndex === index }
         return sameValue
       })

@@ -3,15 +3,15 @@ import clicker from './clicker/migrations'
 import frame from './frame/migrations'
 import switcher from './switcher/migrations'
 /* widgetType: {[version]: handler} */
-let migrateHandlers = {
+const migrateHandlers = {
   clicker,
   frame,
   switcher
 }
 function migrateWidgets (widgets, fromVersion, toVersion) {
   return widgets.reduce((newWidgets, widget) => {
-    let migrations = migrateHandlers[widget.type] || {}
-    let versions = Object.keys(migrations)
+    const migrations = migrateHandlers[widget.type] || {}
+    const versions = Object.keys(migrations)
     versions.forEach((version) => {
       if (compareVersions.compare(version, fromVersion, '>') && compareVersions.compare(version, toVersion, '<=')) {
         try {

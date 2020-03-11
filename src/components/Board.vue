@@ -178,7 +178,7 @@ import { WIDGET_MODE_EDIT, WIDGET_MODE_ADD, WIDGET_MODE_DUPLICATE } from '../con
 const BREAKPOINTS = { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }
 function getBreakpoint (width) {
   width = width || window.innerWidth
-  let breakpoints = ['xxs', 'xs', 'sm', 'md', 'lg']
+  const breakpoints = ['xxs', 'xs', 'sm', 'md', 'lg']
   return breakpoints.reduce((breakpoint, current) => {
     if (width > BREAKPOINTS[current]) {
       return current
@@ -230,15 +230,15 @@ export default {
         let variablesListValues = {}
         if (!variable.type || variable.type === 0) {
           variablesListValues = variable.values.reduce((result, varValue) => {
-            let { label, value } = this.getVariableModel(varValue)
+            const { label, value } = this.getVariableModel(varValue)
             result[value] = { label, value }
             return result
           }, {})
           Object.defineProperty(variablesListValues, 'length', { enumerable: false, value: variable.values.length })
         } else if (variable.type === 1) {
-          let varKeys = Object.values(this.variablesValues[variable.name] || {})
+          const varKeys = Object.values(this.variablesValues[variable.name] || {})
           variablesListValues = varKeys.reduce((result, varValue) => {
-            let { label, value } = this.getVariableModel(varValue)
+            const { label, value } = this.getVariableModel(varValue)
             result[value] = { label, value }
             return result
           }, {})
@@ -328,11 +328,11 @@ export default {
       })
     },
     modifyWidgetByVariables (widget) {
-      let modifyTopics = (topic) => {
+      const modifyTopics = (topic) => {
         if (!topic.topicTemplate) {
           topic.topicTemplate = topic.topicFilter
         }
-        let variables = this.board.activeVariables
+        const variables = this.board.activeVariables
         topic.topicFilter = topic.topicTemplate.replace(/<%([a-zA-Z0-9-+&@#/%?=~_|!:,.;\s]*)%>/gim, (match, name) => {
           return variables[name] || match
         })
@@ -358,7 +358,7 @@ export default {
         a = typeof a === 'string' ? a.toLowerCase() : a
         b = typeof b === 'string' ? b.toLowerCase() : b
         if (a !== b) {
-          let na = Number(a),
+          const na = Number(a),
             ba = Number(b)
           if (na + '' === a && ba + '' === b) {
             return na - ba
@@ -369,7 +369,7 @@ export default {
       })
     },
     actionHandler (data) {
-      let variables = this.board.activeVariables
+      const variables = this.board.activeVariables
       data.topic = data.topic.replace(/<%([a-zA-Z0-9-+&@#/%?=~_|!:,.;\s]*)%>/gim, (match, name) => {
         return variables[name] || match
       })
@@ -387,8 +387,8 @@ export default {
       return { label, value: val }
     },
     getVariableValues (varIndex) {
-      let variableValues = this.variablesListValues[varIndex],
-        variableSettings = this.board.settings.variables[varIndex]
+      let variableValues = this.variablesListValues[varIndex]
+      const variableSettings = this.board.settings.variables[varIndex]
       variableValues = variableSettings.sortVarsBy
         ? this.naturalSort(Object.values(variableValues), 'label')
         : this.naturalSort(Object.values(variableValues), 'value')

@@ -106,7 +106,7 @@
 <script>
 import { copyToClipboard } from 'quasar'
 export default {
-  props: [ 'mode', 'data' ],
+  props: ['mode', 'data'],
   data () {
     return {
       opened: false,
@@ -141,7 +141,7 @@ export default {
           this.$q.notify({
             color: 'positive',
             icon: 'content_copy',
-            message: `Board copied`,
+            message: 'Board copied',
             timeout: 1000,
             position: 'bottom-left'
           })
@@ -149,17 +149,17 @@ export default {
           this.$q.notify({
             color: 'negative',
             icon: 'content_copy',
-            message: `Error coping board`,
+            message: 'Error coping board',
             timeout: 1000,
             position: 'bottom-left'
           })
         })
     },
     downloadFile () {
-      let a = document.createElement('a')
+      const a = document.createElement('a')
       a.style.display = 'none'
-      let file = new Blob([this.data], { type: 'text/plain' })
-      let url = a.href = URL.createObjectURL(file)
+      const file = new Blob([this.data], { type: 'text/plain' })
+      const url = a.href = URL.createObjectURL(file)
       a.download = 'board.txt'
       document.body.appendChild(a)
       a.click()

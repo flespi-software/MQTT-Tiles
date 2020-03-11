@@ -38,10 +38,10 @@ export default {
   },
   computed: {
     title () {
-      return !this.isNeedCopy ? `Replace board` : `Save board`
+      return !this.isNeedCopy ? 'Replace board' : 'Save board'
     },
     message () {
-      return !this.isNeedCopy ? `Such board exists. Replace?` : `Save the new board?`
+      return !this.isNeedCopy ? 'Such board exists. Replace?' : 'Save the new board?'
     },
     nameModel: {
       get () { return this.name },
@@ -61,7 +61,7 @@ export default {
       })
       this.dialogModel = true
       return new Promise((resolve, reject) => {
-        let indetvalId = setInterval(() => {
+        const indetvalId = setInterval(() => {
           if (this.mode) {
             if (this.mode === 'ok') {
               resolve(this.oldName)

@@ -96,14 +96,14 @@ export default {
     title () {
       // return this.getValueByTopic(this.value[this.topic] && this.value[this.topic].payload, this.item.dataTopics[0])
       return this.item.settings.items.map(item => {
-        let topic = item.topic.topicFilter
+        const topic = item.topic.topicFilter
         return this.getValueByTopic(this.value[topic] && this.value[topic].payload, item.topic)
       })
     },
     text () {
       // return this.formatValue(this.title, this.item.settings)
       return this.title.map((title, index) => {
-        let item = this.item.settings.items[index]
+        const item = this.item.settings.items[index]
         return this.formatValue(title, item)
       })
     },

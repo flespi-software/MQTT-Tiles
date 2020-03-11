@@ -69,7 +69,7 @@ export default {
   name: 'LinearSchema',
   props: ['widget', 'board'],
   data () {
-    let defaultSettings = {
+    const defaultSettings = {
       math: '',
       lowLevel: 60,
       midLevel: 100,
@@ -151,7 +151,7 @@ export default {
   },
   methods: {
     changeRangeValueTypeHandler (type) {
-      let topics = []
+      const topics = []
       if (this.currentSettings.minValueMode === WIDGET_RANGE_VALUE_DATASOURCE_MODE) {
         if (type === 'max') {
           topics.push(this.currentSettings.topics[0])

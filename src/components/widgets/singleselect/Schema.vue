@@ -62,13 +62,13 @@ export default {
   name: 'SingleselectSchema',
   props: ['widget', 'board'],
   data () {
-    let defaultItem = {
+    const defaultItem = {
       label: 'item',
       val: '',
       actionTopic: 'topic/to/action',
       actionPayload: ''
     }
-    let defaultSettings = {
+    const defaultSettings = {
       items: [],
       save: true,
       mode: DEFAULT_MODE,
@@ -99,17 +99,17 @@ export default {
       this.$delete(this.currentSettings.items, itemIndex)
     },
     upItem (itemIndex) {
-      let movedItem = this.currentSettings.items.splice(itemIndex, 1)[0]
+      const movedItem = this.currentSettings.items.splice(itemIndex, 1)[0]
       this.currentSettings.items.splice(itemIndex - 1, 0, movedItem)
     },
     downItem (itemIndex) {
-      let movedItem = this.currentSettings.items.splice(itemIndex, 1)[0]
+      const movedItem = this.currentSettings.items.splice(itemIndex, 1)[0]
       this.currentSettings.items.splice(itemIndex + 1, 0, movedItem)
     },
     checkUniqueValue (value, index) {
       let isUnique = true
       this.currentSettings.items.map(item => item.val).some((val, valIndex) => {
-        let sameValue = val === value
+        const sameValue = val === value
         if (sameValue) { isUnique = valIndex === index }
         return sameValue
       })

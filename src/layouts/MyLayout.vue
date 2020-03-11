@@ -35,13 +35,22 @@
             </q-icon>
           </q-item-section>
           <q-item-section>
-            <q-item-label class="ellipsis" :class="{[`text-${connected ? 'green' : 'red'}-6`]: index === activeClientId}">
-              {{client.clientName}}
+            <q-item-label :class="{[`text-${connected ? 'green' : 'red'}-6`]: index === activeClientId}">
+              <div style="max-width: calc(100% - 25px); display: inline-flex;">
+                <div class="ellipsis">{{client.clientName}}</div>
+              </div>
+              <div style="display: inline-flex;">
+                <q-icon v-if="client.attachedBoards && client.attachedBoards.length" name="mdi-link-variant" flat dense size="15px" color="yellow-9" class="q-ml-xs">
+                  <q-tooltip>
+                    {{`Attached boards: ${client.attachedBoards.join(', ')}`}}
+                  </q-tooltip>
+                </q-icon>
+              </div>
             </q-item-label>
             <q-item-label caption class="ellipsis">{{client.host}}</q-item-label>
           </q-item-section>
-          <q-item-section side>
-            <q-btn round flat icon="mdi-dots-vertical" @click.stop="">
+          <q-item-section side style="padding-left: 4px!important;">
+            <q-btn round flat dense icon="mdi-dots-vertical" @click.stop="">
               <q-menu anchor="bottom right" self="top right">
                 <q-list>
                   <q-item v-close-popup clickable @click="editClientSettings(index)">
@@ -91,7 +100,7 @@ import { CLIENTS_LOCAL_STORAGE_NAME, ACTIVE_CLIENT_LOCAL_STORAGE_NAME } from '..
 import { version } from '../../package.json'
 import { defaultClient } from '../constants/defaultes.js'
 
-let saveClientsToLocalStorage = debounce((clients) => {
+const saveClientsToLocalStorage = debounce((clients) => {
   LocalStorage.set(CLIENTS_LOCAL_STORAGE_NAME, clients)
 }, 500, { trailing: true })
 
@@ -122,7 +131,7 @@ export default {
       this.editedClientId = undefined
     },
     saveSettingsHandler (settings) {
-      let key = this.editedClientId ? this.editedClientId : this.clientsIds.length ? parseInt(this.clientsIds[this.clientsIds.length - 1]) + 1 : 0
+      const key = this.editedClientId ? this.editedClientId : this.clientsIds.length ? parseInt(this.clientsIds[this.clientsIds.length - 1]) + 1 : 0
       Vue.set(this.clients, key, settings)
     },
     editClientSettings (clientId) {
@@ -183,7 +192,7 @@ export default {
     },
     addBoardsHandler (boardsIds) {
       if (!this.activeClientId) { return false }
-      let client = this.clients[this.activeClientId],
+      const client = this.clients[this.activeClientId],
         hasAttachedBoards = !!client.attachedBoards
       if (hasAttachedBoards) {
         this.$q.notify({
@@ -207,12 +216,12 @@ export default {
     }
   },
   created () {
-    let shareData = this.$q.sessionStorage.getItem('mqtt-tiles-share')
+    const shareData = this.$q.sessionStorage.getItem('mqtt-tiles-share')
     /* if follow by share link */
     if (this.$route.params.hash || shareData) {
       this.fullViewMode = false
-      let client = defaultClient(),
-        data
+      const client = defaultClient()
+      let data
       if (this.$route.params.hash) {
         data = JSON.parse(Base64.decode(this.$route.params.hash))
       } else {
@@ -226,22 +235,22 @@ export default {
       Vue.set(this.clients, 0, client)
       this.setActiveClient(0)
     } else {
-      let savedClients = LocalStorage.getItem(CLIENTS_LOCAL_STORAGE_NAME)
+      const savedClients = LocalStorage.getItem(CLIENTS_LOCAL_STORAGE_NAME)
       let activeClient = LocalStorage.getItem(ACTIVE_CLIENT_LOCAL_STORAGE_NAME)
       if (savedClients) {
         this.clients = savedClients
         if (this.$route.params.flespiToken) {
-          let token = this.$route.params.flespiToken.replace('FlespiToken ', '')
-          let clientIdsByFlespiToken = this.clientsIds.filter(clientId => {
-            let clientToken = this.clients[clientId].username.replace('FlespiToken ', '')
+          const token = this.$route.params.flespiToken.replace('FlespiToken ', '')
+          const clientIdsByFlespiToken = this.clientsIds.filter(clientId => {
+            const clientToken = this.clients[clientId].username.replace('FlespiToken ', '')
             return token === clientToken
           })
           if (clientIdsByFlespiToken.length) {
             activeClient = clientIdsByFlespiToken[0]
           } else {
-            let client = defaultClient()
+            const client = defaultClient()
             client.username = token
-            let id = (parseInt(this.clientsIds[this.clientsIds.slice(-1)]) + 1).toString()
+            const id = (parseInt(this.clientsIds[this.clientsIds.slice(-1)]) + 1).toString()
             Vue.set(this.clients, id, client)
             activeClient = id
           }

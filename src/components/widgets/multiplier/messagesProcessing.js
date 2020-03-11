@@ -4,10 +4,10 @@ import cloneDeep from 'lodash/cloneDeep'
 import Vue from 'vue'
 
 function getMultiplierValueByPacket (packet, initValue, subscriptionTopic, widget) {
-  let path = subscriptionTopic.split('/')
-  let currentPath = packet.topic.split('/')
+  const path = subscriptionTopic.split('/')
+  const currentPath = packet.topic.split('/')
   let value = initValue
-  let setPath = []
+  const setPath = []
   path.forEach((pathItem, index) => {
     setPath.push(currentPath[index])
   })
@@ -25,9 +25,9 @@ function getMultiplierValueByPacket (packet, initValue, subscriptionTopic, widge
     }
   } else {
     if (setPath.length) {
-      let path = setPath.slice(0, -1).join('.')
-      let name = setPath.slice(-1)[0]
-      let obj = path ? get(value, path, null) : value
+      const path = setPath.slice(0, -1).join('.')
+      const name = setPath.slice(-1)[0]
+      const obj = path ? get(value, path, null) : value
       Vue.delete(obj, name)
     } else {
       value = null

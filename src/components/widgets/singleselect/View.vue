@@ -102,11 +102,11 @@ export default {
   },
   computed: {
     currentLabel () {
-      let value = this.value[this.item.dataTopics[0].topicFilter] && this.value[this.item.dataTopics[0].topicFilter].payload
+      const value = this.value[this.item.dataTopics[0].topicFilter] && this.value[this.item.dataTopics[0].topicFilter].payload
       if (value === null) {
         return 'N/A'
       } else {
-        let activeVal = this.item.settings.items.filter(item => item.val === this.currentValue)[0]
+        const activeVal = this.item.settings.items.filter(item => item.val === this.currentValue)[0]
         return activeVal ? activeVal.label : 'N/A'
       }
     },
@@ -115,7 +115,7 @@ export default {
     },
     currentValue: {
       get () {
-        let value = this.value[this.item.dataTopics[0].topicFilter] && this.value[this.item.dataTopics[0].topicFilter].payload
+        const value = this.value[this.item.dataTopics[0].topicFilter] && this.value[this.item.dataTopics[0].topicFilter].payload
         if (value === null) {
           return null
         } else {
@@ -143,7 +143,7 @@ export default {
         topic = this.item.dataTopics[0].topicFilter
         payload = val
       } else {
-        let currentItem = this.item.settings.items.filter(item => item.val === val)[0]
+        const currentItem = this.item.settings.items.filter(item => item.val === val)[0]
         topic = currentItem.actionTopic
         payload = currentItem.actionPayload
       }
@@ -152,7 +152,7 @@ export default {
     },
     actionHandler () {
       if (this.actionTopic !== null) {
-        let data = { topic: this.actionTopic, payload: this.actionPayload, settings: { retain: this.item.settings.save } }
+        const data = { topic: this.actionTopic, payload: this.actionPayload, settings: { retain: this.item.settings.save } }
         this.$emit('action', data)
       }
     }

@@ -99,11 +99,11 @@ import {
   COLOR_MODE_SIMPLE,
   COLOR_MODE_FULL
 } from './constants'
-let debouncedAction = debounce((ctx, color) => {
+const debouncedAction = debounce((ctx, color) => {
   if (typeof color === 'object') {
     color = JSON.stringify(color)
   }
-  let data = { topic: ctx.item.dataTopics[0].topicFilter, payload: color, settings: { retain: ctx.item.settings.save } }
+  const data = { topic: ctx.item.dataTopics[0].topicFilter, payload: color, settings: { retain: ctx.item.settings.save } }
   ctx.$emit('action', data)
 }, 300)
 export default {
@@ -133,7 +133,7 @@ export default {
     actionHandler (color) { debouncedAction(this, this.getActionColor(color)) },
     getObjByTemplate (color, template) {
       let colorObj = {}
-      let names = []
+      const names = []
       template = template.replace(/\{|\}|\[|\]|\(|\)/g, (match) => `\\${match}`)
       template = new RegExp(template.replace(/%[hex|r|g|b|h|s|v|a]{1,3}%/g, (match) => {
         names.push(match.slice(1, -1))
@@ -184,8 +184,8 @@ export default {
           if (this.item.settings.mode === COLOR_MODE_SIMPLE) {
             color = rgbToHsv(color)
           } else {
-            let isHex = typeof color === 'string' && color.indexOf('#') === 0
-            let isHsv = typeof color === 'object' && color.h !== undefined && color.s !== undefined && color.v !== undefined
+            const isHex = typeof color === 'string' && color.indexOf('#') === 0
+            const isHsv = typeof color === 'object' && color.h !== undefined && color.s !== undefined && color.v !== undefined
             color = isHex ? hexToRgb(color) : isHsv ? hsvToRgb(color) : color
             color = `rgb(${color.r},${color.g},${color.b})`
           }
@@ -202,7 +202,7 @@ export default {
       return color
     },
     getRGBObj (str) {
-      let match = str.match(/rgba?\((\d{1,3}), ?(\d{1,3}), ?(\d{1,3})\)?(?:, ?(\d(?:\.\d?))\))?/)
+      const match = str.match(/rgba?\((\d{1,3}), ?(\d{1,3}), ?(\d{1,3})\)?(?:, ?(\d(?:\.\d?))\))?/)
       return match ? { r: Number(match[1]), g: Number(match[2]), b: Number(match[3]) } : { r: 0, g: 0, b: 0 }
     },
     getActionColor (color) {
@@ -231,7 +231,7 @@ export default {
       }
       if (this.item.settings.valueTemplate) {
         color = this.item.settings.valueTemplate.replace(/%[hex|r|g|b|h|s|v|a]{1,3}%/g, (match) => {
-          let name = match.slice(1, -1)
+          const name = match.slice(1, -1)
           return color[name] === undefined ? (color || '') : color[name]
         })
       }

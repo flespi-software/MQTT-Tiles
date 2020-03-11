@@ -2,7 +2,7 @@ export default {
   methods: {
     validateTopic (topic) {
       if (!topic.length) { return false }
-      let parts = topic.split('/')
+      const parts = topic.split('/')
 
       for (let i = 0; i < parts.length; i++) {
         if (parts[i] === '+') {
@@ -25,7 +25,7 @@ export default {
     },
     validateFiniteTopic (topic) {
       if (!topic.length) { return false }
-      let parts = topic.split('/')
+      const parts = topic.split('/')
 
       for (let i = 0; i < parts.length; i++) {
         if (parts[i] === '+') {

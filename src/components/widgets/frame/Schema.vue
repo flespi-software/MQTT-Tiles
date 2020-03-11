@@ -53,7 +53,7 @@ export default {
   name: 'FrameSchema',
   props: ['widget', 'board'],
   data () {
-    let defaultSettings = {
+    const defaultSettings = {
         height: 6,
         width: 3,
         maxTopicsLength: 0,
@@ -97,7 +97,7 @@ export default {
       this.$set(this.currentSettings, 'items', [
         {
           label: 'Map item',
-          template: `MapView|cmd:{"addmarkers": [[<%position.latitude%>, <%position.longitude%>]], "clear": "all"}`,
+          template: 'MapView|cmd:{"addmarkers": [[<%position.latitude%>, <%position.longitude%>]], "clear": "all"}',
           topic: {
             topicFilter: 'flespi/message/gw/devices/+',
             payloadType: 1,
@@ -123,7 +123,7 @@ export default {
       this.$set(this.currentSettings, 'topics', this.currentSettings.items.map(item => item.topic))
     },
     checkUniqueTopic (itemIndex) {
-      let item = this.currentSettings.items[itemIndex],
+      const item = this.currentSettings.items[itemIndex],
         sameTopicsIndexes = this.currentSettings.items.reduce((res, currItem, index) => {
           if (currItem.topic.topicFilter === item.topic.topicFilter) {
             res.push(index)

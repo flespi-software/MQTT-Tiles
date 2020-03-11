@@ -6,18 +6,19 @@ import {
 } from '../constants'
 import { format, date } from 'quasar'
 const { humanStorageSize } = format
-import math from 'mathjs'
+import { create, all } from 'mathjs'
 import get from 'lodash/get'
-let timeFormat = (value) => {
-  let days = Math.floor(value / 86400000)
+const timeFormat = (value) => {
+  const days = Math.floor(value / 86400000)
   value = value % 86400000
-  let hours = Math.floor(value / 3600000)
+  const hours = Math.floor(value / 3600000)
   value = value % 3600000
-  let minutes = Math.floor(value / 60000)
+  const minutes = Math.floor(value / 60000)
   value = value % 60000
-  let seconds = Math.floor(value / 1000)
+  const seconds = Math.floor(value / 1000)
   return (days ? days + ' days ' : '') + (hours ? hours + ' hours ' : '') + (minutes ? minutes + ' minutes ' : '') + (seconds ? seconds + ' seconds ' : '')
 }
+const math = create(all)
 math.import({
   equal: function (a, b) { return a === b },
   unequal: function (a, b) { return a !== b }
@@ -36,7 +37,7 @@ export default {
             return val
           })
           mathExp = mathExp.replace(/nill/gim, '"nill"')
-          value = math.eval(mathExp)
+          value = math.evaluate(mathExp)
         } catch (e) {
           value = false
         }
@@ -56,7 +57,7 @@ export default {
               break
             }
             case WIDGET_VALUE_FORMAT_DATE: {
-              let format = settings.dateFormat || 'DD/MM/YYYY HH:mm:ss'
+              const format = settings.dateFormat || 'DD/MM/YYYY HH:mm:ss'
               value = value !== 'N/A' ? date.formatDate(value * 1000, format) : value
               break
             }

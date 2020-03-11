@@ -1,8 +1,8 @@
 import compareVersions from 'compare-versions'
 
-let migrateHandlers = {
+const migrateHandlers = {
   '1.6.5': (board) => {
-    let variables = board.settings.variables || []
+    const variables = board.settings.variables || []
     variables.forEach((variable, index) => {
       if (variable.type) {
         variable.topic.payloadNameField = ''
@@ -21,8 +21,8 @@ function migrateBoards (boards, fromVersion, toVersion) {
 }
 
 function migrateBoard (board, fromVersion, toVersion) {
-  let migrations = migrateHandlers
-  let versions = Object.keys(migrations)
+  const migrations = migrateHandlers
+  const versions = Object.keys(migrations)
   versions.forEach((version) => {
     if (compareVersions.compare(version, fromVersion, '>') && compareVersions.compare(version, toVersion, '<=')) {
       try {

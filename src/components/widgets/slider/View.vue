@@ -111,13 +111,13 @@ export default {
       }
     },
     actionHandler (val) {
-      let data = { topic: this.item.dataTopics[0].topicFilter, payload: `${val}`, settings: { retain: this.item.settings.save } }
+      const data = { topic: this.item.dataTopics[0].topicFilter, payload: `${val}`, settings: { retain: this.item.settings.save } }
       this.$emit('action', data)
     }
   },
   computed: {
     valuesBySettings () {
-      let valueTopic = this.item.dataTopics[0],
+      const valueTopic = this.item.dataTopics[0],
         minTopic = this.item.settings.topics[0],
         maxTopic = this.item.settings.topics[1],
         values = {
@@ -136,7 +136,7 @@ export default {
     },
     currentValue: {
       get () {
-        let value = this.valuesBySettings[this.item.dataTopics[0].topicFilter]
+        const value = this.valuesBySettings[this.item.dataTopics[0].topicFilter]
         return Number.isNaN(value) ? 0 : value
       },
       set (val) {

@@ -87,7 +87,7 @@ export default {
   name: 'StatusIndicatorSchema',
   props: ['widget', 'board'],
   data () {
-    let defaultItem = {
+    const defaultItem = {
       label: 'item',
       icon: '',
       color: '#000',
@@ -95,7 +95,7 @@ export default {
       actionTopic: 'topic/to/action',
       actionPayload: ''
     }
-    let defaultSettings = {
+    const defaultSettings = {
       items: [
         {
           label: 'default',
@@ -140,18 +140,18 @@ export default {
       this.$delete(this.currentSettings.items, itemIndex)
     },
     upItem (itemIndex) {
-      let movedItem = this.currentSettings.items.splice(itemIndex, 1)[0]
+      const movedItem = this.currentSettings.items.splice(itemIndex, 1)[0]
       this.currentSettings.items.splice(itemIndex - 1, 0, movedItem)
     },
     downItem (itemIndex) {
-      let movedItem = this.currentSettings.items.splice(itemIndex, 1)[0]
+      const movedItem = this.currentSettings.items.splice(itemIndex, 1)[0]
       this.currentSettings.items.splice(itemIndex + 1, 0, movedItem)
     },
     checkUniqueItem (item, index) {
       let isUnique = true
       this.currentSettings.items.some((currentItem, itemIndex) => {
-        let sameValue = currentItem.val === item.val
-        let sameMath = currentItem.math === item.math
+        const sameValue = currentItem.val === item.val
+        const sameMath = currentItem.math === item.math
         if (sameValue && sameMath) { isUnique = itemIndex === index }
         return sameValue
       })
@@ -166,7 +166,7 @@ export default {
       ) &&
         !!this.currentSettings.items.length &&
         this.currentSettings.items.reduce((isUniq, item, index, items) => {
-          let key = `${item.val} - ${item.math}`
+          const key = `${item.val} - ${item.math}`
           if (!isUniq[key]) { isUniq[key] = 0 }
           isUniq[key]++
           if (index === items.length - 1) {

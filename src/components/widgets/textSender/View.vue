@@ -90,19 +90,19 @@ export default {
       this.textModel = text
     },
     sendHandler () {
-      let data = { topic: this.item.settings.topics[0].topicFilter, payload: this.textModel, settings: { retain: this.item.settings.save } }
+      const data = { topic: this.item.settings.topics[0].topicFilter, payload: this.textModel, settings: { retain: this.item.settings.save } }
       this.$emit('action', data)
     }
   },
   computed: {
     text () {
-      let topic = this.item.settings.topics[0],
+      const topic = this.item.settings.topics[0],
         value = this.getValueByTopic(this.value[topic.topicFilter] && this.value[topic.topicFilter].payload, topic)
       this.setTextModel(value)
       return value
     },
     contentHeight () {
-      let height = 'calc(100% - 44px)'
+      const height = 'calc(100% - 44px)'
       return height
     }
   },
@@ -111,7 +111,7 @@ export default {
       deep: true,
       immediate: true,
       handler () {
-        let topic = this.item.settings.topics[0],
+        const topic = this.item.settings.topics[0],
           value = this.getValueByTopic(this.value[topic.topicFilter] && this.value[topic.topicFilter].payload, topic)
         this.setTextModel(value)
       }

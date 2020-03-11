@@ -62,7 +62,7 @@ export default {
   name: 'MultiplierSchema',
   props: ['widget', 'board'],
   data () {
-    let defaultSettings = {
+    const defaultSettings = {
       type: '',
       groupLayout: 0,
       widgetSettings: {},

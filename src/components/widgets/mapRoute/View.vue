@@ -111,7 +111,7 @@ export default {
     value: {
       deep: true,
       handler (value) {
-        let route = this.getRoute()
+        const route = this.getRoute()
         if (route.length !== this.prevRoute.length || this.prevRoute.some((el, index) => el !== route[index])) {
           this.setRoute(this.getRoute())
         }

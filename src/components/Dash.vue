@@ -111,7 +111,7 @@ import { version } from '../../package.json'
 import getValueByTopic from '../mixins/getValueByTopic'
 import boardsMigrations from '../mixins/boardsMigrations'
 
-let clearWidgets = function clearWidgets (widgets) {
+const clearWidgets = function clearWidgets (widgets) {
     Object.keys(widgets).forEach((widgetId) => {
       widgets[widgetId].status = WIDGET_STATUS_DISABLED
     })
@@ -176,7 +176,7 @@ export default {
           JSON.parse(this.connack.properties.userProperties.token).access.type !== 1
     },
     canShare () {
-      let hasCreds = (this.clientSettings && this.clientSettings.syncCreds && this.clientSettings.syncCreds.length)
+      const hasCreds = (this.clientSettings && this.clientSettings.syncCreds && this.clientSettings.syncCreds.length)
       return this.clientStatus && !!this.clientSettings && this.clientSettings.host.indexOf('flespi') !== -1 &&
         !this.clientSettings.flespiBoard &&
         /* check for not master token used for flespi connection */
@@ -189,20 +189,20 @@ export default {
   methods: {
     uid,
     valuesProcessing () {
-      let values = this.values
+      const values = this.values
       Object.keys(this.widgets).forEach((widgetId) => {
         if (!this.values[widgetId]) { this.$set(this.values, widgetId, {}) }
-        let value = values[widgetId],
-          widget = this.widgets[widgetId],
-          isWidgetValueChanged = false
-        let widgetValue = widget.topics.reduce((widgetValue, topic) => {
+        const value = values[widgetId],
+          widget = this.widgets[widgetId]
+        let isWidgetValueChanged = false
+        const widgetValue = widget.topics.reduce((widgetValue, topic) => {
           let messages = this.subscriptionsStatuses[topic] && this.subscriptions[topic]
-          let hasValue = !!value[topic]
+          const hasValue = !!value[topic]
           if (!hasValue) {
             widgetValue[topic] = {}
           }
           if (hasValue && messages && messages.length === 1) { messages = [] } // not processing last state
-          let messagesValue = messagesProcessing(widget.type)(messages, get(this.values, `${widgetId}['${topic}']`, undefined), topic, widget)
+          const messagesValue = messagesProcessing(widget.type)(messages, get(this.values, `${widgetId}['${topic}']`, undefined), topic, widget)
           if (value[topic] !== messagesValue) { isWidgetValueChanged = true }
           widgetValue[topic] = messagesValue
           return widgetValue
@@ -212,18 +212,18 @@ export default {
     },
     boardsVariablesValuesProcessing () {
       this.boardsVariablesValues = this.boardsIds.reduce((values, boardId) => {
-        let board = this.boards[boardId],
+        const board = this.boards[boardId],
           sourceVariables = (board.settings.variables && board.settings.variables.filter(variable => variable.type === 1)) || []
         if (!values[boardId]) { values[boardId] = {} }
-        let boardValue = sourceVariables.reduce((boardVarValues, variable, varIndex) => {
-          let topic = variable.topic.topicFilter
-          let packets = this.subscriptionsStatuses[topic] && this.subscriptions[topic] ? this.subscriptions[topic] : []
+        const boardValue = sourceVariables.reduce((boardVarValues, variable, varIndex) => {
+          const topic = variable.topic.topicFilter
+          const packets = this.subscriptionsStatuses[topic] && this.subscriptions[topic] ? this.subscriptions[topic] : []
           if (!boardVarValues[variable.name]) { boardVarValues[variable.name] = {} }
           packets.forEach(packet => {
-            let topic = variable.topic.topicFilter
+            const topic = variable.topic.topicFilter
             if (!this.subscriptions[topic]) { return false }
-            let parsedValue = this.getValueByTopic(packet.payload, variable.topic)
-            let subTopic = packet.topic
+            const parsedValue = this.getValueByTopic(packet.payload, variable.topic)
+            const subTopic = packet.topic
             if (!parsedValue || parsedValue === 'N/A') {
               boardVarValues[variable.name][subTopic] && delete boardVarValues[variable.name][subTopic]
             } else {
@@ -249,11 +249,11 @@ export default {
       })
     },
     getVariableValue (boardId, variable, packet) {
-      let varValue = {}
-      let topic = variable.topic.topicFilter
+      const varValue = {}
+      const topic = variable.topic.topicFilter
       if (!this.subscriptions[topic]) { return varValue }
-      let parsedValue = this.getValueByTopic(packet.payload, variable.topic)
-      let subTopic = packet.topic
+      const parsedValue = this.getValueByTopic(packet.payload, variable.topic)
+      const subTopic = packet.topic
       if (!parsedValue || parsedValue === 'N/A') {
         varValue[subTopic] && this.$delete(varValue, subTopic)
       } else {
@@ -263,7 +263,7 @@ export default {
     },
     boardsVariablesValuesClear () {
       this.boardsIds.forEach((boardId) => {
-        let board = this.boards[boardId],
+        const board = this.boards[boardId],
           sourceVariables = (board.settings.variables && board.settings.variables.filter(variable => variable.type === 1)) || []
         this.boardsVariablesValues[boardId] = {}
         sourceVariables.forEach((variable, varIndex) => {
@@ -273,8 +273,8 @@ export default {
     },
     checkTopic (topic, mask) {
       if (topic === mask) { return true }
-      let topicPath = topic.split('/')
-      let currentTopicPath = mask.split('/')
+      const topicPath = topic.split('/')
+      const currentTopicPath = mask.split('/')
       /* process $share subscriptions */
       if (currentTopicPath[0] === '$share') {
         currentTopicPath.splice(0, 2)
@@ -317,7 +317,7 @@ export default {
       if (subTopic.indexOf('$share') === 0) {
         subTopic = this.getSharedTopicFilter(subTopic)
       }
-      let subTopicPath = subTopic.split('/'),
+      const subTopicPath = subTopic.split('/'),
         topicPath = topic.split('/')
 
       if (topicPath.length === subTopicPath.length || subTopicPath[subTopicPath.length - 1] === '#') {
@@ -359,13 +359,13 @@ export default {
         isEqual(newConnectionSettings.properties, oldConnectionSettings.properties)
     },
     initClient () {
-      let endHandler = () => {
+      const endHandler = () => {
           this.clientStatus = false
           this.$emit('change:status', false)
         },
         config = this.clearObject(this.clientSettings)
 
-      let client = mqtt.connect(config.host, config)
+      const client = mqtt.connect(config.host, config)
       client.on('message', (topic, message, packet) => {
         /* synced board processing */
         if (topic.indexOf(config.syncNamespace) !== -1) {
@@ -411,7 +411,7 @@ export default {
       if (subIdentifier) {
         if (!Array.isArray(subIdentifier)) { subIdentifier = [subIdentifier] }
         subIdentifier.forEach(subId => {
-          let subTopic = this.subscriptionsIndetifiers[subId]
+          const subTopic = this.subscriptionsIndetifiers[subId]
           this.writeValueByTopic(subTopic, value)
         })
       } else {
@@ -441,9 +441,9 @@ export default {
     },
     expireMessagesProcessing () {
       this.expireMessagesProcess = setInterval(() => {
-        let currentTimestamp = Date.now()
+        const currentTimestamp = Date.now()
         Object.keys(this.expireMessagesStore).forEach(topic => {
-          let timestamp = this.expireMessagesStore[topic]
+          const timestamp = this.expireMessagesStore[topic]
           if (timestamp < currentTimestamp) {
             this.subscriptionsTopics.forEach((subTopic) => {
               if (this.checkTopic(topic, subTopic)) {
@@ -466,13 +466,13 @@ export default {
         if (this.clientSettings.protocolVersion === 5) {
           if (!options) { options = {} }
           if (!options.properties) { options.properties = {} }
-          let subIdentifier = Number(Object.keys(this.subscriptionsIndetifiers).find(k => this.subscriptionsIndetifiers[k] === topic)) || ++this.currentSubscriptionIndetifier
+          const subIdentifier = Number(Object.keys(this.subscriptionsIndetifiers).find(k => this.subscriptionsIndetifiers[k] === topic)) || ++this.currentSubscriptionIndetifier
           options.properties.subscriptionIdentifier = subIdentifier
           this.subscriptionsIndetifiers[subIdentifier] = topic
         }
         return this.client.subscribe(topic, options)
           .then(() => {
-            let topics = arguments[0]
+            const topics = arguments[0]
             this.subscriptionsStatuses[topics] = true
             return arguments
           })
@@ -481,16 +481,16 @@ export default {
     },
     async unsubscribe (topic) {
       if (this.client) {
-        let [topic, options] = arguments
+        const [topic, options] = arguments
         if (this.clientSettings.protocolVersion === 5) {
-          let subIdentifier = Object.keys(this.subscriptionsIndetifiers).find(key => this.subscriptionsIndetifiers[key] === topic)
+          const subIdentifier = Object.keys(this.subscriptionsIndetifiers).find(key => this.subscriptionsIndetifiers[key] === topic)
           if (subIdentifier !== -1) {
             delete this.subscriptionsIndetifiers[subIdentifier]
           }
         }
         return this.client.unsubscribe(topic, options)
           .then(() => {
-            let topics = arguments[0]
+            const topics = arguments[0]
             delete this.subscriptionsStatuses[topics]
           })
           .catch(err => { this.errorHandler(err) })
@@ -534,11 +534,11 @@ export default {
     },
     deleteBoardHandler (boardId) {
       this.resolveBoardVariables(undefined, this.boards[boardId])
-      let widgetsIndexes = this.boards[boardId].widgetsIndexes
+      const widgetsIndexes = this.boards[boardId].widgetsIndexes
       widgetsIndexes.forEach((widgetIndex) => {
-        let topics = this.widgets[widgetIndex].topics
+        const topics = this.widgets[widgetIndex].topics
         topics.forEach((topic) => {
-          let widgetsIndexesBySubscription = this.widgetsBySubscription[topic]
+          const widgetsIndexesBySubscription = this.widgetsBySubscription[topic]
           removeFromArrayByValue(widgetsIndexesBySubscription, widgetIndex)
           if (!widgetsIndexesBySubscription.length) {
             if (!this.hasBoardsVariableWithSameSubscription(boardId, topic)) {
@@ -565,7 +565,7 @@ export default {
     deleteUploadedBoard (boardId) {
       this.$q.dialog({
         title: 'Delete remote board?',
-        message: `Do you really want to delete remote board?`,
+        message: 'Do you really want to delete remote board?',
         color: 'grey-9',
         ok: true,
         cancel: true
@@ -586,7 +586,7 @@ export default {
       this.$set(this.boards[activeBoardId].settings, 'lastModify', Date.now())
     },
     replaceBoardHandler (boardId) {
-      let board = this.boards[boardId]
+      const board = this.boards[boardId]
       this.$set(this.boards, board.id, board)
       if (this.activeBoardId === boardId) {
         this.clearActiveBoard()
@@ -595,17 +595,17 @@ export default {
       this.$delete(this.boards, boardId)
       /* update widgets ids */
       board.widgetsIndexes.forEach((widgetId, index) => {
-        let newId = uid()
+        const newId = uid()
         this.$set(this.widgets, newId, this.widgets[widgetId])
         this.$set(board.widgetsIndexes, index, newId)
         this.$set(this.widgets[newId], 'id', newId)
         this.$delete(this.widgets, widgetId)
-        let shortcutIndex = board.shortcutsIndexes.indexOf(widgetId)
+        const shortcutIndex = board.shortcutsIndexes.indexOf(widgetId)
         if (shortcutIndex !== -1) {
           this.$set(board.shortcutsIndexes, shortcutIndex, newId)
         }
         this.widgets[newId].topics.forEach((topic, index) => {
-          let widgetsBySubscription = this.widgetsBySubscription[topic]
+          const widgetsBySubscription = this.widgetsBySubscription[topic]
           this.$set(widgetsBySubscription, widgetsBySubscription.indexOf(widgetId), newId)
         })
         Object.keys(board.layouts).forEach(layoutName => {
@@ -614,19 +614,19 @@ export default {
       })
     },
     blockBoardHandler () {
-      let board = this.boards[this.activeBoardId]
+      const board = this.boards[this.activeBoardId]
       this.$set(board.settings, 'blocked', !board.settings.blocked)
     },
     preventBoardHandler () {
-      let board = this.boards[this.activeBoardId]
+      const board = this.boards[this.activeBoardId]
       this.$set(board.settings, 'preventCollision', !board.settings.preventCollision)
     },
     packBoard (board, widgets) {
       return getBoardToSave(board, widgets)
     },
     unpackBoard (board) {
-      let widgets = {}
-      let indexes = []
+      const widgets = {}
+      const indexes = []
       board.widgetsIndexes = migrateWidgets(board.widgetsIndexes, board.appVersion, version)
       board.widgetsIndexes.forEach((widget) => {
         indexes.push(widget.id)
@@ -641,7 +641,7 @@ export default {
     },
     initBoard (board) {
       board = this.migrateBoard(cloneDeep(board), board.appVersion, version)
-      let { board: currentBoard, widgets } = this.unpackBoard(board)
+      const { board: currentBoard, widgets } = this.unpackBoard(board)
       board = currentBoard
       this.$set(this.boards, board.id, board)
       this.resolveBoardVariables(board)
@@ -654,7 +654,7 @@ export default {
         let widgets = {}
         Object.keys(savedBoards).forEach(boardId => {
           let board = savedBoards[boardId]
-          let { board: unpackedBoard, widgets: currentWidgets } = this.unpackBoard(board)
+          const { board: unpackedBoard, widgets: currentWidgets } = this.unpackBoard(board)
           widgets = { ...widgets, ...currentWidgets }
           board = unpackedBoard
           this.resolveBoardVariables(board)
@@ -670,10 +670,10 @@ export default {
     resolveBoardVariables (newBoard, oldBoard) {
       if (!oldBoard) { oldBoard = { settings: {} } }
       if (!newBoard) { newBoard = { settings: {} } }
-      let oldVariables = (oldBoard.settings.variables && oldBoard.settings.variables.filter(variable => variable.type === 1)) || []
-      let newVariables = (newBoard.settings.variables && newBoard.settings.variables.filter(variable => variable.type === 1)) || []
-      let oldTopics = oldVariables.map(variable => variable.topic.topicFilter)
-      let newTopics = newVariables.map(variable => variable.topic.topicFilter)
+      const oldVariables = (oldBoard.settings.variables && oldBoard.settings.variables.filter(variable => variable.type === 1)) || []
+      const newVariables = (newBoard.settings.variables && newBoard.settings.variables.filter(variable => variable.type === 1)) || []
+      const oldTopics = oldVariables.map(variable => variable.topic.topicFilter)
+      const newTopics = newVariables.map(variable => variable.topic.topicFilter)
       if (oldBoard.id) { this.boardsVariablesValues[oldBoard.id] = undefined }
       if (newBoard.id) { this.boardsVariablesValues[newBoard.id] = {} }
       oldTopics.forEach((oldTopic, oldIndex) => {
@@ -683,9 +683,9 @@ export default {
         }
       })
       newTopics.forEach(topic => {
-        let hasSubscription = !!this.subscriptions[topic]
-        let subSettings = { qos: 1 }
-        let userProperties = this.clientSettings && this.clientSettings.userProperties
+        const hasSubscription = !!this.subscriptions[topic]
+        const subSettings = { qos: 1 }
+        const userProperties = this.clientSettings && this.clientSettings.userProperties
         if (userProperties) {
           subSettings.properties = {}
           subSettings.properties.userProperties = userProperties
@@ -709,9 +709,9 @@ export default {
     },
     /* widgets logic start */
     runtimeInitWidgets () {
-      let widgetsIndexes = Object.keys(this.widgets)
+      const widgetsIndexes = Object.keys(this.widgets)
       widgetsIndexes.forEach(widgetIndex => {
-        let topics = this.widgets[widgetIndex].topics
+        const topics = this.widgets[widgetIndex].topics
         topics.forEach(topic => {
           if (!this.subscriptions[topic]) { this.setValueByTopic(topic, null) }
           if (!this.widgetsBySubscription[topic]) { this.widgetsBySubscription[topic] = [] }
@@ -720,15 +720,15 @@ export default {
       })
     },
     initWidgets () {
-      let widgetsIndexes = Object.keys(this.widgets)
+      const widgetsIndexes = Object.keys(this.widgets)
       widgetsIndexes.forEach(widgetIndex => {
         this.$set(this.widgets[widgetIndex], 'status', WIDGET_STATUS_ENABLED)
       })
-      let topics = Object.keys(this.subscriptions)
+      const topics = Object.keys(this.subscriptions)
       if (topics.length) {
-        let getSettings = () => {
-          let settings = { qos: 1 }
-          let userProperties = this.clientSettings && this.clientSettings.userProperties
+        const getSettings = () => {
+          const settings = { qos: 1 }
+          const userProperties = this.clientSettings && this.clientSettings.userProperties
           if (userProperties) {
             settings.properties = {}
             settings.properties.userProperties = userProperties
@@ -740,12 +740,12 @@ export default {
       }
     },
     widgetLayoutSetup (width, height, id, breakpoint) {
-      let board = this.boards[this.activeBoardId],
+      const board = this.boards[this.activeBoardId],
         colNum = this.colsByBreakpoint[breakpoint],
         layout = board.layouts[breakpoint],
         { x, y } = freeSpace()
       function freeSpace () {
-        let max = layout.reduce((max, widget) => {
+        const max = layout.reduce((max, widget) => {
           if ((max.y === widget.y && max.x <= widget.x) || max.y < widget.y) {
             max = widget
           }
@@ -775,7 +775,7 @@ export default {
       this.$set(this.boards[this.activeBoardId].layouts, breakpoint, layout)
     },
     deleteWidgetFromLayout (widgetIndex) {
-      let board = this.boards[this.activeBoardId],
+      const board = this.boards[this.activeBoardId],
         layouts = board.layouts
       Object.keys(this.colsByBreakpoint).forEach(breakpoint => {
         this.$delete(layouts[breakpoint], widgetIndex)
@@ -788,10 +788,10 @@ export default {
         this.boards[this.activeBoardId].widgetsIndexes.push(widget.id)
       }
       widget.topics.forEach(topic => {
-        let hasSubscription = this.subscriptions[topic] !== undefined
-        let needResubscribe = widget.type === 'multiplier'
-        let subSettings = { qos: 1 }
-        let userProperties = this.clientSettings && this.clientSettings.userProperties
+        const hasSubscription = this.subscriptions[topic] !== undefined
+        const needResubscribe = widget.type === 'multiplier'
+        const subSettings = { qos: 1 }
+        const userProperties = this.clientSettings && this.clientSettings.userProperties
         if (userProperties) {
           subSettings.properties = {}
           subSettings.properties.userProperties = userProperties
@@ -828,10 +828,10 @@ export default {
         })
         settings.topics.forEach(topic => {
           if (topics.includes(topic)) { return false }
-          let hasSubscription = !!this.subscriptions[topic]
-          let needResubscribe = settings.type === 'multiplier'
-          let subSettings = { qos: 1 }
-          let userProperties = this.clientSettings && this.clientSettings.userProperties
+          const hasSubscription = !!this.subscriptions[topic]
+          const needResubscribe = settings.type === 'multiplier'
+          const subSettings = { qos: 1 }
+          const userProperties = this.clientSettings && this.clientSettings.userProperties
           if (userProperties) {
             subSettings.properties = {}
             subSettings.properties.userProperties = userProperties
@@ -862,13 +862,13 @@ export default {
       }).onOk(() => {
         this.removeFromShortcuts(widgetId)
         /* remove from board link index */
-        let widgetsIndexes = this.boards[this.activeBoardId].widgetsIndexes,
+        const widgetsIndexes = this.boards[this.activeBoardId].widgetsIndexes,
           widgetIndex = widgetsIndexes.indexOf(widgetId)
         this.$delete(widgetsIndexes, widgetIndex)
         this.deleteWidgetFromLayout(widgetIndex)
 
         settings.topics.forEach(topic => {
-          let widgetsBySubscription = this.widgetsBySubscription[topic]
+          const widgetsBySubscription = this.widgetsBySubscription[topic]
           removeFromArrayByValue(widgetsBySubscription, widgetId)
           if (!widgetsBySubscription.length) {
             if (!this.hasBoardsVariableWithSameSubscription(undefined, topic)) {
@@ -882,7 +882,7 @@ export default {
       })
     },
     fastBindWidgetHandler (widgetId) {
-      let shortcutsIndexes = this.boards[this.activeBoardId].shortcutsIndexes,
+      const shortcutsIndexes = this.boards[this.activeBoardId].shortcutsIndexes,
         index = shortcutsIndexes.indexOf(widgetId)
       if (index !== -1) {
         this.$delete(shortcutsIndexes, index)
@@ -901,7 +901,7 @@ export default {
     },
     removeFromShortcuts (widgetId) {
       Object.keys(this.boards).forEach(boardId => {
-        let shortcutsIndexes = this.boards[boardId].shortcutsIndexes,
+        const shortcutsIndexes = this.boards[boardId].shortcutsIndexes,
           index = shortcutsIndexes.indexOf(widgetId)
 
         if (index !== -1) {
@@ -910,14 +910,14 @@ export default {
       })
     },
     resizeHandler ({ index, height, width }) {
-      let widget = this.widgets[index]
+      const widget = this.widgets[index]
       this.$set(widget.settings, 'height', height)
       this.$set(widget.settings, 'width', width)
       /* modify all layouts */
-      let board = this.boards[this.activeBoardId]
-      let layouts = board.layouts
+      const board = this.boards[this.activeBoardId]
+      const layouts = board.layouts
       Object.keys(layouts).forEach(layoutName => {
-        let layoutWidgetItem = layouts[layoutName].filter(item => item.i === index)[0]
+        const layoutWidgetItem = layouts[layoutName].filter(item => item.i === index)[0]
         layoutWidgetItem.h = height
         layoutWidgetItem.w = width
       })
@@ -944,7 +944,7 @@ export default {
       }
     },
     importBoardHandler (board) {
-      let id = board.id
+      const id = board.id
       this.exportBoardId = id
       if (this.boards[id]) {
         this.$refs.copyReplaceDialog.open({
@@ -954,8 +954,8 @@ export default {
             if (id !== this.exportBoardId) {
               board.id = this.exportBoardId
               board.widgetsIndexes.forEach((widget, index) => {
-                let newId = uid()
-                let shortcutIndex = board.shortcutsIndexes.indexOf(board.widgetsIndexes[index].id)
+                const newId = uid()
+                const shortcutIndex = board.shortcutsIndexes.indexOf(board.widgetsIndexes[index].id)
                 if (shortcutIndex !== -1) {
                   this.$set(board.shortcutsIndexes, shortcutIndex, newId)
                 }
@@ -982,7 +982,7 @@ export default {
       }
     },
     importBoardFromConnectionHandler (id) {
-      let board = cloneDeep(this.boardsFromConnection[id])
+      const board = cloneDeep(this.boardsFromConnection[id])
       this.importBoardHandler(board)
     },
     exportPrepareBoardHandler (id) {
@@ -1006,7 +1006,7 @@ export default {
         this.replaceBoardHandler(id)
         currentId = newId
       }
-      let topic = `${this.clientSettings.syncNamespace}/${currentId}`
+      const topic = `${this.clientSettings.syncNamespace}/${currentId}`
       return this.publish(topic, JSON.stringify(getBoardToSave(board, this.widgets)), { qos: 1, retain: true })
         .then((resp) => {
           if (resp instanceof Error) {
@@ -1023,10 +1023,10 @@ export default {
       this.exportBoardId = ''
     },
     getShareModel (board, isRemoteBoard) {
-      let widgets = isRemoteBoard ? board.widgetsIndexes : board.widgetsIndexes.map(widgetId => this.widgets[widgetId]),
+      const widgets = isRemoteBoard ? board.widgetsIndexes : board.widgetsIndexes.map(widgetId => this.widgets[widgetId]),
         subscribeTopics = uniq(widgets.reduce((topics, widget) => { return [...topics, ...widget.topics] }, [])),
         publishTopics = uniq(getActionTopics(widgets))
-      let topics = {}
+      const topics = {}
       subscribeTopics.forEach((subTopic) => {
         if (!topics[subTopic]) {
           topics[subTopic] = ['subscribe']
@@ -1039,8 +1039,8 @@ export default {
           topics[pubTopic].push('publish')
         }
       })
-      let shareModel = Object.keys(topics).reduce((model, topic) => {
-        let shareObj = { uri: 'mqtt' }
+      const shareModel = Object.keys(topics).reduce((model, topic) => {
+        const shareObj = { uri: 'mqtt' }
         shareObj.topic = topic
         shareObj.actions = topics[topic]
         model.push(shareObj)
@@ -1049,7 +1049,7 @@ export default {
       return shareModel
     },
     shareHandler (boardId) {
-      let shareWizardConfig = {
+      const shareWizardConfig = {
         boardId,
         tokens: [{ label: '<Connection token>', credentions: { username: this.clientSettings.username }, accessable: this.canShareByClientToken }],
         hasRemote: !!this.boardsFromConnection[boardId],
@@ -1058,13 +1058,13 @@ export default {
         updateBoardMethod: this.exportBoardHandler
       }
       if (this.clientSettings.syncCreds) {
-        let creds = cloneDeep(this.clientSettings.syncCreds)
+        const creds = cloneDeep(this.clientSettings.syncCreds)
         shareWizardConfig.tokens = [...shareWizardConfig.tokens, ...creds]
       }
       this.$emit('share:prepare', shareWizardConfig)
     },
     shareUploadedHandler (boardId) {
-      let shareWizardConfig = {
+      const shareWizardConfig = {
         boardId,
         tokens: [{ label: '<Connection token>', credentions: { username: this.clientSettings.username }, accessable: this.canShareByClientToken }],
         hasRemote: false,
@@ -1073,19 +1073,19 @@ export default {
         updateBoardMethod: this.exportBoardHandler
       }
       if (this.clientSettings.syncCreds) {
-        let creds = cloneDeep(this.clientSettings.syncCreds)
+        const creds = cloneDeep(this.clientSettings.syncCreds)
         shareWizardConfig.tokens = [...shareWizardConfig.tokens, ...creds]
       }
       this.$emit('share:prepare', shareWizardConfig)
     },
     shareBoard (config) {
-      let { boardId, isRemote } = config
+      const { boardId, isRemote } = config
       this.$emit('share', { boardId, share: this.getShareModel(isRemote ? this.boardsFromConnection[boardId] : this.boards[boardId], isRemote) })
     },
     shareSync () {
-      let boardId = this.clientSettings.flespiBoard,
-        topic = `${this.clientSettings.syncNamespace}/${boardId}`,
-        savedBoard
+      const boardId = this.clientSettings.flespiBoard,
+        topic = `${this.clientSettings.syncNamespace}/${boardId}`
+      let savedBoard
       this.$q.loading.show()
       this.subscribe(topic)
         .then(() => {
@@ -1108,14 +1108,14 @@ export default {
         })
     },
     exportBoardAsStringHandler (id) {
-      let board = this.boards[id],
+      const board = this.boards[id],
         boardModelForSave = getBoardToSave(board, this.widgets)
       this.importExportMode = 1
       this.importExportData = Base64.encode(JSON.stringify(boardModelForSave))
       this.$refs.importExportModal.open()
     },
     exportBoardAsFileHandler (id) {
-      let board = this.boards[id],
+      const board = this.boards[id],
         boardModelForSave = getBoardToSave(board, this.widgets)
       this.importExportMode = 1
       this.importExportData = Base64.encode(JSON.stringify(boardModelForSave))
@@ -1146,7 +1146,7 @@ export default {
       this.$emit('change:attach', attachedBoards)
     },
     getTitle () {
-      let title = `${this.activeBoardId && this.boards[this.activeBoardId].name ? `${this.boards[this.activeBoardId].name} - ` : ''}MQTT Tiles`
+      const title = `${this.activeBoardId && this.boards[this.activeBoardId].name ? `${this.boards[this.activeBoardId].name} - ` : ''}MQTT Tiles`
       return title
     }
   },
@@ -1194,7 +1194,7 @@ export default {
   watch: {
     clientSettings: {
       handler (client, oldClient) {
-        let firstInit = !!client && !oldClient
+        const firstInit = !!client && !oldClient
         if (this.isConnectivityIsEqual(client, oldClient)) { return false }
         if (this.client) { this.destroyClient() }
         clearWidgets(this.widgets)
@@ -1226,7 +1226,7 @@ export default {
       }
       oldBoards.forEach(boardId => {
         if (this.boards[boardId] && !boards.includes(boardId)) {
-          let boardConfig = this.packBoard(this.boards[boardId], this.widgets)
+          const boardConfig = this.packBoard(this.boards[boardId], this.widgets)
           if (this.activeBoardId === boardId) { this.clearActiveBoard() }
           this.deleteBoardHandler(boardId)
           this.$set(this.boardsConfigs, boardId, boardConfig)
@@ -1269,6 +1269,6 @@ export default {
     ]
   },
   components: { Board, Boards, CopyReplaceDialog, ImportExportModal },
-  mixins: [ getValueByTopic, boardsMigrations ]
+  mixins: [getValueByTopic, boardsMigrations]
 }
 </script>

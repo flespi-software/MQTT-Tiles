@@ -329,11 +329,11 @@ export default {
       this.editedBoardModel = null
     },
     modifyWidgetByVariables (widget, board) {
-      let modifyTopics = (topic) => {
+      const modifyTopics = (topic) => {
         if (!topic.topicTemplate) {
           topic.topicTemplate = topic.topicFilter
         }
-        let variables = board.activeVariables
+        const variables = board.activeVariables
         topic.topicFilter = topic.topicTemplate.replace(/<%([a-zA-Z0-9-+&@#/%?=~_|!:,.;\s]*)%>/gim, (match, name) => {
           return variables[name] || match
         })
@@ -351,7 +351,7 @@ export default {
       return widget
     },
     actionHandler (boardId, data) {
-      let variables = this.boards[boardId].activeVariables
+      const variables = this.boards[boardId].activeVariables
       data.topic = data.topic.replace(/<%([a-zA-Z0-9-+&@#/%?=~_|!:,.;\s]*)%>/gim, (match, name) => {
         return variables[name] || match
       })
@@ -362,7 +362,7 @@ export default {
       this.attachMode = false
     },
     changeAttachedBoards (id) {
-      let attachedBoardIndex = this.currentAttachedBoard.indexOf(id),
+      const attachedBoardIndex = this.currentAttachedBoard.indexOf(id),
         hasBoardsInAttach = attachedBoardIndex !== -1
       if (hasBoardsInAttach) {
         this.$delete(this.currentAttachedBoard, attachedBoardIndex)

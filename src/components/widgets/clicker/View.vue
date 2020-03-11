@@ -112,7 +112,7 @@ export default {
   },
   methods: {
     actionHandler () {
-      let data = { topic: this.actionTopic, payload: this.item.settings.payload, settings: { retain: this.item.settings.save } }
+      const data = { topic: this.actionTopic, payload: this.item.settings.payload, settings: { retain: this.item.settings.save } }
       this.$emit('action', data)
     }
   }

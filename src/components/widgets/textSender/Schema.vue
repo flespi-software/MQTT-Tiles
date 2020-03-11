@@ -19,7 +19,7 @@ export default {
   name: 'TextSenderSchema',
   props: ['widget', 'board'],
   data () {
-    let defaultSettings = {
+    const defaultSettings = {
       height: 2,
       topics: [
         {

@@ -99,7 +99,7 @@ export default {
   name: 'ClientSettings',
   props: ['value', 'settings'],
   data () {
-    let defaultSettings = defaultClient()
+    const defaultSettings = defaultClient()
     return {
       defaultSettings,
       currentSettings: this.settings ? merge({}, defaultSettings, this.settings) : merge({}, defaultSettings),
@@ -124,7 +124,7 @@ export default {
           (
             !!this.currentSettings.syncCreds && !!this.currentSettings.syncCreds.length &&
             this.currentSettings.syncCreds.reduce((isUniq, item, index, items) => {
-              let token = item.credentions.username
+              const token = item.credentions.username
               if (!isUniq[token]) { isUniq[token] = 0 }
               isUniq[token]++
               if (index === items.length - 1) {
@@ -176,27 +176,31 @@ export default {
       }
     },
     flespiLoginHandler () {
-      let tokenHandler = (event) => {
-        if (typeof event.data === 'string' && ~event.data.indexOf('FlespiToken')) {
-          this.currentSettings.username = event.data
+      const tokenHandler = (event) => {
+        if (typeof event.data === 'string' && ~event.data.indexOf('FlespiLogin|token:')) {
+          let payload = event.data
+          payload = payload.replace('FlespiLogin|token:', '')
+          payload = JSON.parse(payload)
+          this.currentSettings.username = payload.token
+          this.currentSettings.host = `wss://${payload.region['mqtt-ws']}`
           window.removeEventListener('message', tokenHandler)
         }
       }
       window.addEventListener('message', tokenHandler)
-      this.openWindow(`https://flespi.io/login/#/providers`)
+      this.openWindow('https://flespi.io/login/#/providers')
     },
     openWindow (url, title) {
       title = title || 'auth'
-      let w = 500, h = 600
-      let dualScreenLeft = window.screenLeft !== undefined ? window.screenLeft : screen.left
-      let dualScreenTop = window.screenTop !== undefined ? window.screenTop : screen.top
+      const w = 500, h = 600
+      const dualScreenLeft = window.screenLeft !== undefined ? window.screenLeft : screen.left
+      const dualScreenTop = window.screenTop !== undefined ? window.screenTop : screen.top
 
-      let width = window.innerWidth ? window.innerWidth : document.documentElement.clientWidth ? document.documentElement.clientWidth : screen.width
-      let height = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight ? document.documentElement.clientHeight : screen.height
+      const width = window.innerWidth ? window.innerWidth : document.documentElement.clientWidth ? document.documentElement.clientWidth : screen.width
+      const height = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight ? document.documentElement.clientHeight : screen.height
 
-      let left = ((width / 2) - (w / 2)) + dualScreenLeft
-      let top = ((height / 2) - (h / 2)) + dualScreenTop
-      let newWindow = window.open(url, title, 'toolbar=no,location=no,status=yes,resizable=yes,scrollbars=yes, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left)
+      const left = ((width / 2) - (w / 2)) + dualScreenLeft
+      const top = ((height / 2) - (h / 2)) + dualScreenTop
+      const newWindow = window.open(url, title, 'toolbar=no,location=no,status=yes,resizable=yes,scrollbars=yes, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left)
 
       // Puts focus on the newWindow
       if (window.focus) {
@@ -211,17 +215,17 @@ export default {
       this.$delete(this.currentSettings.syncCreds, itemIndex)
     },
     upSyncCredsItem (itemIndex) {
-      let movedItem = this.currentSettings.syncCreds.splice(itemIndex, 1)[0]
+      const movedItem = this.currentSettings.syncCreds.splice(itemIndex, 1)[0]
       this.currentSettings.syncCreds.splice(itemIndex - 1, 0, movedItem)
     },
     downSyncCredsItem (itemIndex) {
-      let movedItem = this.currentSettings.syncCreds.splice(itemIndex, 1)[0]
+      const movedItem = this.currentSettings.syncCreds.splice(itemIndex, 1)[0]
       this.currentSettings.syncCreds.splice(itemIndex + 1, 0, movedItem)
     },
     checkUniqueSyncCredsValue (syncCreds, index) {
       let isUnique = true
       this.currentSettings.syncCreds.map(item => item.credentions.username).some((val, valIndex) => {
-        let sameValue = val === syncCreds.credentions.username
+        const sameValue = val === syncCreds.credentions.username
         if (sameValue) { isUnique = valIndex === index }
         return sameValue
       })

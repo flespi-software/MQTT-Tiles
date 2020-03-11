@@ -3,8 +3,8 @@ function defaultProcessing (packets, dest, subTopic, widget) {
   return (packets && ((packets.length && packets.slice(-1)[0]) || dest)) || null
 }
 
-let customHandlersByType = {
-  'multiplier': multiplierHandler
+const customHandlersByType = {
+  multiplier: multiplierHandler
 }
 
 export default function (type) {

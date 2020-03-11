@@ -103,8 +103,8 @@ export default {
     getPayload (itemIndex) {
       let payload
       if (this.item.settings.mode === IFRAME_MODE_INTEGRATION) {
-        let topic = this.item.settings.items[itemIndex].topic
-        let value = this.getValueByTopic(this.value[topic.topicFilter] && this.value[topic.topicFilter].payload, topic)
+        const topic = this.item.settings.items[itemIndex].topic
+        const value = this.getValueByTopic(this.value[topic.topicFilter] && this.value[topic.topicFilter].payload, topic)
         payload = this.item.settings.items[itemIndex].template
         payload = payload.replace('<{topic}>', this.value && this.value.topic)
         payload = payload.replace('<{payload}>', JSON.stringify(value))
@@ -117,7 +117,7 @@ export default {
     update () {
       this.item.settings.items.forEach((item, index) => {
         if (!this.isReadyMap) { return false }
-        let payload = this.getPayload(index)
+        const payload = this.getPayload(index)
         if (this.currentPayloads[index] !== payload) {
           this.send(payload)
         }
@@ -130,8 +130,8 @@ export default {
       if (this.item.settings.mode === IFRAME_MODE_INTEGRATION) {
         return this.item.settings.link
       } else {
-        let urlPattern = /\b(?:https?|ftp):\/\/[a-z0-9-+&@#/%?=~_|!:,.;]*[a-z0-9-+&@#/%=~_|]/gim
-        let linkValue = this.getValueByTopic(this.value[this.item.dataTopics[0].topicFilter] && this.value[this.item.dataTopics[0].topicFilter].payload, this.item.dataTopics[0])
+        const urlPattern = /\b(?:https?|ftp):\/\/[a-z0-9-+&@#/%?=~_|!:,.;]*[a-z0-9-+&@#/%=~_|]/gim
+        const linkValue = this.getValueByTopic(this.value[this.item.dataTopics[0].topicFilter] && this.value[this.item.dataTopics[0].topicFilter].payload, this.item.dataTopics[0])
         return linkValue && linkValue.toString().match(urlPattern) ? linkValue : null
       }
     },

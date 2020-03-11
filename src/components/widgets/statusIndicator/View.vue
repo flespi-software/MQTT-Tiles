@@ -101,14 +101,14 @@ export default {
   },
   computed: {
     size () {
-      let height = this.item.settings.height,
+      const height = this.item.settings.height,
         width = this.item.settings.width,
         active = height > width ? width : height
       return active * 2.5
     },
     currentValue: {
       get () {
-        let value = this.value[this.item.dataTopics[0].topicFilter] && this.value[this.item.dataTopics[0].topicFilter].payload
+        const value = this.value[this.item.dataTopics[0].topicFilter] && this.value[this.item.dataTopics[0].topicFilter].payload
         if (this.item.settings.resetTimeout) {
           this.setExpireLogic()
         } else {
@@ -126,8 +126,8 @@ export default {
       }
     },
     activeItem () {
-      let defaultItem = this.item.settings.items[0]
-      let activeItem = this.item.settings.items.slice(1).filter(item => item.val === `${this.mathProcessing(this.currentValue, item.math)}`)
+      const defaultItem = this.item.settings.items[0]
+      const activeItem = this.item.settings.items.slice(1).filter(item => item.val === `${this.mathProcessing(this.currentValue, item.math)}`)
       return activeItem[0] || defaultItem
     },
     contentHeight () {
@@ -146,7 +146,7 @@ export default {
         topic = this.item.dataTopics[0].topicFilter
         payload = val
       } else {
-        let currentItem = this.item.settings.items.filter(item => item.val === val)[0]
+        const currentItem = this.item.settings.items.filter(item => item.val === val)[0]
         topic = currentItem.actionTopic
         payload = currentItem.actionPayload
       }
@@ -155,7 +155,7 @@ export default {
     },
     actionHandler () {
       if (this.actionTopic !== null) {
-        let data = { topic: this.actionTopic, payload: this.actionPayload, settings: { retain: this.item.settings.save } }
+        const data = { topic: this.actionTopic, payload: this.actionPayload, settings: { retain: this.item.settings.save } }
         this.$emit('action', data)
       }
     },
@@ -164,7 +164,7 @@ export default {
         clearTimeout(this.expireValueTimeoutId)
         this.expireValueTimeoutId = 0
       }
-      let now = Date.now(),
+      const now = Date.now(),
         expiredTime = this.time + this.item.settings.resetTimeout * 1000
       if (now > expiredTime) {
         this.valueExpired = true

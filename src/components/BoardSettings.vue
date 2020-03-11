@@ -126,7 +126,7 @@ const VARIABLE_TYPE_CUSTOM = 0,
 export default {
   props: ['settings', 'value', 'boards'],
   data () {
-    let defaultSettings = Object.freeze(
+    const defaultSettings = Object.freeze(
       {
         name: 'New board',
         id: '',
@@ -140,7 +140,7 @@ export default {
         layouts: { lg: [], md: [], sm: [], xs: [], xxs: [] }
       }
     )
-    let defaultTopic = {
+    const defaultTopic = {
       topicTemplate: '',
       topicFilter: '',
       payloadType: 0,
@@ -187,7 +187,7 @@ export default {
   },
   computed: {
     validateCurrentSettings () {
-      let vars = this.currentSettings.settings.variables
+      const vars = this.currentSettings.settings.variables
       return this.currentSettings.id &&
       (
         !vars.length ||
@@ -201,7 +201,7 @@ export default {
   },
   methods: {
     saveBoardSettingsHandler () {
-      let event = this.settings ? 'edit' : 'add'
+      const event = this.settings ? 'edit' : 'add'
       if (event === 'add') {
         this.$set(this.currentSettings, 'activeVariables', this.currentSettings.settings.variables.reduce((vars, variable) => {
           vars[variable.name] = undefined
@@ -222,7 +222,7 @@ export default {
       this.$delete(this.currentSettings.settings.variables, index)
     },
     changeTypeVariableHandler (index, type) {
-      let variable = this.currentSettings.settings.variables[index]
+      const variable = this.currentSettings.settings.variables[index]
       if (type === VARIABLE_TYPE_CUSTOM) {
         variable.topic = Object.assign({}, this.defaultTopic)
       } else {
@@ -231,7 +231,7 @@ export default {
       this.$set(variable, 'type', type)
     },
     checkUniqueVariables (index) {
-      let variable = this.currentSettings.settings.variables[index],
+      const variable = this.currentSettings.settings.variables[index],
         sameVarIndexes = this.currentSettings.settings.variables.reduce((res, currVar, index) => {
           if (currVar.name === variable.name) {
             res.push(index)
@@ -242,11 +242,11 @@ export default {
         sameVarIndexes.indexOf(index) === 0
     },
     upItem (itemIndex) {
-      let movedItem = this.currentSettings.settings.variables.splice(itemIndex, 1)[0]
+      const movedItem = this.currentSettings.settings.variables.splice(itemIndex, 1)[0]
       this.currentSettings.settings.variables.splice(itemIndex - 1, 0, movedItem)
     },
     downItem (itemIndex) {
-      let movedItem = this.currentSettings.settings.variables.splice(itemIndex, 1)[0]
+      const movedItem = this.currentSettings.settings.variables.splice(itemIndex, 1)[0]
       this.currentSettings.settings.variables.splice(itemIndex + 1, 0, movedItem)
     },
     addVarItem (variable) {
@@ -256,11 +256,11 @@ export default {
       this.$delete(variable.values, itemIndex)
     },
     upVarItem (variable, itemIndex) {
-      let movedItem = variable.values.splice(itemIndex, 1)[0]
+      const movedItem = variable.values.splice(itemIndex, 1)[0]
       variable.values.splice(itemIndex - 1, 0, movedItem)
     },
     downVarItem (variable, itemIndex) {
-      let movedItem = variable.values.splice(itemIndex, 1)[0]
+      const movedItem = variable.values.splice(itemIndex, 1)[0]
       variable.values.splice(itemIndex + 1, 0, movedItem)
     }
   },

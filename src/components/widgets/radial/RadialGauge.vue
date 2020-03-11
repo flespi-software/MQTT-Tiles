@@ -5,7 +5,7 @@
 <script>
 import { RadialGauge } from 'canvas-gauges'
 import throttle from 'lodash/throttle'
-let setValue = throttle((guage, value) => {
+const setValue = throttle((guage, value) => {
   guage.value = value
 }, 1000, { trailing: true })
 export default {

@@ -62,7 +62,7 @@ export default {
   name: 'SliderSchema',
   props: ['widget', 'board'],
   data () {
-    let defaultSettings = {
+    const defaultSettings = {
       minValue: 0,
       topics: [],
       minValueMode: WIDGET_RANGE_VALUE_CURRENT_MODE,
@@ -142,7 +142,7 @@ export default {
   },
   methods: {
     changeRangeValueTypeHandler (type) {
-      let topics = []
+      const topics = []
       if (this.currentSettings.minValueMode === WIDGET_RANGE_VALUE_DATASOURCE_MODE) {
         if (type === 'max') {
           topics.push(this.currentSettings.topics[0])
