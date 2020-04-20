@@ -1054,6 +1054,7 @@ export default {
         tokens: [{ label: '<Connection token>', credentions: { username: this.clientSettings.username }, accessable: this.canShareByClientToken }],
         hasRemote: !!this.boardsFromConnection[boardId],
         currentRemoteBoards: Object.keys(this.boardsFromConnection),
+        host: this.clientSettings.host,
         syncNamespace: this.clientSettings.syncNamespace,
         updateBoardMethod: this.exportBoardHandler
       }
@@ -1069,6 +1070,7 @@ export default {
         tokens: [{ label: '<Connection token>', credentions: { username: this.clientSettings.username }, accessable: this.canShareByClientToken }],
         hasRemote: false,
         isRemote: true,
+        host: this.clientSettings.host,
         syncNamespace: this.clientSettings.syncNamespace,
         updateBoardMethod: this.exportBoardHandler
       }

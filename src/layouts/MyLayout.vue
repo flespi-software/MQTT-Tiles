@@ -228,6 +228,7 @@ export default {
         data = shareData
       }
       this.$q.sessionStorage.set('mqtt-tiles-share', data)
+      if (data.host) { client.host = data.host }
       client.username = data.token
       client.syncNamespace = data.topic
       client.syncToRetain = true

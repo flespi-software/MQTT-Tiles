@@ -69,7 +69,7 @@
       <q-toolbar class="bg-grey-9 text-white">
         <q-btn flat dense class="q-mr-sm absolute" @click="closeHandler">Close</q-btn>
         <q-toolbar-title></q-toolbar-title>
-        <q-btn flat v-if="currentStep !== steps[0].value && !updateBoardError" @click="prevStepHandler">Back</q-btn>
+        <q-btn flat v-if="steps.length && currentStep !== steps[0].value && !updateBoardError" @click="prevStepHandler">Back</q-btn>
         <q-btn flat class="q-ml-sm" v-if="!updateBoardError" @click="nextStepHandler" :disable="!isValidStep">{{ currentStep === 'link' ? 'Done' : 'Next' }}</q-btn>
       </q-toolbar>
     </div>
@@ -86,7 +86,7 @@ export default {
   name: 'ShareWizard',
   props: ['value', 'config'],
   /*
-    config = { tokens: Array, hasRemote: Boolean, boardId: String, syncNamespace: String, isRemote: Boolean, currentRemoteBoards: Array }
+    config = { tokens: Array, hasRemote: Boolean, boardId: String, syncNamespace: String, host: String, isRemote: Boolean, currentRemoteBoards: Array }
   */
   data () {
     return {
@@ -107,7 +107,8 @@ export default {
       currentConfig: cloneDeep(this.config),
       steps: [],
       updatedBoardFlag: undefined,
-      updateBoardError: undefined
+      updateBoardError: undefined,
+      region: null
     }
   },
   computed: {
@@ -136,25 +137,41 @@ export default {
   created () {
     const steps = {}
     let stepIndex = 0
-    if (this.config.tokens.length > 1) {
-      steps[stepIndex] = { label: 'Token', value: this.stepsConst.STEP_TOKEN }
-      this.currentStep = this.stepsConst.STEP_TOKEN
-      stepIndex++
-    } else {
-      this.setToken(this.config.tokens[0])
-    }
-    if (this.config.hasRemote) {
-      steps[stepIndex] = { label: 'Replace', value: this.stepsConst.STEP_REPLACE }
-      if (!this.currentStep) { this.currentStep = this.stepsConst.STEP_REPLACE }
-      stepIndex++
-    } else {
-      this.setboardId(this.config.boardId, this.config.boardId)
-    }
-    steps[stepIndex] = { label: 'Link', value: this.stepsConst.STEP_LINK }
-    if (!this.currentStep) { this.currentStep = this.stepsConst.STEP_LINK }
-    this.steps = steps
+    this.getRegionByHost(this.config.host)
+      .then(() => {
+        if (this.config.tokens.length > 1) {
+          steps[stepIndex] = { label: 'Token', value: this.stepsConst.STEP_TOKEN }
+          this.currentStep = this.stepsConst.STEP_TOKEN
+          stepIndex++
+        } else {
+          this.setToken(this.config.tokens[0])
+        }
+        if (this.config.hasRemote) {
+          steps[stepIndex] = { label: 'Replace', value: this.stepsConst.STEP_REPLACE }
+          if (!this.currentStep) { this.currentStep = this.stepsConst.STEP_REPLACE }
+          stepIndex++
+        } else {
+          this.setboardId(this.config.boardId, this.config.boardId)
+        }
+        steps[stepIndex] = { label: 'Link', value: this.stepsConst.STEP_LINK }
+        if (!this.currentStep) { this.currentStep = this.stepsConst.STEP_LINK }
+        this.steps = steps
+      })
   },
   methods: {
+    getRegionByHost (host) {
+      return fetch('https://flespi.io/auth/regions', {
+        mode: 'cors'
+      }).then(response => response.json())
+        .then((data) => {
+          this.region = data.result.reduce((region, cregion) => {
+            if (`wss://${cregion['mqtt-ws']}`.indexOf(host) === 0) {
+              region = cregion
+            }
+            return region
+          }, null)
+        })
+    },
     closeHandler () {
       this.link = ''
       this.shareBoardModel = {}
@@ -180,7 +197,11 @@ export default {
     validateCurrentStep () {
       switch (this.currentStep) {
         case 'tokens': {
-          return this.validateToken(this.shareBoardModel.token)
+          const isTokenValid = this.validateToken(this.shareBoardModel.token)
+          if (isTokenValid && this.shareBoardModel.boardId) {
+            this.generateLink()
+          }
+          return isTokenValid
         }
         case 'replace': {
           return this.setboardId(this.shareBoardModel.boardId, this.config.boardId)
@@ -197,7 +218,7 @@ export default {
       const flespiToken = token.credentions.username.indexOf('FlespiToken ') === 0
         ? token.credentions.username
         : `FlespiToken ${token.credentions.username}`
-      return fetch('https://flespi.io/auth/info', {
+      return fetch(`${this.region.rest}/auth/info`, {
         mode: 'cors',
         headers: {
           Authorization: flespiToken
@@ -243,10 +264,15 @@ export default {
       return resp
     },
     generateLink () {
-      const token = get(this.shareBoardModel, 'token.credentions.username', ''),
-        topic = this.config.syncNamespace,
-        shareObj = { token, topic, boardId: this.shareBoardModel.boardId },
-        link = `${window.location.href}${Base64.encode(JSON.stringify(shareObj))}`
+      const token = get(this.shareBoardModel, 'token.credentions.username', '')
+      if (!token) { return }
+      const topic = this.config.syncNamespace,
+        host = this.config.host,
+        shareObj = { token, topic, boardId: this.shareBoardModel.boardId }
+      if (host.indexOf('wss://mqtt.flespi.io') !== 0) {
+        shareObj.host = host
+      }
+      const link = `${window.location.href}${Base64.encode(JSON.stringify(shareObj))}`
       this.link = link
     },
     copyLink () {
