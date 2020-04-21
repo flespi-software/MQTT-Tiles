@@ -16,7 +16,7 @@ const timeFormat = (value) => {
   const minutes = Math.floor(value / 60000)
   value = value % 60000
   const seconds = Math.floor(value / 1000)
-  return (days ? days + ' days ' : '') + (hours ? hours + ' hours ' : '') + (minutes ? minutes + ' minutes ' : '') + (seconds ? seconds + ' seconds ' : '')
+  return (days ? days + ' days ' : '') + (hours ? hours + ' hours ' : '') + (minutes ? minutes + ' minutes ' : '') + (seconds || (!days && !hours && !minutes && !seconds) ? seconds + ' seconds ' : '')
 }
 const math = create(all)
 math.import({
