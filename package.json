@@ -1,6 +1,6 @@
 {
   "name": "mqtttiles",
-  "version": "1.9.3",
+  "version": "1.10.0",
   "description": "MQTT-based IoT dashboard visualization tool",
   "productName": "MQTT Tiles",
   "cordovaId": "org.cordova.quasar.app",
@@ -16,6 +16,7 @@
     "@radial-color-picker/vue-color-picker": "^2.3.0",
     "canvas-gauges": "^2.1.5",
     "compare-versions": "^3.6.0",
+    "flespi-io-js": "git+https://github.com/flespi-software/flespi-io-js.git",
     "js-base64": "^2.5.2",
     "lodash": "^4.17.15",
     "mathjs": "^6.6.1",
@@ -30,7 +31,7 @@
     "xss": "^1.0.6"
   },
   "devDependencies": {
-    "@quasar/app": "^1.6.0",
+    "@quasar/app": "^1.8.8",
     "@vue/eslint-config-standard": "^5.1.2",
     "babel-eslint": "^10.1.0",
     "eslint": "^6.8.0",
