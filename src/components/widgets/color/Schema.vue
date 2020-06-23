@@ -12,13 +12,13 @@
         />
       </div>
       <div class="col-12 q-mb-sm">
-        <q-select outlined hide-bottom-space color="grey-9" v-model="currentSettings.format" label="Format" :options="formatOptions" emit-value map-options/>
+        <q-select dense outlined hide-bottom-space color="grey-9" v-model="currentSettings.format" label="Format" :options="formatOptions" emit-value map-options/>
       </div>
       <div class="col-12 q-mb-sm">
-        <q-input outlined hide-bottom-space :error="!isValueTemplateValide" :hint="valueTemplateHelper" type="textarea" color="grey-9" v-model="currentSettings.valueTemplate" label="Value template"/>
+        <q-input outlined dense hide-bottom-space :error="!isValueTemplateValide" :hint="valueTemplateHelper" type="textarea" color="grey-9" v-model="currentSettings.valueTemplate" label="Value template"/>
       </div>
       <div class="col-12 q-mb-sm" v-if="widget.dataTopics[0] && widget.dataTopics[0].payloadType">
-        <q-input outlined hide-bottom-space type="textarea" input-style="resize: none;" color="grey-9" hint="You can set publish template. %value% is variable of your color." v-model="currentSettings.publishTemplate" label="Publish template"/>
+        <q-input outlined hide-bottom-space dense type="textarea" input-style="resize: none;" color="grey-9" hint="You can set publish template. %value% is variable of your color." v-model="currentSettings.publishTemplate" label="Publish template"/>
       </div>
       <q-toggle class="q-mt-sm col-12" color="grey-9" v-model="currentSettings.save" label="Save last status on server (retained message)"/>
       <q-toggle class="q-mt-sm col-12" color="grey-9" v-model="currentSettings.isNeedTime" label="Show last update time"/>

@@ -9,7 +9,7 @@
       <div :style="{ height: $q.platform.is.mobile ? 'calc(100% - 100px)' : '50vh' }" class="q-pa-md scroll bg-white">
         <div class="row">
           <q-input
-            outlined hide-bottom-space
+            outlined hide-bottom-space dense
             class="col-12 q-mb-sm"
             autofocus
             v-model="currentSettings.name"
@@ -18,7 +18,7 @@
           />
           <q-input
             class="col-12 q-mb-sm"
-            outlined hide-bottom-space
+            outlined hide-bottom-space dense
             v-model="currentSettings.id"
             color="grey-9"
             :error="!currentSettings.id || !!currentSettings.id.match(/[/+#\s]/g) || (boards[currentSettings.id] && settings && settings.id !== currentSettings.id)"
@@ -51,53 +51,64 @@
                   </q-item-section>
                 </template>
                 <div class="row q-pa-sm">
-                  <q-input outlined hide-bottom-space class="col-12 q-my-sm" color="grey-9" v-model="variable.name" label="Name" :error="!variable.name"/>
-                  <q-select outlined hide-bottom-space class="col-12 q-mb-sm" :value="variable.type" emit-value map-options :options="variableTypeOptions" color="grey-9" @input="(value) => changeTypeVariableHandler(index, value)" label="Type"/>
-                  <topic class="col-12 q-mb-sm" v-model="variable.topic" v-if="variable.type === VARIABLE_TYPE_SOURCE" :config="{ needLabel: true }"/>
-                  <div v-if="variable.type === VARIABLE_TYPE_SOURCE">
-                    Sort variables by:
-                    <q-btn-toggle
-                      v-model="variable.sortVarsBy"
-                      :options="[{label: 'value', value: SORT_VARS_BY_VALUE}, {label: 'label', value: SORT_VARS_BY_LABEL}]"
-                      rounded toggle-text-color="grey-9" text-color="grey-6" flat color="grey-9"
-                    />
-                  </div>
-                  <template v-if="variable.type === VARIABLE_TYPE_CUSTOM">
-                    <div class="variable__items-wrapper col-12 relative-position q-mt-sm">
-                      <q-list bordered>
-                        <q-btn color="grey-9" style="top: -20px; right: 8px; position: absolute; z-index: 1130;" class="col-12" fab-mini @click="addVarItem(variable)" icon="mdi-plus"/>
-                        <q-item-label class="q-py-md q-px-sm" :class="{'text-red-6': !variable.values.length}">Items{{variable.values.length ? '' : ' are empty'}}</q-item-label>
-                        <q-expansion-item
-                          v-for="(item, index) in variable.values"
-                          :key="`${index}`"
-                          group="singleselect-items"
-                          :header-class="[`bg-${item[1].indexOf('#') === -1 ? 'grey-4' : 'red-2'}`]"
-                          expand-icon="mdi-settings"
-                          default-opened
-                        >
-                          <template slot="header">
-                            <q-item-section avatar>
-                              <div>
-                                <q-btn :disabled="index === 0" round dense flat class="col-1" @click.stop="upVarItem(variable, index)" icon="mdi-arrow-up"/>
-                                <q-btn :disabled="index === (variable.values.length - 1)" round dense flat class="col-1" @click.stop="downVarItem(variable, index)" icon="mdi-arrow-down"/>
-                              </div>
-                            </q-item-section>
-                            <q-item-section>{{item[0] ? `${item[0]} [${item[1]}]` : item[1] || `item ${index + 1}`}}</q-item-section>
-                            <q-item-section side>
-                              <q-btn flat color="red-6" round dense @click="removeVarItem(variable, index)" icon="mdi-delete"/>
-                            </q-item-section>
-                          </template>
-                          <div class="row q-pa-sm">
-                            <div class="col-6">
-                              <q-input autofocus outlined hide-bottom-space class="q-mr-xs" color="grey-9" v-model="item[0]" label="Label"/>
-                            </div>
-                            <div class="col-6">
-                              <q-input outlined hide-bottom-space class="q-ml-xs" color="grey-9" v-model="item[1]" label="Value" :error="item[1].indexOf('#') !== -1"/>
-                            </div>
-                          </div>
-                        </q-expansion-item>
-                      </q-list>
+                  <q-input outlined hide-bottom-space dense class="col-12 q-my-sm" color="grey-9" v-model="variable.name" label="Name" :error="!variable.name"/>
+                  <q-select
+                    v-if="$flespiMode"
+                    v-model="variable.preset"
+                    emit-value map-options outlined dense hide-bottom-space
+                    color="grey-9" class="col-12 q-my-sm"
+                    :options="variablesPresets"
+                    label="Presets"
+                    @input="(value) => { setPresetByIndex(index, value) }"
+                  ></q-select>
+                  <template name="customSettingsVars" v-if="variable.preset === 'custom' || variable.preset === undefined || !$flespiMode">
+                    <q-select outlined dense hide-bottom-space class="col-12 q-mb-sm" :value="variable.type" emit-value map-options :options="variableTypeOptions" color="grey-9" @input="(value) => changeTypeVariableHandler(index, value)" label="Type"/>
+                    <topic class="col-12 q-mb-sm" v-model="variable.topic" v-if="variable.type === VARIABLE_TYPE_SOURCE" :config="{ needLabel: true }"/>
+                    <div v-if="variable.type === VARIABLE_TYPE_SOURCE">
+                      Sort variables by:
+                      <q-btn-toggle
+                        v-model="variable.sortVarsBy"
+                        :options="[{label: 'value', value: SORT_VARS_BY_VALUE}, {label: 'label', value: SORT_VARS_BY_LABEL}]"
+                        rounded toggle-text-color="grey-9" text-color="grey-6" flat color="grey-9"
+                      />
                     </div>
+                    <template v-if="variable.type === VARIABLE_TYPE_CUSTOM">
+                      <div class="variable__items-wrapper col-12 relative-position q-mt-md">
+                        <q-list bordered>
+                          <q-btn color="grey-9" style="top: -20px; right: 8px; position: absolute; z-index: 1130;" class="col-12" fab-mini @click="addVarItem(variable)" icon="mdi-plus"/>
+                          <q-item-label class="q-py-md q-px-sm" :class="{'text-red-6': !variable.values.length}">Items{{variable.values.length ? '' : ' are empty'}}</q-item-label>
+                          <q-expansion-item
+                            v-for="(item, index) in variable.values"
+                            :key="`${index}`"
+                            group="singleselect-items"
+                            :header-class="[`bg-${item[1].indexOf('#') === -1 ? 'grey-4' : 'red-2'}`]"
+                            expand-icon="mdi-settings"
+                            default-opened
+                          >
+                            <template slot="header">
+                              <q-item-section avatar>
+                                <div>
+                                  <q-btn :disabled="index === 0" round dense flat class="col-1" @click.stop="upVarItem(variable, index)" icon="mdi-arrow-up"/>
+                                  <q-btn :disabled="index === (variable.values.length - 1)" round dense flat class="col-1" @click.stop="downVarItem(variable, index)" icon="mdi-arrow-down"/>
+                                </div>
+                              </q-item-section>
+                              <q-item-section>{{item[0] ? `${item[0]} [${item[1]}]` : item[1] || `item ${index + 1}`}}</q-item-section>
+                              <q-item-section side>
+                                <q-btn flat color="red-6" round dense @click="removeVarItem(variable, index)" icon="mdi-delete"/>
+                              </q-item-section>
+                            </template>
+                            <div class="row q-pa-sm">
+                              <div class="col-6">
+                                <q-input autofocus dense outlined hide-bottom-space class="q-mr-xs" color="grey-9" v-model="item[0]" label="Label"/>
+                              </div>
+                              <div class="col-6">
+                                <q-input outlined dense hide-bottom-space class="q-ml-xs" color="grey-9" v-model="item[1]" label="Value" :error="item[1].indexOf('#') !== -1"/>
+                              </div>
+                            </div>
+                          </q-expansion-item>
+                        </q-list>
+                      </div>
+                    </template>
                   </template>
                 </div>
               </q-expansion-item>
@@ -119,6 +130,7 @@
 import merge from 'lodash/merge'
 import { uid } from 'quasar'
 import Topic from './widgets/Topic'
+import variblesShemasByPresets from '../constants/variablesPresets'
 const VARIABLE_TYPE_CUSTOM = 0,
   VARIABLE_TYPE_SOURCE = 1,
   SORT_VARS_BY_VALUE = 0,
@@ -159,6 +171,8 @@ export default {
         if (variable.sortVarsBy === undefined) {
           variable.sortVarsBy = 0
         }
+        /* 16.06.20 */
+        if (!variable.preset) { variable.preset = 'custom' }
       })
       /* end */
     } else {
@@ -170,6 +184,7 @@ export default {
       defaultTopic,
       defaultVariable: {
         name: 'name',
+        preset: 'custom',
         type: VARIABLE_TYPE_CUSTOM,
         topic: defaultTopic,
         sortVarsBy: SORT_VARS_BY_VALUE,
@@ -182,6 +197,12 @@ export default {
       variableTypeOptions: [
         { label: 'Custom', value: VARIABLE_TYPE_CUSTOM },
         { label: 'Source', value: VARIABLE_TYPE_SOURCE }
+      ],
+      variablesPresets: [
+        { label: 'Devices', value: 'devices' },
+        { label: 'Channels', value: 'channels' },
+        { label: 'Calcs', value: 'calcs' },
+        { label: 'Custom', value: 'custom' }
       ]
     }
   },
@@ -216,7 +237,7 @@ export default {
       this.$emit('hide')
     },
     addVar () {
-      this.currentSettings.settings.variables.push(Object.assign({}, this.defaultVariable))
+      this.currentSettings.settings.variables.push(Object.assign({}, this.$flespiMode ? variblesShemasByPresets.devices : this.defaultVariable))
     },
     removeVar (index) {
       this.$delete(this.currentSettings.settings.variables, index)
@@ -229,6 +250,10 @@ export default {
         variable.values = []
       }
       this.$set(variable, 'type', type)
+    },
+    setPresetByIndex (index, preset) {
+      const schema = variblesShemasByPresets[preset]
+      this.$set(this.currentSettings.settings.variables, index, schema)
     },
     checkUniqueVariables (index) {
       const variable = this.currentSettings.settings.variables[index],

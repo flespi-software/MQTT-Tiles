@@ -293,7 +293,7 @@ export default {
   },
   computed: {
     attachedBoards () {
-      return this.connectionSettings && this.connectionSettings.attachedBoards
+      return (this.connectionSettings && this.connectionSettings.attachedBoards) || []
     },
     boardsKeys () {
       return Object.keys(this.boards)

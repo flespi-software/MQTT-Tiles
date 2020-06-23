@@ -3,7 +3,7 @@
     <div class="text-grey-6 text-center q-mt-md" style="font-size: 1.3rem;">{{descriptions[currentSettings.mode]}}</div>
     <div class="row">
       <q-btn-toggle class='q-mt-md col-12' rounded toggle-text-color="grey-9" text-color="grey-6" flat v-model="currentSettings.mode" :options="modeOptions"/>
-      <q-input outlined hide-bottom-space class="col-12" v-if="currentSettings.mode === IFRAME_MODE_INTEGRATION" color="grey-9" v-model="currentSettings.link" label="Iframe link"/>
+      <q-input outlined dense hide-bottom-space class="col-12" v-if="currentSettings.mode === IFRAME_MODE_INTEGRATION" color="grey-9" v-model="currentSettings.link" label="Iframe link"/>
       <div class="frame__items-wrapper col-12 relative-position q-mb-sm q-mt-lg" v-if="currentSettings.mode === IFRAME_MODE_INTEGRATION">
         <q-list bordered>
           <q-btn color="grey-9" style="top: -20px; right: 8px; position: absolute; z-index: 1130;" class="col-12" fab-mini @click="addItem" icon="mdi-plus"/>
@@ -23,9 +23,9 @@
               </q-item-section>
             </template>
             <div class="row q-pa-sm">
-              <q-input outlined hide-bottom-space class="col-12 q-mb-sm" color="grey-9" v-model="item.label" label="Label"/>
+              <q-input outlined dense hide-bottom-space class="col-12 q-mb-sm" color="grey-9" v-model="item.label" label="Label"/>
               <topic class="col-12 q-mb-sm" v-model="item.topic" :label="item.label" @input="setTopics" :board="board"/>
-              <q-input outlined hide-bottom-space class="col-12" type="textarea" color="grey-9" v-model="item.template" label="Payload template" input-style="resize: none;"/>
+              <q-input outlined dense hide-bottom-space class="col-12" type="textarea" color="grey-9" v-model="item.template" label="Payload template" input-style="resize: none;"/>
               <div class="col-12 text-grey-6" style="font-size: .8rem">
                 You can use variables in template: <span class="text-grey-10 cursor-pointer" @click="item.template += '<{topic}>'">&lt;{topic}&gt;</span> is a topic from payload packet, <span class="text-grey-10 cursor-pointer" @click="item.template += '<{payload}>'">&lt;{payload}&gt;</span> is a stringified payload of packet, <span class="text-grey-8">&lt;%payload.name%&gt;</span> is a JSON path to value in payload, if payload is object.
               </div>

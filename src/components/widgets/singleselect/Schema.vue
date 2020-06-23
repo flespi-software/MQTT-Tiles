@@ -31,16 +31,16 @@
             </template>
             <div class="row q-pa-sm">
               <div class="col-6 q-mb-sm">
-                <q-input outlined hide-bottom-space autofocus class="q-mr-xs" color="grey-9" v-model="item.label" label="Label"/>
+                <q-input outlined dense hide-bottom-space autofocus class="q-mr-xs" color="grey-9" v-model="item.label" label="Label"/>
               </div>
               <div class="col-6  q-mb-sm">
-                <q-input outlined hide-bottom-space class="q-ml-xs" color="grey-9" v-model="item.val" label="Value" :error="!checkUniqueValue(item.val, index)"/>
+                <q-input outlined dense hide-bottom-space class="q-ml-xs" color="grey-9" v-model="item.val" label="Value" :error="!checkUniqueValue(item.val, index)"/>
               </div>
               <div v-if="currentSettings.mode === 1" class="col-6">
-                <q-input outlined hide-bottom-space class="q-mr-xs" color="grey-9" v-model="item.actionTopic" label="Action topic" :error="!item.actionTopic"/>
+                <q-input outlined dense hide-bottom-space class="q-mr-xs" color="grey-9" v-model="item.actionTopic" label="Action topic" :error="!item.actionTopic"/>
               </div>
               <div v-if="currentSettings.mode === 1" class="col-6">
-                <q-input outlined hide-bottom-space class="q-ml-xs" color="grey-9" v-model="item.actionPayload" label="Action payload"/>
+                <q-input outlined dense hide-bottom-space class="q-ml-xs" color="grey-9" v-model="item.actionPayload" label="Action payload"/>
               </div>
               <variables-helper class="col-12" v-if="board.settings.variables && board.settings.variables.length" :variables="board.settings.variables" @add="(variable) => item.actionTopic += variable"/>
             </div>

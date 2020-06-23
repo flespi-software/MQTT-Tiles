@@ -9,7 +9,7 @@
         <div class="text-grey-6">{{message}}</div>
         <div class="text-grey-6">
           <q-checkbox v-model="isNeedCopy" color="grey-9" label="Rename to save a copy"/>
-          <q-input outlined hide-bottom-space color="grey-9" v-model="nameModel" :disable="!isNeedCopy" label="Name" :error="isNeedCopy && oldName === name"/>
+          <q-input outlined dense hide-bottom-space color="grey-9" v-model="nameModel" :disable="!isNeedCopy" label="Name" :error="isNeedCopy && oldName === name"/>
         </div>
       </div>
       <div class="flex justify-end q-mt-md q-pa-sm">

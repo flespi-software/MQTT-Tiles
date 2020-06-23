@@ -13,10 +13,10 @@
           {{path}}
         </div>
       </div>
-      <q-input outlined hide-bottom-space v-model="currentSettings.nameField" v-if="widget.dataTopics[0] && widget.dataTopics[0].payloadType === 1" label="Widget`s name field" class="col-12 q-mb-sm" color="grey-9"/>
-      <q-input outlined hide-bottom-space v-model="currentSettings.math" label="Multiplied widget render logic" class="col-12 q-mb-sm" color="grey-9" hint="You can use math logic to define what values to show in the widget. Example: `%value% > 1000` or `<%jsons-some-field%> != nill`, where %value% is a payload and <%jsons-some-field%> is a JSON field from your subscription."/>
+      <q-input outlined dense hide-bottom-space v-model="currentSettings.nameField" v-if="widget.dataTopics[0] && widget.dataTopics[0].payloadType === 1" label="Widget`s name field" class="col-12 q-mb-sm" color="grey-9"/>
+      <q-input outlined dense hide-bottom-space v-model="currentSettings.math" label="Multiplied widget render logic" class="col-12 q-mb-sm" color="grey-9" hint="You can use math logic to define what values to show in the widget. Example: `%value% > 1000` or `<%jsons-some-field%> != nill`, where %value% is a payload and <%jsons-some-field%> is a JSON field from your subscription."/>
       <div class="q-mb-sm col-12">
-        <q-select outlined hide-bottom-space color="grey-9" v-model="currentSettings.type" :options="typeOptions" @input="currentSettings.widgetSettings = {}" emit-value map-options label="Widget multiplier type" />
+        <q-select outlined dense hide-bottom-space color="grey-9" v-model="currentSettings.type" :options="typeOptions" @input="currentSettings.widgetSettings = {}" emit-value map-options label="Widget multiplier type" />
       </div>
       <div class="color-palette q-pa-sm rounded-borders q-mb-lg col-12">
         <div class="text-grey-9 q-pb-sm color-palette__label">Widgets color</div>

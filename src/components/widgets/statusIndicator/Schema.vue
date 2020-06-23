@@ -2,11 +2,11 @@
   <div>
     <div class="row">
       <div class="col-xs-12 q-mb-sm">
-        <q-input outlined hide-bottom-space class="q-mr-xs icon-input" color="grey-9" v-model="currentSettings.defaultIcon" label="Default icon" :error="!currentSettings.defaultIcon">
+        <q-input outlined dense hide-bottom-space class="q-mr-xs icon-input" color="grey-9" v-model="currentSettings.defaultIcon" label="Default icon" :error="!currentSettings.defaultIcon">
           <q-icon slot="after" :name="`mdi-${currentSettings.defaultIcon}`" size="1.5rem" style="position: absolute; right: 0; bottom : 7px;"/>
         </q-input>
       </div>
-      <q-input outlined hide-bottom-space class="col-12" color="grey-9" v-model="currentSettings.math" label="Math expression" placeholder="%value%"/>
+      <q-input outlined dense hide-bottom-space class="col-12" color="grey-9" v-model="currentSettings.math" label="Math expression" placeholder="%value%"/>
       <div class="text-grey-9" style="font-size: .8rem;">You can use math expressions to calculate the final value. Example: (%value% * 1000) / 1024, where %value% is the payload from your subscription.</div>
       <div class="status-indicator__items-wrapper col-12 relative-position q-mb-sm q-mt-lg">
         <q-list bordered>
@@ -37,13 +37,13 @@
                 Default item. Used if there is no data in the source or data doesn't match the specified items.
               </div>
               <div :class="[`col-${item.default ? '12' : '6'}`]" class="q-mb-sm">
-                <q-input outlined hide-bottom-space autofocus class="q-mr-xs" color="grey-9" v-model="item.label" label="Label"/>
+                <q-input outlined dense hide-bottom-space autofocus class="q-mr-xs" color="grey-9" v-model="item.label" label="Label"/>
               </div>
               <div class="col-6" v-if="!item.default">
-                <q-input outlined hide-bottom-space class="q-ml-xs" color="grey-9" v-model="item.val" label="Value" :error="!checkUniqueItem(item, index)"/>
+                <q-input outlined dense hide-bottom-space class="q-ml-xs" color="grey-9" v-model="item.val" label="Value" :error="!checkUniqueItem(item, index)"/>
               </div>
               <div class="col-10 q-mb-sm">
-                <q-input outlined hide-bottom-space class="q-mr-xs icon-input" :style="{color: item.color}" color="grey-9" v-model="item.icon" label="Icon">
+                <q-input outlined dense hide-bottom-space class="q-mr-xs icon-input" :style="{color: item.color}" color="grey-9" v-model="item.icon" label="Icon">
                   <q-icon slot="append" :name="`mdi-${item.icon || currentSettings.defaultIcon}`" size="1.5rem" :style="{color: item.color}"/>
                 </q-input>
               </div>
@@ -60,19 +60,19 @@
               <div class="col-12 text-grey-6 q-mt-sm" style="font-size: .8rem;" v-if="item.default">
                 You can find more icons on <a href="https://materialdesignicons.com/" target="blank">MDI</a>
               </div>
-              <q-input outlined hide-bottom-space class="col-12" color="grey-9" v-model="item.math" label="Math expression" placeholder="%value%" v-if="!item.default" :error="!checkUniqueItem(item, index)"/>
+              <q-input outlined dense hide-bottom-space class="col-12" color="grey-9" v-model="item.math" label="Math expression" placeholder="%value%" v-if="!item.default" :error="!checkUniqueItem(item, index)"/>
               <div class="text-grey-9" v-if="!item.default" style="font-size: .8rem;">You can use math expressions to calculate the final value. Example: (%value% * 1000) / 1024, where %value% is the payload from your subscription.</div>
               <div v-if="currentSettings.mode === 1" class="col-6">
-                <q-input outlined hide-bottom-space class="q-mr-xs" color="grey-9" v-model="item.actionTopic" label="Action topic" :error="!item.actionTopic"/>
+                <q-input outlined dense hide-bottom-space class="q-mr-xs" color="grey-9" v-model="item.actionTopic" label="Action topic" :error="!item.actionTopic"/>
               </div>
               <div v-if="currentSettings.mode === 1" class="col-6">
-                <q-input outlined hide-bottom-space class="q-ml-xs" color="grey-9" v-model="item.actionPayload" label="Action payload"/>
+                <q-input outlined dense hide-bottom-space class="q-ml-xs" color="grey-9" v-model="item.actionPayload" label="Action payload"/>
               </div>
             </div>
           </q-expansion-item>
         </q-list>
       </div>
-      <q-input outlined hide-bottom-space class="col-12" color="grey-9" v-model.number="currentSettings.resetTimeout" type="number" label="Reset timeout, s"/>
+      <q-input outlined dense hide-bottom-space class="col-12" color="grey-9" v-model.number="currentSettings.resetTimeout" type="number" label="Reset timeout, s"/>
       <div class="q-mt-sm col-12">
         <q-toggle color="grey-9" v-model="currentSettings.isNeedTime" label="Show last update time"/>
       </div>

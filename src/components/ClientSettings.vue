@@ -7,21 +7,21 @@
         </q-toolbar-title>
       </q-toolbar>
       <div :style="{ height: $q.platform.is.mobile ? 'calc(100% - 100px)' : '50vh'}" class="q-pa-md scroll bg-white">
-        <q-input color="grey-9 q-mb-sm" outlined hide-bottom-space v-model="currentSettings.clientName" label="MQTT client name" :error="!currentSettings.clientName"/>
-        <q-input color="grey-9 q-mb-sm" outlined hide-bottom-space v-model="currentSettings.clientId" label="Client ID" :error="!currentSettings.clientId">
+        <q-input color="grey-9 q-mb-sm" outlined hide-bottom-space dense v-model="currentSettings.clientName" label="MQTT client name" :error="!currentSettings.clientName"/>
+        <q-input color="grey-9 q-mb-sm" outlined hide-bottom-space dense v-model="currentSettings.clientId" label="Client ID" :error="!currentSettings.clientId">
           <q-btn slot="append" flat dense icon="mdi-refresh" @click="currentSettings.clientId = `mqtt-tiles-${Math.random().toString(16).substr(2, 8)}`" />
         </q-input>
-        <q-input color="grey-9 q-mb-sm" outlined hide-bottom-space v-model="currentSettings.host" label="Host" :error="!currentSettings.host || (currentSettings.host.indexOf('ws:') === 0)">
+        <q-input color="grey-9 q-mb-sm" outlined hide-bottom-space dense v-model="currentSettings.host" label="Host" :error="!currentSettings.host || (currentSettings.host.indexOf('ws:') === 0)">
           <q-btn slot="append" flat dense icon="mdi-alert-outline" @click="hostErrorHandler" v-if="!currentSettings.host || (currentSettings.host.indexOf('ws:') === 0)"/>
         </q-input>
-        <q-input color="grey-9 q-mb-sm" outlined hide-bottom-space type="number" v-model.number="currentSettings.keepalive" label="Keep alive"/>
-        <q-select color="grey-9 q-mb-sm" outlined hide-bottom-space v-model="currentSettings.protocolVersion" emit-value map-options :options="[{label: '3.1.1', value: 4}, {label: '5.0', value: 5}]" label="Version of MQTT"/>
+        <q-input color="grey-9 q-mb-sm" outlined hide-bottom-space dense type="number" v-model.number="currentSettings.keepalive" label="Keep alive"/>
+        <q-select color="grey-9 q-mb-sm" outlined dense hide-bottom-space v-model="currentSettings.protocolVersion" emit-value map-options :options="[{label: '3.1.1', value: 4}, {label: '5.0', value: 5}]" label="Version of MQTT"/>
         <q-checkbox style="height: 56px" color="grey-9" class="q-mr-sm" v-model="currentSettings.clean" :label="currentSettings.protocolVersion === 5 ? 'Clean start' : 'Clean session'"/>
-        <q-input outlined hide-bottom-space color="grey-9 q-mb-sm" v-if="currentSettings.protocolVersion === 5" v-model.number="currentSettings.properties.sessionExpiryInterval" type="number" label="Session expiry interval" clearable/>
-        <q-input outlined hide-bottom-space color="grey-9 q-mb-sm" v-model="currentSettings.username" label="Username">
+        <q-input outlined hide-bottom-space dense color="grey-9 q-mb-sm" v-if="currentSettings.protocolVersion === 5" v-model.number="currentSettings.properties.sessionExpiryInterval" type="number" label="Session expiry interval" clearable/>
+        <q-input outlined hide-bottom-space dense color="grey-9 q-mb-sm" v-model="currentSettings.username" label="Username">
           <q-btn slot="append" flat dense icon="mdi-login" @click="flespiLoginHandler" v-if="currentSettings.host.indexOf('flespi') !== -1" />
         </q-input>
-        <q-input color="grey-9 q-mb-sm" outlined hide-bottom-space v-model="currentSettings.password" label="Password"/>
+        <q-input color="grey-9 q-mb-sm" outlined hide-bottom-space dense v-model="currentSettings.password" label="Password"/>
         <q-expansion-item v-if="currentSettings.protocolVersion === 5" class="q-mt-md q-mb-sm bg-grey-4" label="Subscribe User Properties">
           <div>
             <q-list v-if="currentSettings.userProperties">
@@ -30,8 +30,8 @@
                 <span>{{`${name}: ${value}`}}</span>
               </q-item>
             </q-list>
-            <q-input color="grey-9 q-ma-sm" outlined hide-bottom-space v-model="userProperty.name" label="User property name"/>
-            <q-input color="grey-9 q-mx-sm q-mb-sm" outlined hide-bottom-space v-model="userProperty.value" label="User property value"/>
+            <q-input color="grey-9 q-ma-sm" outlined dense hide-bottom-space v-model="userProperty.name" label="User property name"/>
+            <q-input color="grey-9 q-mx-sm q-mb-sm" outlined dense hide-bottom-space v-model="userProperty.value" label="User property value"/>
             <q-btn :disable="!userProperty.name || !userProperty.value" style="width: 100%" class="q-mt-sm" color="grey-9" @click="addUserProperty">Add</q-btn>
           </div>
         </q-expansion-item>
@@ -67,10 +67,10 @@
               </template>
               <div class="row">
                 <div class="col-12 q-my-sm q-px-sm">
-                  <q-input autofocus outlined hide-bottom-space color="grey-9" v-model="syncCreds.label" label="Label"/>
+                  <q-input autofocus outlined dense hide-bottom-space color="grey-9" v-model="syncCreds.label" label="Label"/>
                 </div>
                 <div class="col-12 q-mb-sm q-px-sm">
-                  <q-input outlined hide-bottom-space color="grey-9" v-model="syncCreds.credentions.username" label="Token" :error="!checkUniqueSyncCredsValue(syncCreds, index)"/>
+                  <q-input outlined hide-bottom-space dense color="grey-9" v-model="syncCreds.credentions.username" label="Token" :error="!checkUniqueSyncCredsValue(syncCreds, index)"/>
                 </div>
               </div>
             </q-expansion-item>

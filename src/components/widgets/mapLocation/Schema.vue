@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="row">
-      <q-input outlined hide-bottom-space v-if="integration" v-model="currentSettings.latField" label="Latitude`s field" class="col-12" color="grey-9"/>
+      <q-input outlined dense hide-bottom-space v-if="integration" v-model="currentSettings.latField" label="Latitude`s field" class="col-12" color="grey-9"/>
       <q-expansion-item
         v-else
         class="col-12 q-mt-sm"
@@ -11,12 +11,12 @@
         style="border: solid #e0e0e0 1px"
       >
         <div class="row">
-          <div class="col-12">
-            <topic v-model="latValue" label="Latitude value" :board="board"/>
+          <div class="col-12 q-pa-xs">
+            <topic v-model="latValue" label="Latitude value" :board="board" :config="{ needSelectors: true }"/>
           </div>
         </div>
       </q-expansion-item>
-      <q-input outlined hide-bottom-space v-if="integration" v-model="currentSettings.lonField" label="Longetude`s field" class="col-12" color="grey-9"/>
+      <q-input outlined dense hide-bottom-space v-if="integration" v-model="currentSettings.lonField" label="Longetude`s field" class="col-12" color="grey-9"/>
       <q-expansion-item
         v-else
         class="col-12 q-mt-sm"
@@ -26,8 +26,8 @@
         style="border: solid #e0e0e0 1px"
       >
         <div class="row">
-          <div class="col-12">
-            <topic v-model="lonValue" label="Longitude value" :board="board"/>
+          <div class="col-12 q-pa-xs">
+            <topic v-model="lonValue" label="Longitude value" :board="board" :config="{ needSelectors: true }"/>
           </div>
         </div>
       </q-expansion-item>

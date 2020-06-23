@@ -1,14 +1,14 @@
 <template>
-  <q-dialog v-model='status' @hide="closeHandler" no-esc-dismiss no-backdrop-dismiss>
-    <div :style="{ width: $q.platform.is.mobile ? 'calc(100% - 40px)' : '50vw' }" class="bg-white">
+  <q-dialog v-model='status' @hide="closeHandler" no-esc-dismiss no-backdrop-dismiss :maximized="$q.platform.is.mobile">
+    <div :style="{ width: $q.platform.is.mobile ? '100%' : '80vw' }" class="bg-white">
       <q-toolbar class="bg-grey-9 text-white">
         <q-toolbar-title>
           Widget
         </q-toolbar-title>
       </q-toolbar>
-      <div :style="{ height: $q.platform.is.mobile ? 'calc(100% - 100px)' : '50vh' }" class="scroll q-pa-md">
-        <q-input outlined hide-bottom-space color="grey-9 q-mb-sm" v-model.trim="currentSettings.name" label="Name"/>
-        <q-select outlined hide-bottom-space color="grey-9  q-mb-sm" @input="typeChangeHandler" :value="currentSettings.type" :options="typeOptions" emit-value map-options label="Type">
+      <div :style="{ maxHeight: $q.platform.is.mobile ? 'calc(100% - 100px)' : 'calc(100vh - 148px)' }" class="scroll q-pa-md">
+        <q-input outlined hide-bottom-space dense color="grey-9 q-mb-sm" v-model.trim="currentSettings.name" label="Name"/>
+        <q-select outlined dense hide-bottom-space color="grey-9  q-mb-sm" @input="typeChangeHandler" :value="currentSettings.type" :options="typeOptions" emit-value map-options label="Type">
           <template v-slot:option="scope">
           <q-item
             v-bind="scope.itemProps"
@@ -23,8 +23,8 @@
           </q-item>
         </template>
         </q-select>
-        <div class="color-palette q-pa-sm rounded-borders q-mb-lg">
-          <div class="text-grey-9 q-pb-sm color-palette__label">Color</div>
+        <div class="color-palette q-px-sm q-py-xs rounded-borders q-mb-lg">
+          <div class="text-grey-9 q-pb-xs q-ml-xs color-palette__label">Color</div>
           <div class="row color-palette__wrapper">
             <span
               v-for="color in colors"
@@ -61,7 +61,7 @@
                 <q-btn flat color="red-6" round dense @click="removeTopicHandler(index)" icon="mdi-delete"/>
               </q-item-section>
             </template>
-            <topic v-model="currentSettings.dataTopics[index]" :board="board" class="q-pa-sm"/>
+            <topic v-model="currentSettings.dataTopics[index]" :board="board" class="q-pa-sm" :config="{ needSelectors: true }"/>
           </q-expansion-item>
         </q-list>
         <component
@@ -86,20 +86,20 @@
   .color-palette
     border 1px solid $grey-5
     .color-palette__label
-      font-size .75rem
+      font-size .7rem
     .color-palette__wrapper
       .color-palette__item
         position relative
-        height 20px
-        width 20px
+        height 18px
+        width 18px
         padding 3px
         border-radius 50%
         .item__icon
           position absolute
           top 0
           left 0
-          height 20px
-          width 20px
+          height 17px
+          width 17px
 </style>
 
 <script>

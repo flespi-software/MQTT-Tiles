@@ -70,10 +70,10 @@
           </template>
           <div class="row q-pa-sm">
             <div class="col-6 q-mb-sm">
-              <q-input outlined hide-bottom-space autofocus class="q-mr-xs" color="grey-9" v-model="editedItem.label" label="Label"/>
+              <q-input outlined dense hide-bottom-space autofocus class="q-mr-xs" color="grey-9" v-model="editedItem.label" label="Label"/>
             </div>
             <div class="col-6 q-mb-sm">
-              <q-input outlined hide-bottom-space class="q-ml-xs" color="grey-9" v-model="editedItem.path" label="Path" placeholder="item[0].value"/>
+              <q-input outlined dense hide-bottom-space class="q-ml-xs" color="grey-9" v-model="editedItem.path" label="Path" placeholder="item[0].value"/>
             </div>
             <q-expansion-item
               v-if="editedItem.type === 'knob' || editedItem.type === 'progress'"
@@ -85,10 +85,10 @@
             >
               <div class="row q-pa-sm">
                 <div class="col-5 q-mb-sm">
-                  <q-select outlined hide-bottom-space color="grey-9" v-model="editedItem.minValueMode" label="Min value source" emit-value map-options :options="rangeValueModeOptions" @input="changeRangeValueTypeHandler(editedItem.index, 'min')"/>
+                  <q-select outlined dense hide-bottom-space color="grey-9" v-model="editedItem.minValueMode" label="Min value source" emit-value map-options :options="rangeValueModeOptions" @input="changeRangeValueTypeHandler(editedItem.index, 'min')"/>
                 </div>
                 <div class="col-12">
-                  <q-input outlined hide-bottom-space v-if="editedItem.minValueMode === 0" type="number" color="grey-9" v-model.number="editedItem.minValue" label="Min value"/>
+                  <q-input outlined dense hide-bottom-space v-if="editedItem.minValueMode === 0" type="number" color="grey-9" v-model.number="editedItem.minValue" label="Min value"/>
                   <topic v-else v-model="editedItem.minValue" label="Min value" :board="board"/>
                 </div>
               </div>
@@ -103,18 +103,18 @@
             >
               <div class="row q-pa-sm">
                 <div class="col-5 q-mb-sm">
-                  <q-select outlined hide-bottom-space color="grey-9" v-model="editedItem.maxValueMode" emit-value map-options label="Max value source" :options="rangeValueModeOptions" @input="changeRangeValueTypeHandler(editedItem.index, 'max')"/>
+                  <q-select outlined dense hide-bottom-space color="grey-9" v-model="editedItem.maxValueMode" emit-value map-options label="Max value source" :options="rangeValueModeOptions" @input="changeRangeValueTypeHandler(editedItem.index, 'max')"/>
                 </div>
                 <div class="col-12">
-                  <q-input outlined hide-bottom-space v-if="editedItem.maxValueMode === 0" type="number" color="grey-9" v-model.number="editedItem.maxValue" label="Max value"/>
+                  <q-input outlined dense hide-bottom-space v-if="editedItem.maxValueMode === 0" type="number" color="grey-9" v-model.number="editedItem.maxValue" label="Max value"/>
                   <topic v-else v-model="editedItem.maxValue" label="Max value" :board="board"/>
                 </div>
               </div>
             </q-expansion-item>
             <div v-if="editedItem.type === 'text'" class="row">
-              <q-input outlined hide-bottom-space class="col-8 q-mb-sm q-pr-xs" color="grey-9" v-model="editedItem.math" label="Math expression" placeholder="%value%"/>
-              <q-select outlined hide-bottom-space class="col-4 q-mb-sm" color="grey-9" v-model="editedItem.valueFormat" :options="formatOptions" emit-value map-options label="Format value as"/>
-              <q-input outlined hide-bottom-space class="col-12" color="grey-9" v-if="editedItem.valueFormat === constants.WIDGET_VALUE_FORMAT_DATE" v-model="editedItem.dateFormat" label="Datetime format" placeholder="DD/MM/YYYY HH:mm:ss.SSS"/>
+              <q-input outlined dense hide-bottom-space class="col-8 q-mb-sm q-pr-xs" color="grey-9" v-model="editedItem.math" label="Math expression" placeholder="%value%"/>
+              <q-select outlined dense hide-bottom-space class="col-4 q-mb-sm" color="grey-9" v-model="editedItem.valueFormat" :options="formatOptions" emit-value map-options label="Format value as"/>
+              <q-input outlined dense hide-bottom-space class="col-12" color="grey-9" v-if="editedItem.valueFormat === constants.WIDGET_VALUE_FORMAT_DATE" v-model="editedItem.dateFormat" label="Datetime format" placeholder="DD/MM/YYYY HH:mm:ss.SSS"/>
               <div class="text-grey-7 q-mt-xs" style="font-size: 12px; line-height: 1;">You can use math expressions to calculate the final value. Example: (%value% * 1000) / 1024, where %value% is the payload from your subscription.</div>
             </div>
           </div>

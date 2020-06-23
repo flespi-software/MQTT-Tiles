@@ -1,0 +1,181 @@
+{
+  "devices": {
+    "selectors": [
+      {
+        "name": "devices",
+        "getter": {
+          "name": "getDevices",
+          "params": []
+        },
+        "value": { "label": "all", "value": "+" }
+      }
+    ],
+    "children": {
+      "state": {
+        "topic": {
+          "topicPattern": "flespi/state/gw/devices/${devices}/${fields}",
+          "payloadType": "string"
+        },
+        "selectors": [
+          {
+            "name": "fields",
+            "list": [
+              { "label": "ID", "value": "id" },
+              { "label": "Name", "value": "name" },
+              { "label": "Device type ID", "value": "device_type_id" },
+              { "label": "Configuration", "value": "configuration" },
+              { "label": "Settings", "value": "settings" },
+              { "label": "Messages size", "value": "messages_size" },
+              { "label": "Messages TTL", "value": "messages_ttl" },
+              { "label": "Messages rotate", "value": "messages_rotate" },
+              { "label": "Blocked status", "value": "blocked" },
+              { "label": "Connected status", "value": "connected" },
+              { "label": "CID", "value": "cid" }
+            ],
+            "value": { "label": "all", "value": "+" }
+          }
+        ]
+      },
+      "messages": {
+        "topic": {
+          "topicPattern": "flespi/message/gw/devices/${devices}",
+          "payloadType": "JSON"
+        }
+      },
+      "intervals": {
+        "topic": {
+          "topicPattern": "flespi/interval/gw/calcs/${calcs}/devices/${devices}/${events}",
+          "payloadType": "JSON"
+        },
+        "selectors": [
+          {
+            "name": "calcs",
+            "getter": {
+              "name": "getCalcs",
+              "params": ["devices"]
+            },
+            "value": { "label": "all", "value": "+" }
+          },
+          {
+            "name": "events",
+            "list":  [
+              { "label": "Created", "value": "created" },
+              { "label": "Updated", "value": "updated" },
+              { "label": "Deleted", "value": "deleted" }
+            ],
+            "value": { "label": "all", "value": "+" }
+          }
+        ]
+      },
+      "logs": {
+        "topic": {
+          "topicPattern": "flespi/log/gw/devices/${devices}/${event type}",
+          "payloadType": "JSON"
+        },
+        "selectors": [
+          {
+            "name": "event type",
+            "list":  [
+              { "label": "Created", "value": "created" },
+              { "label": "Updated", "value": "updated" },
+              { "label": "Deleted", "value": "deleted" },
+              { "label": "Blocked", "value": "blocked" },
+              { "label": "Unblocked", "value": "unblocked" },
+              { "label": "Connected", "value": "connected" },
+              { "label": "Disconnected", "value": "disconnected" }
+            ],
+            "value": { "label": "all", "value": "+" }
+          }
+        ]
+      },
+      "telemetry": {
+        "topic": {
+          "topicPattern": "flespi/state/gw/devices/${devices}/telemetry/${parameters}",
+          "payloadType": "string"
+        },
+        "selectors": [
+          {
+            "name": "parameters",
+            "getter": {
+              "name": "getDevicesTelemetry",
+              "params": ["devices"]
+            },
+            "value": { "label": "all", "value": "+" }
+          }
+        ]
+      },
+      "settings": {
+        "topic": {
+          "topicPattern": "flespi/state/gw/devices/${devices}/settings/${name}",
+          "payloadType": "JSON"
+        },
+        "selectors": [
+          {
+            "name": "name",
+            "getter": {
+              "name": "getDevicesSettings",
+              "params": ["devices"]
+            },
+            "value": { "label": "all", "value": "+" }
+          }
+        ]
+      }
+    }
+  },
+  "analytics": {
+    "selectors": [
+      {
+        "name": "calcs",
+        "getter": {
+          "name": "getCalcs",
+          "params": ["devices"]
+        },
+        "value": { "label": "all", "value": "+" }
+      },
+      {
+        "name": "devices",
+        "getter": {
+          "name": "getDevices",
+          "params": ["calcs"]
+        },
+        "value": { "label": "all", "value": "+" }
+      }
+    ],
+    "children": {
+      "state": {
+        "topic": {
+          "topicPattern": "flespi/state/gw/calcs/${calcs}/devices/${devices}/${statuses}",
+          "payloadType": "JSON"
+        },
+        "selectors": [
+          {
+            "name": "statuses",
+            "list":  [
+              { "label": "Synchronization state", "value": "synced" },
+              { "label": "Last detected interval", "value": "last" },
+              { "label": "Currently active interval", "value": "active" }
+            ],
+            "value": { "label": "all", "value": "+" }
+          }
+        ]
+      },
+      "intervals": {
+        "topic": {
+          "topicPattern": "flespi/interval/gw/calcs/${calcs}/devices/${devices}/${events}",
+          "payloadType": "JSON"
+        },
+        "selectors": [
+          {
+            "name": "events",
+            "list":  [
+              { "label": "Created", "value": "created" },
+              { "label": "Updated", "value": "updated" },
+              { "label": "Deleted", "value": "deleted" }
+            ],
+            "value": { "label": "all", "value": "+" }
+          }
+        ]
+      }
+      }
+    }
+}

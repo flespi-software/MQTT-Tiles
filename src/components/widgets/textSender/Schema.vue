@@ -3,7 +3,7 @@
     <div class="row">
       <q-toggle class="q-mt-sm" color="grey-9" v-model="currentSettings.save" label="Save last status on server (retained message)"/>
       <div class="col-12 q-mt-sm">
-        <q-input outlined hide-bottom-space class="q-mr-sm" color="grey-9" label="Topic" v-model="currentSettings.topics[0].topicTemplate" @input="currentSettings.topics[0].topicFilter = currentSettings.topics[0].topicTemplate"/>
+        <q-input dense outlined hide-bottom-space class="q-mr-sm" color="grey-9" label="Topic" v-model="currentSettings.topics[0].topicTemplate" @input="currentSettings.topics[0].topicFilter = currentSettings.topics[0].topicTemplate"/>
         <variables-helper v-if="board.settings.variables && board.settings.variables.length" :variables="board.settings.variables" @add="(variable) => currentSettings.topics[0].topicFilter += variable"/>
       </div>
       <div class="q-mt-sm col-12">

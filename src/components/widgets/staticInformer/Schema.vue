@@ -2,10 +2,10 @@
   <div>
     <div class="row">
       <div class="col-xs-12 q-mb-sm">
-        <q-select outlined hide-bottom-space color="grey-9" v-model="currentSettings.valueFormat" :options="formatOptions" emit-value map-options label="Format value as"/>
+        <q-select outlined dense hide-bottom-space color="grey-9" v-model="currentSettings.valueFormat" :options="formatOptions" emit-value map-options label="Format value as"/>
       </div>
       <div class="col-xs-12">
-        <q-input outlined hide-bottom-space color="grey-9" :max-height="300" type="textarea" v-model="currentSettings.text" label="Text" input-style="resize: none;"/>
+        <q-input outlined dense hide-bottom-space color="grey-9" :max-height="300" type="textarea" v-model="currentSettings.text" label="Text" input-style="resize: none;"/>
       </div>
     </div>
   </div>

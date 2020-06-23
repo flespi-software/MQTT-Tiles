@@ -10,7 +10,7 @@
         <template v-if="mode === 1">
           <div class="export-modal-view">
             <div class="export-modal-view__string" style="height: 45%;">
-              <q-input outlined hide-bottom-space :rows="7" input-style="resize: none;" type="textarea" :readonly="true" v-model="data" label="Board config" color="grey-9">
+              <q-input outlined dense hide-bottom-space :rows="7" input-style="resize: none;" type="textarea" :readonly="true" v-model="data" label="Board config" color="grey-9">
                 <q-btn slot="append" dense flat icon='mdi-content-copy' @click="copyString" />
               </q-input>
             </div>
@@ -23,7 +23,7 @@
         <template v-else-if="mode === 0">
           <div class="import-modal-view full-height">
             <div class="export-modal-view__string" style="height: 45%;">
-              <q-input outlined hide-bottom-space :row="7" class="full-height" input-style="resize: none;" type="textarea" v-model="importData" label="Board config" color="grey-9" placeholder="Put exported board config here"/>
+              <q-input outlined dense hide-bottom-space :row="7" class="full-height" input-style="resize: none;" type="textarea" v-model="importData" label="Board config" color="grey-9" placeholder="Put exported board config here"/>
             </div>
             <div class="text-center text-italic" style="height: 10%; font-size: 2rem;">or</div>
             <div class="export-modal-view__file flex flex-center relative-position rounded-borders" style="height: 45%; border: dashed 1px black; ">

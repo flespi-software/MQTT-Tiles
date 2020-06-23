@@ -35,7 +35,7 @@
             <q-checkbox v-model="isNeedCopy" color="grey-9" label="Rename to save a copy"/>
             <q-input
               color="grey-9"
-              outlined hide-bottom-space
+              outlined hide-bottom-space dense
               v-model="shareBoardModel.boardId"
               :disable="!isNeedCopy"
               label="Name"
@@ -44,7 +44,7 @@
           </q-step>
           <q-step name="link" title="Link" :active-icon="isLinkCopied && currentStep === 'link' ? 'mdi-check' : undefined" :active-color="isLinkCopied && currentStep === 'link' ? 'green' : undefined" icon="mdi-link" :done="isLinkCopied && currentStep === 'link'">
             <template v-if="updatedBoardFlag">
-              <q-input type="textarea" v-model="link" readonly outlined hide-bottom-space input-style="resize: none;"/>
+              <q-input type="textarea" v-model="link" readonly outlined dense hide-bottom-space input-style="resize: none;"/>
               <div class="text-center q-mt-md">
                 <q-btn @click="copyLink" flat icon="mdi-content-copy" size="1.2rem">Copy</q-btn>
               </div>

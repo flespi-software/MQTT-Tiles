@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="row">
-      <q-input outlined hide-bottom-space class="col-12" color="grey-9" v-model="currentSettings.math" label="Math expression" placeholder="%value%"/>
+      <q-input outlined dense hide-bottom-space class="col-12" color="grey-9" v-model="currentSettings.math" label="Math expression" placeholder="%value%"/>
       <div class="text-grey-9" style="font-size: .8rem;">You can use math expressions to calculate the final value. Example: (%value% * 1000) / 1024, where %value% is the payload from your subscription.</div>
       <q-expansion-item
         class="col-12 q-mt-sm"
@@ -12,10 +12,10 @@
       >
         <div class="row q-pa-sm">
           <div class="col-5 q-mb-sm">
-            <q-select outlined hide-bottom-space color="grey-9" v-model="currentSettings.minValueMode" emit-value map-options label="Min value source" :options="rangeValueModeOptions" @input="changeRangeValueTypeHandler('min')"/>
+            <q-select outlined dense hide-bottom-space color="grey-9" v-model="currentSettings.minValueMode" emit-value map-options label="Min value source" :options="rangeValueModeOptions" @input="changeRangeValueTypeHandler('min')"/>
           </div>
           <div class="col-12">
-            <q-input outlined hide-bottom-space v-if="currentSettings.minValueMode === 0" type="number" color="grey-9" v-model.number="currentSettings.minValue" label="Min value"/>
+            <q-input outlined dense hide-bottom-space v-if="currentSettings.minValueMode === 0" type="number" color="grey-9" v-model.number="currentSettings.minValue" label="Min value"/>
             <topic v-else v-model="minValue" label="Min value" :board="board"/>
           </div>
         </div>
@@ -29,25 +29,25 @@
       >
         <div class="row q-pa-sm">
           <div class="col-5 q-mb-sm">
-            <q-select outlined hide-bottom-space color="grey-9" v-model="currentSettings.maxValueMode" emit-value map-options label="Max value source" :options="rangeValueModeOptions" @input="changeRangeValueTypeHandler('max')"/>
+            <q-select outlined dense hide-bottom-space color="grey-9" v-model="currentSettings.maxValueMode" emit-value map-options label="Max value source" :options="rangeValueModeOptions" @input="changeRangeValueTypeHandler('max')"/>
           </div>
           <div class="col-12">
-            <q-input outlined hide-bottom-space v-if="currentSettings.maxValueMode === 0" type="number" color="grey-9" v-model.number="currentSettings.maxValue" label="Max value"/>
+            <q-input outlined dense hide-bottom-space v-if="currentSettings.maxValueMode === 0" type="number" color="grey-9" v-model.number="currentSettings.maxValue" label="Max value"/>
             <topic v-else v-model="maxValue" label="Max value" :board="board"/>
           </div>
         </div>
       </q-expansion-item>
       <div class="col-4 q-mb-sm">
-        <q-input outlined hide-bottom-space class="q-mr-sm" type="number" color="grey-9" v-model.number="currentSettings.lowLevel" label="Low level"/>
+        <q-input outlined dense hide-bottom-space class="q-mr-sm" type="number" color="grey-9" v-model.number="currentSettings.lowLevel" label="Low level"/>
       </div>
       <div class="col-4">
-        <q-input outlined hide-bottom-space class="q-mx-sm" type="number" color="grey-9" v-model.number="currentSettings.midLevel" label="Mid level"/>
+        <q-input outlined dense hide-bottom-space class="q-mx-sm" type="number" color="grey-9" v-model.number="currentSettings.midLevel" label="Mid level"/>
       </div>
       <div class="col-4">
-        <q-input outlined hide-bottom-space class="q-ml-sm" type="number" color="grey-9" v-model.number="currentSettings.highLevel" label="High level"/>
+        <q-input outlined dense hide-bottom-space class="q-ml-sm" type="number" color="grey-9" v-model.number="currentSettings.highLevel" label="High level"/>
       </div>
       <div class="col-4">
-        <q-input outlined hide-bottom-space class="q-mr-sm" color="grey-9" v-model="currentSettings.units" label="Units"/>
+        <q-input outlined dense hide-bottom-space class="q-mr-sm" color="grey-9" v-model="currentSettings.units" label="Units"/>
       </div>
       <div class="q-mt-sm col-12">
         <q-toggle color="grey-9" v-model="currentSettings.isNeedTime" label="Show last update time"/>

@@ -53,6 +53,13 @@
               </q-item-section>
             </q-item>
           </template>
+          <template v-slot:no-option>
+            <q-item>
+              <q-item-section>
+                <div class="text-italic text-grey-9 text-h6 text-center text-bold">{{`No ${variable.name}`}}</div>
+              </q-item-section>
+            </q-item>
+          </template>
           <template v-slot:selected-item="scope">
             <q-item
               v-bind="scope.itemProps"
@@ -319,7 +326,8 @@ export default {
     },
     changeVaribleHandler (variableName, value) {
       /* write current value */
-      this.board.activeVariables[variableName] = value
+      this.$set(this.board.activeVariables, variableName, value)
+      // this.board.activeVariables[variableName] = value
       /* modify all widgets */
       this.board.widgetsIndexes.forEach(widgetIndex => {
         let widget = cloneDeep(this.widgets[widgetIndex])

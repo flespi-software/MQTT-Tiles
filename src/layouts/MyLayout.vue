@@ -99,6 +99,8 @@ import { Base64 } from 'js-base64'
 import { CLIENTS_LOCAL_STORAGE_NAME, ACTIVE_CLIENT_LOCAL_STORAGE_NAME } from '../constants'
 import { version } from '../../package.json'
 import { defaultClient } from '../constants/defaultes.js'
+import SelectorsAsync from '../components/selectors/async'
+import get from 'lodash/get'
 
 const saveClientsToLocalStorage = debounce((clients) => {
   LocalStorage.set(CLIENTS_LOCAL_STORAGE_NAME, clients)
@@ -133,6 +135,7 @@ export default {
     saveSettingsHandler (settings) {
       const key = this.editedClientId ? this.editedClientId : this.clientsIds.length ? parseInt(this.clientsIds[this.clientsIds.length - 1]) + 1 : 0
       Vue.set(this.clients, key, settings)
+      this.setActiveClient(key)
     },
     editClientSettings (clientId) {
       this.currentSettings = this.clients[clientId]
@@ -154,6 +157,8 @@ export default {
     setActiveClient (clientId) {
       this.activeClientId = clientId
       LocalStorage.set(ACTIVE_CLIENT_LOCAL_STORAGE_NAME, clientId)
+      this.setFlespiMode(clientId)
+      this.makeFlespiRestBus(clientId)
     },
     changeStatus (status) {
       this.connected = status
@@ -168,6 +173,37 @@ export default {
         position: 'bottom-left'
       })
       this.$delete(client, 'attachedBoards')
+    },
+    setFlespiMode (clientId) {
+      const client = this.clients[clientId]
+      if (client.host.indexOf('flespi') > -1) {
+        Vue.prototype.$flespiMode = true
+      } else {
+        Vue.prototype.$flespiMode = false
+      }
+    },
+    makeFlespiRestBus (clientId) {
+      const client = this.clients[clientId]
+      const selectorsAsync = new SelectorsAsync()
+      selectorsAsync.bus.auth.getRegions()
+        .then((regions) => {
+          regions = get(regions, 'data.result', [])
+          const flespiClientRestRegion = regions.reduce((flespiRegion, region) => {
+            const host = region['mqtt-ws'].split(':')[0]
+            if (client.host.indexOf(host) !== -1) {
+              return region
+            } else {
+              return flespiRegion
+            }
+          })
+          if (flespiClientRestRegion) {
+            selectorsAsync.settings = { server: flespiClientRestRegion.rest }
+            selectorsAsync.token = client.username
+            Vue.prototype.$flespiRestBus = selectorsAsync
+          } else {
+            Vue.prototype.$flespiRestBus = null
+          }
+        })
     },
     changeAttachedBoards (attachedBoardsIds) {
       if (attachedBoardsIds.length) {
@@ -217,6 +253,7 @@ export default {
   },
   created () {
     const shareData = this.$q.sessionStorage.getItem('mqtt-tiles-share')
+    Vue.prototype.$flespiMode = false
     /* if follow by share link */
     if (this.$route.params.hash || shareData) {
       this.fullViewMode = false
