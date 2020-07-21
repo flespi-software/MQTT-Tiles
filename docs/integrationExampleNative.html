@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Example</title>
+  <script>
+    window.addEventListener('message', ({data}) => {
+      const iframe = document.querySelector('iframe')
+      if (data.indexOf('ready') > -1) {
+        iframe.contentWindow.postMessage(`MQTTTiles|iframe|SetFlespiLogin=>${JSON.stringify({
+          token: '0FneZZpyqP3reyiaedXA1546yjQbN1pCwAEjoTICwzTBX1z12nqTgkPFrtE2lRsH',
+          region: {
+            "cdn": "https://cdn.flespi.io",
+            "default": true,
+            "gw": "gw.flespi.io",
+            "gw-ip": "193.193.165.37",
+            "mqtt": "mqtt.flespi.io:8883",
+            "mqtt-ws": "mqtt.flespi.io:443",
+            "name": "eu",
+            "registration-allowed": true,
+            "rest": "https://flespi.io"
+          }
+        })}`, '*')
+      }
+      if (data.indexOf('connected') > -1) {
+        iframe.contentWindow.postMessage(`MQTTTiles|iframe|SetBoards=>${JSON.stringify({
+          "681e65ae-94df-47b5-b143-4146b7ea55ba":{"name":"New board","id":"681e65ae-94df-47b5-b143-4146b7ea55ba","settings":{"blocked":false,"variables":[],"lastModify":1593592177533},"activeVariables":{},"shortcutsIndexes":[],"widgetsIndexes":[],"layouts":{"lg":[],"md":[],"sm":[],"xs":[],"xxs":[]},"appVersion":"1.10.0"}
+        })}`, '*')
+        iframe.contentWindow.postMessage(`MQTTTiles|iframe|SetActiveBoard=>681e65ae-94df-47b5-b143-4146b7ea55ba`, '*')
+      }
+    })
+  </script>
+</head>
+<body style="margin: 0;">
+  <iframe  style="width: 100%; height: 100vh;" src="http://localhost:8080/#/integration" frameborder="0" name="iframe"></iframe>
+</body>
+</html>

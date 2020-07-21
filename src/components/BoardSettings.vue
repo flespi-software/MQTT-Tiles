@@ -1,5 +1,5 @@
 <template>
-  <q-dialog v-model='value' @hide="closeHandler" :maximized="$q.platform.is.mobile">
+  <q-dialog :value='value' @hide="closeHandler" @escape-key="closeHandler" :maximized="$q.platform.is.mobile" no-backdrop-dismiss>
     <div :style="{width: $q.platform.is.mobile ? '100%' : '50vw'}">
       <q-toolbar class="bg-grey-9 text-white">
         <q-toolbar-title>

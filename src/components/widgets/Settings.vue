@@ -6,7 +6,7 @@
           Widget
         </q-toolbar-title>
       </q-toolbar>
-      <div :style="{ maxHeight: $q.platform.is.mobile ? 'calc(100% - 100px)' : 'calc(100vh - 148px)' }" class="scroll q-pa-md">
+      <div :style="{ maxHeight: $q.platform.is.mobile ? '' : 'calc(100vh - 148px)', height: $q.platform.is.mobile ? 'calc(100% - 100px)' : '' }" class="scroll q-pa-md">
         <q-input outlined hide-bottom-space dense color="grey-9 q-mb-sm" v-model.trim="currentSettings.name" label="Name"/>
         <q-select outlined dense hide-bottom-space color="grey-9  q-mb-sm" @input="typeChangeHandler" :value="currentSettings.type" :options="typeOptions" emit-value map-options label="Type">
           <template v-slot:option="scope">
@@ -56,7 +56,7 @@
             default-opened
           >
             <template slot="header">
-              <q-item-section>{{topic.topicTemplate || 'Empty'}}</q-item-section>
+              <q-item-section><span class="ellipsis full-width">{{topic.topicTemplate || 'Empty'}}</span></q-item-section>
               <q-item-section side>
                 <q-btn flat color="red-6" round dense @click="removeTopicHandler(index)" icon="mdi-delete"/>
               </q-item-section>

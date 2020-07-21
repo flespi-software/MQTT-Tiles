@@ -3,6 +3,7 @@
     <board
       v-if="activeBoardId"
       :board="boards[activeBoardId]"
+      :boards="boards"
       :widgets="widgets"
       :values="values"
       :variables-values="boardsVariablesValues[activeBoardId]"
@@ -12,6 +13,7 @@
       @close="clearActiveBoard"
       @add:widget="addWidget"
       @edit:widget="editWidget"
+      @edit:board="editBoardHandler"
       @delete:widget="deleteWidget"
       @action="actionHandler"
       @fast-bind="fastBindWidgetHandler"
@@ -95,6 +97,7 @@ import bl from 'bl'
 import debounce from 'lodash/debounce'
 import cloneDeep from 'lodash/cloneDeep'
 import remove from 'lodash/remove'
+import merge from 'lodash/merge'
 import difference from 'lodash/difference'
 import uniq from 'lodash/uniq'
 import get from 'lodash/get'
@@ -385,6 +388,9 @@ export default {
         if (!this.clientSettings.flespiBoard) {
           this.getSyncedBoards()
         }
+        if (this.$integrationMode) {
+          this.$integrationBus.send('connected')
+        }
       })
       client.on('error', (error) => {
         this.errorHandler(error, false)
@@ -512,10 +518,16 @@ export default {
     setActiveBoard (boardId) {
       this.activeBoardId = boardId
       this.$emit('change:title', this.getTitle())
+      if (this.$integrationMode) {
+        this.$integrationBus.send('activeBoard', boardId)
+      }
     },
     clearActiveBoard () {
       this.activeBoardId = undefined
       this.$emit('change:title', this.getTitle())
+      if (this.$integrationMode) {
+        this.$integrationBus.send('activeBoard', undefined)
+      }
     },
     actionHandler ({ topic, payload, settings }) {
       if (!settings.qos) {
@@ -1150,6 +1162,52 @@ export default {
     getTitle () {
       const title = `${this.activeBoardId && this.boards[this.activeBoardId].name ? `${this.boards[this.activeBoardId].name} - ` : ''}MQTT Tiles`
       return title
+    },
+    integrationModeActivate () {
+      // watch for initBoards
+      this.$watch('initBoards', function (initBoards) {
+        if (initBoards) {
+          let boardsConfigs = { ...initBoards }
+          if (this.clientSettings && this.clientSettings.attachedBoards) {
+            initBoards = this.clientSettings.attachedBoards.reduce((res, boardId) => {
+              if (initBoards[boardId]) {
+                res[boardId] = initBoards[boardId]
+                delete boardsConfigs[boardId]
+              }
+              return res
+            }, {})
+          } else {
+            boardsConfigs = {}
+          }
+          this.boardsConfigs = boardsConfigs
+          this.initSavedBoards(initBoards)
+        }
+      })
+      // subscribe to SeActiveBoard from integrationBus
+      this.$integrationBus.on('CreateBoard', () => {
+        const emptyBoard = Object.freeze(
+          {
+            name: 'New board',
+            id: '',
+            settings: {
+              blocked: false,
+              variables: []
+            },
+            activeVariables: {},
+            shortcutsIndexes: [],
+            widgetsIndexes: [],
+            layouts: { lg: [], md: [], sm: [], xs: [], xxs: [] }
+          }
+        )
+        const newBoard = merge({}, emptyBoard)
+        newBoard.id = uid()
+        this.addBoard(newBoard)
+        this.$integrationBus.send('boardCreated', newBoard.id)
+      })
+      // subscribe to SeActiveBoard from integrationBus
+      this.$integrationBus.on('SetActiveBoard', (boardId) => {
+        this.setActiveBoard(boardId)
+      })
     }
   },
   created () {
@@ -1179,6 +1237,7 @@ export default {
       this.boardsConfigs = boardsConfigs
       this.initSavedBoards(initBoards)
     }
+    if (this.$integrationMode) { this.integrationModeActivate() }
     if (window) {
       window.addEventListener('beforeunload', () => {
         if (this.client) {

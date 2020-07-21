@@ -2,7 +2,7 @@
   <div class="row">
     <template  v-if="config && config.needSelectors && $flespiMode">
       <div class="col-12  q-mb-sm text-grey-8 text-subtitle2">Select source by flespi entities:</div>
-      <flespi-selector :connector="$flespiRestBus" @input="selectorTopicUpdate" :variables="selectorsVariables" class="col-12"/>
+      <flespi-selector :value="this.currentValue.topicTemplate" :connector="$flespiRestBus" @input="selectorTopicUpdate" :variables="selectorsVariables" class="col-12"/>
       <div class="col-12 q-mb-md row">
         <hr class="q-separator q-separator--horizontal col-5" style="height: 1px; margin-top: 10px;"/>
         <div class="col-2 text-grey-8 text-center text-uppercase">or</div>
@@ -70,6 +70,7 @@ export default {
   },
   methods: {
     selectorTopicUpdate ({ topic: { topicPattern, payloadType } }) {
+      if (!topicPattern) { return false }
       this.$set(this.currentValue, 'topicTemplate', topicPattern)
       this.$set(this.currentValue, 'topicFilter', topicPattern)
       payloadType = payloadType === 'JSON' ? WIDGET_PAYLOAD_TYPE_JSON : WIDGET_PAYLOAD_TYPE_STRING

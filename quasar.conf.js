@@ -8,7 +8,8 @@ module.exports = function (ctx) {
     // https://quasar.dev/quasar-cli/cli-documentation/boot-files
     boot: [
       'prism',
-      'i18n'
+      'i18n',
+      'integrationBus'
     ],
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css
@@ -162,29 +163,29 @@ module.exports = function (ctx) {
         theme_color: '#333333',
         icons: [
           {
-            'src': 'statics/icons/icon-128x128.png',
-            'sizes': '128x128',
-            'type': 'image/png'
+            src: 'statics/icons/icon-128x128.png',
+            sizes: '128x128',
+            type: 'image/png'
           },
           {
-            'src': 'statics/icons/icon-192x192.png',
-            'sizes': '192x192',
-            'type': 'image/png'
+            src: 'statics/icons/icon-192x192.png',
+            sizes: '192x192',
+            type: 'image/png'
           },
           {
-            'src': 'statics/icons/icon-256x256.png',
-            'sizes': '256x256',
-            'type': 'image/png'
+            src: 'statics/icons/icon-256x256.png',
+            sizes: '256x256',
+            type: 'image/png'
           },
           {
-            'src': 'statics/icons/icon-384x384.png',
-            'sizes': '384x384',
-            'type': 'image/png'
+            src: 'statics/icons/icon-384x384.png',
+            sizes: '384x384',
+            type: 'image/png'
           },
           {
-            'src': 'statics/icons/icon-512x512.png',
-            'sizes': '512x512',
-            'type': 'image/png'
+            src: 'statics/icons/icon-512x512.png',
+            sizes: '512x512',
+            type: 'image/png'
           }
         ]
       }

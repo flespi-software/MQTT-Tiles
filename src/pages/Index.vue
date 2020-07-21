@@ -39,7 +39,7 @@ export default {
   data () {
     return {
       title: '',
-      initBoards: this.$q.localStorage.getItem(BOARDS_LOCALSTORAGE_NAME),
+      initBoards: this.$integrationMode ? undefined : this.$q.localStorage.getItem(BOARDS_LOCALSTORAGE_NAME),
       shareWizardOpened: false,
       shareWizardConfig: undefined
     }
@@ -52,8 +52,12 @@ export default {
         boardsToAdd = diff(newBoardsKeys, oldBoardsKeys)
       if (boardsToRemove.length) { this.$emit('delete:boards', boardsToRemove) }
       if (boardsToAdd.length) { this.$emit('add:boards', boardsToAdd) }
-      this.$q.localStorage.set(BOARDS_LOCALSTORAGE_NAME, boards)
-      this.initBoards = boards
+      if (!this.$integrationMode) {
+        this.$q.localStorage.set(BOARDS_LOCALSTORAGE_NAME, boards)
+        this.initBoards = boards
+      } else {
+        this.$integrationBus.send('saveBoards', boards)
+      }
     },
     sharePrepareHandler (shareWizardConfig) {
       this.shareWizardConfig = shareWizardConfig
@@ -64,6 +68,13 @@ export default {
     },
     changeAttachedBoards (attachedBoards) {
       this.$emit('change:attach', attachedBoards)
+    }
+  },
+  created () {
+    if (this.$integrationMode) {
+      this.$integrationBus.on('SetBoards', (boards) => {
+        this.initBoards = boards
+      })
     }
   },
   props: ['client'],

@@ -166,10 +166,15 @@
               </template>
               <div v-else class='shortcuts--empty col-12' style="min-height: 89px; margin-bottom: 2px;">
                 <div class="text-center text-grey-8 q-mb-sm q-mt-sm" style="font-size: 1.2rem;">You have no shortcuts</div>
-                <div class="text-center text-grey-8">You can add one on <q-btn icon="mdi-fullscreen" color="grey-8" size="sm" dense label="full board view" @click="$emit('select', id)" /></div>
+                <div class="text-center text-grey-8">You can add one on <q-btn icon="mdi-fullscreen" color="grey-8" size="sm" dense unelevated label="full board view" @click="$emit('select', id)" /></div>
               </div>
               <div v-if="board.settings.lastModify" class="absolute-top-right text-grey-5 q-pr-xs" style="font-size: .7rem;">{{date(board.settings.lastModify, 'DD-MM-YYYY HH:mm:ss')}}</div>
               <span class="text-bold text-white absolute bg-purple-6 rounded-borders q-px-xs" style="font-size: 10px; bottom: 4px; right: 4px; cursor: default;" title="Widgets count">{{board.widgetsIndexes.length}}</span>
+              <div class="absolute-bottom-left q-ml-xs">
+                <q-icon class="q-mr-xs" v-for="variable in board.settings.variables" :key="variable.name" :name="getIcon(variable)" color="grey-7">
+                  <q-tooltip>Variable: {{variable.name}}</q-tooltip>
+                </q-icon>
+              </div>
             </q-card-section>
           </q-card>
         </div>
@@ -369,6 +374,25 @@ export default {
       } else {
         this.currentAttachedBoard.push(id)
       }
+    },
+    getIcon (variable) {
+      let icon = ''
+      if (variable.preset) {
+        if (variable.preset === 'devices') {
+          icon = 'mdi-developer-board'
+        } else if (variable.preset === 'channels') {
+          icon = 'mdi-call-merge'
+        } else if (variable.preset === 'calcs') {
+          icon = 'mdi-calculator-variant'
+        } else if (variable.preset === 'custom') {
+          if (variable.type === 1) {
+            icon = 'mdi-lan-connect'
+          } else {
+            icon = 'mdi-variable'
+          }
+        }
+      }
+      return icon
     }
   },
   watch: {

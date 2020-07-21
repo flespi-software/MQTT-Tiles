@@ -8,7 +8,7 @@
     />
     <q-header v-if="fullViewMode">
       <q-toolbar class="bg-grey-9">
-        <q-btn flat rounded icon="mdi-menu" @click="leftDrawerOpen = !leftDrawerOpen"/>
+        <q-btn v-if="fullViewMode && !$integrationMode" flat rounded icon="mdi-menu" @click="leftDrawerOpen = !leftDrawerOpen"/>
         <q-toolbar-title style="line-height: 36px;">
           <img src="statics/mqtttiles-logo.png" alt="MQTT Tiles" style="height: 30px; vertical-align: text-bottom;">
           MQTT Tiles
@@ -16,7 +16,7 @@
         </q-toolbar-title>
       </q-toolbar>
     </q-header>
-    <q-drawer side="left" v-model="leftDrawerOpen" v-if="fullViewMode">
+    <q-drawer side="left" v-model="leftDrawerOpen" v-if="fullViewMode && !$integrationMode">
       <div class="connections__subheader q-px-md bg-grey-9" style="position: relative; height: 70px;">
         <span class="text-white" style="font-size: 1.4rem; line-height: 70px;">My connections</span>
         <q-btn fab-mini @click="openSettings" icon="mdi-plus" color="white" class="text-grey-9" style="position: absolute; bottom: -20px; right: 16px; z-index: 1;"/>
@@ -251,11 +251,23 @@ export default {
       }
     }
   },
+  mounted () {
+    this.$integrationBus.send('ready')
+  },
   created () {
     const shareData = this.$q.sessionStorage.getItem('mqtt-tiles-share')
     Vue.prototype.$flespiMode = false
-    /* if follow by share link */
-    if (this.$route.params.hash || shareData) {
+    Vue.prototype.$integrationMode = false
+    if (this.$route.path.indexOf('integration') > -1) {
+      Vue.prototype.$integrationMode = true
+      this.$integrationBus.on('SetFlespiLogin', ({ token, region }) => {
+        const client = defaultClient()
+        client.host = `wss://${region['mqtt-ws']}`
+        client.username = token
+        Vue.set(this.clients, 0, client)
+        this.setActiveClient(0)
+      })
+    } else if (this.$route.params.hash || shareData) { /* if follow by share link */
       this.fullViewMode = false
       const client = defaultClient()
       let data

@@ -10,9 +10,10 @@
       map-options
       outlined dense color="grey-9"
     />
-    <div>
-      <template v-if="config[entity].selectors">
-        <div v-for="selector in config[entity].selectors" :key="`${entity}-${selector.name}`">
+    <div class="relative-position">
+      <div v-if="!entity" class="selectors__settings-splash"></div>
+      <template v-if="renderConfig.selectors">
+        <div v-for="selector in renderConfig.selectors" :key="`${entity}-${selector.name}`">
           <q-select
             class="q-mb-md"
             v-if="!useVars[selector.name]"
@@ -38,7 +39,7 @@
               </q-item>
             </template>
             <template v-slot:after v-if="variables.length">
-              <q-btn round dense flat icon="mdi-variable" @click="useVars[selector.name] = !useVars[selector.name]">
+              <q-btn round dense flat icon="mdi-variable" @click="toggleVariableView(selector.name)">
                 <q-tooltip>Select variables</q-tooltip>
               </q-btn>
             </template>
@@ -74,15 +75,15 @@
               </q-item>
             </template>
             <template v-slot:after>
-              <q-btn round dense flat icon="mdi-format-list-bulleted-square" @click="useVars[selector.name] = !useVars[selector.name]">
+              <q-btn round dense flat icon="mdi-format-list-bulleted-square" @click="toggleVariableView(selector.name)">
                 <q-tooltip>{{`Select ${selector.name}`}}</q-tooltip>
               </q-btn>
             </template>
           </q-select>
         </div>
       </template>
-      <template v-if="config[entity].children">
-        <flespi-selectors :config="config[entity].children" :variables="variables" :connector="connector" @input="updateModel" :entities="model" :key="entity" />
+      <template v-if="renderConfig.children">
+        <flespi-selectors :value="value" :config="renderConfig.children" :variables="variables" :connector="connector" @input="updateModel" :entities="model" :key="entity" />
       </template>
     </div>
   </div>
@@ -109,16 +110,17 @@ export default {
     variables: {
       type: Array,
       default () { return [] }
-    }
+    },
+    value: String
   },
   data () {
-    const entity = Object.keys(this.config)[0]
-    const state = this.initByEntity(entity)
-    const model = { ...this.entities, ...state.model }
-    const lists = state.lists
-    const vars = state.vars
-    const useVars = state.useVars
-    const topic = this.config[entity].topic
+    const entity = undefined // Object.keys(this.config)[0]
+    // const state = this.initByEntity(entity)
+    const model = {} // { ...this.entities, ...state.model }
+    const lists = {} // state.lists
+    const vars = {} // state.vars
+    const useVars = {} // state.useVars
+    const topic = '' // this.config[entity].topic
     return {
       entity,
       lists,
@@ -132,6 +134,10 @@ export default {
   computed: {
     options () {
       return Object.keys(this.config).map(name => ({ label: name, value: name }))
+    },
+    entitiesNames () { return Object.keys(this.config) },
+    renderConfig () {
+      return this.entity ? this.config[this.entity] : this.config[this.entitiesNames[0]]
     }
   },
   methods: {
@@ -177,7 +183,7 @@ export default {
     },
     update (selectorName, value) {
       this.$set(this.model, selectorName, value && value.length ? value : null)
-      if (this.config[this.entity].selectors) {
+      if (this.entity && this.config[this.entity].selectors) {
         this.config[this.entity].selectors.forEach((selector) => {
           if (selector.getter && selector.getter.params && selector.getter.params.includes(selectorName)) {
             this.$set(this.lists, selector.name, [])
@@ -193,7 +199,7 @@ export default {
     },
     getCurrentTopic (topic, model) {
       let currentTopic = topic && topic.topicPattern
-      if (topic && this.config[this.entity].selectors) {
+      if (topic && this.entity && this.config[this.entity].selectors) {
         const vars = this.config[this.entity].selectors.map(selector => selector.name)
         // const varsFromPattern = topicPattern.match(/\$\{\w+\}/g).map(variable => variable.slice(2, -1))
         currentTopic = vars.reduce((topic, variable) => {
@@ -213,16 +219,70 @@ export default {
         }, currentTopic)
       }
       return { ...topic, topicPattern: currentTopic }
-    }
-  },
-  created () {
-    const topicPattern = this.getCurrentTopic(this.topic, this.model)
-    if (topicPattern) {
-      this.$emit('input', { topic: topicPattern })
-    }
-  },
-  watch: {
-    entity (entity) {
+    },
+    topicToModelHandler (topic) {
+      function createModelPath (config) {
+        const paths = []
+        for (const pathPart in config) {
+          const confByPath = config[pathPart]
+          const path = [pathPart]
+          const topic = confByPath.topic && confByPath.topic.topicPattern
+          if (confByPath.children) {
+            const childrenProcess = createModelPath(confByPath.children)
+            for (const child of childrenProcess) {
+              paths.push(
+                {
+                  path: [...path, ...child.path],
+                  topic: child.topic
+                }
+              )
+            }
+          } else {
+            paths.push({ path, topic })
+          }
+        }
+        return paths
+      }
+      const patternsToPath = createModelPath(this.config)
+      const routes = patternsToPath.filter(({ path, topic: pattern }) => {
+        pattern = new RegExp(pattern.replace(/\$\{\w+\}/g, '.*'))
+        return pattern.test(topic)
+      })
+      const route = routes.pop()
+      let model
+      if (route) {
+        model = { path: route.path, values: {}, vars: {} }
+        const patternPath = route.topic.split('/'),
+          valuesPath = topic.split('/')
+        patternPath.forEach((path, index) => {
+          path.replace(/\$\{(\w+)\}/, (_, name) => {
+            const value = valuesPath[index]
+            if (value.match(/<%.*%>/)) {
+              model.vars[name] = value.slice(2, -2)
+            } else {
+              model.values[name] = value === '+' ? null : value.split(',')
+            }
+          })
+        })
+      }
+      return model
+    },
+    setModel (model) {
+      if (!model) { return false }
+      const { lists, model: selectorsModel, vars, useVars } = this.initByEntity(model.path[0])
+      this.entity = model.path[0]
+      this.lists = lists
+      for (const name in model.vars) {
+        useVars[name] = true
+        vars[name] = model.vars[name]
+      }
+      this.vars = vars
+      this.useVars = useVars
+      this.model = Object.assign(selectorsModel, model.values)
+      this.topic = this.config[model.path[0]].topic
+      this.topic && this.$emit('input', { topic: this.getCurrentTopic(this.topic, this.model) })
+    },
+    changeEntity (entity) {
       const { lists, model, vars, useVars } = this.initByEntity(entity)
       this.lists = lists
       this.vars = vars
@@ -231,6 +291,20 @@ export default {
       this.topic = this.config[entity].topic
       this.topic && this.$emit('input', { topic: this.getCurrentTopic(this.topic, this.model) })
     },
+    toggleVariableView (name) {
+      this.$set(this.useVars, name, !this.useVars[name])
+      this.topic && this.$emit('input', { topic: this.getCurrentTopic(this.topic, this.model) })
+    }
+  },
+  created () {
+    const topicPattern = this.getCurrentTopic(this.topic, this.model)
+    this.setModel(this.topicToModelHandler(this.value))
+    this.$watch('entity', this.changeEntity)
+    if (topicPattern) {
+      this.$emit('input', { topic: topicPattern })
+    }
+  },
+  watch: {
     entities: {
       deep: true,
       handler (entities) {
@@ -242,3 +316,14 @@ export default {
   }
 }
 </script>
+
+<style lang="stylus">
+  .selectors__settings-splash
+    position absolute
+    top 0
+    bottom 0
+    right 0
+    left 0
+    background-color rgba(255,255,255,0.6)
+    z-index 1
+</style>

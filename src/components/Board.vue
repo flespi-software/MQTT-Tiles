@@ -29,6 +29,9 @@
       <q-btn @click="blockBoardHandler" :icon="board.settings.blocked ? 'mdi-lock' : 'mdi-lock-open'" color="grey-9" flat round v-if="!isFrized">
         <q-tooltip>{{board.settings.blocked ? 'Unlock your board' : 'Lock your board'}}</q-tooltip>
       </q-btn>
+      <q-btn @click="modifyBoardSettings" icon="mdi-settings" color="grey-9" flat round v-if="!isFrized">
+        <q-tooltip>Board settings</q-tooltip>
+      </q-btn>
     </q-toolbar>
     <q-toolbar class="q-py-none bg-white" style="flex-wrap: wrap" v-if="board.settings.variables && board.settings.variables.length">
       <q-resize-observer @resize="onVariablesWrapperResize" />
@@ -131,6 +134,13 @@
         <div><q-btn color="grey-9" icon="mdi-plus-circle-outline" label="Add widget" @click="addWidgetHandler" /></div>
       </div>
     </div>
+    <board-settings
+      v-if="boardSettingsModalModel"
+      v-model="boardSettingsModalModel"
+      :settings="board"
+      :boards="boards"
+      @edit="editBoardHandler"
+    />
   </div>
 </template>
 
@@ -158,6 +168,7 @@
 
 <script>
 import Vue from 'vue'
+import BoardSettings from './BoardSettings'
 import VirtualList from 'vue-virtual-scroll-list'
 import cloneDeep from 'lodash/cloneDeep'
 import uniq from 'lodash/uniq'
@@ -197,10 +208,11 @@ function getBreakpoint (width) {
 
 export default {
   name: 'Board',
-  props: ['board', 'widgets', 'values', 'canShare', 'isFrized', 'hasConnection', 'variablesValues'],
+  props: ['board', 'boards', 'widgets', 'values', 'canShare', 'isFrized', 'hasConnection', 'variablesValues'],
   data () {
     return {
       settingsModel: false,
+      boardSettingsModalModel: false,
       currentSettings: undefined,
       editedWidgetId: undefined,
       editedWidgetTopics: undefined,
@@ -401,10 +413,27 @@ export default {
         ? this.naturalSort(Object.values(variableValues), 'label')
         : this.naturalSort(Object.values(variableValues), 'value')
       return variableValues
+    },
+    modifyBoardSettings () {
+      this.boardSettingsModalModel = true
+    },
+    editBoardHandler (boardModel) {
+      boardModel.widgetsIndexes.forEach(widgetIndex => {
+        let widget = cloneDeep(this.widgets[widgetIndex])
+        boardModel.settings.variables.forEach((variable) => {
+          if (!variable.values.includes(boardModel.activeVariables[variable.name])) {
+            boardModel.activeVariables[variable.name] = undefined
+          }
+        })
+        widget = this.modifyWidgetByVariables(widget, boardModel)
+        this.$emit('edit:widget', { settings: widget, widgetId: widget.id, topics: [...this.widgets[widgetIndex].topics] })
+      })
+      this.$emit('edit:board', { id: this.board.id, board: boardModel })
     }
   },
   components: {
     Settings,
+    BoardSettings,
     Switcher,
     Informer,
     MultiInformer,
