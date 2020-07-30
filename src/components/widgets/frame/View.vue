@@ -82,7 +82,7 @@ export default {
       width: 0,
       height: 0,
       currentPayloads: [],
-      isReadyMap: false,
+      isReady: !this.item.settings.readyMessage,
       IFRAME_MODE_INTEGRATION,
       IFRAME_MODE_SHOW
     }
@@ -105,18 +105,23 @@ export default {
       if (this.item.settings.mode === IFRAME_MODE_INTEGRATION) {
         const topic = this.item.settings.items[itemIndex].topic
         const value = this.getValueByTopic(this.value[topic.topicFilter] && this.value[topic.topicFilter].payload, topic)
+        const path = this.value && this.value[topic.topicFilter].topic.split('/')
         payload = this.item.settings.items[itemIndex].template
-        payload = payload.replace('<{topic}>', this.value && this.value.topic)
+        payload = payload.replace('<{topic}>', this.value && this.value[topic.topicFilter].topic)
+        payload = payload.replace(/<{topic\[(\d)\]}>/g, (_, index) => {
+          return path && path[index]
+        })
         payload = payload.replace('<{payload}>', JSON.stringify(value))
         payload = payload.replace(/<%([a-zA-Z0-9-+&@#/%?=~_|!:,.;\s]*)%>/gim, (_, name) => {
           return JSON.stringify(get(value, name, null))
         })
       }
+      console.log(payload)
       return payload
     },
     update () {
       this.item.settings.items.forEach((item, index) => {
-        if (!this.isReadyMap) { return false }
+        if (!this.isReady) { return false }
         const payload = this.getPayload(index)
         if (this.currentPayloads[index] !== payload) {
           this.send(payload)
@@ -152,12 +157,14 @@ export default {
     }
   },
   created () {
-    window.addEventListener('message', (e) => {
-      if (e.data === 'MapView|state:{"ready": true}') {
-        this.isReadyMap = true
-        this.update()
-      }
-    })
+    if (this.item.settings.readyMessage) {
+      window.addEventListener('message', (e) => {
+        if (e.data === this.item.settings.readyMessage) {
+          this.isReady = true
+          this.update()
+        }
+      })
+    }
   },
   mixins: [getValueByTopic, timestamp]
 }

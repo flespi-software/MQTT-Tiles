@@ -23,5 +23,10 @@ export default {
       delete settings.template
     }
     return widget
+  },
+  '1.10.1': (widget) => {
+    const settings = widget.settings
+    settings.readyMessage = ''
+    return widget
   }
 }
