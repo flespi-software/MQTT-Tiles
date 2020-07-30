@@ -160,10 +160,15 @@ export default {
     if (this.item.settings.readyMessage) {
       window.addEventListener('message', (e) => {
         if (e.data === this.item.settings.readyMessage) {
+          if (this.item.settings.initMessage) {
+            this.send(this.item.settings.initMessage)
+          }
           this.isReady = true
           this.update()
         }
       })
+    } else if (this.item.settings.initMessage) {
+      this.send(this.item.settings.initMessage)
     }
   },
   mixins: [getValueByTopic, timestamp]

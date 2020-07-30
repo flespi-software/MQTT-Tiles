@@ -4,7 +4,8 @@
     <div class="row">
       <q-btn-toggle class='q-mt-md col-12' rounded toggle-text-color="grey-9" text-color="grey-6" flat v-model="currentSettings.mode" :options="modeOptions"/>
       <q-input outlined dense hide-bottom-space class="col-12 q-mb-sm" v-if="currentSettings.mode === IFRAME_MODE_INTEGRATION" color="grey-9" v-model="currentSettings.link" label="Iframe link"/>
-      <q-input outlined dense hide-bottom-space class="col-12" v-if="currentSettings.mode === IFRAME_MODE_INTEGRATION" color="grey-9" v-model="currentSettings.readyMessage" label="Ready message from iframe"/>
+      <q-input outlined dense hide-bottom-space class="col-12 q-mb-sm" v-if="currentSettings.mode === IFRAME_MODE_INTEGRATION" color="grey-9" v-model="currentSettings.readyMessage" label="Ready message from iframe"/>
+      <q-input outlined dense hide-bottom-space class="col-12" v-if="currentSettings.mode === IFRAME_MODE_INTEGRATION" color="grey-9" v-model="currentSettings.initMessage" label="Init message to iframe"/>
       <div class="frame__items-wrapper col-12 relative-position q-mb-sm q-mt-lg" v-if="currentSettings.mode === IFRAME_MODE_INTEGRATION">
         <q-list bordered>
           <q-btn color="grey-9" style="top: -20px; right: 8px; position: absolute; z-index: 1130;" class="col-12" fab-mini @click="addItem" icon="mdi-plus"/>
@@ -66,6 +67,7 @@ export default {
         topics: [],
         link: 'https://flespi.io/mapview',
         readyMessage: '',
+        initMessage: '',
         isNeedTime: true
       },
       defaultItem = {

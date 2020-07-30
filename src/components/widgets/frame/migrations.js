@@ -28,5 +28,10 @@ export default {
     const settings = widget.settings
     settings.readyMessage = ''
     return widget
+  },
+  '1.10.3': (widget) => {
+    const settings = widget.settings
+    settings.initMessage = ''
+    return widget
   }
 }
