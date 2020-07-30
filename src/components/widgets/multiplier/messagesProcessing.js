@@ -28,7 +28,7 @@ function getMultiplierValueByPacket (packet, initValue, subscriptionTopic, widge
       const path = setPath.slice(0, -1).join('.')
       const name = setPath.slice(-1)[0]
       const obj = path ? get(value, path, null) : value
-      Vue.delete(obj, name)
+      obj && Vue.delete(obj, name)
     } else {
       value = null
     }

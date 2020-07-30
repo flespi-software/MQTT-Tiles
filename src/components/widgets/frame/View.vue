@@ -105,9 +105,10 @@ export default {
       if (this.item.settings.mode === IFRAME_MODE_INTEGRATION) {
         const topic = this.item.settings.items[itemIndex].topic
         const value = this.getValueByTopic(this.value[topic.topicFilter] && this.value[topic.topicFilter].payload, topic)
-        const path = this.value && this.value[topic.topicFilter].topic.split('/')
+        const valuedTopic = this.value && this.value[topic.topicFilter] && this.value[topic.topicFilter].topic
+        const path = valuedTopic && valuedTopic.split('/')
         payload = this.item.settings.items[itemIndex].template
-        payload = payload.replace('<{topic}>', this.value && this.value[topic.topicFilter].topic)
+        payload = payload.replace('<{topic}>', valuedTopic)
         payload = payload.replace(/<{topic\[(\d)\]}>/g, (_, index) => {
           return path && path[index]
         })
@@ -116,7 +117,6 @@ export default {
           return JSON.stringify(get(value, name, null))
         })
       }
-      console.log(payload)
       return payload
     },
     update () {

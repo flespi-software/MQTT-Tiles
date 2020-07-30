@@ -28,7 +28,7 @@
     </q-item>
     <q-card-section class="widget__content scroll q-pa-none" :class="[`bg-${item.color}-1`]" :style="{height: integration ? '' : contentHeight}">
       <div style="width: 100%; height: 100%;">
-        <iframe style="width: 100%;height: calc(100% - 18px);" src="https://flespi.io/mapview" frameborder="0" ref="map" allowfullscreen></iframe>
+        <iframe style="width: 100%;height: calc(100% - 18px);" :src="route" frameborder="0" ref="map" allowfullscreen></iframe>
       </div>
       <div class="absolute-top-left q-pa-xs" :class="[`text-${item.color}-7`, `bg-${item.color}-1`]" style="font-size: .8rem; border-bottom-left-radius: 4px;">{{position}}</div>
       <div v-if="item.settings.isNeedTime" class="absolute-bottom-left q-px-xs q-pt-xs" style="font-size: 12px; border-top-right-radius: 5px;" :class="[`text-${item.color}-7`, `bg-${item.color}-1`]">
@@ -54,6 +54,7 @@
 </style>
 
 <script>
+import { uid } from 'quasar'
 import {
   WIDGET_STATUS_DISABLED
 } from '../../../constants'
@@ -63,7 +64,10 @@ export default {
   name: 'MapLocation',
   props: ['item', 'index', 'mini', 'in-shortcuts', 'value', 'blocked', 'integration'],
   data () {
+    const salt = uid()
     return {
+      route: `https://flespi.io/mapview/#/salt/${salt}`,
+      salt,
       WIDGET_STATUS_DISABLED,
       prevPosition: []
     }
@@ -102,14 +106,14 @@ export default {
   methods: {
     setPosition (position) {
       if (position[0] && position[1]) {
-        this.$refs.map && this.$refs.map.contentWindow.postMessage(`MapView|cmd:{"addmarkers": ${JSON.stringify([position])}, "clear": "all", "fullscreencontrol": true}`, '*')
+        this.$refs.map && this.$refs.map.contentWindow.postMessage(`MapView-${this.salt}|cmd:{"addmarkers": ${JSON.stringify([position])}, "clear": "all", "fullscreencontrol": true}`, '*')
       }
       this.prevPosition = position
     }
   },
   created () {
     window.addEventListener('message', (e) => {
-      if (e.data === 'MapView|state:{"ready": true}') {
+      if (e.data === `MapView-${this.salt}|state:{"ready": true}`) {
         this.setPosition(this.position)
       }
     })
