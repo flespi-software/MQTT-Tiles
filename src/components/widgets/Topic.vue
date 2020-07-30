@@ -66,7 +66,8 @@ export default {
     currentValue: {
       deep: true,
       handler (val) { this.$emit('input', val) }
-    }
+    },
+    value (value) { this.currentValue = value }
   },
   methods: {
     selectorTopicUpdate ({ topic: { topicPattern, payloadType } }) {

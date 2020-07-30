@@ -26,7 +26,7 @@
             </template>
             <div class="row q-pa-sm">
               <q-input outlined dense hide-bottom-space class="col-12 q-mb-sm" color="grey-9" v-model="item.label" label="Label"/>
-              <topic class="col-12 q-mb-sm" v-model="item.topic" :label="item.label" @input="setTopics" :board="board"/>
+              <topic class="col-12 q-mb-sm" v-model="item.topic" :label="item.label" @input="setTopics" :board="board" :key="`${index}${item.value}`"/>
               <q-input outlined dense hide-bottom-space class="col-12" type="textarea" color="grey-9" v-model="item.template" label="Payload template" input-style="resize: none;"/>
               <div class="col-12 text-grey-6" style="font-size: .8rem">
                 You can use variables in template: <span class="text-grey-10 cursor-pointer" @click="item.template += '<{topic}>'">&lt;{topic}&gt;</span> is a topic from payload packet, <span class="text-grey-10 cursor-pointer" @click="item.template += '<{topic[0]}>'">&lt;{topic[0]}&gt;</span> is a slash separated topic part (0 is part index), <span class="text-grey-10 cursor-pointer" @click="item.template += '<{payload}>'">&lt;{payload}&gt;</span> is a stringified payload of packet, <span class="text-grey-8">&lt;%payload.name%&gt;</span> is a JSON path to value in payload, if payload is object.

@@ -154,6 +154,14 @@ export default {
       handler () {
         this.update()
       }
+    },
+    item: {
+      deep: true,
+      handler () {
+        if (this.item.settings.initMessage) {
+          this.send(this.item.settings.initMessage)
+        }
+      }
     }
   },
   created () {
