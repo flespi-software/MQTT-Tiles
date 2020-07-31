@@ -101,9 +101,6 @@ export default {
     }
   },
   computed: {
-    actionTopic () {
-      return this.item.settings.topic
-    },
     contentHeight () {
       let height = 'calc(100% - 22px)'
       if (!this.item.name && this.blocked) { height = '100%' }
@@ -112,8 +109,10 @@ export default {
   },
   methods: {
     actionHandler () {
-      const data = { topic: this.actionTopic, payload: this.item.settings.payload, settings: { retain: this.item.settings.save } }
-      this.$emit('action', data)
+      this.item.settings.topics.forEach((topic) => {
+        const data = { topic: topic.topicTemplate, payload: this.item.settings.payload, settings: { retain: this.item.settings.save } }
+        this.$emit('action', data)
+      })
     }
   }
 }

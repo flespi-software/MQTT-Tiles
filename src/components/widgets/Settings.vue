@@ -53,7 +53,7 @@
             :key="index"
             :header-class="[`bg-${topicsHighlight[index]}`]"
             expand-icon="mdi-settings"
-            default-opened
+            :default-opened="index === 0"
           >
             <template slot="header">
               <q-item-section><span class="ellipsis full-width">{{topic.topicTemplate || 'Empty'}}</span></q-item-section>
@@ -165,9 +165,11 @@ export default {
       colors: ['grey', 'red', 'green', 'orange', 'blue', 'light-blue', 'purple', 'deep-orange', 'cyan', 'brown', 'blue-grey'],
       isValideSchema: true,
       defaultTopic: {
+        topicTemplate: '',
         topicFilter: '',
         payloadType: 0,
-        payloadField: ''
+        payloadField: '',
+        payloadNameField: ''
       },
       saveButtonLabels: {
         [WIDGET_MODE_ADD]: 'Save',
@@ -229,7 +231,7 @@ export default {
       this.isValideSchema = status
     },
     addTopicHandler () {
-      this.currentSettings.dataTopics.push(Object.assign({}, this.defaultTopic))
+      this.currentSettings.dataTopics.unshift(Object.assign({}, this.defaultTopic))
     },
     removeTopicHandler (index) {
       Vue.delete(this.currentSettings.dataTopics, index)

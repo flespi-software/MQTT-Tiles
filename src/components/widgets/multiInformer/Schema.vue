@@ -11,7 +11,7 @@
             group="singleselect-items"
             :header-class="[`bg-${!!item.topic.topicFilter ? 'grey-4' : 'red-2'}`]"
             expand-icon="mdi-settings"
-            default-opened
+            :default-opened="index === 0"
           >
             <template slot="header">
               <q-item-section side>
@@ -20,7 +20,7 @@
                   <q-btn :disabled="index === (currentSettings.items.length - 1)" round dense flat class="col-1" @click.stop="downItem(index)" icon="mdi-arrow-down"/>
                 </div>
               </q-item-section>
-              <q-item-section>{{item.topic.topicFilter || `item ${index + 1}`}}</q-item-section>
+              <q-item-section>{{item.topic.topicFilter || 'New item'}}</q-item-section>
               <q-item-section side>
                 <q-btn flat color="red-6" round dense @click="removeItem(index)" icon="mdi-delete"/>
               </q-item-section>
@@ -61,6 +61,7 @@ import {
 import validateTopic from '../../../mixins/validateTopic.js'
 import Topic from '../Topic'
 import isEqual from 'lodash/isEqual'
+import cloneDeep from 'lodash/cloneDeep'
 export default {
   name: 'MultiInformerSchema',
   props: ['widget', 'board'],
@@ -77,9 +78,11 @@ export default {
     }
     const defaultItem = {
       topic: {
+        topicTemplate: '',
         topicFilter: '',
         payloadType: 0,
-        payloadField: ''
+        payloadField: '',
+        payloadNameField: ''
       },
       math: '',
       valueFormat: 0,
@@ -98,7 +101,7 @@ export default {
         WIDGET_VALUE_FORMAT_JSON,
         WIDGET_VALUE_FORMAT_DURATION
       },
-      currentItem: Object.assign({}, defaultItem),
+      currentItem: cloneDeep(defaultItem),
       currentSettings: Object.assign({}, defaultSettings, this.widget.settings),
       formatOptions: [
         { label: 'String', value: WIDGET_VALUE_FORMAT_STRING },
@@ -110,16 +113,18 @@ export default {
         { label: 'JSON', value: WIDGET_VALUE_FORMAT_JSON }
       ],
       defaultTopic: {
+        topicTemplate: '',
         topicFilter: '',
         payloadType: 0,
-        payloadField: ''
+        payloadField: '',
+        payloadNameField: ''
       }
     }
   },
   methods: {
     addItem () {
-      this.currentSettings.items.push(this.currentItem)
-      this.currentItem = Object.assign({}, this.defaultItem)
+      this.currentSettings.items.unshift(this.currentItem)
+      this.currentItem = cloneDeep(this.defaultItem)
     },
     removeItem (itemIndex) {
       this.$delete(this.currentSettings.items, itemIndex)

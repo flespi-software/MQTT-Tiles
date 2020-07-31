@@ -5,8 +5,29 @@
     <q-input outlined hide-bottom-space dense class="q-mb-sm" color="grey-9" v-model="currentSettings.icon" label="Icon">
       <q-icon slot="append" :name="`mdi-${currentSettings.icon || 'send'}`" size="1.5rem"/>
     </q-input>
-    <q-input color="grey-9" outlined hide-bottom-space dense v-model="currentSettings.topic" label="Topic"/>
-    <variables-helper v-if="board.settings.variables && board.settings.variables.length" :variables="board.settings.variables" @add="(variable) => currentSettings.topic += variable"/>
+    <q-list bordered class="relative-position q-mt-lg" >
+      <q-btn color="grey-9" style="top: -20px; right: 8px; position: absolute; z-index: 1130;" class="col-12" fab-mini @click="addTopic" icon="mdi-plus"/>
+      <q-item-label class="q-py-md q-px-sm" :class="{'text-red-6': !currentSettings.topics.length}">Topics{{currentSettings.topics.length ? '' : ' are empty'}}</q-item-label>
+      <q-expansion-item
+        v-for="(item, index) in currentSettings.topics"
+        :key="index"
+        group="frame-items"
+        :header-class="[`bg-${checkUniqueTopic(index) ? 'grey-4' : 'red-2'}`]"
+        expand-icon="mdi-settings"
+        :default-opened="index === 0"
+      >
+        <template slot="header">
+          <q-item-section>{{item.topicTemplate || 'New topic'}}</q-item-section>
+          <q-item-section side>
+            <q-btn flat color="red-6" round dense @click="removeTopic(index)" icon="mdi-delete"/>
+          </q-item-section>
+        </template>
+        <div class="row q-pa-sm">
+          <q-input outlined dense hide-bottom-space class="col-12 q-mb-sm" color="grey-9" v-model="item.topicTemplate" @input="val => item.topicFilter = val" label="Topic"/>
+          <variables-helper v-if="board.settings.variables && board.settings.variables.length" :variables="board.settings.variables" @add="(variable) => item.value += variable"/>
+        </div>
+      </q-expansion-item>
+    </q-list>
     <q-input type="textarea" outlined hide-bottom-space dense color="grey-9" class="q-mt-sm" v-model="currentSettings.payload" label="Payload" input-style="resize: none;"/>
   </div>
 </template>
@@ -20,7 +41,7 @@ export default {
     const defaultSettings = {
       label: '',
       icon: '',
-      topic: 'button/topic/publish',
+      topics: [],
       payload: '',
       save: false,
       height: 2,
@@ -39,7 +60,28 @@ export default {
   },
   methods: {
     validate () {
-      return this.currentSettings.label.length <= 25
+      return this.currentSettings.label.length <= 25 && this.currentSettings.topics.length > 0
+    },
+    addTopic () {
+      this.currentSettings.topics.unshift({
+        topicTemplate: '',
+        topicFilter: '',
+        payloadType: 0,
+        payloadField: '',
+        payloadNameField: ''
+      })
+    },
+    removeTopic (index) { this.$delete(this.currentSettings.topics, index) },
+    checkUniqueTopic (itemIndex) {
+      const item = this.currentSettings.topics[itemIndex],
+        sameTopicsIndexes = this.currentSettings.topics.reduce((res, currItem, index) => {
+          if (currItem.topicTemplate === item.topicTemplate) {
+            res.push(index)
+          }
+          return res
+        }, [])
+      return item.topicTemplate &&
+        sameTopicsIndexes.indexOf(itemIndex) === 0
     }
   },
   watch: {

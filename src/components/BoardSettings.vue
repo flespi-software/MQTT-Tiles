@@ -36,7 +36,7 @@
                 group="variables"
                 :header-class="[`bg-${checkUniqueVariables(index) ? 'grey-4' : 'red-2'}`]"
                 expand-icon="mdi-settings"
-                default-opened
+                :default-opened="index === 0"
               >
                 <template slot="header">
                   <q-item-section avatar>
@@ -83,7 +83,7 @@
                             group="singleselect-items"
                             :header-class="[`bg-${item[1].indexOf('#') === -1 ? 'grey-4' : 'red-2'}`]"
                             expand-icon="mdi-settings"
-                            default-opened
+                            :default-opened="index === 0"
                           >
                             <template slot="header">
                               <q-item-section avatar>
@@ -92,7 +92,7 @@
                                   <q-btn :disabled="index === (variable.values.length - 1)" round dense flat class="col-1" @click.stop="downVarItem(variable, index)" icon="mdi-arrow-down"/>
                                 </div>
                               </q-item-section>
-                              <q-item-section>{{item[0] ? `${item[0]} [${item[1]}]` : item[1] || `item ${index + 1}`}}</q-item-section>
+                              <q-item-section>{{item[0] ? `${item[0]} [${item[1]}]` : item[1] || 'new item'}}</q-item-section>
                               <q-item-section side>
                                 <q-btn flat color="red-6" round dense @click="removeVarItem(variable, index)" icon="mdi-delete"/>
                               </q-item-section>
@@ -237,7 +237,7 @@ export default {
       this.$emit('hide')
     },
     addVar () {
-      this.currentSettings.settings.variables.push(Object.assign({}, this.$flespiMode ? variblesShemasByPresets.devices : this.defaultVariable))
+      this.currentSettings.settings.variables.unshift(Object.assign({}, this.$flespiMode ? variblesShemasByPresets.devices : this.defaultVariable))
     },
     removeVar (index) {
       this.$delete(this.currentSettings.settings.variables, index)
@@ -275,7 +275,7 @@ export default {
       this.currentSettings.settings.variables.splice(itemIndex + 1, 0, movedItem)
     },
     addVarItem (variable) {
-      variable.values.push(['', ''])
+      variable.values.unshift(['', ''])
     },
     removeVarItem (variable, itemIndex) {
       this.$delete(variable.values, itemIndex)

@@ -157,8 +157,10 @@ export default {
     setActiveClient (clientId) {
       this.activeClientId = clientId
       LocalStorage.set(ACTIVE_CLIENT_LOCAL_STORAGE_NAME, clientId)
-      this.setFlespiMode(clientId)
-      this.makeFlespiRestBus(clientId)
+      if (clientId) {
+        this.setFlespiMode(clientId)
+        this.makeFlespiRestBus(clientId)
+      }
     },
     changeStatus (status) {
       this.connected = status

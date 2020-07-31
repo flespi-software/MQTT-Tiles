@@ -18,7 +18,7 @@
             group="status-indicator-items"
             :header-class="[`bg-${checkUniqueItem(item, index) && !!item.actionTopic ? 'grey-4' : 'red-2'}`]"
             expand-icon="mdi-settings"
-            default-opened
+            :default-opened="index === 0"
           >
             <template slot="header">
               <q-item-section side>
@@ -133,7 +133,7 @@ export default {
   },
   methods: {
     addItem () {
-      this.currentSettings.items.push(this.currentItem)
+      this.currentSettings.items.unshift(this.currentItem)
       this.currentItem = Object.assign({}, this.defaultItem)
     },
     removeItem (itemIndex) {

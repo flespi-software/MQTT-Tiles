@@ -15,7 +15,7 @@
             group="singleselect-items"
             :header-class="[`bg-${checkUniqueValue(item.val, index) && !!item.actionTopic ? 'grey-4' : 'red-2'}`]"
             expand-icon="mdi-settings"
-            default-opened=""
+            :default-opened="index === 0"
           >
             <template slot="header">
               <q-item-section avatar>
@@ -24,7 +24,7 @@
                   <q-btn :disabled="index === (currentSettings.items.length - 1)" round dense flat class="col-1" @click.stop="downItem(index)" icon="mdi-arrow-down"/>
                 </div>
               </q-item-section>
-              <q-item-section>{{item.label ? `${item.label} [${item.val}]` : item.val || `item ${index + 1}`}}</q-item-section>
+              <q-item-section>{{item.label ? `${item.label} [${item.val}]` : item.val || 'New item'}}</q-item-section>
               <q-item-section side>
                 <q-btn flat color="red-6" round dense @click="removeItem(index)" icon="mdi-delete"/>
               </q-item-section>
@@ -92,7 +92,7 @@ export default {
   },
   methods: {
     addItem () {
-      this.currentSettings.items.push(this.currentItem)
+      this.currentSettings.items.unshift(this.currentItem)
       this.currentItem = Object.assign({}, this.defaultItem)
     },
     removeItem (itemIndex) {

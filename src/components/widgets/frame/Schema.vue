@@ -16,7 +16,7 @@
             group="frame-items"
             :header-class="[`bg-${checkUniqueTopic(index) ? 'grey-4' : 'red-2'}`]"
             expand-icon="mdi-settings"
-            default-opened
+            :default-opened="index === 0"
           >
             <template slot="header">
               <q-item-section>{{item.label || item.topic.topicFilter}}</q-item-section>
@@ -119,7 +119,7 @@ export default {
       ])
     },
     addItem () {
-      this.currentSettings.items.push(cloneDeep(this.defaultItem))
+      this.currentSettings.items.unshift(cloneDeep(this.defaultItem))
     },
     removeItem (itemIndex) {
       this.$delete(this.currentSettings.items, itemIndex)

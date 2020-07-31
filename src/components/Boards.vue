@@ -386,7 +386,7 @@ export default {
           icon = 'mdi-calculator-variant'
         } else if (variable.preset === 'custom') {
           if (variable.type === 1) {
-            icon = 'mdi-lan-connect'
+            icon = 'mdi-alpha-v-box'
           } else {
             icon = 'mdi-variable'
           }

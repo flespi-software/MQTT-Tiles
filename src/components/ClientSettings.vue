@@ -48,7 +48,7 @@
               group="singleselect-items"
               :header-class="[`bg-${checkUniqueSyncCredsValue(syncCreds, index) ? 'grey-4' : 'red-2'}`]"
               expand-icon="mdi-settings"
-              default-opened
+              :default-opened="index === 0"
             >
               <template slot="header">
                 <q-item-section avatar>
@@ -58,7 +58,7 @@
                   </div>
                 </q-item-section>
                 <q-item-section>
-                  <q-item-label class="ellipsis">{{syncCreds.label ? syncCreds.label : `Item ${index + 1}`}}</q-item-label>
+                  <q-item-label class="ellipsis">{{syncCreds.label ? syncCreds.label : 'New token'}}</q-item-label>
                   <q-item-label class="text-grey-8 ellipsis" style="font-size: .8rem;">{{syncCreds.credentions.username || '*Empty*'}}</q-item-label>
                 </q-item-section>
                 <q-item-section side>
@@ -209,7 +209,7 @@ export default {
     },
     addSyncCredsItem () {
       if (!this.currentSettings.syncCreds) { this.$set(this.currentSettings, 'syncCreds', []) }
-      this.currentSettings.syncCreds.push(cloneDeep(this.syncCreds))
+      this.currentSettings.syncCreds.unshift(cloneDeep(this.syncCreds))
     },
     removeSyncCredsItem (itemIndex) {
       this.$delete(this.currentSettings.syncCreds, itemIndex)
