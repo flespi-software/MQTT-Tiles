@@ -25,10 +25,10 @@
         <div class="row q-pa-sm">
           <q-input outlined dense hide-bottom-space class="col-12 q-mb-sm" color="grey-9" v-model="item.topicTemplate" @input="val => item.topicFilter = val" label="Topic"/>
           <variables-helper v-if="board.settings.variables && board.settings.variables.length" :variables="board.settings.variables" @add="(variable) => item.value += variable"/>
+          <q-input type="textarea" outlined hide-bottom-space dense color="grey-9" class="q-mt-sm" v-model="item.payload" label="Payload" input-style="resize: none;"/>
         </div>
       </q-expansion-item>
     </q-list>
-    <q-input type="textarea" outlined hide-bottom-space dense color="grey-9" class="q-mt-sm" v-model="currentSettings.payload" label="Payload" input-style="resize: none;"/>
   </div>
 </template>
 
@@ -42,7 +42,6 @@ export default {
       label: '',
       icon: '',
       topics: [],
-      payload: '',
       save: false,
       height: 2,
       width: 3,
@@ -68,7 +67,8 @@ export default {
         topicFilter: '',
         payloadType: 0,
         payloadField: '',
-        payloadNameField: ''
+        payloadNameField: '',
+        payload: ''
       })
     },
     removeTopic (index) { this.$delete(this.currentSettings.topics, index) },

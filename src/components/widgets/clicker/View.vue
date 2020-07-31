@@ -110,7 +110,7 @@ export default {
   methods: {
     actionHandler () {
       this.item.settings.topics.forEach((topic) => {
-        const data = { topic: topic.topicTemplate, payload: this.item.settings.payload, settings: { retain: this.item.settings.save } }
+        const data = { topic: topic.topicTemplate, payload: topic.payload, settings: { retain: this.item.settings.save } }
         this.$emit('action', data)
       })
     }

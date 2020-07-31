@@ -21,5 +21,12 @@ export default {
       ]
     }
     return widget
+  },
+  '1.10.7': (widget) => {
+    const settings = widget.settings
+    if (typeof settings.payload === 'string') {
+      settings.topics[0].payload = settings.payload
+    }
+    return widget
   }
 }
