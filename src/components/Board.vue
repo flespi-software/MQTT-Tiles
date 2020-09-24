@@ -23,6 +23,15 @@
       <q-btn v-if="canShare" @click="uploadHandler" icon="mdi-cloud-upload-outline" color="grey-9" flat round>
         <q-tooltip>Upload board</q-tooltip>
       </q-btn>
+      <q-btn @click="prepareExport" icon="mdi-export-variant" color="grey-9" flat round v-if="!exportEnabled">
+        <q-tooltip>Export widgets</q-tooltip>
+      </q-btn>
+      <q-btn @click="doneExport" label="export" color="green-9" flat v-else>
+        <q-tooltip>Export widgets</q-tooltip>
+      </q-btn>
+      <q-btn @click="importWidgets" icon="mdi-import" color="grey-9" flat round>
+        <q-tooltip>Import widgets</q-tooltip>
+      </q-btn>
       <q-btn @click="preventCollisionBoardHandler" :icon="board.settings.preventCollision ? 'mdi-pin' : 'mdi-pin-outline'" color="grey-9" flat round v-if="!isFrized && !board.settings.blocked">
         <q-tooltip>{{board.settings.preventCollision ? 'Unlock widgets positions' : 'Lock widgets positions'}}</q-tooltip>
       </q-btn>
@@ -88,7 +97,7 @@
           :layout.sync="currentLayout"
           :col-num="colNum"
           :row-height="rowHeight"
-          :is-draggable="!board.settings.blocked && !isFrized"
+          :is-draggable="!board.settings.blocked && !isFrized && !exportEnabled"
           :is-resizable="!board.settings.blocked && !isFrized"
           :is-mirrored="false"
           :vertical-compact="false"
@@ -111,6 +120,18 @@
               dragIgnoreFrom=".widget__content"
               @resized="resizeHandler"
             >
+              <div
+                v-if="exportEnabled"
+                class="wrapper__item--export absolute-top-left absolute-bottom-right cursor-pointer"
+              >
+                <q-btn
+                  @click="exportWidgets(widgetIndex)"
+                  icon="mdi-check"
+                  :color="exportedWidgetsIndexes[widgetIndex] ? 'green' : 'grey'"
+                  :size="`${currentLayout[index].h > currentLayout[index].w ? currentLayout[index].w : currentLayout[index].h}rem`"
+                  flat class="absolute-top-left absolute-bottom-right full-width"
+                />
+              </div>
               <component
                 class="wrapper__items"
                 :class="{'wrapper__items--edited': !board.settings.blocked && !isFrized}"
@@ -155,6 +176,10 @@
   .wrapper__items--edited
     border 1px solid transparent
     box-shadow 0 1px 5px rgba(0,0,0,0.2), 0 2px 2px rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12)!important
+  .wrapper__item--export
+    background-color $grey-3
+    opacity .7
+    z-index 100
   .button--add
     bottom 16px
     right 16px
@@ -221,7 +246,9 @@ export default {
       breakpoints: BREAKPOINTS,
       breakpoint: 'xxs',
       operationMode: -1,
-      variablesWrapperHeight: 0
+      variablesWrapperHeight: 0,
+      exportEnabled: false,
+      exportedWidgetsIndexes: null
     }
   },
   computed: {
@@ -429,6 +456,26 @@ export default {
         this.$emit('edit:widget', { settings: widget, widgetId: widget.id, topics: [...this.widgets[widgetIndex].topics] })
       })
       this.$emit('edit:board', { id: this.board.id, board: boardModel })
+    },
+    exportWidgets (widgetIndex) {
+      if (this.exportedWidgetsIndexes[widgetIndex]) {
+        this.$delete(this.exportedWidgetsIndexes, widgetIndex)
+      } else {
+        this.$set(this.exportedWidgetsIndexes, widgetIndex, true)
+      }
+    },
+    prepareExport () {
+      this.exportedWidgetsIndexes = {}
+      this.exportEnabled = true
+    },
+    doneExport () {
+      const widgets = Object.keys(this.exportedWidgetsIndexes).map(index => this.widgets[index])
+      this.$emit('export-widgets', widgets)
+      this.exportedWidgetsIndexes = null
+      this.exportEnabled = false
+    },
+    importWidgets () {
+      this.$emit('import-widgets')
     }
   },
   components: {

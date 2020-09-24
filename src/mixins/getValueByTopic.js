@@ -1,5 +1,11 @@
 import { WIDGET_PAYLOAD_TYPE_STRING, WIDGET_PAYLOAD_TYPE_JSON } from '../constants'
-import get from 'lodash/get'
+import JSONPath from 'jsonpath'
+function jsonpath (source, path, defaultValue) {
+  let value = JSONPath.query(source, path)
+  if (value === null || value === undefined || !value.length) { value = defaultValue }
+  if (value.length === 1) { value = value[0] }
+  return value
+}
 export default {
   methods: {
     getValueByTopic (value, topic) {
@@ -15,9 +21,10 @@ export default {
           case WIDGET_PAYLOAD_TYPE_JSON: {
             try {
               if (topic.payloadField) {
-                const val = get(isPacket ? JSON.parse(value.toString()) : value, topic.payloadField, 'N/A')
+                const source = isPacket ? JSON.parse(value.toString()) : value
+                const val = jsonpath(source, topic.payloadField, 'N/A')
                 if (topic.payloadNameField) {
-                  const name = get(isPacket ? JSON.parse(value.toString()) : value, topic.payloadNameField, 'N/A')
+                  const name = jsonpath(source, topic.payloadNameField, 'N/A')
                   value = [name, val]
                 } else {
                   value = val

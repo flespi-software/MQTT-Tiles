@@ -28,14 +28,14 @@
                 <q-btn round dense flat icon="mdi-dots-vertical" color="grey-9">
                   <q-menu anchor="bottom right" self="top right">
                     <q-list dense>
-                      <q-item v-close-popup @click.stop="$emit('share:uploaded', id)" v-if="canShare" clickable>
+                      <q-item v-close-popup @click.stop="$emit('share-uploaded', id)" v-if="canShare" clickable>
                         <q-item-section avatar>
                           <q-icon name="mdi-link"/>
                         </q-item-section>
                         <q-item-section>Get link</q-item-section>
                       </q-item>
                       <q-separator v-if="canShare"/>
-                      <q-item v-close-popup @click.stop="$emit('delete:uploaded', id)" clickable>
+                      <q-item v-close-popup @click.stop="$emit('delete-uploaded', id)" clickable>
                         <q-item-section avatar>
                           <q-icon name="mdi-delete-outline" color="red"/>
                         </q-item-section>
@@ -117,17 +117,11 @@
                           </q-item-section>
                           <q-item-section>Save to broker</q-item-section>
                         </q-item>
-                        <q-item v-close-popup clickable @click.stop="$emit('export:string', id)">
+                        <q-item v-close-popup clickable @click.stop="$emit('export-as', id)">
                           <q-item-section avatar>
                             <q-icon name="mdi-export-variant" />
                           </q-item-section>
-                          <q-item-section>Export as string</q-item-section>
-                        </q-item>
-                        <q-item v-close-popup clickable @click.stop="$emit('export:file', id)">
-                          <q-item-section avatar>
-                            <q-icon name="mdi-file-export" />
-                          </q-item-section>
-                          <q-item-section>Export as file</q-item-section>
+                          <q-item-section>Export</q-item-section>
                         </q-item>
                         <q-item v-close-popup clickable @click.stop="openEditSettingsHandler(id)">
                           <q-item-section avatar>

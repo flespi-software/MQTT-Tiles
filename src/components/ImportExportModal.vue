@@ -10,7 +10,7 @@
         <template v-if="mode === 1">
           <div class="export-modal-view">
             <div class="export-modal-view__string" style="height: 45%;">
-              <q-input outlined dense hide-bottom-space :rows="7" input-style="resize: none;" type="textarea" :readonly="true" v-model="data" label="Board config" color="grey-9">
+              <q-input outlined dense hide-bottom-space :rows="7" input-style="resize: none;" type="textarea" :readonly="true" v-model="data" label="Config" color="grey-9">
                 <q-btn slot="append" dense flat icon='mdi-content-copy' @click="copyString" />
               </q-input>
             </div>
@@ -23,7 +23,7 @@
         <template v-else-if="mode === 0">
           <div class="import-modal-view full-height">
             <div class="export-modal-view__string" style="height: 45%;">
-              <q-input outlined dense hide-bottom-space :row="7" class="full-height" input-style="resize: none;" type="textarea" v-model="importData" label="Board config" color="grey-9" placeholder="Put exported board config here"/>
+              <q-input outlined dense hide-bottom-space :row="7" class="full-height" input-style="resize: none;" type="textarea" v-model="importData" label="Config" color="grey-9" placeholder="Put exported config here"/>
             </div>
             <div class="text-center text-italic" style="height: 10%; font-size: 2rem;">or</div>
             <div class="export-modal-view__file flex flex-center relative-position rounded-borders" style="height: 45%; border: dashed 1px black; ">
@@ -55,7 +55,7 @@
                 <template v-slot:list="scope">
                   <div v-if="!scope.files.length" class="text-center">
                     <q-icon name="mdi-file-import-outline" size="6rem" color="grey-9" />
-                    <div style="font-size: 18px;">Select an importing board file.</div>
+                    <div style="font-size: 18px;">Select an importing file.</div>
                   </div>
                   <q-list separator>
                     <q-item v-for="file in scope.files" :key="file.name">
@@ -141,7 +141,7 @@ export default {
           this.$q.notify({
             color: 'positive',
             icon: 'content_copy',
-            message: 'Board copied',
+            message: 'Copied',
             timeout: 1000,
             position: 'bottom-left'
           })
@@ -149,7 +149,7 @@ export default {
           this.$q.notify({
             color: 'negative',
             icon: 'content_copy',
-            message: 'Error coping board',
+            message: 'Error coping',
             timeout: 1000,
             position: 'bottom-left'
           })
@@ -160,7 +160,7 @@ export default {
       a.style.display = 'none'
       const file = new Blob([this.data], { type: 'text/plain' })
       const url = a.href = URL.createObjectURL(file)
-      a.download = 'board.txt'
+      a.download = 'data.txt'
       document.body.appendChild(a)
       a.click()
       setTimeout(function () {

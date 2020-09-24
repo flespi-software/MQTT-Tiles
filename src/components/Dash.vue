@@ -24,6 +24,8 @@
       @share="shareHandler(activeBoardId)"
       @upload="exportPrepareBoardHandler(activeBoardId)"
       @modify="setModifyTimeBoardHandler(activeBoardId)"
+      @export-widgets="exportWidgetsFromBoard"
+      @import-widgets="importClickHandler('widgets')"
       :style="{height: `${clientSettings ? fullView ? 'calc(100vh - 50px)' : '100vh' : 'calc(100vh - 110px)'}`}"
     />
     <boards
@@ -44,17 +46,16 @@
       @select="setActiveBoard"
       @action="actionHandler"
       @share="shareHandler"
-      @share:uploaded="shareUploadedHandler"
-      @delete:uploaded="deleteUploadedBoard"
+      @share-uploaded="shareUploadedHandler"
+      @delete-uploaded="deleteUploadedBoard"
       @export="exportPrepareBoardHandler"
-      @export:string="exportBoardAsStringHandler"
-      @export:file="exportBoardAsFileHandler"
+      @export-as="exportBoardAsHandler"
       @import="importBoardFromConnectionHandler"
       @change:attach="changeAttachedBoards"
       :style="{height: `${clientSettings ? 'calc(100vh - 50px)' : 'calc(100vh - 110px)'}`}"
     >
       <div slot="actions">
-        <q-btn label="import" @click="importClickHandler" flat color="grey-9"/>
+        <q-btn label="import" @click="importClickHandler('board')" flat color="grey-9"/>
       </div>
     </boards>
     <div v-if="!clientSettings" class="bg-red-2 text-red-8 text-center absolute connections--empty">
@@ -70,7 +71,7 @@
       :mode="importExportMode"
       :data="importExportData"
       @close="importExportClose"
-      @import="importBoardFromUserHandler"
+      @import="importFromUserHandler"
     />
   </div>
 </template>
@@ -165,6 +166,7 @@ export default {
       expireMessagesStore: {},
       importExportMode: undefined,
       importExportData: undefined,
+      importExportEntity: undefined,
       values: {},
       boardsVariablesValues: {}
     }
@@ -1121,36 +1123,47 @@ export default {
           this.$q.loading.hide()
         })
     },
-    exportBoardAsStringHandler (id) {
+    exportBoardAsHandler (id) {
       const board = this.boards[id],
         boardModelForSave = getBoardToSave(board, this.widgets)
-      this.importExportMode = 1
-      this.importExportData = Base64.encode(JSON.stringify(boardModelForSave))
-      this.$refs.importExportModal.open()
+      this.exportAsHandler(boardModelForSave)
     },
-    exportBoardAsFileHandler (id) {
-      const board = this.boards[id],
-        boardModelForSave = getBoardToSave(board, this.widgets)
+    exportWidgetsFromBoard (widgets) {
+      const configs = cloneDeep(widgets).map(widget => {
+        widget.id = undefined
+        widget.status = WIDGET_STATUS_DISABLED
+        return widget
+      })
+      this.exportAsHandler(configs)
+    },
+    exportAsHandler (data) {
       this.importExportMode = 1
-      this.importExportData = Base64.encode(JSON.stringify(boardModelForSave))
+      this.importExportData = Base64.encode(JSON.stringify(data))
       this.$refs.importExportModal.open()
     },
     importExportClose () {
       this.importExportMode = undefined
       this.importExportData = undefined
     },
-    importClickHandler () {
+    importClickHandler (entity) {
       this.importExportMode = 0
+      this.importExportEntity = entity
       this.$refs.importExportModal.open()
     },
-    importBoardFromUserHandler (data) {
-      let boardModel
+    importFromUserHandler (data) {
+      let model
       try {
-        boardModel = JSON.parse(data)
+        model = JSON.parse(data)
       } catch (e) {
-        boardModel = JSON.parse(Base64.decode(data))
+        model = JSON.parse(Base64.decode(data))
       }
-      this.importBoardHandler(boardModel)
+      if (this.importExportEntity === 'board') {
+        this.importBoardHandler(model)
+      } else if (this.importExportEntity === 'widgets') {
+        model.forEach(widget => {
+          this.addWidget(widget)
+        })
+      }
     },
     /* events */
     updateBoards (boards, widgets) {
