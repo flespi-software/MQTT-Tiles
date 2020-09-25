@@ -297,8 +297,8 @@ export default {
     }
   },
   created () {
-    const topicPattern = this.getCurrentTopic(this.topic, this.model)
     this.setModel(this.topicToModelHandler(this.value))
+    const topicPattern = this.getCurrentTopic(this.topic, this.model)
     this.$watch('entity', this.changeEntity)
     if (topicPattern) {
       this.$emit('input', { topic: topicPattern })
@@ -309,8 +309,10 @@ export default {
       deep: true,
       handler (entities) {
         this.model = { ...this.model, ...entities }
-        const { lists } = this.initByEntity(this.entity)
-        this.lists = lists
+        if (this.entity) {
+          const { lists } = this.initByEntity(this.entity)
+          this.lists = lists
+        }
       }
     }
   }
