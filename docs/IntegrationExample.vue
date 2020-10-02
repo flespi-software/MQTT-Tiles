@@ -20,7 +20,7 @@ export default {
   data () {
     return {
       flespiLogin: {
-        token: '0FneZZpyqP3reyiaedXA1546yjQbN1pCwAEjoTICwzTBX1z12nqTgkPFrtE2lRsH',
+        token: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
         region: {
           cdn: 'https://cdn.flespi.io',
           default: true,

@@ -28,13 +28,13 @@
                 <q-btn round dense flat icon="mdi-dots-vertical" color="grey-9">
                   <q-menu anchor="bottom right" self="top right">
                     <q-list dense>
-                      <q-item v-close-popup @click.stop="$emit('share-uploaded', id)" v-if="canShare" clickable>
+                      <q-item v-close-popup @click.stop="share('share-uploaded', id)" :disable="!canShare" clickable>
                         <q-item-section avatar>
                           <q-icon name="mdi-link"/>
                         </q-item-section>
                         <q-item-section>Get link</q-item-section>
                       </q-item>
-                      <q-separator v-if="canShare"/>
+                      <q-separator/>
                       <q-item v-close-popup @click.stop="$emit('delete-uploaded', id)" clickable>
                         <q-item-section avatar>
                           <q-icon name="mdi-delete-outline" color="red"/>
@@ -91,7 +91,7 @@
               </q-item-section>
               <q-item-section side>
                 <div>
-                  <q-btn round dense flat icon="mdi-link" color="grey-9" @click.native="$emit('share', id)" v-if="canShare">
+                  <q-btn round dense flat icon="mdi-link" :color="`grey-${canShare ? 9 : 7}`" @click.native="share('share', id)" :ripple="canShare">
                     <q-tooltip>Get link</q-tooltip>
                   </q-btn>
                   <q-btn round dense flat icon="mdi-fullscreen" color="grey-9" @click.native="$emit('select', id)">
@@ -387,6 +387,13 @@ export default {
         }
       }
       return icon
+    },
+    share (event, id) {
+      if (this.canShare) {
+        this.$emit(event, id)
+      } else {
+        this.$emit('share-error')
+      }
     }
   },
   watch: {

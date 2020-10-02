@@ -4,12 +4,13 @@
       ref="dash"
       :client-settings="client"
       :init-boards="initBoards"
-      @change:status="(status) => { $emit('change:status', status) }"
+      @change-status="(status) => { $emit('change-status', status) }"
       @share="model => $emit('share', model)"
       @share:prepare="sharePrepareHandler"
       @change:title="t => title = t"
       @update:boards="updateBoards"
       @change:attach="changeAttachedBoards"
+      @update-client-settings="$emit('update-client-settings')"
     />
     <share-wizard
       v-if="shareWizardConfig"

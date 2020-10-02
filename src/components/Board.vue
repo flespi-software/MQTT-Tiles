@@ -17,10 +17,10 @@
         <q-tooltip>Back to boards list</q-tooltip>
       </q-btn>
       <q-toolbar-title class="text-grey-9">{{board.name || '*No name*'}}</q-toolbar-title>
-      <q-btn v-if="canShare" @click="shareHandler" icon="mdi-link" color="grey-9" flat round>
+      <q-btn @click="share(shareHandler)" icon="mdi-link" flat round :color="`grey-${canShare ? 9 : 7}`" :ripple="canShare">
         <q-tooltip>Get link</q-tooltip>
       </q-btn>
-      <q-btn v-if="canShare" @click="uploadHandler" icon="mdi-cloud-upload-outline" color="grey-9" flat round>
+      <q-btn @click="share(uploadHandler)" icon="mdi-cloud-upload-outline" flat round :color="`grey-${canShare ? 9 : 7}`" :ripple="canShare">
         <q-tooltip>Upload board</q-tooltip>
       </q-btn>
       <q-btn @click="prepareExport" icon="mdi-application-export" color="grey-9" flat round v-if="!exportEnabled">
@@ -508,6 +508,13 @@ export default {
     },
     importWidgets () {
       this.$emit('import-widgets')
+    },
+    share (cb) {
+      if (this.canShare) {
+        cb()
+      } else {
+        this.$emit('share-error')
+      }
     }
   },
   components: {

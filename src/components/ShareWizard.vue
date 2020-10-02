@@ -5,7 +5,7 @@
         <q-toolbar-title>Share wizard</q-toolbar-title>
       </q-toolbar>
       <div :style="{ height: $q.platform.is.mobile ? 'calc(100% - 100px)' : '50vh'}" class="scroll bg-white">
-        <q-stepper flat ref="stepper" v-model="currentStep" animated class="share-stepper" done-color="green-6" active-color="amber-9" contracted>
+        <q-stepper flat ref="stepper" v-model="currentStep" animated class="share-stepper" done-color="green-6" active-color="amber-9" :header-class="stepsEnum.length === 1 ? 'hidden' : ''" contracted>
           <q-step name="tokens" title="Tokens" v-if="config.tokens.length > 1" icon="mdi-fingerprint" :done="currentStep === 'replace' || currentStep === 'link'">
             <q-list separator bordered>
               <q-item
@@ -69,7 +69,7 @@
       <q-toolbar class="bg-grey-9 text-white">
         <q-btn flat dense class="q-mr-sm absolute" @click="closeHandler">Close</q-btn>
         <q-toolbar-title></q-toolbar-title>
-        <q-btn flat v-if="steps.length && currentStep !== steps[0].value && !updateBoardError" @click="prevStepHandler">Back</q-btn>
+        <q-btn flat v-if="canBack" @click="prevStepHandler">Back</q-btn>
         <q-btn flat class="q-ml-sm" v-if="!updateBoardError" @click="nextStepHandler" :disable="!isValidStep">{{ currentStep === 'link' ? 'Done' : 'Next' }}</q-btn>
       </q-toolbar>
     </div>
@@ -132,6 +132,10 @@ export default {
         }
         default: { return true }
       }
+    },
+    stepsEnum () { return Object.values(this.steps) },
+    canBack () {
+      return !!this.stepsEnum.length && this.currentStep !== this.steps[0].value && !this.updateBoardError
     }
   },
   created () {

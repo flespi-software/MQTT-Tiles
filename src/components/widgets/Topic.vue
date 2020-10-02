@@ -8,7 +8,7 @@
         <div class="col-2 text-grey-8 text-center text-uppercase">or</div>
         <hr class="q-separator q-separator--horizontal col-5" style="height: 1px; margin-top: 10px;"/>
       </div>
-      <div class="col-12 text-grey-8 q-mb-sm text-subtitle2"> Enter its manually:</div>
+      <div class="col-12 text-grey-8 q-mb-sm text-subtitle2"> Enter manually:</div>
     </template>
     <q-input dense autofocus outlined hide-bottom-space class="col-8 q-pr-sm" color="grey-9" v-model="currentValue.topicTemplate" @input="currentValue.topicFilter = currentValue.topicTemplate" label="Topic" :error="!validateTopic(currentValue.topicFilter)"/>
     <q-select dense class="col-4" outlined hide-bottom-space color="grey-9" v-model="currentValue.payloadType" emit-value map-options label="Payload type" :options="payloadTypeOptions"/>

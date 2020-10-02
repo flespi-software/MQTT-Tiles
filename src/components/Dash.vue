@@ -22,6 +22,7 @@
       @prevent="preventBoardHandler"
       @update:layout="layoutUpdateHandler"
       @share="shareHandler(activeBoardId)"
+      @share-error="shareErrorHandler"
       @upload="exportPrepareBoardHandler(activeBoardId)"
       @modify="setModifyTimeBoardHandler(activeBoardId)"
       @export-widgets="exportWidgetsFromBoard"
@@ -47,6 +48,7 @@
       @action="actionHandler"
       @share="shareHandler"
       @share-uploaded="shareUploadedHandler"
+      @share-error="shareErrorHandler"
       @delete-uploaded="deleteUploadedBoard"
       @export="exportPrepareBoardHandler"
       @export-as="exportBoardAsHandler"
@@ -366,7 +368,7 @@ export default {
     initClient () {
       const endHandler = () => {
           this.clientStatus = false
-          this.$emit('change:status', false)
+          this.$emit('change-status', false)
         },
         config = this.clearObject(this.clientSettings)
 
@@ -385,7 +387,7 @@ export default {
       client.on('connect', (connack) => {
         this.connack = connack
         this.clientStatus = true
-        this.$emit('change:status', true)
+        this.$emit('change-status', true)
         this.initWidgets()
         if (!this.clientSettings.flespiBoard) {
           this.getSyncedBoards()
@@ -1078,6 +1080,33 @@ export default {
       }
       this.$emit('share:prepare', shareWizardConfig)
     },
+    shareErrorHandler () {
+      if (!this.clientSettings) {
+        this.$q.notify({
+          type: 'warning',
+          timeout: 5000,
+          message: 'Attention',
+          caption: 'You need to choose client.',
+          icon: 'mdi-alert',
+          position: 'bottom-left',
+          closeBtn: true
+        })
+      } else {
+        this.$q.notify({
+          type: 'warning',
+          timeout: 0,
+          message: 'Attention',
+          caption: 'You need to have a Standard or ACL token for sharing set up in the MQTT Client settings. Please read more <a href="https://flespi.com/blog/mqtt-tiles-shareable-and-flexible-iot-dashboards" target="_blank">here</a>.',
+          html: true,
+          icon: 'mdi-alert',
+          position: 'bottom-left',
+          actions: [
+            { label: 'Update settings', color: 'white', handler: () => { this.$emit('update-client-settings') } },
+            { label: 'Close', color: 'white', handler: () => {} }
+          ]
+        })
+      }
+    },
     shareUploadedHandler (boardId) {
       const shareWizardConfig = {
         boardId,
@@ -1129,6 +1158,7 @@ export default {
       this.exportAsHandler(boardModelForSave)
     },
     exportWidgetsFromBoard (widgets) {
+      if (!widgets.length) { return false }
       const configs = cloneDeep(widgets).map(widget => {
         widget.id = undefined
         widget.status = WIDGET_STATUS_DISABLED

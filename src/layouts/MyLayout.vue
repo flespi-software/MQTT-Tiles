@@ -80,11 +80,12 @@
     <q-page-container>
       <router-view
         :client="clients[activeClientId]"
-        @change:status="changeStatus"
+        @change-status="changeStatus"
         @share="shareHandler"
         @change:attach="changeAttachedBoards"
         @delete:boards="deleteBoardsHandler"
         @add:boards="addBoardsHandler"
+        @update-client-settings="editClientSettings(activeClientId)"
       />
     </q-page-container>
   </q-layout>
