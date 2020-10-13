@@ -32,7 +32,6 @@ function migrateBoard (board, fromVersion, toVersion) {
       }
     }
   })
-  board.appVersion = toVersion
   return board
 }
 

@@ -10,7 +10,7 @@
       </div>
       <div class="col-12 text-grey-8 q-mb-sm text-subtitle2"> Enter manually:</div>
     </template>
-    <q-input dense autofocus outlined hide-bottom-space class="col-8 q-pr-sm" color="grey-9" v-model="currentValue.topicTemplate" @input="currentValue.topicFilter = currentValue.topicTemplate" label="Topic" :error="!validateTopic(currentValue.topicFilter)"/>
+    <q-input dense :autofocus="config.needAutofocus" outlined hide-bottom-space class="col-8 q-pr-sm" color="grey-9" v-model="currentValue.topicTemplate" @input="currentValue.topicFilter = currentValue.topicTemplate" label="Topic" :error="!validateTopic(currentValue.topicFilter)"/>
     <q-select dense class="col-4" outlined hide-bottom-space color="grey-9" v-model="currentValue.payloadType" emit-value map-options label="Payload type" :options="payloadTypeOptions"/>
     <variables-helper class="col-12" v-if="board && board.settings.variables && board.settings.variables.length" :variables="board.settings.variables" @add="(variable) => currentValue.topicTemplate += variable"/>
     <q-input dense outlined hide-bottom-space v-if="currentValue.payloadType === WIDGET_PAYLOAD_TYPE_JSON" color="grey-9" class="col-12 q-mt-sm" v-model="currentValue.payloadField" label="Payload path" hint="You can set path in result JSON. Path started from root of object. Example: names[0].value"/>
@@ -29,7 +29,7 @@ import {
 export default {
   name: 'Topic',
   props: ['value', 'board', 'config'],
-  /* config = { needLabel, needSelectors } */
+  /* config = { needLabel, needSelectors, needAutofocus } */
   data () {
     const defaultTopic = {
         topicTemplate: '',

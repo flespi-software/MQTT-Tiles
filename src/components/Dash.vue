@@ -659,6 +659,7 @@ export default {
       board = this.migrateBoard(cloneDeep(board), board.appVersion, version)
       const { board: currentBoard, widgets } = this.unpackBoard(board)
       board = currentBoard
+      board.appVersion = version
       this.$set(this.boards, board.id, board)
       this.resolveBoardVariables(board)
       Object.keys(widgets).forEach(widgetId => {
@@ -675,6 +676,7 @@ export default {
           board = unpackedBoard
           this.resolveBoardVariables(board)
           savedBoards[boardId] = this.migrateBoard(board, board.appVersion, version)
+          savedBoards[boardId].appVersion = version
         })
         this.boards = savedBoards
         if (widgets) {

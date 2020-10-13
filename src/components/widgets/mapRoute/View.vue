@@ -1,5 +1,5 @@
 <template>
-  <q-card flat inline class="widget__map-route " style="width: 100%; height: 100%;" :class="[`bg-${item.color}-1`, `${blocked ? 'scroll' : ''}`, `${integration ? '' : 'absolute'}`]">
+  <q-card flat inline class="widget__map-route absolute" style="width: 100%; height: 100%;" :class="[`bg-${item.color}-1`, `${blocked ? 'scroll' : ''}`]">
     <q-item class="q-px-sm q-pt-sm q-pb-none" style="min-height: 0px;">
       <q-item-section class="ellipsis" :class="[`text-${item.color}-7`]" style="font-size: .9rem">
         <q-item-label class="ellipsis">{{item.name}}</q-item-label>
@@ -26,7 +26,7 @@
         </q-item-section>
       </transition>
     </q-item>
-    <q-card-section class="widget__content scroll q-pa-none" :class="[`bg-${item.color}-1`]" :style="{height: integration ? '' : contentHeight}">
+    <q-card-section class="widget__content scroll q-pa-none" :class="[`bg-${item.color}-1`]" :style="{height: contentHeight}">
       <div style="width: 100%; height: 100%;">
         <div style="width: 100%; height: 100%;">
           <iframe style="width: 100%;height: calc(100% - 18px);" :src="route" frameborder="0" ref="map" allowfullscreen></iframe>
@@ -63,7 +63,7 @@ import getValueByTopic from '../../../mixins/getValueByTopic.js'
 import timestamp from '../../../mixins/timestamp.js'
 export default {
   name: 'MapRoute',
-  props: ['item', 'index', 'mini', 'in-shortcuts', 'value', 'blocked', 'integration'],
+  props: ['item', 'index', 'mini', 'in-shortcuts', 'value', 'blocked'],
   data () {
     const salt = uid()
     return {
@@ -83,30 +83,29 @@ export default {
     }
   },
   methods: {
-    setRoute (route) {
-      this.$refs.map && this.$refs.map.contentWindow.postMessage(`MapView-${this.salt}|cmd:{"addgroutes": ${JSON.stringify(route)}, "clear": "all", "fullscreencontrol": true}`, '*')
-      this.prevRoute = route
+    setRoutes (routes) {
+      this.$refs.map && this.$refs.map.contentWindow.postMessage(`MapView-${this.salt}|cmd:{"addgroutes": ${JSON.stringify(routes)}, "clear": "all", "fullscreencontrol": true}`, '*')
+      this.prevRoute = routes
     },
-    getRoute () {
-      let routeTopic = this.integration ? this.item.dataTopics[0] : this.item.settings.topics[0]
-      if (this.integration) {
-        routeTopic = { ...routeTopic, payloadField: this.item.settings.routeField }
-      }
-      let value = this.getValueByTopic(this.value[routeTopic.topicFilter] && this.value[routeTopic.topicFilter].payload, routeTopic),
-        values = []
-      value = value === 'N/A' ? '' : value
-      if (Array.isArray(value)) {
-        values = value
-      } else {
-        values = [value]
-      }
-      return values
+    getRoutes () {
+      const routes = this.item.settings.items.reduce((values, item) => {
+        const routeTopic = item.route
+        let value = this.getValueByTopic(this.value[routeTopic.topicFilter] && this.value[routeTopic.topicFilter].payload, routeTopic)
+        value = value === 'N/A' ? '' : value
+        if (Array.isArray(value)) {
+          values = [...values, ...value]
+        } else {
+          values.push(value)
+        }
+        return values
+      }, [])
+      return routes
     }
   },
   created () {
     window.addEventListener('message', (e) => {
       if (e.data === `MapView-${this.salt}|state:{"ready": true}`) {
-        this.setRoute(this.getRoute())
+        this.setRoutes(this.getRoutes())
       }
     })
   },
@@ -115,14 +114,14 @@ export default {
     value: {
       deep: true,
       handler (value) {
-        const route = this.getRoute()
+        const route = this.getRoutes()
         if (route.length !== this.prevRoute.length || this.prevRoute.some((el, index) => el !== route[index])) {
-          this.setRoute(this.getRoute())
+          this.setRoutes(this.getRoutes())
         }
       }
     },
     'item.settings.topics' () {
-      this.setRoute(this.getRoute())
+      this.setRoutes(this.getRoutes())
     }
   }
 }

@@ -2,11 +2,15 @@ import compareVersions from 'compare-versions'
 import clicker from './clicker/migrations'
 import frame from './frame/migrations'
 import switcher from './switcher/migrations'
+import mapLocation from './mapLocation/migrations'
+import mapRoute from './mapRoute/migrations'
 /* widgetType: {[version]: handler} */
 const migrateHandlers = {
   clicker,
   frame,
-  switcher
+  switcher,
+  'map-location': mapLocation,
+  'map-route': mapRoute
 }
 function migrateWidgets (widgets, fromVersion, toVersion) {
   return widgets.reduce((newWidgets, widget) => {

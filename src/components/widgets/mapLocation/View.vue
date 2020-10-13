@@ -1,5 +1,5 @@
 <template>
-  <q-card flat inline class="widget__map-location" style="width: 100%; height: 100%;" :class="[`bg-${item.color}-1`, `${blocked ? 'scroll' : ''}`, `${integration ? '' : 'absolute'}`]">
+  <q-card flat inline class="widget__map-location absolute" style="width: 100%; height: 100%;" :class="[`bg-${item.color}-1`, `${blocked ? 'scroll' : ''}`]">
     <q-item class="q-px-sm q-pt-sm q-pb-none" style="min-height: 0;">
       <q-item-section class="ellipsis" :class="[`text-${item.color}-7`]" style="font-size: .9rem">
         <q-item-label class="ellipsis">{{item.name}}</q-item-label>
@@ -26,11 +26,11 @@
         </q-item-section>
       </transition>
     </q-item>
-    <q-card-section class="widget__content scroll q-pa-none" :class="[`bg-${item.color}-1`]" :style="{height: integration ? '' : contentHeight}">
+    <q-card-section class="widget__content scroll q-pa-none" :class="[`bg-${item.color}-1`]" :style="{height: contentHeight}">
       <div style="width: 100%; height: 100%;">
         <iframe style="width: 100%;height: calc(100% - 18px);" :src="route" frameborder="0" ref="map" allowfullscreen></iframe>
       </div>
-      <div class="absolute-top-left q-pa-xs" :class="[`text-${item.color}-7`, `bg-${item.color}-1`]" style="font-size: .8rem; border-bottom-left-radius: 4px;">{{position}}</div>
+      <!-- <div class="absolute-top-left q-pa-xs" :class="[`text-${item.color}-7`, `bg-${item.color}-1`]" style="font-size: .8rem; border-bottom-left-radius: 4px;">{{positions}}</div> -->
       <div v-if="item.settings.isNeedTime" class="absolute-bottom-left q-px-xs q-pt-xs" style="font-size: 12px; border-top-right-radius: 5px;" :class="[`text-${item.color}-7`, `bg-${item.color}-1`]">
         {{timestamp}}
       </div>
@@ -62,37 +62,31 @@ import getValueByTopic from '../../../mixins/getValueByTopic.js'
 import timestamp from '../../../mixins/timestamp.js'
 export default {
   name: 'MapLocation',
-  props: ['item', 'index', 'mini', 'in-shortcuts', 'value', 'blocked', 'integration'],
+  props: ['item', 'index', 'mini', 'in-shortcuts', 'value', 'blocked'],
   data () {
     const salt = uid()
     return {
       route: `https://flespi.io/mapview/#/salt/${salt}`,
       salt,
       WIDGET_STATUS_DISABLED,
-      prevPosition: []
+      prevPositions: {}
     }
   },
   computed: {
-    position () {
-      let values = []
-      if (this.integration) {
-        const dataTopic = this.item.dataTopics[0],
-          topicFilter = dataTopic.topicFilter,
-          latDataTopic = { ...dataTopic, payloadField: this.item.settings.latField },
-          lonDataTopic = { ...dataTopic, payloadField: this.item.settings.lonField }
-        values = [
-          parseFloat(this.getValueByTopic(this.value[topicFilter] && this.value[topicFilter].payload, latDataTopic)),
-          parseFloat(this.getValueByTopic(this.value[topicFilter] && this.value[topicFilter].payload, lonDataTopic))
-        ]
-      } else {
-        const latTopic = this.item.settings.topics[0],
-          lonTopic = this.item.settings.topics[1],
+    positions () {
+      const values = this.item.settings.items.reduce((result, item) => {
+        const latTopic = item.lat,
+          lonTopic = item.lon,
           lat = parseFloat(this.getValueByTopic(this.value[latTopic.topicFilter] && this.value[latTopic.topicFilter].payload, latTopic)),
           lon = parseFloat(this.getValueByTopic(this.value[lonTopic.topicFilter] && this.value[lonTopic.topicFilter].payload, lonTopic))
-        values = [lat, lon]
-      }
-      const isValueSame = values[0] === this.prevPosition[0] && values[1] === this.prevPosition[1]
-      !isValueSame && this.setPosition(values)
+        if (lat && lon) {
+          result[item.name] = { latlng: [lat, lon], title: item.name, label: item.name }
+        } else if (this.prevPositions[item.name] && this.prevPositions[item.name].lat && this.prevPositions[item.name].lon) {
+          result[item.name] = { latlng: [this.prevPositions[item.name].lat, this.prevPositions[item.name].lon], title: item.name, label: item.name }
+        }
+        return result
+      }, {})
+      this.setPosition(values)
       return values
     },
     contentHeight () {
@@ -104,17 +98,20 @@ export default {
     }
   },
   methods: {
-    setPosition (position) {
-      if (position[0] && position[1]) {
-        this.$refs.map && this.$refs.map.contentWindow.postMessage(`MapView-${this.salt}|cmd:{"addmarkers": ${JSON.stringify([position])}, "clear": "all", "fullscreencontrol": true}`, '*')
-      }
-      this.prevPosition = position
+    setPosition (positions) {
+      this.$refs.map && this.$refs.map.contentWindow.postMessage(`MapView-${this.salt}|cmd:{"namedmarkers": ${JSON.stringify(positions)}, "clear": "all", "fullscreencontrol": true}`, '*')
+      this.prevPositions = positions
+    }
+  },
+  watch: {
+    'item.settings.items' () {
+      this.setPosition(this.positions)
     }
   },
   created () {
     window.addEventListener('message', (e) => {
       if (e.data === `MapView-${this.salt}|state:{"ready": true}`) {
-        this.setPosition(this.position)
+        this.setPosition(this.positions)
       }
     })
   },
