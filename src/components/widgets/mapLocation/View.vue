@@ -30,7 +30,7 @@
       <div style="width: 100%; height: 100%;">
         <iframe style="width: 100%;height: calc(100% - 18px);" :src="route" frameborder="0" ref="map" allowfullscreen></iframe>
       </div>
-      <!-- <div class="absolute-top-left q-pa-xs" :class="[`text-${item.color}-7`, `bg-${item.color}-1`]" style="font-size: .8rem; border-bottom-left-radius: 4px;">{{positions}}</div> -->
+      <div class="absolute-top-left q-pa-xs hidden" :class="[`text-${item.color}-7`, `bg-${item.color}-1`]" style="font-size: .8rem; border-bottom-left-radius: 4px;">{{positions}}</div>
       <div v-if="item.settings.isNeedTime" class="absolute-bottom-left q-px-xs q-pt-xs" style="font-size: 12px; border-top-right-radius: 5px;" :class="[`text-${item.color}-7`, `bg-${item.color}-1`]">
         {{timestamp}}
       </div>
