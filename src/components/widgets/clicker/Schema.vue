@@ -6,15 +6,17 @@
       <q-icon slot="append" :name="`mdi-${currentSettings.icon || 'send'}`" size="1.5rem"/>
     </q-input>
     <q-list bordered class="relative-position q-mt-lg" >
-      <q-btn color="grey-9" style="top: -20px; right: 8px; position: absolute; z-index: 1130;" class="col-12" fab-mini @click="addTopic" icon="mdi-plus"/>
-      <q-item-label class="q-py-md q-px-sm" :class="{'text-red-6': !currentSettings.topics.length}">Topics{{currentSettings.topics.length ? '' : ' are empty'}}</q-item-label>
+      <q-item-label class="q-py-md q-px-sm list__header" :class="{'text-red-6': !currentSettings.topics.length}">
+        Topics{{currentSettings.topics.length ? '' : ' are empty'}}
+        <q-btn color="grey-9" class="absolute-right" flat label="ADD" @click="addTopic" icon="mdi-plus"/>
+      </q-item-label>
       <q-expansion-item
         v-for="(item, index) in currentSettings.topics"
         :key="index"
         group="frame-items"
         :header-class="[`bg-${checkUniqueTopic(index) ? 'grey-4' : 'red-2'}`]"
         expand-icon="mdi-settings"
-        :default-opened="index === 0"
+        :value="index === currentSettings.topics.length - 1"
       >
         <template slot="header">
           <q-item-section>{{item.topicTemplate || 'New topic'}}</q-item-section>
@@ -62,7 +64,7 @@ export default {
       return this.currentSettings.label.length <= 25 && this.currentSettings.topics.length > 0
     },
     addTopic () {
-      this.currentSettings.topics.unshift({
+      this.currentSettings.topics.push({
         topicTemplate: '',
         topicFilter: '',
         payloadType: 0,
@@ -96,3 +98,11 @@ export default {
   components: { VariablesHelper }
 }
 </script>
+
+<style lang="stylus">
+  .list__header
+    position sticky
+    top -15px
+    background-color white
+    z-index 1
+</style>

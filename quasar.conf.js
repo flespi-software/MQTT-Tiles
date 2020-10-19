@@ -84,7 +84,8 @@ module.exports = function (ctx) {
         'QPagination',
         'QStepper',
         'QStep',
-        'QStepperNavigation'
+        'QStepperNavigation',
+        'QResizeObserver'
       ],
 
       directives: [

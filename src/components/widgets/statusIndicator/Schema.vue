@@ -10,15 +10,17 @@
       <div class="text-grey-9" style="font-size: .8rem;">You can use math expressions to calculate the final value. Example: (%value% * 1000) / 1024, where %value% is the payload from your subscription.</div>
       <div class="status-indicator__items-wrapper col-12 relative-position q-mb-sm q-mt-lg">
         <q-list bordered>
-          <q-btn color="grey-9" style="top: -20px; right: 8px; position: absolute; z-index: 1130;" class="col-12" fab-mini @click="addItem" icon="mdi-plus"/>
-          <q-item-label class="q-py-md q-px-sm" :class="{'text-red-6': !currentSettings.items.length}">Items{{currentSettings.items.length ? '' : ' are empty'}}</q-item-label>
+          <q-item-label class="q-py-md q-px-sm list__header" :class="{'text-red-6': !currentSettings.items.length}">
+            Items{{currentSettings.items.length ? '' : ' are empty'}}
+            <q-btn color="grey-9" class="absolute-right" flat label="ADD" @click="addItem" icon="mdi-plus"/>
+          </q-item-label>
           <q-expansion-item
             v-for="(item, index) in currentSettings.items"
             :key="`${index}${item.value}`"
             group="status-indicator-items"
             :header-class="[`bg-${checkUniqueItem(item, index) && !!item.actionTopic ? 'grey-4' : 'red-2'}`]"
             expand-icon="mdi-settings"
-            :default-opened="index === 0"
+            :value="index === currentSettings.items.length - 1"
           >
             <template slot="header">
               <q-item-section side>
@@ -133,7 +135,7 @@ export default {
   },
   methods: {
     addItem () {
-      this.currentSettings.items.unshift(this.currentItem)
+      this.currentSettings.items.push(this.currentItem)
       this.currentItem = Object.assign({}, this.defaultItem)
     },
     removeItem (itemIndex) {
@@ -206,3 +208,11 @@ export default {
   }
 }
 </script>
+
+<style lang="stylus">
+  .list__header
+    position sticky
+    top -15px
+    background-color white
+    z-index 99
+</style>

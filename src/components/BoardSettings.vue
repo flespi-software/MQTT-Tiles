@@ -26,9 +26,9 @@
           />
           <div class="board-settings__variables col-12 q-mt-lg relative-position">
             <q-list bordered>
-              <q-btn color="grey-9" style="top: -20px; right: 8px; position: absolute; z-index: 1130;" class="col-12" fab-mini @click="addVar" icon="mdi-plus"/>
-              <q-item-label class="q-py-md q-px-sm">
+              <q-item-label class="q-py-md q-px-sm list__header">
                 <div>Variables{{currentSettings.settings.variables.length ? '' : ' are empty'}}</div>
+                <q-btn color="grey-9" class="absolute-right" flat label="ADD" @click="addVar" icon="mdi-plus"/>
               </q-item-label>
               <q-expansion-item
                 v-for="(variable, index) in currentSettings.settings.variables"
@@ -36,7 +36,7 @@
                 group="variables"
                 :header-class="[`bg-${checkUniqueVariables(index) ? 'grey-4' : 'red-2'}`]"
                 expand-icon="mdi-settings"
-                :default-opened="index === 0"
+                :value="index === currentSettings.settings.variables.length - 1"
               >
                 <template slot="header">
                   <q-item-section avatar>
@@ -75,15 +75,17 @@
                     <template v-if="variable.type === VARIABLE_TYPE_CUSTOM">
                       <div class="variable__items-wrapper col-12 relative-position q-mt-md">
                         <q-list bordered>
-                          <q-btn color="grey-9" style="top: -20px; right: 8px; position: absolute; z-index: 1130;" class="col-12" fab-mini @click="addVarItem(variable)" icon="mdi-plus"/>
-                          <q-item-label class="q-py-md q-px-sm" :class="{'text-red-6': !variable.values.length}">Items{{variable.values.length ? '' : ' are empty'}}</q-item-label>
+                          <q-item-label class="q-py-md q-px-sm list__header" :class="{'text-red-6': !variable.values.length}">
+                            Items{{variable.values.length ? '' : ' are empty'}}
+                            <q-btn color="grey-9" class="absolute-right" flat label="ADD" @click="addVarItem(variable)" icon="mdi-plus"/>
+                          </q-item-label>
                           <q-expansion-item
                             v-for="(item, index) in variable.values"
                             :key="`${index}`"
                             group="singleselect-items"
                             :header-class="[`bg-${item[1].indexOf('#') === -1 ? 'grey-4' : 'red-2'}`]"
                             expand-icon="mdi-settings"
-                            :default-opened="index === 0"
+                            :value="index === variable.values.length - 1"
                           >
                             <template slot="header">
                               <q-item-section avatar>
@@ -237,7 +239,7 @@ export default {
       this.$emit('hide')
     },
     addVar () {
-      this.currentSettings.settings.variables.unshift(Object.assign({}, this.$flespiMode ? variblesShemasByPresets.devices : this.defaultVariable))
+      this.currentSettings.settings.variables.push(Object.assign({}, this.$flespiMode ? variblesShemasByPresets.devices : this.defaultVariable))
     },
     removeVar (index) {
       this.$delete(this.currentSettings.settings.variables, index)
@@ -275,7 +277,7 @@ export default {
       this.currentSettings.settings.variables.splice(itemIndex + 1, 0, movedItem)
     },
     addVarItem (variable) {
-      variable.values.unshift(['', ''])
+      variable.values.push(['', ''])
     },
     removeVarItem (variable, itemIndex) {
       this.$delete(variable.values, itemIndex)
@@ -292,3 +294,11 @@ export default {
   components: { Topic }
 }
 </script>
+
+<style lang="stylus">
+  .list__header
+    position sticky
+    top -15px
+    background-color white
+    z-index 99
+</style>

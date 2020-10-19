@@ -8,22 +8,19 @@
       </q-toolbar>
       <div :style="{ maxHeight: $q.platform.is.mobile ? '' : 'calc(100vh - 148px)', height: $q.platform.is.mobile ? 'calc(100% - 100px)' : '' }" class="scroll q-pa-md">
         <q-input outlined hide-bottom-space dense color="grey-9 q-mb-sm" v-model.trim="currentSettings.name" label="Name"/>
-        <q-select outlined dense hide-bottom-space color="grey-9  q-mb-sm" @input="typeChangeHandler" :value="currentSettings.type" :options="typeOptions" emit-value map-options label="Type">
+        <q-select outlined dense hide-bottom-space color="grey-9" @input="typeChangeHandler" :value="currentSettings.type" :options="typeOptions" emit-value map-options label="Type" popup-content-class="type__content" :popup-content-style="{width: `${typeElementWidth}px`}">
+          <q-resize-observer @resize="onResize" />
           <template v-slot:option="scope">
-          <q-item
-            v-bind="scope.itemProps"
-            v-on="scope.itemEvents"
-          >
-            <q-item-section>
-              <q-item-label v-html="scope.opt.label" />
-            </q-item-section>
-            <q-item-section avatar>
-              <q-icon :name="scope.opt.rightIcon" />
-            </q-item-section>
-          </q-item>
-        </template>
+            <q-item v-bind="scope.itemProps" v-on="scope.itemEvents" :style="{width: $q.platform.is.desktop ? '16.6666667%' : '25%', minHeight: '70px'}">
+              <q-item-section class="text-center">
+                <q-icon :size="$q.platform.is.desktop ? '2rem' : '1.5rem'" :name="scope.opt.rightIcon" style="width: auto;" />
+                <q-item-label v-html="scope.opt.label" class="q-mt-xs ellipsis" :style="{fontSize: '.7rem'}" />
+                <q-tooltip>{{scope.opt.label}}</q-tooltip>
+              </q-item-section>
+            </q-item>
+          </template>
         </q-select>
-        <div class="color-palette q-px-sm q-py-xs rounded-borders q-mb-lg">
+        <div class="color-palette q-px-sm q-py-xs rounded-borders q-mb-lg q-mt-sm">
           <div class="text-grey-9 q-pb-xs q-ml-xs color-palette__label">Color</div>
           <div class="row color-palette__wrapper">
             <span
@@ -38,22 +35,24 @@
           </div>
         </div>
         <q-list class="relative-position q-mb-sm" v-if="currentSettings.settings.maxTopicsLength !== 0" bordered>
-          <q-btn
-            color="grey-9"
-            style="top: -20px; right: 8px; position: absolute; z-index: 1130;"
-            class="col-12"
-            fab-mini
-            @click="addTopicHandler"
-            icon="mdi-plus"
-            v-if="!(this.currentSettings.settings.maxTopicsLength && this.currentSettings.dataTopics.length >= this.currentSettings.settings.maxTopicsLength) || this.currentSettings.settings.maxTopicsLength === undefined"
-          />
-          <q-item-label class="q-py-md q-px-sm" :class="{'text-red-6': !currentSettings.dataTopics.length}">Topics{{currentSettings.dataTopics.length ? '' : ' are empty'}}</q-item-label>
+          <q-item-label class="q-py-md q-px-sm list__header" :class="{'text-red-6': !currentSettings.dataTopics.length}">
+            Topics{{currentSettings.dataTopics.length ? '' : ' are empty'}}
+            <q-btn
+              color="grey-9"
+              class="absolute-right"
+              flat label="ADD"
+              @click="addTopicHandler"
+              icon="mdi-plus"
+              v-if="!(this.currentSettings.settings.maxTopicsLength && this.currentSettings.dataTopics.length >= this.currentSettings.settings.maxTopicsLength) || this.currentSettings.settings.maxTopicsLength === undefined"
+            />
+          </q-item-label>
           <q-expansion-item
             v-for="(topic, index) in currentSettings.dataTopics"
             :key="index"
             :header-class="[`bg-${topicsHighlight[index]}`]"
+            group="topics"
             expand-icon="mdi-settings"
-            :default-opened="index === 0"
+            :value="index === currentSettings.dataTopics.length - 1"
           >
             <template slot="header">
               <q-item-section><span class="ellipsis full-width">{{topic.topicTemplate || 'Empty'}}</span></q-item-section>
@@ -83,6 +82,15 @@
 </template>
 
 <style lang="stylus">
+  .list__header
+    position sticky
+    top -15px
+    background-color white
+    z-index 1
+  .type__content
+    .q-virtual-scroll__content
+      display flex
+      flex-wrap wrap
   .color-palette
     border 1px solid $grey-5
     .color-palette__label
@@ -126,6 +134,7 @@ import MapLocation from './mapLocation/Schema'
 import MapRoute from './mapRoute/Schema'
 import StatusIndicator from './statusIndicator/Schema'
 import TextSender from './textSender/Schema'
+import Calculator from './calculator/Schema'
 
 export default {
   name: 'Settings',
@@ -155,13 +164,15 @@ export default {
         { label: 'Map (Location)', value: 'map-location', rightIcon: 'mdi-map-marker-outline' },
         { label: 'Map (Route)', value: 'map-route', rightIcon: 'mdi-map-marker-distance' },
         { label: 'Status Indicator', value: 'status-indicator', rightIcon: 'mdi-lightbulb-outline' },
+        { label: 'Formula', value: 'calculator', rightIcon: 'mdi-calculator' },
         { label: 'Radial gauge', value: 'radial', rightIcon: 'mdi-gauge' },
         { label: 'Linear gauge', value: 'linear', rightIcon: 'mdi-oil-temperature' },
         { label: 'Iframe', value: 'frame', rightIcon: 'mdi-window-maximize' },
         { label: 'Radio button', value: 'singleselect', rightIcon: 'mdi-radiobox-marked' },
         { label: 'Multiplier', value: 'multiplier', rightIcon: 'mdi-monitor-multiple' },
-        { label: 'Complex', value: 'complex', rightIcon: 'mdi-card-bulleted-outline' }
+        { label: 'Complex', value: 'complex', rightIcon: 'mdi-ballot-outline' }
       ],
+      typeElementWidth: 0,
       colors: ['grey', 'red', 'green', 'orange', 'blue', 'light-blue', 'purple', 'deep-orange', 'cyan', 'brown', 'blue-grey'],
       isValideSchema: true,
       defaultTopic: {
@@ -231,7 +242,7 @@ export default {
       this.isValideSchema = status
     },
     addTopicHandler () {
-      this.currentSettings.dataTopics.unshift(Object.assign({}, this.defaultTopic))
+      this.currentSettings.dataTopics.push(Object.assign({}, this.defaultTopic))
     },
     removeTopicHandler (index) {
       Vue.delete(this.currentSettings.dataTopics, index)
@@ -255,6 +266,9 @@ export default {
         topics = uniq([...topics, ...this.currentSettings.settings.topics.map(topic => topic.topicFilter)])
       }
       return topics
+    },
+    onResize ({ width }) {
+      this.typeElementWidth = width
     }
   },
   watch: {
@@ -273,7 +287,7 @@ export default {
   },
   mixins: [validateTopic],
   components: {
-    Topic, Switcher, Informer, Clicker, Radial, Linear, Frame, Singleselect, Multiplier, Complex, StaticInformer, MultiInformer, Slider, Color, MapLocation, MapRoute, StatusIndicator, TextSender
+    Topic, Switcher, Informer, Clicker, Radial, Linear, Frame, Singleselect, Multiplier, Complex, StaticInformer, MultiInformer, Slider, Color, MapLocation, MapRoute, StatusIndicator, TextSender, Calculator
   }
 }
 </script>

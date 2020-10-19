@@ -75,7 +75,7 @@ export default {
   },
   computed: {
     contentHeight () {
-      let height = 'calc(100% - 44px)'
+      let height = 'calc(100% - 34px)'
       if (!this.item.name && this.blocked) {
         height = 'calc(100% - 11px)'
       }

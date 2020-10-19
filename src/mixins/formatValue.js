@@ -29,11 +29,11 @@ export default {
       if (mathTemplate && value !== 'N/A') {
         try {
           let mathExp = mathTemplate.replace(/%value%/g, value)
-          mathExp = mathExp.replace(/<%([a-zA-Z0-9-+&@#/%?=~_|!:,.;\s]*)%>/gim, (match, name) => {
+          mathExp = mathExp.replace(/<%([a-zA-Z0-9-+&@#/%?=~_|!:,.;\s[\]']*)%>/gim, (match, name) => {
             let val = get(value, name, undefined)
             val = val === undefined
               ? 'nill'
-              : typeof value[name] === 'string' ? `"${value[name]}"` : value[name]
+              : typeof val === 'string' ? `"${val}"` : val
             return val
           })
           mathExp = mathExp.replace(/nill/gim, '"nill"')

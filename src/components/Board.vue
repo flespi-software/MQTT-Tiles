@@ -248,6 +248,7 @@ import StatusIndicator from './widgets/statusIndicator/View'
 import MapLocation from './widgets/mapLocation/View'
 import MapRoute from './widgets/mapRoute/View'
 import TextSender from './widgets/textSender/View'
+import Calculator from './widgets/calculator/View'
 import { WIDGET_MODE_EDIT, WIDGET_MODE_ADD, WIDGET_MODE_DUPLICATE } from '../constants'
 
 const BREAKPOINTS = { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }
@@ -537,6 +538,7 @@ export default {
     MapLocation,
     MapRoute,
     TextSender,
+    Calculator,
     GridLayout: VueGridLayout.GridLayout,
     GridItem: VueGridLayout.GridItem,
     VirtualList

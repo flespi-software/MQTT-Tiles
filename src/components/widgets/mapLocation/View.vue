@@ -76,13 +76,15 @@ export default {
     positions () {
       const values = this.item.settings.items.reduce((result, item) => {
         const latTopic = item.lat,
-          lonTopic = item.lon,
-          lat = parseFloat(this.getValueByTopic(this.value[latTopic.topicFilter] && this.value[latTopic.topicFilter].payload, latTopic)),
+          lonTopic = item.lon
+        let lat = parseFloat(this.getValueByTopic(this.value[latTopic.topicFilter] && this.value[latTopic.topicFilter].payload, latTopic)),
           lon = parseFloat(this.getValueByTopic(this.value[lonTopic.topicFilter] && this.value[lonTopic.topicFilter].payload, lonTopic))
         if (lat && lon) {
-          result[item.name] = { latlng: [lat, lon], title: item.name, label: item.name }
+          result[item.name] = { latlng: [lat, lon], title: [lat, lon], label: item.name }
         } else if (this.prevPositions[item.name] && this.prevPositions[item.name].lat && this.prevPositions[item.name].lon) {
-          result[item.name] = { latlng: [this.prevPositions[item.name].lat, this.prevPositions[item.name].lon], title: item.name, label: item.name }
+          lat = this.prevPositions[item.name].lat
+          lon = this.prevPositions[item.name].lon
+          result[item.name] = { latlng: [lat, lon], title: [lat, lon], label: item.name }
         }
         return result
       }, {})
@@ -90,7 +92,7 @@ export default {
       return values
     },
     contentHeight () {
-      let height = 'calc(100% - 44px)'
+      let height = 'calc(100% - 34px)'
       if (!this.item.name && this.blocked) {
         height = 'calc(100% - 11px)'
       }

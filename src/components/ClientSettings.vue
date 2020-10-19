@@ -37,10 +37,10 @@
         </q-expansion-item>
         <div class="share-tokens__items-wrapper col-12 relative-position q-mt-lg q-mb-md" v-if="currentSettings.protocolVersion === 5 && currentSettings.host.indexOf('flespi.io') !== -1">
           <q-list bordered>
-            <q-btn color="grey-9" style="top: -20px; right: 8px; position: absolute; z-index: 1130;" class="col-12" fab-mini @click="addSyncCredsItem" icon="mdi-plus"/>
-            <q-item-label class="q-py-md q-px-sm">
+            <q-item-label class="q-py-md q-px-sm list__header">
               <div :class="{'text-red-6': !currentSettings.syncCreds || !currentSettings.syncCreds.length}">Tokens for sharing{{currentSettings.syncCreds && currentSettings.syncCreds.length ? '' : ' are empty'}}</div>
               <div style="font-size: .8rem;" class="text-grey-6 q-mt-xs">List of standard or ACL flespi tokens to be used for sharing boards.</div>
+              <q-btn color="grey-9" class="absolute-right" flat label="ADD" @click="addSyncCredsItem" icon="mdi-plus"/>
             </q-item-label>
             <q-expansion-item
               v-for="(syncCreds, index) in currentSettings.syncCreds"
@@ -48,7 +48,7 @@
               group="singleselect-items"
               :header-class="[`bg-${checkUniqueSyncCredsValue(syncCreds, index) ? 'grey-4' : 'red-2'}`]"
               expand-icon="mdi-settings"
-              :default-opened="index === 0"
+              :value="index === currentSettings.syncCreds.length - 1"
             >
               <template slot="header">
                 <q-item-section avatar>
@@ -209,7 +209,7 @@ export default {
     },
     addSyncCredsItem () {
       if (!this.currentSettings.syncCreds) { this.$set(this.currentSettings, 'syncCreds', []) }
-      this.currentSettings.syncCreds.unshift(cloneDeep(this.syncCreds))
+      this.currentSettings.syncCreds.push(cloneDeep(this.syncCreds))
     },
     removeSyncCredsItem (itemIndex) {
       this.$delete(this.currentSettings.syncCreds, itemIndex)
@@ -239,3 +239,11 @@ export default {
   }
 }
 </script>
+
+<style lang="stylus">
+  .list__header
+    position sticky
+    top -15px
+    background-color white
+    z-index 99
+</style>
