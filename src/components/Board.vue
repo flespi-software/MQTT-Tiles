@@ -17,20 +17,22 @@
         <q-tooltip>Back to boards list</q-tooltip>
       </q-btn>
       <q-toolbar-title class="text-grey-9">{{board.name || '*No name*'}}</q-toolbar-title>
-      <q-btn @click="share(shareHandler)" icon="mdi-link" flat round :color="`grey-${canShare ? 9 : 7}`" :ripple="canShare">
+      <q-btn @click="share(shareHandler)" v-if="!isFrized" icon="mdi-link" flat round :color="`grey-${canShare ? 9 : 7}`" :ripple="canShare">
         <q-tooltip>Get link</q-tooltip>
       </q-btn>
-      <q-btn @click="share(uploadHandler)" icon="mdi-cloud-upload-outline" flat round :color="`grey-${canShare ? 9 : 7}`" :ripple="canShare">
+      <q-btn @click="share(uploadHandler)" v-if="!isFrized" icon="mdi-cloud-upload-outline" flat round :color="`grey-${canShare ? 9 : 7}`" :ripple="canShare">
         <q-tooltip>Upload board</q-tooltip>
       </q-btn>
-      <q-btn @click="prepareExport" icon="mdi-application-export" color="grey-9" flat round v-if="!exportEnabled">
-        <q-tooltip>Export widgets</q-tooltip>
-      </q-btn>
-      <q-btn @click="doneExport" label="export" color="green-9" flat v-else>
-        <q-tooltip>Export widgets</q-tooltip>
-      </q-btn>
+      <template v-if="!isFrized">
+        <q-btn @click="prepareExport" icon="mdi-application-export" color="grey-9" flat round v-if="!exportEnabled">
+          <q-tooltip>Export widgets</q-tooltip>
+        </q-btn>
+        <q-btn @click="doneExport" label="export" color="green-9" flat v-else>
+          <q-tooltip>Export widgets</q-tooltip>
+        </q-btn>
+      </template>
       <template v-if="$q.platform.is.desktop">
-        <q-btn @click="importWidgets" icon="mdi-application-import" color="grey-9" flat round>
+        <q-btn @click="importWidgets" icon="mdi-application-import" color="grey-9" flat round v-if="!isFrized">
           <q-tooltip>Import widgets</q-tooltip>
         </q-btn>
         <q-btn @click="preventCollisionBoardHandler" :icon="board.settings.preventCollision ? 'mdi-pin' : 'mdi-pin-outline'" color="grey-9" flat round v-if="!isFrized && !board.settings.blocked">
@@ -43,7 +45,7 @@
           <q-tooltip>Board settings</q-tooltip>
         </q-btn>
       </template>
-      <q-btn round dense flat icon="mdi-dots-vertical" color="grey-9" v-else>
+      <q-btn round dense flat icon="mdi-dots-vertical" color="grey-9" v-else-if="!isFrized">
         <q-menu anchor="bottom right" self="top right">
           <q-list dense>
             <q-item v-close-popup clickable @click.stop="importWidgets">
@@ -52,19 +54,19 @@
               </q-item-section>
               <q-item-section>Import widgets</q-item-section>
             </q-item>
-            <q-item clickable v-close-popup @click.stop="modifyBoardSettings" v-if="!isFrized">
+            <q-item clickable v-close-popup @click.stop="modifyBoardSettings">
               <q-item-section avatar>
                 <q-icon name="mdi-settings" />
               </q-item-section>
               <q-item-section>Board settings</q-item-section>
             </q-item>
-            <q-item v-close-popup clickable v-if="!isFrized" @click.stop="blockBoardHandler">
+            <q-item v-close-popup clickable @click.stop="blockBoardHandler">
               <q-item-section avatar>
                 <q-icon :name="board.settings.blocked ? 'mdi-lock' : 'mdi-lock-open'" />
               </q-item-section>
-              <q-item-section>{{board.settings.preventCollision ? 'Unlock widgets positions' : 'Lock widgets positions'}}</q-item-section>
+              <q-item-section>{{board.settings.preventCollision ? 'Unlock your board' : 'Lock your board'}}</q-item-section>
             </q-item>
-            <q-item v-close-popup clickable @click.stop="preventCollisionBoardHandler" v-if="!isFrized && !board.settings.blocked">
+            <q-item v-close-popup clickable @click.stop="preventCollisionBoardHandler" v-if="!board.settings.blocked">
               <q-item-section avatar>
                 <q-icon :name="board.settings.preventCollision ? 'mdi-pin' : 'mdi-pin-outline'" />
               </q-item-section>
