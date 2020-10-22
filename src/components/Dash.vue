@@ -190,7 +190,7 @@ export default {
         (hasCreds || this.canShareByClientToken)
     },
     isAttachedBoardsMode () {
-      return !!this.clientSettings.attachedBoards
+      return !!this.clientSettings && !!this.clientSettings.attachedBoards
     }
   },
   methods: {
