@@ -63,7 +63,7 @@
           style="border: solid #e0e0e0 1px"
         >
           <template slot="header">
-            <q-item-section>{{editedItem.label ? `${editedItem.label} [${editedItem.type}]` : editedItem.type}}</q-item-section>
+            <q-item-section><span class="ellipsis full-width">{{editedItem.label ? `${editedItem.label} [${editedItem.type}]` : editedItem.type}}</span></q-item-section>
             <q-item-section side>
               <q-btn flat color="red-6" round dense @click="removeItem(editedItem.index)" icon="mdi-delete"/>
             </q-item-section>

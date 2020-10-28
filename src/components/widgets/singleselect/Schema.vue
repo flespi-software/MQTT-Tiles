@@ -26,7 +26,7 @@
                   <q-btn :disabled="index === (currentSettings.items.length - 1)" round dense flat class="col-1" @click.stop="downItem(index)" icon="mdi-arrow-down"/>
                 </div>
               </q-item-section>
-              <q-item-section>{{item.label ? `${item.label} [${item.val}]` : item.val || 'New item'}}</q-item-section>
+              <q-item-section><span class="ellipsis full-width">{{item.label ? `${item.label} [${item.val}]` : item.val || 'New item'}}</span></q-item-section>
               <q-item-section side>
                 <q-btn flat color="red-6" round dense @click="removeItem(index)" icon="mdi-delete"/>
               </q-item-section>

@@ -22,7 +22,7 @@
                   <q-btn :disabled="index === (currentSettings.items.length - 1)" round dense flat class="col-1" @click.stop="downItem(index)" icon="mdi-arrow-down"/>
                 </div>
               </q-item-section>
-              <q-item-section>{{item.name || 'New item'}}</q-item-section>
+              <q-item-section><span class="ellipsis full-width">{{item.name || 'New item'}}</span></q-item-section>
               <q-item-section side>
                 <q-btn flat color="red-6" round dense @click="removeItem(index)" icon="mdi-delete"/>
               </q-item-section>
@@ -38,7 +38,7 @@
               >
                 <div class="row">
                   <div class="col-12 q-pa-xs">
-                    <topic v-model="item.route" label="Route value" :board="board" :config="{ needSelectors: true }"/>
+                    <topic v-model="item.route" @input="updateTopics" label="Route value" :board="board" :config="{ needSelectors: true }"/>
                   </div>
                 </div>
               </q-expansion-item>

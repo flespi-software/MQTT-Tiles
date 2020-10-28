@@ -29,7 +29,7 @@
                   <q-btn :disabled="index === (currentSettings.items.length - 1)" round dense flat class="col-1" @click.stop="downItem(index)" icon="mdi-arrow-down"/>
                 </div>
               </q-item-section>
-              <q-item-section>{{getItemLabel(item, index)}}</q-item-section>
+              <q-item-section><span class="ellipsis full-width">{{getItemLabel(item, index)}}</span></q-item-section>
               <q-item-section side v-if="!item.default">
                 <q-btn flat color="red-6" round dense @click="removeItem(index)" icon="mdi-delete"/>
               </q-item-section>

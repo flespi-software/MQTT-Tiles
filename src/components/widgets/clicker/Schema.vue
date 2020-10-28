@@ -19,7 +19,7 @@
         :value="index === currentSettings.topics.length - 1"
       >
         <template slot="header">
-          <q-item-section>{{item.topicTemplate || 'New topic'}}</q-item-section>
+          <q-item-section><span class="ellipsis full-width">{{item.topicTemplate || 'New topic'}}</span></q-item-section>
           <q-item-section side>
             <q-btn flat color="red-6" round dense @click="removeTopic(index)" icon="mdi-delete"/>
           </q-item-section>
