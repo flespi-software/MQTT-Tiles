@@ -192,8 +192,8 @@ export default {
       return this.renderItems.filter(item => item.position === 'bottom')
     },
     contentHeight () {
-      let height = 'calc(100% - 24px)'
-      if (!this.item.name && this.blocked) { height = 'calc(100% - 6px)' }
+      let height = 'calc(100% - 44px)'
+      if (!this.item.name && this.blocked) { height = 'calc(100% - 24px)' }
       return height
     }
   },
