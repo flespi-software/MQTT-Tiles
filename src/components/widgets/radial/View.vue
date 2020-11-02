@@ -2,10 +2,10 @@
   <div v-if="mini" style="text-align: center;" @click.stop="showTooltip">
     <div style="height: 60px; width: 60px; line-height: 60px; margin: 0 auto; border-radius: 5px;" :class="[`bg-${currentValueText !== null ? `${item.color}-1` : 'grey-3'}`]">
       <div class='ellipsis' :style="{fontSize: `${stringLength > 5 ? 16 : 18}px`}">
-        {{`${currentValueText}${item.settings.units}`}}
+        {{`${currentValue}${item.settings.units}`}}
       </div>
       <q-tooltip ref="tooltip">
-        {{`${currentValueText}${item.settings.units}`}}
+        {{`${currentValue}${item.settings.units}`}}
       </q-tooltip>
     </div>
     <div class="ellipsis q-mt-sm">{{item.name}}</div>
@@ -191,7 +191,7 @@ export default {
       return Number.isNaN(value) ? 0 : this.mathProcessing(value, this.item.settings.math)
     },
     stringLength () {
-      return this.currentValueText.length + this.item.settings.units.length
+      return this.currentValue.length + this.item.settings.units.length
     },
     maxValue () {
       return this.item.settings.maxValueMode === WIDGET_RANGE_VALUE_CURRENT_MODE
@@ -225,7 +225,7 @@ export default {
           }, [])
         }
       return {
-        valueText: this.currentValueText,
+        valueText: this.currentValue,
         minValue: this.minValue,
         maxValue: this.maxValue,
         width: this.width - 16,
@@ -256,7 +256,7 @@ export default {
       }
     },
     contentHeight () {
-      let height = 'calc(100% - 44px)'
+      let height = 'calc(100% - 34px)'
       if (!this.item.name && this.blocked) {
         height = 'calc(100% - 11px)'
       }

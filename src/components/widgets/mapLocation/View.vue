@@ -74,9 +74,9 @@ export default {
   },
   computed: {
     positions () {
-      const values = this.item.settings.items.reduce((result, item) => {
-        const latTopic = item.lat,
-          lonTopic = item.lon
+      const values = this.item.settings.items.reduce((result, item, index) => {
+        const latTopic = this.item.settings.topics[index * 2],
+          lonTopic = this.item.settings.topics[index * 2 + 1]
         let lat = parseFloat(this.getValueByTopic(this.value[latTopic.topicFilter] && this.value[latTopic.topicFilter].payload, latTopic)),
           lon = parseFloat(this.getValueByTopic(this.value[lonTopic.topicFilter] && this.value[lonTopic.topicFilter].payload, lonTopic))
         if (lat && lon) {

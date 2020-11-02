@@ -88,8 +88,8 @@ export default {
       this.prevRoute = routes
     },
     getRoutes () {
-      const routes = this.item.settings.items.reduce((values, item) => {
-        const routeTopic = item.route
+      const routes = this.item.settings.items.reduce((values, item, index) => {
+        const routeTopic = this.item.settings.topics[index]
         let value = this.getValueByTopic(this.value[routeTopic.topicFilter] && this.value[routeTopic.topicFilter].payload, routeTopic)
         value = value === 'N/A' ? '' : value
         if (Array.isArray(value)) {
