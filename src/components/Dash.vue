@@ -98,6 +98,7 @@ import mqtt from '../boot/async-mqtt.js'
 import { uid } from 'quasar'
 import bl from 'bl'
 import debounce from 'lodash/debounce'
+import throttle from 'lodash/throttle'
 import cloneDeep from 'lodash/cloneDeep'
 import remove from 'lodash/remove'
 import merge from 'lodash/merge'
@@ -1256,7 +1257,7 @@ export default {
     }
   },
   created () {
-    this.debouncedBusMessagesProcessing = debounce(this.busMessagesProcessing, 500, { trailing: true })
+    this.debouncedBusMessagesProcessing = throttle(this.busMessagesProcessing, 1000, { trailing: true })
     this.debouncedUpdateBoards = debounce(this.updateBoards, 500, { trailing: true })
     this.valuesProcessing()
     if (this.clientSettings) {
