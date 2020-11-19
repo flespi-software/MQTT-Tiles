@@ -130,6 +130,7 @@
 
 <script>
 import merge from 'lodash/merge'
+import cloneDeep from 'lodash/cloneDeep'
 import { uid } from 'quasar'
 import Topic from './widgets/Topic'
 import variblesShemasByPresets from '../constants/variablesPresets'
@@ -162,12 +163,12 @@ export default {
     }
     let currentSettings = {}
     if (this.settings) {
-      currentSettings = merge({}, defaultSettings, this.settings)
+      currentSettings = cloneDeep(merge({}, defaultSettings, this.settings))
       /* remove after some time 16.08.19 it`s a mutation for edited boards */
       currentSettings.settings.variables && currentSettings.settings.variables.forEach((variable) => {
         if (variable.type === undefined) {
           variable.type = 0
-          variable.topic = Object.assign({}, defaultTopic)
+          variable.topic = cloneDeep(defaultTopic)
         }
         /* 04.12.19 */
         if (variable.sortVarsBy === undefined) {
@@ -178,7 +179,7 @@ export default {
       })
       /* end */
     } else {
-      currentSettings = merge({}, defaultSettings)
+      currentSettings = cloneDeep(defaultSettings)
       currentSettings.id = uid()
     }
     return {
@@ -239,7 +240,7 @@ export default {
       this.$emit('hide')
     },
     addVar () {
-      this.currentSettings.settings.variables.push(Object.assign({}, this.$flespiMode ? variblesShemasByPresets.devices : this.defaultVariable))
+      this.currentSettings.settings.variables.push(cloneDeep(this.$flespiMode ? variblesShemasByPresets.devices : this.defaultVariable))
     },
     removeVar (index) {
       this.$delete(this.currentSettings.settings.variables, index)
@@ -247,7 +248,7 @@ export default {
     changeTypeVariableHandler (index, type) {
       const variable = this.currentSettings.settings.variables[index]
       if (type === VARIABLE_TYPE_CUSTOM) {
-        variable.topic = Object.assign({}, this.defaultTopic)
+        variable.topic = cloneDeep(this.defaultTopic)
       } else {
         variable.values = []
       }
