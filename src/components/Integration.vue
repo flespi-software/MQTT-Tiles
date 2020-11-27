@@ -51,6 +51,12 @@ export default {
     },
     createBoard () {
       this.send('CreateBoard')
+    },
+    addWidget (widgetConfig, boardId) {
+      this.send('AddWidget', {
+        boardId,
+        widgetConfig
+      })
     }
   },
   created () {

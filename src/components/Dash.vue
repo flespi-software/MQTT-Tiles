@@ -758,8 +758,9 @@ export default {
           .then((topics) => { this.clientInited = true })
       }
     },
-    widgetLayoutSetup (width, height, id, breakpoint) {
-      const board = this.boards[this.activeBoardId],
+    widgetLayoutSetup (width, height, id, breakpoint, boardId) {
+      boardId = boardId || this.activeBoardId
+      const board = this.boards[boardId],
         colNum = this.colsByBreakpoint[breakpoint],
         layout = board.layouts[breakpoint],
         { x, y } = freeSpace()
@@ -785,9 +786,9 @@ export default {
         y
       })
     },
-    widgetLayoutsSetup (width, height, id) {
+    widgetLayoutsSetup (width, height, id, boardId) {
       Object.keys(this.colsByBreakpoint).forEach(breakpoint => {
-        this.widgetLayoutSetup(width, height, id, breakpoint)
+        this.widgetLayoutSetup(width, height, id, breakpoint, boardId)
       })
     },
     layoutUpdateHandler ({ layout, breakpoint }) {
@@ -800,11 +801,12 @@ export default {
         this.$delete(layouts[breakpoint], widgetIndex)
       })
     },
-    addWidget (widget) {
+    addWidget (widget, boardId) {
+      boardId = boardId || this.activeBoardId
       if (!widget.id) {
         widget.id = uid()
-        this.widgetLayoutsSetup(widget.settings.width, widget.settings.height, widget.id)
-        this.boards[this.activeBoardId].widgetsIndexes.push(widget.id)
+        this.widgetLayoutsSetup(widget.settings.width, widget.settings.height, widget.id, boardId)
+        this.boards[boardId].widgetsIndexes.push(widget.id)
       }
       widget.topics.forEach(topic => {
         const hasSubscription = this.subscriptions[topic] !== undefined
@@ -831,6 +833,7 @@ export default {
         widget.status = WIDGET_STATUS_ENABLED
       }
       this.$set(this.widgets, widget.id, widget)
+      return this.widgets[widget.id]
     },
     editWidget ({ widgetId, settings, topics }) {
       if (difference(settings.topics, topics).length || difference(topics, settings.topics).length) {
@@ -1249,6 +1252,11 @@ export default {
         newBoard.id = uid()
         this.addBoard(newBoard)
         this.$integrationBus.send('boardCreated', newBoard.id)
+      })
+      // add widget to board
+      this.$integrationBus.on('AddWidget', ({ boardId, widgetConfig }) => {
+        const widget = this.addWidget(widgetConfig, boardId)
+        this.$integrationBus.send('widgetCreated', widget.id)
       })
       // subscribe to SeActiveBoard from integrationBus
       this.$integrationBus.on('SetActiveBoard', (boardId) => {

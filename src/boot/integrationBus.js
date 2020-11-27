@@ -3,12 +3,14 @@ import Vue from 'vue'
   => SetFlespiLogin({token, region}) Message format: `MQTTTiles|${postkey}|${commandName}=>${payload}`
   => SetBoards({...board})
   => SetActiveBoard({boardId, [params]})
+  => AddWidget({boardId, widgetConfig})
   => CreateBoard()
   <= @ready() - mounted on Tiles
   <= @connected() - connection established
   <= @saveBoards({...boards})
   <= @activeBoard(id)
   <= @boardCreated(boardId)
+  <= @widgetCreated(widgetId)
 */
 class IntegrationBus {
   constructor () {

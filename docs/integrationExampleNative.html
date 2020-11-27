@@ -9,7 +9,7 @@
       const iframe = document.querySelector('iframe')
       if (data.indexOf('ready') > -1) {
         iframe.contentWindow.postMessage(`MQTTTiles|iframe|SetFlespiLogin=>${JSON.stringify({
-          token: '0FneZZpyqP3reyiaedXA1546yjQbN1pCwAEjoTICwzTBX1z12nqTgkPFrtE2lRsH',
+          token: 'izJdxo9lOPivuZdgha3ayEb0U2IJXba5AH7VW67yJdT30Va8T18iv86e0CNNBLH0',
           region: {
             "cdn": "https://cdn.flespi.io",
             "default": true,
@@ -26,6 +26,10 @@
       if (data.indexOf('connected') > -1) {
         iframe.contentWindow.postMessage(`MQTTTiles|iframe|SetBoards=>${JSON.stringify({
           "681e65ae-94df-47b5-b143-4146b7ea55ba":{"name":"New board","id":"681e65ae-94df-47b5-b143-4146b7ea55ba","settings":{"blocked":false,"variables":[],"lastModify":1593592177533},"activeVariables":{},"shortcutsIndexes":[],"widgetsIndexes":[],"layouts":{"lg":[],"md":[],"sm":[],"xs":[],"xxs":[]},"appVersion":"1.10.0"}
+        })}`, '*')
+        iframe.contentWindow.postMessage(`MQTTTiles|iframe|AddWidget=>${JSON.stringify({
+          boardId: '681e65ae-94df-47b5-b143-4146b7ea55ba',
+          widgetConfig: {"name":"New widget","color":"grey","type":"informer","topics":["a/b/c"],"dataTopics":[{"topicTemplate":"a/b/c","topicFilter":"a/b/c","payloadType":0,"payloadField":"","payloadNameField":""}],"settings":{"math":"","valueFormat":0,"prefix":"","postfix":"","height":2,"width":2,"minWidth":1,"minHeight":2,"maxTopicsLength":1,"isNeedTime":true},"status":0}
         })}`, '*')
         iframe.contentWindow.postMessage(`MQTTTiles|iframe|SetActiveBoard=>681e65ae-94df-47b5-b143-4146b7ea55ba`, '*')
       }
