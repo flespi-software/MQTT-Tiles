@@ -30,14 +30,14 @@ class Connector {
     }
     const devicesData = await this.bus.gw.getDevices(deviceIds, { fields: 'id,name' })
     let devices = get(devicesData, 'data.result', [])
-    devices = devices.map(device => ({ label: device.name, value: `${device.id}` }))
+    devices = devices.map(device => ({ label: device.name || `#${device.id}`, value: `${device.id}` }))
     return devices
   }
 
   async getChannels () {
     const calcsData = await this.bus.gw.getChannels('all', { fileds: 'id,name' })
     let calcs = get(calcsData, 'data.result', [])
-    calcs = calcs.map(calc => ({ label: calc.name, value: `${calc.id}` }))
+    calcs = calcs.map(calc => ({ label: calc.name || `#${calc.id}`, value: `${calc.id}` }))
     return calcs
   }
 
@@ -59,7 +59,7 @@ class Connector {
     }
     const channelsData = await this.bus.gw.getCalcs(calcsIds, { fileds: 'id,name' })
     let channels = get(channelsData, 'data.result', [])
-    channels = channels.map(channel => ({ label: channel.name, value: `${channel.id}` }))
+    channels = channels.map(channel => ({ label: channel.name || `#${channel.id}`, value: `${channel.id}` }))
     return channels
   }
 

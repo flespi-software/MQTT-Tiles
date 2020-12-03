@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="row">
-      <div class="q-mb-sm col-12" v-if="widget.topics.length && widget.topics[0].split('/')">
+      <div class="q-mb-sm col-12" v-if="widget.topics.length && widget.topics[0] && widget.topics[0].split('/').length">
         <div class="q-mb-sm text-grey-9">Group layer</div>
         <div
           v-for="(path, index) in widget.topics[0].split('/')"

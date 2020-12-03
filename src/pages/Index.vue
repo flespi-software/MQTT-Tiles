@@ -71,13 +71,6 @@ export default {
       this.$emit('change:attach', attachedBoards)
     }
   },
-  created () {
-    if (this.$integrationMode) {
-      this.$integrationBus.on('SetBoards', (boards) => {
-        this.initBoards = boards
-      })
-    }
-  },
   props: ['client'],
   components: { Dash, ShareWizard }
 }

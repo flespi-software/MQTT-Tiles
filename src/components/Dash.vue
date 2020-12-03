@@ -1213,24 +1213,8 @@ export default {
       return title
     },
     integrationModeActivate () {
-      // watch for initBoards
-      this.$watch('initBoards', function (initBoards) {
-        if (initBoards) {
-          let boardsConfigs = { ...initBoards }
-          if (this.clientSettings && this.clientSettings.attachedBoards) {
-            initBoards = this.clientSettings.attachedBoards.reduce((res, boardId) => {
-              if (initBoards[boardId]) {
-                res[boardId] = initBoards[boardId]
-                delete boardsConfigs[boardId]
-              }
-              return res
-            }, {})
-          } else {
-            boardsConfigs = {}
-          }
-          this.boardsConfigs = boardsConfigs
-          this.initSavedBoards(initBoards)
-        }
+      this.$integrationBus.on('SetBoards', (boards) => {
+        this.initSavedBoards(boards)
       })
       // subscribe to SeActiveBoard from integrationBus
       this.$integrationBus.on('CreateBoard', () => {

@@ -158,7 +158,7 @@ export default {
     setActiveClient (clientId) {
       this.activeClientId = clientId
       LocalStorage.set(ACTIVE_CLIENT_LOCAL_STORAGE_NAME, clientId)
-      if (clientId) {
+      if (clientId !== undefined) {
         this.setFlespiMode(clientId)
         this.makeFlespiRestBus(clientId)
       }
@@ -267,7 +267,7 @@ export default {
         const client = defaultClient()
         client.host = `wss://${region['mqtt-ws']}`
         client.username = token
-        Vue.set(this.clients, 0, client)
+        this.$set(this.clients, 0, client)
         this.setActiveClient(0)
       })
     } else if (this.$route.params.hash || shareData) { /* if follow by share link */
