@@ -188,7 +188,7 @@ export default {
       return this.clientStatus && !!this.clientSettings && this.clientSettings.host.indexOf('flespi') !== -1 &&
         !this.clientSettings.flespiBoard &&
         /* check for not master token used for flespi connection */
-        (hasCreds || this.canShareByClientToken)
+        (hasCreds || (this.canShareByClientToken || true))
     },
     isAttachedBoardsMode () {
       return !!this.clientSettings && !!this.clientSettings.attachedBoards
@@ -1249,7 +1249,7 @@ export default {
     }
   },
   created () {
-    this.debouncedBusMessagesProcessing = throttle(this.busMessagesProcessing, 1000, { trailing: true })
+    this.debouncedBusMessagesProcessing = throttle(this.busMessagesProcessing, 1000, { leading: false })
     this.debouncedUpdateBoards = debounce(this.updateBoards, 500, { trailing: true })
     this.valuesProcessing()
     if (this.clientSettings) {

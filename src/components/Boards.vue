@@ -59,7 +59,7 @@
     </transition>
     <q-toolbar class="bg-white">
       <q-toolbar-title class="text-grey-9">Boards</q-toolbar-title>
-      <template v-if="connectionSettings">
+      <template v-if="connectionSettings && !$integrationMode">
         <q-btn v-if="!attachMode" @click="attachMode = true" icon="mdi-link-variant" flat color="grey-9">
           <q-tooltip>Attach boards to connection</q-tooltip>
         </q-btn>

@@ -261,6 +261,13 @@ export default {
     const shareData = this.$q.sessionStorage.getItem('mqtt-tiles-share')
     Vue.prototype.$flespiMode = false
     Vue.prototype.$integrationMode = false
+    this.$root.$on('new-share-token', (token) => {
+      const client = this.clients[this.activeClientId]
+      if (client) {
+        if (!client.syncCreds) { client.syncCreds = [] }
+        client.syncCreds.push(token)
+      }
+    })
     if (this.$route.path.indexOf('integration') > -1) {
       Vue.prototype.$integrationMode = true
       this.$integrationBus.on('SetFlespiLogin', ({ token, region }) => {

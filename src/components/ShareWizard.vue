@@ -6,8 +6,9 @@
       </q-toolbar>
       <div :style="{ height: $q.platform.is.mobile ? 'calc(100% - 100px)' : '50vh'}" class="scroll bg-white">
         <q-stepper flat ref="stepper" v-model="currentStep" animated class="share-stepper" done-color="green-6" active-color="amber-9" :header-class="stepsEnum.length === 1 ? 'hidden' : ''" contracted>
-          <q-step name="tokens" title="Tokens" v-if="config.tokens.length > 1" icon="mdi-fingerprint" :done="currentStep === 'replace' || currentStep === 'link'">
-            <q-list separator bordered>
+          <q-step name="tokens" title="Tokens" icon="mdi-fingerprint" :done="currentStep === 'replace' || currentStep === 'link'">
+            <div class="text-grey-8">Tokens</div>
+            <q-list separator bordered class="q-mb-md">
               <q-item
                 v-for="(token, index) in config.tokens" :key="token.credentions.username"
                 @click="setToken(token), currentSelectedToken = index" :active="token.label === shareBoardModel.token.label"
@@ -29,6 +30,23 @@
                 </q-item-section>
               </q-item>
             </q-list>
+            <div class="col-12 q-mb-md row">
+              <hr class="q-separator q-separator--horizontal col-5" style="height: 1px; margin-top: 10px;"/>
+              <div class="col-2 text-grey-8 text-center text-uppercase">or</div>
+              <hr class="q-separator q-separator--horizontal col-5" style="height: 1px; margin-top: 10px;"/>
+            </div>
+            <div class="text-grey-8">Create new token</div>
+            <q-item class="q-px-none q-pb-none">
+              <q-item-section>
+                <q-input v-model="newTokenLabel" label="Label" color="grey-9" outlined hide-bottom-space dense class="q-mb-xs"/>
+                <q-input v-model="newTokenValue" @input="newTokenError = false" label="Token" color="grey-9" outlined hide-bottom-space dense :error="!newTokenValid || newTokenError"/>
+              </q-item-section>
+              <q-item-section side>
+                <q-btn label="add" @click="addToken" :loading="addingNewToken" flat class="full-height" :disable="!newTokenValid || newTokenError || !newTokenValue"/>
+              </q-item-section>
+            </q-item>
+            <div v-if="newTokenError" class="text-red" style="font-size: .7rem">You need to have a Standard or ACL token for sharing set up in the MQTT Client settings. Please read more <a href="https://flespi.com/blog/mqtt-tiles-shareable-and-flexible-iot-dashboards" target="_blank">here</a>.</div>
+            <div v-if="!newTokenValid" class="text-red" style="font-size: .7rem">Your token must be unique in list.</div>
           </q-step>
           <q-step name="replace" title="Upload" v-if="config.hasRemote" icon="mdi-file-replace-outline" :done="currentStep === 'link'">
             <div class="q-mx-sm q-my-md text-grey-8 text-center" style="font-size: 1.2rem;">Such board exists. Continue?</div>
@@ -108,7 +126,11 @@ export default {
       steps: [],
       updatedBoardFlag: undefined,
       updateBoardError: undefined,
-      region: null
+      region: null,
+      newTokenLabel: '',
+      newTokenValue: '',
+      addingNewToken: false,
+      newTokenError: false
     }
   },
   computed: {
@@ -119,7 +141,7 @@ export default {
     isValidStep () {
       switch (this.currentStep) {
         case 'tokens': {
-          return this.shareBoardModel.token
+          return this.shareBoardModel.token && this.shareBoardModel.token.accessable
         }
         case 'replace': {
           return !this.isNeedCopy ||
@@ -136,6 +158,14 @@ export default {
     stepsEnum () { return Object.values(this.steps) },
     canBack () {
       return !!this.stepsEnum.length && this.currentStep !== this.steps[0].value && !this.updateBoardError
+    },
+    newTokenValid () {
+      return this.config.tokens.reduce((res, token) => {
+        if (token.credentions.username === this.newTokenValue) {
+          res = false
+        }
+        return res
+      }, true)
     }
   },
   created () {
@@ -143,13 +173,9 @@ export default {
     let stepIndex = 0
     this.getRegionByHost(this.config.host)
       .then(() => {
-        if (this.config.tokens.length > 1) {
-          steps[stepIndex] = { label: 'Token', value: this.stepsConst.STEP_TOKEN }
-          this.currentStep = this.stepsConst.STEP_TOKEN
-          stepIndex++
-        } else {
-          this.setToken(this.config.tokens[0])
-        }
+        steps[stepIndex] = { label: 'Token', value: this.stepsConst.STEP_TOKEN }
+        this.currentStep = this.stepsConst.STEP_TOKEN
+        stepIndex++
         if (this.config.hasRemote) {
           steps[stepIndex] = { label: 'Replace', value: this.stepsConst.STEP_REPLACE }
           if (!this.currentStep) { this.currentStep = this.stepsConst.STEP_REPLACE }
@@ -238,7 +264,7 @@ export default {
           } else if (errors || !accessGranted) {
             this.$set(token, 'accessable', false)
           }
-          return accessGranted
+          return !(errors || !accessGranted)
         })
     },
     setToken (token) {
@@ -298,6 +324,27 @@ export default {
             timeout: 1000,
             position: 'bottom-left'
           })
+        })
+    },
+    addToken () {
+      const token = {
+        credentions: {
+          username: this.newTokenValue
+        },
+        label: this.newTokenLabel
+      }
+      this.addingNewToken = true
+      this.validateToken(token)
+        .then((granted) => {
+          if (granted) {
+            this.config.tokens.push(token)
+            this.$root.$emit('new-share-token', token)
+            this.newTokenValue = ''
+            this.newTokenLabel = ''
+          } else {
+            this.newTokenError = true
+          }
+          this.addingNewToken = false
         })
     }
   }
