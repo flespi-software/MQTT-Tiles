@@ -302,7 +302,6 @@ export default {
       if (host.indexOf('wss://mqtt.flespi.io') !== 0) {
         shareObj.host = host
       }
-      console.log(window.location)
       const link = `${window.location.origin}/#/${Base64.encode(JSON.stringify(shareObj))}`
       this.link = link
     },

@@ -1,10 +1,11 @@
 <template>
   <div>
-    <q-btn-toggle v-model="entity" :options="options" class="q-mb-md" spread unelevated toggle-color="grey-9" v-if="$q.platform.is.desktop" />
+    <q-btn-toggle v-model="entity" :options="options" class="q-mb-md" spread unelevated toggle-color="grey-9" v-if="$q.platform.is.desktop && $q.screen.width > 650" />
     <q-select
       class="q-mb-md"
       v-else
       v-model="entity"
+      :label="entity ? undefined : 'Choose..'"
       :options="options"
       emit-value
       map-options

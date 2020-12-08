@@ -78,50 +78,13 @@
     </q-toolbar>
     <q-toolbar class="q-py-none bg-white" style="flex-wrap: wrap" v-if="board.settings.variables && board.settings.variables.length">
       <q-resize-observer @resize="onVariablesWrapperResize" />
-      <template v-for="(variable, varIndex) in board.settings.variables">
-        <q-select
-          outlined hide-bottom-space color="grey-9" :key="variable.name" emit-value map-options dense class="q-mr-sm" style="min-width: 120px;"
-          :options="getVariableValues(varIndex)"
-          :value="(variablesListValues[varIndex][board.activeVariables[variable.name]] && variablesListValues[varIndex][board.activeVariables[variable.name]].value) || ''"
-          @input="(value) => { changeVaribleHandler(variable.name, value) }"
-          :label="variable.name"
-        >
-           <template v-slot:option="scope">
-            <q-item
-              v-bind="scope.itemProps"
-              v-on="scope.itemEvents"
-            >
-              <q-item-section>
-                <q-item-label :class="{'text-grey-7': !scope.opt.label}">{{scope.opt.label || '*Empty*'}}</q-item-label>
-              </q-item-section>
-              <q-item-section side v-if="scope.opt.label != scope.opt.value">
-                <q-item-label>{{scope.opt.value}}</q-item-label>
-              </q-item-section>
-            </q-item>
-          </template>
-          <template v-slot:no-option>
-            <q-item>
-              <q-item-section>
-                <div class="text-italic text-grey-9 text-h6 text-center text-bold">{{`No ${variable.name}`}}</div>
-              </q-item-section>
-            </q-item>
-          </template>
-          <template v-slot:selected-item="scope">
-            <q-item
-              v-bind="scope.itemProps"
-              v-on="scope.itemEvents"
-              class="q-pa-none" style="min-height: 14px;"
-            >
-              <q-item-section>
-                <q-item-label>{{scope.opt.label && scope.opt.value ? scope.opt.label : scope.opt.value ? (scope.opt.label || '*Empty*') : ''}}</q-item-label>
-              </q-item-section>
-              <q-item-section side v-if="scope.opt.label != scope.opt.value">
-                <q-item-label>{{scope.opt.value}}</q-item-label>
-              </q-item-section>
-            </q-item>
-          </template>
-        </q-select>
-      </template>
+      <board-variable
+        v-for="(variable, varIndex) in board.settings.variables" :key="variable.name"
+        :variable="variable"
+        :options="getVariableValues(varIndex)"
+        :value="(variablesListValues[varIndex][board.activeVariables[variable.name]] && variablesListValues[varIndex][board.activeVariables[variable.name]].value) || ''"
+        @input="(value) => { changeVaribleHandler(variable.name, value) }"
+      />
     </q-toolbar>
     <div class="widgets__wrapper scroll" :style="{height: wrapperHeight}" :class="{'q-px-sm': $q.platform.is.mobile}">
       <div style="width: 100%; position: relative;" v-if="board.widgetsIndexes.length">
@@ -228,6 +191,7 @@
 <script>
 import Vue from 'vue'
 import BoardSettings from './BoardSettings'
+import BoardVariable from './BoardVariable'
 import VirtualList from 'vue-virtual-scroll-list'
 import cloneDeep from 'lodash/cloneDeep'
 import uniq from 'lodash/uniq'
@@ -523,6 +487,7 @@ export default {
   components: {
     Settings,
     BoardSettings,
+    BoardVariable,
     Switcher,
     Informer,
     MultiInformer,
