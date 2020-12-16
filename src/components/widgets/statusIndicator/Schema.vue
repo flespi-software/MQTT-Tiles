@@ -44,20 +44,18 @@
               <div class="col-6" v-if="!item.default">
                 <q-input outlined dense hide-bottom-space class="q-ml-xs" color="grey-9" v-model="item.val" label="Value" :error="!checkUniqueItem(item, index)"/>
               </div>
-              <div class="col-10 q-mb-sm">
+              <div class="col-12 q-mb-sm">
                 <q-input outlined dense hide-bottom-space class="q-mr-xs icon-input" :style="{color: item.color}" color="grey-9" v-model="item.icon" label="Icon">
                   <q-icon slot="append" :name="`mdi-${item.icon || currentSettings.defaultIcon}`" size="1.5rem" :style="{color: item.color}"/>
+                  <q-btn flat slot="after" :style="{backgroundColor: item.color}">
+                    <q-menu class="q-pa-sm" anchor="top right" self="bottom right">
+                      <q-color
+                        v-model="item.color"
+                        format-model='hex'
+                      />
+                    </q-menu>
+                  </q-btn>
                 </q-input>
-              </div>
-              <div class="col-2 relative-position">
-                <q-btn flat :style="{backgroundColor: item.color}" style="position: absolute; bottom: 18px; right: 0;">
-                  <q-menu class="q-pa-sm" anchor="top right" self="bottom right">
-                    <q-color
-                      v-model="item.color"
-                      format-model='hex'
-                    />
-                  </q-menu>
-                </q-btn>
               </div>
               <div class="col-12 text-grey-6 q-mt-sm" style="font-size: .8rem;" v-if="item.default">
                 You can find more icons on <a href="https://materialdesignicons.com/" target="blank">MDI</a>
@@ -75,9 +73,8 @@
         </q-list>
       </div>
       <q-input outlined dense hide-bottom-space class="col-12" color="grey-9" v-model.number="currentSettings.resetTimeout" type="number" label="Reset timeout, s"/>
-      <div class="q-mt-sm col-12">
-        <q-toggle color="grey-9" v-model="currentSettings.isNeedTime" label="Show last update time"/>
-      </div>
+      <q-toggle class="q-mt-sm col-12" color="grey-9" v-model="currentSettings.isNeedShowTitles" label="Show labels with icons"/>
+      <q-toggle class="q-mt-sm col-12" color="grey-9" v-model="currentSettings.isNeedTime" label="Show last update time"/>
     </div>
   </div>
 </template>
@@ -120,6 +117,7 @@ export default {
       maxTopicsLength: 1,
       minWidth: 1,
       minHeight: 2,
+      isNeedShowTitles: false,
       isNeedTime: true
     }
     return {

@@ -169,7 +169,6 @@ export default {
       }, 0)
     },
     pickFiles () {
-      console.log(this.$refs.uploader)
       this.$refs.uploader.pickFiles()
     }
   },

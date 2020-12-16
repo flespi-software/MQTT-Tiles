@@ -91,7 +91,7 @@
               </q-item-section>
               <q-item-section side>
                 <div>
-                  <q-btn round dense flat icon="mdi-link" :color="`grey-${canShare ? 9 : 7}`" @click.native="share('share', id)" :ripple="canShare">
+                  <q-btn round dense flat icon="mdi-link" :color="`grey-${canShare ? 9 : 7}`" @click.native="share('share', id)" :ripple="!!canShare">
                     <q-tooltip>Get link</q-tooltip>
                   </q-btn>
                   <q-btn round dense flat icon="mdi-fullscreen" color="grey-9" @click.native="$emit('select', id)">
@@ -100,17 +100,6 @@
                   <q-btn round dense flat icon="mdi-dots-vertical" color="grey-9">
                     <q-menu anchor="bottom right" self="top right">
                       <q-list dense>
-                        <!-- <q-item style="padding: 0 0;">
-                          <q-item-section/>
-                          <q-item-section side>
-                            <q-btn size="0.8rem" icon="mdi-settings" v-close-popup @click="openEditSettingsHandler(id)" flat round>
-                              <q-tooltip>Settings</q-tooltip>
-                            </q-btn>
-                            <q-btn size="0.8rem" color="red" icon="mdi-delete-outline" v-close-popup @click="$emit('delete', id)" flat round>
-                              <q-tooltip>Remove</q-tooltip>
-                            </q-btn>
-                          </q-item-section>
-                        </q-item> -->
                         <q-item clickable v-close-popup @click.stop="$emit('export', id)" v-if="!!connectionSettings">
                           <q-item-section avatar>
                             <q-icon name="mdi-cloud-upload-outline" />
@@ -122,6 +111,12 @@
                             <q-icon name="mdi-export-variant" />
                           </q-item-section>
                           <q-item-section>Export</q-item-section>
+                        </q-item>
+                        <q-item v-close-popup clickable @click.stop="$emit('get-board-info', id)">
+                          <q-item-section avatar>
+                            <q-icon name="mdi-information-outline"/>
+                          </q-item-section>
+                          <q-item-section>Board info</q-item-section>
                         </q-item>
                         <q-item v-close-popup clickable @click.stop="openEditSettingsHandler(id)">
                           <q-item-section avatar>

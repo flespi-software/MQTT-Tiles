@@ -11,7 +11,7 @@
             <q-list separator bordered class="q-mb-md">
               <q-item
                 v-for="(token, index) in config.tokens" :key="token.credentions.username"
-                @click="setToken(token), currentSelectedToken = index" :active="token.label === shareBoardModel.token.label"
+                @click="setToken(token), currentSelectedToken = index, validateToken(token)" :active="token.label === shareBoardModel.token.label"
                 clickable active-class="bg-amber-2"
               >
                 <q-item-section>

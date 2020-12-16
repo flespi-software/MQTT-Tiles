@@ -50,12 +50,12 @@
     </q-item>
     <q-card-section class="widget__content q-pa-none" :class="[`bg-${item.color}-1`]" :style="{height: contentHeight}">
       <q-list style="height: 100%; overflow: auto;">
-        <q-item tag="label" v-for="(listItem, index) in item.settings.items" :key="`${index}${listItem.value}`" class="q-pa-none">
+        <q-item tag="label" v-for="(listItem, index) in item.settings.items" :key="`${index}${listItem.value}`" class="q-pa-none q-mb-xs">
           <q-item-section avatar>
             <q-radio v-model="currentValue" :val="listItem.val" :color="`${item.color}-7`" />
           </q-item-section>
           <q-item-section class="cursor-pointer">
-            <q-item-label header>{{listItem.label || listItem.val || 'Empty'}}</q-item-label>
+            <q-item-label>{{listItem.label || listItem.val || 'Empty'}}</q-item-label>
             <q-item-label v-if="item.settings.mode === COMMAND_MODE" caption>{{listItem.actionTopic}}</q-item-label>
             <q-item-label v-if="item.settings.mode === COMMAND_MODE" caption>({{listItem.actionPayload || '*Empty*'}})</q-item-label>
           </q-item-section>

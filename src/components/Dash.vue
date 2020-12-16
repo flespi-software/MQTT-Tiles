@@ -27,6 +27,7 @@
       @modify="setModifyTimeBoardHandler(activeBoardId)"
       @export-widgets="exportWidgetsFromBoard"
       @import-widgets="importClickHandler('widgets')"
+      @get-board-info="getBoardInfoHandler(boards[activeBoardId])"
       :style="{height: `${clientSettings ? fullView ? 'calc(100vh - 50px)' : '100vh' : 'calc(100vh - 110px)'}`}"
     />
     <boards
@@ -54,6 +55,7 @@
       @export-as="exportBoardAsHandler"
       @import="importBoardFromConnectionHandler"
       @change:attach="changeAttachedBoards"
+      @get-board-info="boardId => getBoardInfoHandler(boards[boardId])"
       :style="{height: `${clientSettings ? 'calc(100vh - 50px)' : 'calc(100vh - 110px)'}`}"
     >
       <div slot="actions">
@@ -75,6 +77,7 @@
       @close="importExportClose"
       @import="importFromUserHandler"
     />
+    <board-info-dialog :board="boardInfo" @close="boardInfo = undefined"/>
   </div>
 </template>
 
@@ -103,17 +106,16 @@ import cloneDeep from 'lodash/cloneDeep'
 import remove from 'lodash/remove'
 import merge from 'lodash/merge'
 import difference from 'lodash/difference'
-import uniq from 'lodash/uniq'
 import get from 'lodash/get'
 import { Base64 } from 'js-base64'
 import Board from './Board'
 import Boards from './Boards'
 import { WIDGET_STATUS_DISABLED, WIDGET_STATUS_ENABLED } from '../constants'
-import getActionTopics from './widgets/getActionTopics.js'
 import messagesProcessing from './widgets/messagesProcessing.js'
 import migrateWidgets from './widgets/migrations'
 import CopyReplaceDialog from './CopyReplaceDialog'
 import ImportExportModal from './ImportExportModal'
+import BoardInfoDialog from './BoardInfoDialog'
 import { version } from '../../package.json'
 import getValueByTopic from '../mixins/getValueByTopic'
 import boardsMigrations from '../mixins/boardsMigrations'
@@ -171,7 +173,8 @@ export default {
       importExportData: undefined,
       importExportEntity: undefined,
       values: {},
-      boardsVariablesValues: {}
+      boardsVariablesValues: {},
+      boardInfo: undefined
     }
   },
   computed: {
@@ -1044,32 +1047,6 @@ export default {
     closeExportHandler () {
       this.exportBoardId = ''
     },
-    getShareModel (board, isRemoteBoard) {
-      const widgets = isRemoteBoard ? board.widgetsIndexes : board.widgetsIndexes.map(widgetId => this.widgets[widgetId]),
-        subscribeTopics = uniq(widgets.reduce((topics, widget) => { return [...topics, ...widget.topics] }, [])),
-        publishTopics = uniq(getActionTopics(widgets))
-      const topics = {}
-      subscribeTopics.forEach((subTopic) => {
-        if (!topics[subTopic]) {
-          topics[subTopic] = ['subscribe']
-        }
-      })
-      publishTopics.forEach((pubTopic) => {
-        if (!topics[pubTopic]) {
-          topics[pubTopic] = ['publish']
-        } else {
-          topics[pubTopic].push('publish')
-        }
-      })
-      const shareModel = Object.keys(topics).reduce((model, topic) => {
-        const shareObj = { uri: 'mqtt' }
-        shareObj.topic = topic
-        shareObj.actions = topics[topic]
-        model.push(shareObj)
-        return model
-      }, [])
-      return shareModel
-    },
     shareHandler (boardId) {
       const shareWizardConfig = {
         boardId,
@@ -1128,10 +1105,6 @@ export default {
         shareWizardConfig.tokens = [...shareWizardConfig.tokens, ...creds]
       }
       this.$emit('share:prepare', shareWizardConfig)
-    },
-    shareBoard (config) {
-      const { boardId, isRemote } = config
-      this.$emit('share', { boardId, share: this.getShareModel(isRemote ? this.boardsFromConnection[boardId] : this.boards[boardId], isRemote) })
     },
     shareSync () {
       const boardId = this.clientSettings.flespiBoard,
@@ -1246,6 +1219,13 @@ export default {
       this.$integrationBus.on('SetActiveBoard', (boardId) => {
         this.setActiveBoard(boardId)
       })
+    },
+    getBoardInfoHandler (board, isRemoteBoard) {
+      const widgets = isRemoteBoard ? board.widgetsIndexes : board.widgetsIndexes.map(widgetId => this.widgets[widgetId])
+      this.boardInfo = {
+        settings: board,
+        widgets
+      }
     }
   },
   created () {
@@ -1367,7 +1347,7 @@ export default {
       }
     ]
   },
-  components: { Board, Boards, CopyReplaceDialog, ImportExportModal },
+  components: { Board, Boards, CopyReplaceDialog, ImportExportModal, BoardInfoDialog },
   mixins: [getValueByTopic, boardsMigrations]
 }
 </script>

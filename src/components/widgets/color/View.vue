@@ -90,7 +90,8 @@ import '@radial-color-picker/vue-color-picker/dist/vue-color-picker.min.css'
 import { WIDGET_STATUS_DISABLED } from '../../../constants'
 import getValueByTopic from '../../../mixins/getValueByTopic.js'
 import timestamp from '../../../mixins/timestamp.js'
-import { debounce, colors } from 'quasar'
+import { colors } from 'quasar'
+import debounce from 'lodash/debounce'
 const { rgbToHex, rgbToHsv, hexToRgb, hsvToRgb } = colors
 import {
   COLOR_FORMAT_HEX,
@@ -99,13 +100,6 @@ import {
   COLOR_MODE_SIMPLE,
   COLOR_MODE_FULL
 } from './constants'
-const debouncedAction = debounce((ctx, color) => {
-  if (typeof color === 'object') {
-    color = JSON.stringify(color)
-  }
-  const data = { topic: ctx.item.dataTopics[0].topicFilter, payload: color, settings: { retain: ctx.item.settings.save } }
-  ctx.$emit('action', data)
-}, 300)
 export default {
   name: 'Color',
   props: ['item', 'index', 'mini', 'in-shortcuts', 'value', 'blocked'],
@@ -130,7 +124,6 @@ export default {
       this.disable = status
       return status
     },
-    actionHandler (color) { debouncedAction(this, this.getActionColor(color)) },
     getObjByTemplate (color, template) {
       let colorObj = {}
       const names = []
@@ -267,6 +260,16 @@ export default {
       if (!this.item.name && this.blocked) { height = 'calc(100% - 24px)' }
       return height
     }
+  },
+  created () {
+    this.actionHandler = debounce((color) => {
+      color = this.getActionColor(color)
+      if (typeof color === 'object') {
+        color = JSON.stringify(color)
+      }
+      const data = { topic: this.item.dataTopics[0].topicFilter, payload: color, settings: { retain: this.item.settings.save } }
+      this.$emit('action', data)
+    }, 300)
   },
   components: { ColorPicker },
   mixins: [getValueByTopic, timestamp]

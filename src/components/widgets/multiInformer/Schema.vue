@@ -28,7 +28,7 @@
               </q-item-section>
             </template>
             <div class="row q-pa-sm">
-              <topic class="col-12 q-mb-sm" v-model="item.topic" @input="updateTopics" :board="board"/>
+              <topic class="col-12 q-mb-sm" v-model="item.topic" @input="updateTopics" :board="board" :config="{ needSelectors: true }"/>
               <div class="col-6 q-mb-sm">
                 <q-input outlined dense hide-bottom-space class="q-mr-sm" color="grey-9" v-model="item.prefix" label="Prefix"/>
               </div>

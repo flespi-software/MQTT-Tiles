@@ -5,7 +5,7 @@
       :class="[`bg-${currentValue !== null ? `${item.color}-1` : 'grey-3'}`]"
     >
       <q-icon
-        v-if="activeItem.icon || !activeItem.label"
+        v-if="needShowIcon"
         size="3rem"
         :style="{color: activeItem.color}"
         :name="`mdi-${activeItem.icon || item.settings.defaultIcon}`"
@@ -51,12 +51,13 @@
     </q-item>
     <q-card-section class="widget__content scroll q-pa-none" :class="[`bg-${item.color}-1`]" :style="{height: contentHeight}">
       <q-icon
-        v-if="activeItem.icon || !activeItem.label"
-        :style="{color: activeItem.color, fontSize: `${size}rem`}"
+        v-if="needShowIcon"
+        :style="{color: activeItem.color, fontSize: `${size}rem`, height: activeItem.label && item.settings.isNeedShowTitles ? 'calc(100% - 25px)' : '100%'}"
         :name="`mdi-${activeItem.icon || item.settings.defaultIcon}`"
-        style="width: 100%; height: 100%;"
+        style="width: 100%;"
       />
       <div v-else style="width: 100%; height: 100%;" class="flex flex-center" :style="{color: activeItem.color}">{{activeItem.label}}</div>
+      <div v-if="activeItem.label && needShowIcon && item.settings.isNeedShowTitles" style="width: 100%;" class="flex flex-center ellipsis" :style="{color: activeItem.color}">{{activeItem.label}}</div>
     </q-card-section>
     <div v-if="item.settings.isNeedTime" class="absolute-bottom-left q-px-xs q-pt-xs" style="font-size: 12px; border-top-right-radius: 5px; bottom: 1px; left: 1px;" :class="[`text-${item.color}-7`, `bg-${item.color}-1`]">
       {{timestamp}}
@@ -100,11 +101,15 @@ export default {
     }
   },
   computed: {
+    needShowIcon () {
+      return this.item.settings.defaultIcon || this.activeItem.icon || !this.activeItem.label
+    },
     size () {
       const height = this.item.settings.height,
         width = this.item.settings.width,
         active = height > width ? width : height
-      return active * 2.5
+      const mul = this.activeItem.label && this.needShowIcon && this.item.settings.isNeedShowTitles ? 2 : 2.5
+      return active * mul
     },
     currentValue: {
       get () {

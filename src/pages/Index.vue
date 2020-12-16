@@ -64,9 +64,7 @@ export default {
       this.shareWizardConfig = shareWizardConfig
       this.shareWizardOpened = true
     },
-    shareBoard (config) {
-      this.$refs.dash.shareBoard(config)
-    },
+    shareBoard (config) {},
     changeAttachedBoards (attachedBoards) {
       this.$emit('change:attach', attachedBoards)
     }
