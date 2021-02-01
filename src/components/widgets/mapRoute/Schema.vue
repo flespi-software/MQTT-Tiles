@@ -86,7 +86,9 @@ export default {
         route: {
           topicFilter: 'topic/to/route',
           payloadType: 0,
-          payloadField: ''
+          payloadField: '',
+          topicTemplate: 'topic/to/route',
+          payloadNameField: ''
         }
       }
     }
@@ -94,9 +96,11 @@ export default {
   methods: {
     addItem () {
       this.currentSettings.items.push(cloneDeep(this.defaultItem))
+      this.updateTopics()
     },
     removeItem (itemIndex) {
       this.$delete(this.currentSettings.items, itemIndex)
+      this.updateTopics()
     },
     upItem (itemIndex) {
       const movedItem = this.currentSettings.items.splice(itemIndex, 1)[0]

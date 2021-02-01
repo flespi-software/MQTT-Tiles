@@ -33,5 +33,12 @@ export default {
     const settings = widget.settings
     settings.initMessage = ''
     return widget
+  },
+  '1.12.13': (widget) => {
+    const settings = widget.settings
+    if (!settings.aclTopics) {
+      settings.aclTopics = []
+    }
+    return widget
   }
 }

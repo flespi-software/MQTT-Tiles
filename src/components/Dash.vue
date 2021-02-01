@@ -174,17 +174,16 @@ export default {
       importExportEntity: undefined,
       values: {},
       boardsVariablesValues: {},
-      boardInfo: undefined
+      boardInfo: undefined,
+      flespiToken: undefined
     }
   },
   computed: {
     boardsIds () { return Object.keys(this.boards) },
     subscriptionsTopics () { return Object.keys(this.subscriptions) },
     canShareByClientToken () {
-      return this.connack && this.connack.properties &&
-          this.connack.properties.userProperties &&
-          this.connack.properties.userProperties.token &&
-          JSON.parse(this.connack.properties.userProperties.token).access.type !== 1
+      return this.connack && this.flespiToken &&
+          this.flespiToken.access.type !== 1
     },
     canShare () {
       const hasCreds = (this.clientSettings && this.clientSettings.syncCreds && this.clientSettings.syncCreds.length)
@@ -390,6 +389,7 @@ export default {
 
       client.on('connect', (connack) => {
         this.connack = connack
+        this.flespiToken = JSON.parse(get(this.connack, 'properties.userProperties.token', null))
         this.clientStatus = true
         this.$emit('change-status', true)
         this.initWidgets()
@@ -477,12 +477,15 @@ export default {
     async subscribe () {
       if (this.client) {
         let [topic, options] = arguments
+        const flespiCid = get(this.flespiToken, 'cid', undefined)
         if (this.clientSettings.protocolVersion === 5) {
           if (!options) { options = {} }
           if (!options.properties) { options.properties = {} }
           const subIdentifier = Number(Object.keys(this.subscriptionsIndetifiers).find(k => this.subscriptionsIndetifiers[k] === topic)) || ++this.currentSubscriptionIndetifier
           options.properties.subscriptionIdentifier = subIdentifier
           this.subscriptionsIndetifiers[subIdentifier] = topic
+          if (!options.properties.userProperties) { options.properties.userProperties = {} }
+          if (flespiCid) { options.properties.userProperties.cid = flespiCid }
         }
         return this.client.subscribe(topic, options)
           .then(() => {

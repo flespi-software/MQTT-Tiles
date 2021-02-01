@@ -42,6 +42,25 @@
         <span class="text-red"> (will clear all your settings)</span>
       </div>
       <div class="q-mt-sm col-12">
+        <q-input outlined dense hide-bottom-space color="grey-9" v-model="aclTopicName" label="ACL Topic" hint='You can specify tokens which be used for publishing from iframe logic. Command format: `MQTTTiles|${postkey}|publish=>{ "topic":"topic/to/data", "payload":"message", "retain":true }`, where postkey is a uniq key for iframe.'>
+          <q-btn round flat dense icon="mdi-plus" :disable="!aclTopicName" @click="addAcl">
+            <q-tooltip v-if="!aclTopicName">Enter topic first</q-tooltip>
+          </q-btn>
+        </q-input>
+        <q-list bordered separator class="q-mt-sm" v-if="currentSettings.aclTopics.length">
+          <q-item-label class="q-py-sm q-px-sm" style="font-size: .7rem">
+            ACL Topics
+          </q-item-label>
+          <q-separator/>
+          <q-item v-for="(topic, index) in currentSettings.aclTopics" :key="topic" class="q-px-sm">
+            <q-item-section style="word-break: break-word;">{{topic}}</q-item-section>
+            <q-item-section side>
+              <q-btn round flat dense icon="mdi-close" @click="removeAcl(index)"/>
+            </q-item-section>
+          </q-item>
+        </q-list>
+      </div>
+      <div class="q-mt-sm col-12">
         <q-toggle color="grey-9" v-model="currentSettings.isNeedTime" label="Show last update time"/>
       </div>
     </div>
@@ -70,7 +89,8 @@ export default {
         link: 'https://flespi.io/mapview',
         readyMessage: '',
         initMessage: '',
-        isNeedTime: true
+        isNeedTime: true,
+        aclTopics: []
       },
       defaultItem = {
         label: 'New item',
@@ -78,7 +98,9 @@ export default {
         topic: {
           topicFilter: '',
           payloadType: 0,
-          payloadField: ''
+          payloadField: '',
+          topicTemplate: '',
+          payloadNameField: ''
         }
       }
     return {
@@ -94,7 +116,8 @@ export default {
       descriptions: [
         'Payload will be posted to your iframe',
         'Link as payload expected!'
-      ]
+      ],
+      aclTopicName: ''
     }
   },
   methods: {
@@ -148,6 +171,13 @@ export default {
       ) || (
         this.currentSettings.mode === IFRAME_MODE_SHOW
       )
+    },
+    addAcl () {
+      this.currentSettings.aclTopics.push(this.aclTopicName)
+      this.aclTopicName = ''
+    },
+    removeAcl (index) {
+      this.currentSettings.aclTopics.splice(index, 1)
     }
   },
   created () {

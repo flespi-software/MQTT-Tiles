@@ -25,7 +25,9 @@ export default {
         {
           topicFilter: 'topic/to/data',
           payloadType: 0,
-          payloadField: ''
+          payloadField: '',
+          topicTemplate: 'topic/to/data',
+          payloadNameField: ''
         }
       ],
       width: 2,

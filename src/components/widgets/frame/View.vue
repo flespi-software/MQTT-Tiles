@@ -128,6 +128,40 @@ export default {
         }
         this.$set(this.currentPayloads, index, payload)
       })
+    },
+    checkTopicByAcl (topic, acl) {
+      if (topic.indexOf('+') !== -1 || topic.indexOf('#') !== -1) { return false }
+      return acl.some(aclTopic => {
+        const aclRegExp = new RegExp(
+          aclTopic
+            .replace('+', '[0-9a-zA-Z-,.]+$')
+            .replace('#', '(.*)')
+        )
+        return !!topic.match(aclRegExp)
+      })
+    },
+    handleActionMessage (data) {
+      if (typeof data === 'string' && data.indexOf('MQTTTiles|') === 0) {
+        let cmd = '',
+          payload = null
+        data = data.split('|')
+        const hasPostkey = data[1].indexOf('=>') === -1
+        data = data[hasPostkey ? 2 : 1].split('=>')
+        cmd = data[0]
+        try {
+          payload = JSON.parse(data[1])
+        } catch (e) {
+          payload = data[1]
+        }
+        if (cmd === 'publish' && payload && typeof payload === 'object') {
+          const canPublish = this.checkTopicByAcl(payload.topic, this.item.settings.aclTopics)
+          if (canPublish) {
+            const data = { topic: payload.topic, payload: payload.payload, settings: { retain: payload.retain } }
+            console.log(data)
+            this.$emit('action', data)
+          }
+        }
+      }
     }
   },
   computed: {
@@ -141,9 +175,11 @@ export default {
       }
     },
     contentHeight () {
-      let height = 'calc(100% - 44px)'
+      let height = 'calc(100% - 34px)'
       if (!this.item.name && this.blocked) {
         height = 'calc(100% - 11px)'
+      } else if (this.blocked) {
+        height = 'calc(100% - 24px)'
       }
       return height
     }
@@ -162,22 +198,32 @@ export default {
           this.send(this.item.settings.initMessage)
         }
       }
+    },
+    blocked (blocked) {
+      this.send(`MQTTTiles|blocked=>${blocked}`)
     }
   },
   created () {
-    if (this.item.settings.readyMessage) {
-      window.addEventListener('message', (e) => {
-        if (e.data === this.item.settings.readyMessage) {
-          if (this.item.settings.initMessage) {
-            this.send(this.item.settings.initMessage)
-          }
-          this.isReady = true
-          this.update()
+    window.addEventListener('message', (e) => {
+      if (!this.isReady && this.item.settings.readyMessage && e.data === this.item.settings.readyMessage) {
+        if (this.item.settings.initMessage) {
+          this.send(this.item.settings.initMessage)
         }
-      })
-    } else if (this.item.settings.initMessage) {
-      this.send(this.item.settings.initMessage)
-    }
+        this.isReady = true
+        this.update()
+        this.send(`MQTTTiles|blocked=>${this.blocked}`)
+      } else {
+        this.handleActionMessage(e.data)
+      }
+    })
+  },
+  mounted () {
+    this.$nextTick(() => {
+      if (this.item.settings.initMessage) {
+        this.send(this.item.settings.initMessage)
+      }
+      if (!this.item.settings.readyMessage) { this.send(`MQTTTiles|blocked=>${this.blocked}`) }
+    })
   },
   mixins: [getValueByTopic, timestamp]
 }

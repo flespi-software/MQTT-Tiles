@@ -219,7 +219,9 @@ export default {
       defaultTopic: {
         topicFilter: '',
         payloadType: 0,
-        payloadField: ''
+        payloadField: '',
+        topicTemplate: '',
+        payloadNameField: ''
       },
       edited: null
     }
