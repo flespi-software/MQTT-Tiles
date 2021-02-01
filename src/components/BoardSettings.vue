@@ -123,6 +123,7 @@
         </q-toolbar-title>
         <q-btn flat dense class="q-mr-sm" @click="closeHandler">Close</q-btn>
         <q-btn flat dense :disable="!validateCurrentSettings" @click="saveBoardSettingsHandler">{{settings ? 'Update' : 'Save'}}</q-btn>
+        <q-btn flat dense :disable="!validateCurrentSettings" @click="saveAndOpenBoardSettingsHandler">{{settings ? 'Update & open' : 'Save & open'}}</q-btn>
       </q-toolbar>
     </div>
   </q-dialog>
@@ -234,6 +235,10 @@ export default {
       }
       this.$emit(event, this.currentSettings)
       this.closeHandler()
+    },
+    saveAndOpenBoardSettingsHandler () {
+      this.saveBoardSettingsHandler()
+      this.$emit('open', this.currentSettings.id)
     },
     closeHandler () {
       this.$emit('input', false)

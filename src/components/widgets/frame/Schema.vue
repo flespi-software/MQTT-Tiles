@@ -42,7 +42,7 @@
         <span class="text-red"> (will clear all your settings)</span>
       </div>
       <div class="q-mt-sm col-12">
-        <q-input outlined dense hide-bottom-space color="grey-9" v-model="aclTopicName" label="ACL Topic" hint='You can specify tokens which be used for publishing from iframe logic. Command format: `MQTTTiles|${postkey}|publish=>{ "topic":"topic/to/data", "payload":"message", "retain":true }`, where postkey is a uniq key for iframe.'>
+        <q-input outlined dense hide-bottom-space color="grey-9" v-model="aclTopicName" @keyup.enter="addAcl" label="ACL Topic" hint='You can specify tokens which be used for publishing from iframe logic. Command format: `MQTTTiles|${postkey}|publish=>{ "topic":"topic/to/data", "payload":"message", "retain":true }`, where postkey is a uniq key for iframe.'>
           <q-btn round flat dense icon="mdi-plus" :disable="!aclTopicName" @click="addAcl">
             <q-tooltip v-if="!aclTopicName">Enter topic first</q-tooltip>
           </q-btn>

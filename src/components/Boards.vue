@@ -223,6 +223,7 @@
       @add="addBoardHandler"
       @edit="editBoardHandler"
       @hide="hideModalHandler"
+      @open="id => $emit('select', id)"
     />
   </div>
 </template>
