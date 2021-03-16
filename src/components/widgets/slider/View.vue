@@ -89,6 +89,7 @@
 </style>
 
 <script>
+import JSONPath from 'jsonpath'
 import {
   WIDGET_STATUS_DISABLED,
   WIDGET_RANGE_VALUE_CURRENT_MODE,
@@ -111,7 +112,18 @@ export default {
       }
     },
     actionHandler (val) {
-      const data = { topic: this.item.dataTopics[0].topicFilter, payload: `${val}`, settings: { retain: this.item.settings.save } }
+      const topic = this.item.dataTopics[0]
+      const topicFilter = topic.topicFilter
+      const payloadField = topic.payloadField
+      let payload = `${val}`
+      if (payloadField) {
+        payload = this.getCleanValue(this.value[topicFilter] && this.value[topicFilter].payload, topic)
+        if (payload !== 'N/A') {
+          JSONPath.apply(payload, payloadField, () => +val)
+          payload = JSON.stringify(payload)
+        }
+      }
+      const data = { topic: topicFilter, payload, settings: { retain: this.item.settings.save } }
       this.$emit('action', data)
     }
   },
@@ -159,8 +171,8 @@ export default {
         : this.valuesBySettings[this.item.settings.topics[0].topicFilter]
     },
     contentHeight () {
-      let height = 'calc(100% - 44px)'
-      if (!this.item.name && this.blocked) {
+      let height = 'calc(100% - 34px)'
+      if (!this.item.name) {
         height = 'calc(100% - 11px)'
       }
       return height

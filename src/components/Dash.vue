@@ -96,10 +96,11 @@
 </style>
 
 <script>
-import isEqual from 'lodash/isEqual'
 import mqtt from '../boot/async-mqtt.js'
+import './global/register'
 import { uid } from 'quasar'
 import bl from 'bl'
+import isEqual from 'lodash/isEqual'
 import debounce from 'lodash/debounce'
 import throttle from 'lodash/throttle'
 import cloneDeep from 'lodash/cloneDeep'

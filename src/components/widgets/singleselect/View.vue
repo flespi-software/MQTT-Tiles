@@ -84,6 +84,7 @@
 </style>
 
 <script>
+import JSONPath from 'jsonpath'
 import { WIDGET_STATUS_DISABLED } from '../../../constants'
 import { DEFAULT_MODE, COMMAND_MODE } from './constants.js'
 import getValueByTopic from '../../../mixins/getValueByTopic.js'
@@ -142,6 +143,14 @@ export default {
       if (this.item.settings.mode === DEFAULT_MODE) {
         topic = this.item.dataTopics[0].topicFilter
         payload = val
+        const payloadField = this.item.dataTopics[0].payloadField
+        if (payloadField) {
+          payload = this.getCleanValue(this.value[topic] && this.value[topic].payload, this.item.dataTopics[0])
+          if (payload !== 'N/A') {
+            JSONPath.apply(payload, payloadField, () => val)
+            payload = JSON.stringify(payload)
+          }
+        }
       } else {
         const currentItem = this.item.settings.items.filter(item => item.val === val)[0]
         topic = currentItem.actionTopic

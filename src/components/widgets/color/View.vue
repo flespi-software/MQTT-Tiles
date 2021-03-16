@@ -85,6 +85,7 @@
 </style>
 
 <script>
+import JSONPath from 'jsonpath'
 import ColorPicker from '@radial-color-picker/vue-color-picker'
 import '@radial-color-picker/vue-color-picker/dist/vue-color-picker.min.css'
 import { WIDGET_STATUS_DISABLED } from '../../../constants'
@@ -263,11 +264,21 @@ export default {
   },
   created () {
     this.actionHandler = debounce((color) => {
+      const topic = this.item.dataTopics[0]
       color = this.getActionColor(color)
-      if (typeof color === 'object') {
-        color = JSON.stringify(color)
+      const topicFilter = topic.topicFilter
+      const payloadField = topic.payloadField
+      let payload = color
+      if (payloadField) {
+        payload = this.getCleanValue(this.value[topicFilter] && this.value[topicFilter].payload, topic)
+        if (payload !== 'N/A') {
+          JSONPath.apply(payload, payloadField, () => color)
+          payload = JSON.stringify(payload)
+        }
+      } else if (typeof color === 'object') {
+        payload = JSON.stringify(color)
       }
-      const data = { topic: this.item.dataTopics[0].topicFilter, payload: color, settings: { retain: this.item.settings.save } }
+      const data = { topic: topicFilter, payload, settings: { retain: this.item.settings.save } }
       this.$emit('action', data)
     }, 300)
   },

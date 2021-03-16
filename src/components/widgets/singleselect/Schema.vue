@@ -36,7 +36,7 @@
                 <q-input outlined dense hide-bottom-space autofocus class="q-mr-xs" color="grey-9" v-model="item.label" label="Label"/>
               </div>
               <div class="col-6  q-mb-sm">
-                <q-input outlined dense hide-bottom-space class="q-ml-xs" color="grey-9" v-model="item.val" label="Value" :error="!checkUniqueValue(item.val, index)"/>
+               <typed-input class="q-ml-xs" v-model="item.val" :settings='{label: "Value", error: !checkUniqueValue(item.val, index)}'/>
               </div>
               <div v-if="currentSettings.mode === 1" class="col-6">
                 <q-input outlined dense hide-bottom-space class="q-mr-xs" color="grey-9" v-model="item.actionTopic" label="Action topic" :error="!item.actionTopic"/>

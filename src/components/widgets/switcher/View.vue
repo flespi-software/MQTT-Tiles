@@ -80,6 +80,7 @@
 </style>
 
 <script>
+import JSONPath from 'jsonpath'
 import { WIDGET_STATUS_DISABLED } from '../../../constants'
 import { DEFAULT_MODE, COMMAND_MODE, ACCUMULATE_AND_MODE, ACCUMULATE_OR_MODE } from './constants.js'
 import getValueByTopic from '../../../mixins/getValueByTopic.js'
@@ -97,21 +98,23 @@ export default {
     currentValue () {
       const mode = this.item.settings.accumulateLogic
       const initValue = mode === ACCUMULATE_AND_MODE
+      const trueValue = this.item.settings.trueValue
+      const falseValue = this.item.settings.falseValue
       return this.item.dataTopics.reduce((result, topicObj) => {
         if (result === null) { return result }
         const value = this.value[topicObj.topicFilter] !== null
-          ? `${this.mathProcessing(this.getValueByTopic(this.value[topicObj.topicFilter].payload, topicObj), this.item.settings.math)}`
+          ? this.mathProcessing(this.getValueByTopic(this.value[topicObj.topicFilter].payload, topicObj), this.item.settings.math)
           : this.value[topicObj.topicFilter]
         switch (mode) {
           case ACCUMULATE_AND_MODE: {
-            result = value === this.item.settings.trueValue
-              ? result && true : value === this.item.settings.falseValue
+            result = value === trueValue
+              ? result && true : value === falseValue
                 ? result && false : null
             break
           }
           case ACCUMULATE_OR_MODE: {
-            result = value === this.item.settings.trueValue
-              ? result || true : value === this.item.settings.falseValue
+            result = value === trueValue
+              ? result || true : value === falseValue
                 ? result || false : null
             break
           }
@@ -133,7 +136,7 @@ export default {
       return topic
     },
     isActiveWidget () {
-      return this.actionTopic && ((this.item.settings.mode === COMMAND_MODE) || (!this.item.settings.math && this.item.settings.mode === DEFAULT_MODE))
+      return !!this.actionTopic && ((this.item.settings.mode === COMMAND_MODE) || (!this.item.settings.math && this.item.settings.mode === DEFAULT_MODE))
     },
     contentHeight () {
       let height = 'calc(100% - 22px)'
@@ -145,10 +148,11 @@ export default {
   },
   methods: {
     getValue () {
+      let value = ''
       if (this.item.settings.mode === COMMAND_MODE) {
-        return this.currentValue ? this.item.settings.falsePayload : this.item.settings.truePayload
+        value = this.currentValue ? this.item.settings.falsePayload : this.item.settings.truePayload
       } else {
-        return this.item.dataTopics.reduce((result, topicObj) => {
+        value = this.item.dataTopics.reduce((result, topicObj) => {
           const value = this.value[topicObj.topicFilter] !== null
             ? this.getValueByTopic(this.value[topicObj.topicFilter].payload, topicObj)
             : this.value[topicObj.topicFilter]
@@ -158,10 +162,22 @@ export default {
                 ? this.item.settings.falseValue : this.item.settings.trueValue
         }, this.item.settings.falseValue)
       }
+      return value
     },
     actionHandler () {
       if (this.currentValue !== null && this.isActiveWidget) {
-        const data = { topic: this.actionTopic, payload: this.getValue(), settings: { retain: this.item.settings.save } }
+        const val = this.getValue()
+        const topic = this.actionTopic
+        let payload = val
+        const firstDataTopic = this.item.dataTopics[0]
+        if (this.item.settings.mode === DEFAULT_MODE && firstDataTopic.payloadField) {
+          payload = this.getCleanValue(this.value[topic] && this.value[topic].payload, firstDataTopic)
+          if (payload !== 'N/A') {
+            JSONPath.apply(payload, firstDataTopic.payloadField, () => val)
+            payload = JSON.stringify(payload)
+          }
+        }
+        const data = { topic, payload, settings: { retain: this.item.settings.save } }
         this.$emit('action', data)
       }
     }

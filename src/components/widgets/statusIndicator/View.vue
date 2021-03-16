@@ -122,7 +122,7 @@ export default {
         if (value === null || this.valueExpired) {
           return null
         } else {
-          return `${this.mathProcessing(this.getValueByTopic(value, this.item.dataTopics[0]), this.item.settings.math)}`
+          return this.mathProcessing(this.getValueByTopic(value, this.item.dataTopics[0]), this.item.settings.math)
         }
       },
       set (val) {
@@ -132,7 +132,7 @@ export default {
     },
     activeItem () {
       const defaultItem = this.item.settings.items[0]
-      const activeItem = this.item.settings.items.slice(1).filter(item => item.val === `${this.mathProcessing(this.currentValue, item.math)}`)
+      const activeItem = this.item.settings.items.slice(1).filter(item => item.val === this.mathProcessing(this.currentValue, item.math))
       return activeItem[0] || defaultItem
     },
     contentHeight () {

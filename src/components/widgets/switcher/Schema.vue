@@ -7,7 +7,8 @@
       <q-btn-toggle class='q-my-sm col-12' rounded toggle-text-color="grey-9" text-color="grey-6" flat v-model="currentSettings.mode" :options="modeOptions"/>
       <q-input outlined dense hide-bottom-space class="col-12 q-mb-sm" v-if="currentSettings.mode === 0 && widget.topics.length > 1" color="grey-9" v-model="currentSettings.actionTopic" label="Action topic"/>
       <div class="col-6 q-pr-sm">
-        <q-input outlined dense hide-bottom-space color="grey-9" class="q-mb-sm" v-model="currentSettings.trueValue" label="True value"/>
+        <!-- <q-input outlined dense hide-bottom-space color="grey-9" class="q-mb-sm" v-model="currentSettings.trueValue" label="True value"/> -->
+        <typed-input class="q-mb-sm" v-model="currentSettings.trueValue" :settings="{ label: 'True value' }"/>
         <q-input outlined dense hide-bottom-space class="q-mb-sm icon-input" color="grey-9" v-model="currentSettings.trueIcon" label="True value icon">
           <q-icon slot="append" :name="`mdi-${currentSettings.trueIcon || 'toggle-switch-outline'}`" size="1.5rem"/>
         </q-input>
@@ -22,7 +23,8 @@
         </q-input>
       </div>
       <div class="col-6 q-pl-sm">
-        <q-input outlined dense hide-bottom-space color="grey-9" class="q-mb-sm" v-model="currentSettings.falseValue" label="False value"/>
+        <!-- <q-input outlined dense hide-bottom-space color="grey-9" class="q-mb-sm" v-model="currentSettings.falseValue" label="False value"/> -->
+        <typed-input class="q-mb-sm" v-model="currentSettings.falseValue" :settings="{ label: 'False value' }"/>
         <q-input outlined dense hide-bottom-space class="q-mb-sm icon-input" color="grey-9" v-model="currentSettings.falseIcon" label="False value icon">
           <q-icon slot="append" :name="`mdi-${currentSettings.falseIcon || 'toggle-switch-off-outline'}`" size="1.5rem"/>
         </q-input>
