@@ -60,7 +60,7 @@ export default {
         } else {
           const needle = val.toLowerCase()
           this.filterOptions = this.options.filter(
-            variable => JSON.stringify(variable.label).indexOf(needle) !== -1 || JSON.stringify(variable.value).indexOf(needle) !== -1
+            variable => JSON.stringify(variable.label).toLowerCase().indexOf(needle) !== -1 || JSON.stringify(variable.value).toLowerCase().indexOf(needle) !== -1
           )
         }
       })
