@@ -22,7 +22,7 @@ export default {
       let value = this.typedValue
       try { value = JSON.parse(value) } catch (e) {}
       const needWrap = typeof this.typedValue !== typeof value
-      value = needWrap ? `'${value}'` : JSON.stringify(value)
+      value = needWrap ? `'${value}'` : value !== null ? value : JSON.stringify(value)
       return value
     }
   },
@@ -33,7 +33,7 @@ export default {
       if (needStringType) { value = value.slice(1, -1) }
       try { value = JSON.parse(value) } catch (e) {}
       if (typeof value === 'string') { value = initValue }
-      if (needStringType) { value = value.toString() }
+      if (needStringType) { value = value ? value.toString() : JSON.stringify(value) }
       return value
     },
     setTypedValue (value) {
