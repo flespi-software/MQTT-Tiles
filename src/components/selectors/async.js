@@ -64,7 +64,7 @@ class Connector {
   }
 
   async getDevicesTelemetry (id) {
-    const telemetryData = await this.bus.gw.getDevicesTelemetry(id)
+    const telemetryData = await this.bus.gw.getDevicesTelemetry(id, 'all')
     let telemetry = get(telemetryData, 'data.result', [])
     telemetry = telemetry.reduce((telemetry, device) => {
       const deviceTelemetry = device.telemetry
