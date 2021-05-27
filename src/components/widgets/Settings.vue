@@ -135,6 +135,7 @@ import MapRoute from './mapRoute/Schema'
 import StatusIndicator from './statusIndicator/Schema'
 import TextSender from './textSender/Schema'
 import Calculator from './calculator/Schema'
+import Scheme from './scheme/Schema'
 
 export default {
   name: 'Settings',
@@ -153,7 +154,7 @@ export default {
       defaultSettings,
       currentSettings: this.settings ? merge({}, defaultSettings, this.settings) : merge({}, defaultSettings),
       typeOptions: [
-        { label: 'Text', value: 'informer', rightIcon: 'mdi-format-color-text' },
+        { label: 'Text', value: 'informer', rightIcon: 'mdi-format-text-variant' },
         { label: 'Multi text', value: 'multi-informer', rightIcon: 'mdi-card-text-outline' },
         { label: 'Static text', value: 'static-informer', rightIcon: 'mdi-format-text' },
         { label: 'Toggle', value: 'switcher', rightIcon: 'mdi-toggle-switch-outline' },
@@ -170,7 +171,8 @@ export default {
         { label: 'Iframe', value: 'frame', rightIcon: 'mdi-window-maximize' },
         { label: 'Radio button', value: 'singleselect', rightIcon: 'mdi-radiobox-marked' },
         { label: 'Multiplier', value: 'multiplier', rightIcon: 'mdi-monitor-multiple' },
-        { label: 'Complex', value: 'complex', rightIcon: 'mdi-ballot-outline' }
+        { label: 'Complex', value: 'complex', rightIcon: 'mdi-ballot-outline' },
+        { label: 'Scheme', value: 'scheme', rightIcon: 'mdi-floor-plan' }
       ],
       typeElementWidth: 0,
       colors: ['grey', 'red', 'green', 'orange', 'blue', 'light-blue', 'purple', 'deep-orange', 'cyan', 'brown', 'blue-grey'],
@@ -287,7 +289,7 @@ export default {
   },
   mixins: [validateTopic],
   components: {
-    Topic, Switcher, Informer, Clicker, Radial, Linear, Frame, Singleselect, Multiplier, Complex, StaticInformer, MultiInformer, Slider, Color, MapLocation, MapRoute, StatusIndicator, TextSender, Calculator
+    Topic, Switcher, Informer, Clicker, Radial, Linear, Frame, Singleselect, Multiplier, Complex, StaticInformer, Scheme, MultiInformer, Slider, Color, MapLocation, MapRoute, StatusIndicator, TextSender, Calculator
   }
 }
 </script>

@@ -9,6 +9,7 @@ module.exports = function (ctx) {
     boot: [
       'prism',
       'i18n',
+      'icomoon',
       'integrationBus'
     ],
 
@@ -85,12 +86,15 @@ module.exports = function (ctx) {
         'QStepper',
         'QStep',
         'QStepperNavigation',
-        'QResizeObserver'
+        'QResizeObserver',
+        'QFile',
+        'QSlideTransition'
       ],
 
       directives: [
         'Ripple',
-        'ClosePopup'
+        'ClosePopup',
+        'TouchPan'
       ],
 
       // Quasar plugins

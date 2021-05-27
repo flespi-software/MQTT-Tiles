@@ -65,7 +65,7 @@ import Topic from '../Topic'
 import isEqual from 'lodash/isEqual'
 import cloneDeep from 'lodash/cloneDeep'
 export default {
-  name: 'MultiInformerSchema',
+  name: 'SchemeSchema',
   props: ['widget', 'board'],
   data () {
     const defaultSettings = {

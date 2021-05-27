@@ -9,7 +9,7 @@
       <div class="col-6 q-pr-sm">
         <!-- <q-input outlined dense hide-bottom-space color="grey-9" class="q-mb-sm" v-model="currentSettings.trueValue" label="True value"/> -->
         <typed-input class="q-mb-sm" v-model="currentSettings.trueValue" :settings="{ label: 'True value' }"/>
-        <q-input outlined dense hide-bottom-space class="q-mb-sm icon-input" color="grey-9" v-model="currentSettings.trueIcon" label="True value icon">
+        <q-input outlined dense hide-bottom-space class="q-mb-sm" color="grey-9" v-model="currentSettings.trueIcon" label="True value icon">
           <q-icon slot="append" :name="`mdi-${currentSettings.trueIcon || 'toggle-switch-outline'}`" size="1.5rem"/>
         </q-input>
         <div v-if="currentSettings.mode === 1" class="q-mb-sm">
@@ -23,9 +23,8 @@
         </q-input>
       </div>
       <div class="col-6 q-pl-sm">
-        <!-- <q-input outlined dense hide-bottom-space color="grey-9" class="q-mb-sm" v-model="currentSettings.falseValue" label="False value"/> -->
         <typed-input class="q-mb-sm" v-model="currentSettings.falseValue" :settings="{ label: 'False value' }"/>
-        <q-input outlined dense hide-bottom-space class="q-mb-sm icon-input" color="grey-9" v-model="currentSettings.falseIcon" label="False value icon">
+        <q-input outlined dense hide-bottom-space class="q-mb-sm" color="grey-9" v-model="currentSettings.falseIcon" label="False value icon">
           <q-icon slot="append" :name="`mdi-${currentSettings.falseIcon || 'toggle-switch-off-outline'}`" size="1.5rem"/>
         </q-input>
         <div v-if="currentSettings.mode === 1" class="q-mb-sm">

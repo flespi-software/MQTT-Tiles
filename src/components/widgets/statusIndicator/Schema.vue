@@ -2,8 +2,8 @@
   <div>
     <div class="row">
       <div class="col-xs-12 q-mb-sm">
-        <q-input outlined dense hide-bottom-space class="q-mr-xs icon-input" color="grey-9" v-model="currentSettings.defaultIcon" label="Default icon" :error="!currentSettings.defaultIcon">
-          <q-icon slot="after" :name="`mdi-${currentSettings.defaultIcon}`" size="1.5rem" style="position: absolute; right: 0; bottom : 7px;"/>
+        <q-input outlined dense hide-bottom-space color="grey-9" v-model="currentSettings.defaultIcon" label="Default icon" :error="!currentSettings.defaultIcon">
+          <q-icon slot="append" :name="`mdi-${currentSettings.defaultIcon}`" size="1.5rem"/>
         </q-input>
       </div>
       <q-input outlined dense hide-bottom-space class="col-12" color="grey-9" v-model="currentSettings.math" label="Math expression" placeholder="%value%"/>
@@ -45,7 +45,7 @@
                 <typed-input class="q-ml-xs" v-model="item.val" :settings="{label: 'Value', error: !checkUniqueItem(item, index)}"/>
               </div>
               <div class="col-12 q-mb-sm">
-                <q-input outlined dense hide-bottom-space class="q-mr-xs icon-input" :style="{color: item.color}" color="grey-9" v-model="item.icon" label="Icon">
+                <q-input outlined dense hide-bottom-space class="q-mr-xs" :style="{color: item.color}" color="grey-9" v-model="item.icon" label="Icon">
                   <q-icon slot="append" :name="`mdi-${item.icon || currentSettings.defaultIcon}`" size="1.5rem" :style="{color: item.color}"/>
                   <q-btn flat slot="after" :style="{backgroundColor: item.color}">
                     <q-menu class="q-pa-sm" anchor="top right" self="bottom right">
@@ -89,7 +89,7 @@ export default {
     const defaultItem = {
       label: 'item',
       icon: '',
-      color: '#000',
+      color: '#9e9e9e',
       val: '',
       actionTopic: 'topic/to/action',
       actionPayload: ''
@@ -99,7 +99,7 @@ export default {
         {
           label: 'default',
           icon: '',
-          color: '#000',
+          color: '#9e9e9e',
           math: '',
           val: '',
           default: true,
