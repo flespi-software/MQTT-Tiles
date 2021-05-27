@@ -11,6 +11,14 @@
         <typed-input class="q-mb-sm" v-model="currentSettings.trueValue" :settings="{ label: 'True value' }"/>
         <q-input outlined dense hide-bottom-space class="q-mb-sm" color="grey-9" v-model="currentSettings.trueIcon" label="True value icon">
           <q-icon slot="append" :name="`mdi-${currentSettings.trueIcon || 'toggle-switch-outline'}`" size="1.5rem"/>
+          <q-btn flat slot="after" :style="{backgroundColor: currentSettings.trueColor}">
+            <q-menu class="q-pa-sm" anchor="top right" self="bottom right">
+              <q-color
+                v-model="currentSettings.trueColor"
+                format-model='hex'
+              />
+            </q-menu>
+          </q-btn>
         </q-input>
         <div v-if="currentSettings.mode === 1" class="q-mb-sm">
           <q-input outlined dense hide-bottom-space color="grey-9" v-model="currentSettings.trueActionTopic" label="True action topic">
@@ -26,6 +34,14 @@
         <typed-input class="q-mb-sm" v-model="currentSettings.falseValue" :settings="{ label: 'False value' }"/>
         <q-input outlined dense hide-bottom-space class="q-mb-sm" color="grey-9" v-model="currentSettings.falseIcon" label="False value icon">
           <q-icon slot="append" :name="`mdi-${currentSettings.falseIcon || 'toggle-switch-off-outline'}`" size="1.5rem"/>
+          <q-btn flat slot="after" :style="{backgroundColor: currentSettings.falseColor}">
+          <q-menu class="q-pa-sm" anchor="top right" self="bottom right">
+            <q-color
+              v-model="currentSettings.falseColor"
+              format-model='hex'
+            />
+          </q-menu>
+        </q-btn>
         </q-input>
         <div v-if="currentSettings.mode === 1" class="q-mb-sm">
           <q-input outlined dense hide-bottom-space color="grey-9" v-model="currentSettings.falseActionTopic" label="False action topic"/>
@@ -64,6 +80,8 @@ export default {
       falseValue: '0',
       falseIcon: '',
       falseActionTopic: '',
+      trueColor: '#9e9e9e',
+      falseColor: '#333',
       falsePayload: '',
       accumulateLogic: ACCUMULATE_AND_MODE,
       save: true,

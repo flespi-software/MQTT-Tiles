@@ -4,7 +4,7 @@
     <q-icon
       @click.native="actionHandler"
       :size="`${size}px`"
-      :color="item.currentValue === null ? 'grey-4' : currentValue ? `${widget.color}-7` : `grey-6`"
+      :style="{color}"
       :name="currentValue ? `mdi-${item.settings.trueIcon || 'toggle-switch-outline'}` : `mdi-${item.settings.falseIcon || 'toggle-switch-off-outline'}`"
       :class="[`${isActiveWidget ? 'cursor-pointer' : ''}`]"
     />
@@ -30,6 +30,17 @@ export default {
       const { width, height } = this.wrapperSize,
         active = height > width ? width : height
       return active
+    },
+    color () {
+      let color = '#e0e0e0e'
+      if (this.currentValue !== null) {
+        if (this.currentValue) {
+          color = this.item.settings.trueColor
+        } else {
+          color = this.item.settings.falseColor
+        }
+      }
+      return color
     },
     actionTopic () {
       let topic = null

@@ -1,5 +1,5 @@
 <template>
-  <q-card flat inline class="widget__informer" style="width: 100%; height: 100%;" :class="[`bg-${item.color}-1`]">
+  <q-card flat inline class="widget__scheme" style="width: 100%; height: 100%;" :class="[`bg-${item.color}-1`]">
     <q-item class="q-px-sm q-pt-sm q-pb-none" style="min-height: 0px;">
       <q-item-section class="ellipsis" :class="[`text-${item.color}-7`]" style="font-size: .9rem">
         <q-item-label class="ellipsis">{{item.name}}</q-item-label>
@@ -27,8 +27,9 @@
       </transition>
     </q-item>
     <q-card-section class="widget__content scroll q-pa-none" :class="[`bg-${item.color}-1`]" :style="{height: contentHeight}">
-      <div class="scheme-view__image-wrapper q-pa-xs relative-position">
-        <img :src='item.settings.image' width="100%" draggable="false" />
+      <q-resize-observer @resize="onResize" />
+      <div class="scheme-view__image-wrapper q-pa-xs relative-position" style="display: inline-flex;">
+        <img :src='item.settings.image' :style="imageStyle" draggable="false" />
         <div
           v-for="(miniItem, index) in item.settings.items" :key="index"
           class="scheme__item-view-wrapper absolute"
@@ -41,6 +42,7 @@
         >
           <component
             :is="`${miniItem.type}-view`"
+            ref="items"
             :item="item.settings.items[index]"
             :widget="item"
             :value="values[index]"
@@ -92,7 +94,8 @@ export default {
   props: ['item', 'index', 'mini', 'in-shortcuts', 'value', 'blocked'],
   data () {
     return {
-      WIDGET_STATUS_DISABLED
+      WIDGET_STATUS_DISABLED,
+      imageStyle: {}
     }
   },
   methods: {
@@ -100,16 +103,18 @@ export default {
       if (this.$q.platform.is.mobile) {
         this.$refs.tooltip.toogle()
       }
+    },
+    onResize ({ width, height }) {
+      const style = {}
+      style.maxHeight = `${height - 8}px`
+      style.maxWidth = `${width - 8}px`
+      this.imageStyle = style
+      this.$nextTick(() => {
+        this.$refs.items.forEach(item => item.fit && item.fit())
+      })
     }
   },
   computed: {
-    // title () {
-    //   // return this.getValueByTopic(this.value[this.topic] && this.value[this.topic].payload, this.item.dataTopics[0])
-    //   return this.item.settings.items.map(item => {
-    //     const topic = item.topic.topicFilter
-    //     return this.getValueByTopic(this.value[topic] && this.value[topic].payload, item.topic)
-    //   })
-    // },
     values () {
       return this.item.settings.items.map(miniWidget => {
         const topic = miniWidget.topic

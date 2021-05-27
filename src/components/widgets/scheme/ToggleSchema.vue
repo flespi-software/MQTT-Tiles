@@ -6,6 +6,14 @@
       <typed-input class="q-mb-sm" v-model="current.settings.trueValue" :settings="{ label: 'True value' }"/>
       <q-input outlined dense hide-bottom-space class="q-mb-sm" color="grey-9" v-model="current.settings.trueIcon" label="True value icon">
         <q-icon slot="append" :name="`mdi-${current.settings.trueIcon || 'toggle-switch-outline'}`" size="1.5rem"/>
+        <q-btn flat slot="after" :style="{backgroundColor: current.settings.trueColor}">
+          <q-menu class="q-pa-sm" anchor="top right" self="bottom right">
+            <q-color
+              v-model="current.settings.trueColor"
+              format-model='hex'
+            />
+          </q-menu>
+        </q-btn>
       </q-input>
       <div v-if="current.settings.mode === 1" class="q-mb-sm">
         <q-input outlined dense hide-bottom-space color="grey-9" v-model="current.settings.trueActionTopic" label="True action topic">
@@ -21,6 +29,14 @@
       <typed-input class="q-mb-sm" v-model="current.settings.falseValue" :settings="{ label: 'False value' }"/>
       <q-input outlined dense hide-bottom-space class="q-mb-sm" color="grey-9" v-model="current.settings.falseIcon" label="False value icon">
         <q-icon slot="append" :name="`mdi-${current.settings.falseIcon || 'toggle-switch-off-outline'}`" size="1.5rem"/>
+        <q-btn flat slot="after" :style="{backgroundColor: current.settings.falseColor}">
+          <q-menu class="q-pa-sm" anchor="top right" self="bottom right">
+            <q-color
+              v-model="current.settings.falseColor"
+              format-model='hex'
+            />
+          </q-menu>
+        </q-btn>
       </q-input>
       <div v-if="current.settings.mode === 1" class="q-mb-sm">
         <q-input outlined dense hide-bottom-space color="grey-9" v-model="current.settings.falseActionTopic" label="False action topic"/>
@@ -37,6 +53,7 @@
 import Topic from '../Topic'
 import VariablesHelper from '../VariablesHelper'
 import cloneDeep from 'lodash/cloneDeep'
+import merge from 'lodash/merge'
 export default {
   props: ['settings', 'board'],
   data () {
@@ -53,6 +70,12 @@ export default {
       deep: true,
       handler () {
         this.$emit('update', this.current)
+      }
+    },
+    settings: {
+      deep: true,
+      handler (settings) {
+        this.current = merge(settings, this.current)
       }
     }
   },

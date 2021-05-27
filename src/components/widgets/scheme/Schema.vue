@@ -61,7 +61,7 @@
         <q-slide-transition>
           <div v-if="activeItem">
             <q-input outlined dense hide-bottom-space class="col-8 q-my-sm" color="grey-9" v-model="activeItem.label" label="Label"/>
-            <component :is="`${activeItem.type}-schema`" :settings="activeItem" :board="board" @update="item => updateItem(item, activeItemIndex)"/>
+            <component :is="`${activeItem.type}-schema`" :key="activeItemIndex + activeItem.type" :settings="activeItem" :board="board" @update="item => updateItem(item, activeItemIndex)"/>
           </div>
         </q-slide-transition>
       </div>
@@ -184,6 +184,8 @@ export default {
             trueIcon: '',
             trueActionTopic: '',
             truePayload: '',
+            trueColor: '#9e9e9e',
+            falseColor: '#333',
             falseValue: '0',
             mode: 0,
             falseIcon: '',

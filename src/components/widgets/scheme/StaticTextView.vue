@@ -14,7 +14,7 @@ export default {
     }
   },
   methods: {
-    onResize () {
+    fit () {
       this.textEl.fit()
     }
   },
@@ -25,13 +25,13 @@ export default {
     this.textEl.unsubscribe()
   },
   watch: {
-    'widget.settings.height' () { this.onResize() },
-    'widget.settings.width' () { this.onResize() },
-    'item.width' () { this.onResize() },
-    'item.height' () { this.onResize() },
+    'widget.settings.height' () { this.fit() },
+    'widget.settings.width' () { this.fit() },
+    'item.width' () { this.fit() },
+    'item.height' () { this.fit() },
     'item.settings.modificators': {
       deep: true,
-      handler () { this.onResize() }
+      handler () { this.fit() }
     }
   }
 }

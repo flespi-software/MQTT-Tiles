@@ -50,6 +50,7 @@ import {
   WIDGET_VALUE_FORMAT_DURATION
 } from '../../../constants'
 import cloneDeep from 'lodash/cloneDeep'
+import merge from 'lodash/merge'
 export default {
   props: ['settings', 'board'],
   data () {
@@ -88,6 +89,12 @@ export default {
       deep: true,
       handler () {
         this.$emit('update', this.current)
+      }
+    },
+    settings: {
+      deep: true,
+      handler (settings) {
+        this.current = merge(settings, this.current)
       }
     }
   },

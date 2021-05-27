@@ -52,7 +52,7 @@
       <q-icon
         @click.native.stop="actionHandler"
         size="3.8rem"
-        :color="item.currentValue === null ? 'grey-4' : currentValue ? `${item.color}-7` : `grey-6`"
+        :style="{color}"
         :name="currentValue ? `mdi-${item.settings.trueIcon || 'toggle-switch-outline'}` : `mdi-${item.settings.falseIcon || 'toggle-switch-off-outline'}`"
         style="width: 100%; height: 100%;"
         :class="[`${currentValue === null ? 'disabled' : isActiveWidget ? 'cursor-pointer' : ''}`]"
@@ -95,6 +95,17 @@ export default {
     }
   },
   computed: {
+    color () {
+      let color = '#e0e0e0e'
+      if (this.currentValue !== null) {
+        if (this.currentValue) {
+          color = this.item.settings.trueColor
+        } else {
+          color = this.item.settings.falseColor
+        }
+      }
+      return color
+    },
     currentValue () {
       const mode = this.item.settings.accumulateLogic
       const initValue = mode === ACCUMULATE_AND_MODE
