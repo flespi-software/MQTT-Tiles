@@ -11,7 +11,7 @@
             >
               <q-tooltip>Add {{item.label}}</q-tooltip>
             </q-btn>
-            <q-btn class="float-right" dense flat icon="mdi-close" color="red" @click="currentSettings.image = null">
+            <q-btn class="float-right" dense flat icon="mdi-close" color="red" @click="clearImage">
               <q-tooltip>Remove image</q-tooltip>
             </q-btn>
           </div>
@@ -47,7 +47,7 @@
             </div>
           </div>
         </div>
-        <q-file v-else class="scheme__image-picker q-mb-md" borderless
+        <q-file ref="file" v-else class="scheme__image-picker q-mb-md" borderless
           v-model="image" @input="getBase64"
           accept="image/*"
           max-file-size="1048576"
@@ -226,6 +226,13 @@ export default {
       this.activeItemIndex = undefined
       this.$delete(this.currentSettings.items, itemIndex)
     },
+    clearImage () {
+      this.currentSettings.image = null
+      this.$nextTick(() => {
+        this.$refs.file.removeAtIndex(0)
+        this.imgae = null
+      })
+    },
     updateTopics () {
       this.$set(this.currentSettings, 'topics', this.currentSettings.items.map(item => item.topic).filter(topic => !!topic))
     },
@@ -242,6 +249,7 @@ export default {
         )
     },
     getBase64 (file) {
+      if (!file) { return }
       var reader = new FileReader()
       reader.readAsDataURL(file)
       reader.onload = () => {

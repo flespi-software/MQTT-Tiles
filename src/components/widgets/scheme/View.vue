@@ -28,8 +28,8 @@
     </q-item>
     <q-card-section class="widget__content scroll q-pa-none" :class="[`bg-${item.color}-1`]" :style="{height: contentHeight}">
       <q-resize-observer @resize="onResize" />
-      <div class="scheme-view__image-wrapper q-pa-xs relative-position" style="display: inline-flex;">
-        <img :src='item.settings.image' :style="imageStyle" draggable="false" />
+      <div class="scheme-view__image-wrapper q-pa-xs relative-position row inline" :style="wrapperStyle">
+        <img ref="image" :src='item.settings.image' :style="imageStyle" draggable="false" />
         <div
           v-for="(miniItem, index) in item.settings.items" :key="index"
           class="scheme__item-view-wrapper absolute"
@@ -95,7 +95,8 @@ export default {
   data () {
     return {
       WIDGET_STATUS_DISABLED,
-      imageStyle: {}
+      imageStyle: {},
+      wrapperStyle: {}
     }
   },
   methods: {
@@ -106,11 +107,17 @@ export default {
     },
     onResize ({ width, height }) {
       const style = {}
-      style.maxHeight = `${height - 8}px`
+      style.maxHeight = `${height - 10}px`
       style.maxWidth = `${width - 8}px`
       this.imageStyle = style
       this.$nextTick(() => {
-        this.$refs.items.forEach(item => item.fit && item.fit())
+        const wrapperStyle = {}
+        const image = this.$refs.image.getBoundingClientRect()
+        wrapperStyle.marginLeft = `${(width - image.width - 8) / 2}px`
+        wrapperStyle.marginTop = `${(height - image.height - 10) / 2}px`
+        this.wrapperStyle = wrapperStyle
+        const items = this.$refs.items
+        items && items.forEach(item => item.fit && item.fit())
       })
     }
   },
