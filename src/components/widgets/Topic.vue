@@ -12,6 +12,7 @@
     <variables-helper class="col-12" v-if="board && board.settings.variables && board.settings.variables.length" :variables="board.settings.variables" @add="(variable) => currentValue.topicTemplate += variable"/>
     <q-input dense outlined hide-bottom-space v-if="currentValue.payloadType === WIDGET_PAYLOAD_TYPE_JSON" color="grey-9" class="col-12 q-mt-sm" v-model="currentValue.payloadField" label="Payload path" hint="You can set path in result JSON. Path started from root of object. Example: names[0].value"/>
     <q-input dense outlined hide-bottom-space v-if="config && config.needLabel && currentValue.payloadType === WIDGET_PAYLOAD_TYPE_JSON" color="grey-9" class="col-12 q-mt-sm" v-model="currentValue.payloadNameField" label="Value`s label" hint="Value`s label gets from resilt JSON by path. Example: names[0].label"/>
+    <q-input dense outlined hide-bottom-space v-if="config && config.needDefault" color="grey-9" class="col-12 q-mt-sm" v-model="currentValue.default" label="Default value" hint="If you currently have no any value by this subscription, you can set an empty state value"/>
   </div>
 </template>
 
@@ -19,6 +20,7 @@
 import validateTopic from '../../mixins/validateTopic.js'
 import VariablesHelper from './VariablesHelper'
 import FlespiSelector from '../selectors/Selectors'
+import { getTopicModel } from '../../constants/defaultes'
 import {
   WIDGET_PAYLOAD_TYPE_STRING,
   WIDGET_PAYLOAD_TYPE_JSON
@@ -26,15 +28,9 @@ import {
 export default {
   name: 'Topic',
   props: ['value', 'board', 'config'],
-  /* config = { needLabel, needSelectors, needAutofocus } */
+  /* config = { needLabel, needSelectors, needAutofocus, needDefault } */
   data () {
-    const defaultTopic = {
-        topicTemplate: '',
-        topicFilter: '',
-        payloadType: 0,
-        payloadField: '',
-        payloadNameField: ''
-      },
+    const defaultTopic = getTopicModel(),
       currentValue = Object.assign({}, this.defaultTopic, this.value)
     if (!currentValue.topicTemplate) {
       currentValue.topicTemplate = currentValue.topicFilter

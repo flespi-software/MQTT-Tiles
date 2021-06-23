@@ -1,3 +1,4 @@
+import { getTopicModel } from '../../../constants/defaultes'
 export default {
   '1.5.3': (widget) => {
     widget.settings.minWidth = 1
@@ -11,13 +12,12 @@ export default {
     const settings = widget.settings
     if (typeof settings.topic === 'string') {
       settings.topics = [
-        {
-          topicTemplate: settings.topic,
-          topicFilter: settings.topic,
-          payloadType: 0,
-          payloadField: '',
-          payloadNameField: ''
-        }
+        getTopicModel(
+          {
+            topicTemplate: settings.topic,
+            topicFilter: settings.topic
+          }
+        )
       ]
     }
     return widget

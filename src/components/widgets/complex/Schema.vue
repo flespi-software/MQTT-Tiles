@@ -1,64 +1,10 @@
 <template>
   <div class="q-mt-xl">
     <div class="row">
-      <q-card class="complex__items-editor row col-12 q-mb-xl" :class="[`bg-${widget.color}-1`]">
-        <div class="items__top col-12 flex q-px-md q-py-xs" style="background-color: rgba(255,255,255,0.5)">
-          <component
-            v-for="(item, layoutIndex) in currentSettings.items.filter(item => item.position === 'top')"
-            :key="`top${layoutIndex}${item.index}`"
-            class="complex__element cursor-pointer"
-            :is="`my-${currentSettings.items[item.index].type}`"
-            @click.native="selectHandler('top', layoutIndex)"
-            :item="currentSettings.items[item.index]"
-            :color="widget.color"
-            :selected="(!!edited && edited.position === 'top' && edited.indexByPosition === layoutIndex)"
-          />
-          <add-menu class="q-ml-sm" anchor="bottom left" self="top left" @add="(type) => addItem(type, 'top')"/>
-        </div>
-        <div class="items__left col-6 flex q-pa-sm">
-          <component
-            v-for="(item, layoutIndex) in currentSettings.items.filter(item => item.position === 'left')"
-            :key="`left${layoutIndex}${item.index}`"
-            class="complex__element cursor-pointer"
-            :is="`my-${currentSettings.items[item.index].type}`"
-            @click.native="selectHandler('left', layoutIndex)"
-            :item="currentSettings.items[item.index]"
-            :color="widget.color"
-            :selected="(!!edited && edited.position === 'left' && edited.indexByPosition === layoutIndex)"
-          />
-          <add-menu style="width: 100%; min-height: 30px;" anchor="top middle" self="bottom middle" @add="(type) => addItem(type, 'left')"/>
-        </div>
-        <div class="items__right col-6 q-pa-sm">
-          <component
-            v-for="(item, layoutIndex) in currentSettings.items.filter(item => item.position === 'right')"
-            :key="`right${layoutIndex}${item.index}`"
-            class="complex__element text-center cursor-pointer"
-            :is="`my-${currentSettings.items[item.index].type}`"
-            @click.native="selectHandler('right', layoutIndex)"
-            :item="currentSettings.items[item.index]"
-            :color="widget.color"
-            :selected="(!!edited && edited.position === 'right' && edited.indexByPosition === layoutIndex)"
-          />
-          <add-menu style="width: 100%; min-height: 30px;" anchor="top middle" self="bottom middle" @add="(type) => addItem(type, 'right')" />
-        </div>
-        <div class="items__bottom col-12 flex q-px-md q-py-xs" style="background-color: rgba(255,255,255,0.5)">
-          <component
-            v-for="(item, layoutIndex) in currentSettings.items.filter(item => item.position === 'bottom')"
-            :key="`bottom${layoutIndex}${item.index}`"
-            class="complex__element cursor-pointer"
-            :is="`my-${currentSettings.items[item.index].type}`"
-            @click.native="selectHandler('bottom', layoutIndex)"
-            :item="currentSettings.items[item.index]"
-            :color="widget.color"
-            :selected="(!!edited && edited.position === 'bottom' && edited.indexByPosition === layoutIndex)"
-          />
-          <add-menu class="q-ml-sm" anchor="top right" self="bottom middle" @add="(type) => addItem(type, 'bottom')" />
-        </div>
-      </q-card>
       <div class="complex__items-wrapper col-12 relative-position q-mb-sm" v-if="edited">
         <q-expansion-item
           :header-class="[`bg-grey-4`]"
-          expand-icon="mdi-settings"
+          expand-icon="mdi-cog"
           default-opened
           style="border: solid #e0e0e0 1px"
         >
@@ -136,6 +82,7 @@
 import Topic from '../Topic'
 import isEqual from 'lodash/isEqual'
 import validateTopic from '../../../mixins/validateTopic.js'
+import { getTopicModel } from '../../../constants/defaultes'
 import {
   WIDGET_RANGE_VALUE_CURRENT_MODE,
   WIDGET_RANGE_VALUE_DATASOURCE_MODE,
@@ -147,10 +94,6 @@ import {
   WIDGET_VALUE_FORMAT_JSON,
   WIDGET_VALUE_FORMAT_DURATION
 } from '../../../constants'
-import AddMenu from './AddMenu'
-import Text from './Text'
-import Knob from './Knob'
-import Progress from './Progress'
 export default {
   name: 'ComplexSchema',
   props: ['widget', 'board'],
@@ -216,13 +159,7 @@ export default {
         { label: 'Markdown', value: WIDGET_VALUE_FORMAT_MARKDOWN },
         { label: 'JSON', value: WIDGET_VALUE_FORMAT_JSON }
       ],
-      defaultTopic: {
-        topicFilter: '',
-        payloadType: 0,
-        payloadField: '',
-        topicTemplate: '',
-        payloadNameField: ''
-      },
+      defaultTopic: getTopicModel(),
       edited: null
     }
   },
@@ -233,26 +170,15 @@ export default {
     }
   },
   methods: {
-    selectHandler (position, indexByPosition) {
-      let index = -1
-      this.currentSettings.items.reduce((currentIndex, item, indexInStore) => {
-        if (item.position === position) {
-          currentIndex++
-          if (currentIndex === indexByPosition) {
-            index = indexInStore
-          }
-        }
-        return currentIndex
-      }, -1)
-      this.edited = { position, indexByPosition, index }
+    selectHandler (edited) {
+      this.edited = edited
     },
-    addItem (type, position) {
+    addItem ({ type, position }) {
       const index = this.currentSettings.items.length
       this.currentItem.index = index
       this.currentItem.type = type
       this.currentItem.position = position
       this.currentSettings.items.push(this.currentItem)
-      this.selectHandler(position, this.currentSettings.items.filter(item => item.position === position).length - 1)
       this.currentItem = Object.assign({}, this.defaultItem)
       return this.currentSettings.items.length - 1
     },
@@ -303,6 +229,12 @@ export default {
   },
   created () {
     this.$emit('update', this.currentSettings)
+    this.$widgetBus.$on('add', this.addItem)
+    this.$widgetBus.$on('edit', this.selectHandler)
+  },
+  destroyed () {
+    this.$widgetBus.$off('add', this.addItem)
+    this.$widgetBus.$off('edit', this.selectHandler)
   },
   watch: {
     currentSettings: {
@@ -331,11 +263,7 @@ export default {
   },
   mixins: [validateTopic],
   components: {
-    Topic,
-    AddMenu,
-    MyText: Text,
-    MyKnob: Knob,
-    MyProgress: Progress
+    Topic
   }
 }
 </script>

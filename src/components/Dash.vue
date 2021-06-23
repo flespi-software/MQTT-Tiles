@@ -212,7 +212,8 @@ export default {
           if (!hasValue) {
             widgetValue[topic] = {}
           }
-          if (hasValue && messages && messages.length === 1) { messages = [] } // not processing last state
+          /* commented because it breakes multiplier widget logic */
+          // if (hasValue && messages && messages.length === 1) { messages = [] } // not processing last state
           const messagesValue = messagesProcessing(widget.type)(messages, get(this.values, `${widgetId}['${topic}']`, undefined), topic, widget)
           if (value[topic] !== messagesValue) { isWidgetValueChanged = true }
           widgetValue[topic] = messagesValue

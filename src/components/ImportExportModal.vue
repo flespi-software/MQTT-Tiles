@@ -10,7 +10,7 @@
         <template v-if="mode === 1">
           <div class="export-modal-view">
             <div class="export-modal-view__string" style="height: 45%;">
-              <q-input outlined dense hide-bottom-space :rows="7" input-style="resize: none;" type="textarea" :readonly="true" v-model="data" label="Config" color="grey-9">
+              <q-input outlined dense hide-bottom-space :rows="7" input-style="resize: none;" type="textarea" :readonly="true" :value="data" label="Config" color="grey-9">
                 <q-btn slot="append" dense flat icon='mdi-content-copy' @click="copyString" />
               </q-input>
             </div>

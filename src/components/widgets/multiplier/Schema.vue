@@ -55,15 +55,13 @@ import Radial from '../radial/Schema'
 import Linear from '../linear/Schema'
 import Singleselect from '../singleselect/Schema'
 import Complex from '../complex/Schema'
-import MapLocation from '../mapLocation/Schema'
-import MapRoute from '../mapRoute/Schema'
 import { WIDGET_STATUS_DISABLED } from '../../../constants'
 export default {
   name: 'MultiplierSchema',
   props: ['widget', 'board'],
   data () {
     const defaultSettings = {
-      type: '',
+      type: 'informer',
       groupLayout: 0,
       widgetSettings: {},
       topics: [],
@@ -80,14 +78,12 @@ export default {
       defaultSettings,
       currentSettings: Object.assign({}, defaultSettings, this.widget.settings),
       typeOptions: [
-        { label: 'Toggle', value: 'switcher' },
         { label: 'Text', value: 'informer' },
+        { label: 'Toggle', value: 'switcher' },
         { label: 'Radial gauge', value: 'radial' },
         { label: 'Linear gauge', value: 'linear' },
         { label: 'Radio button', value: 'singleselect' },
-        { label: 'Complex', value: 'complex' },
-        { label: 'Location', value: 'map-location' },
-        { label: 'Route', value: 'map-route' }
+        { label: 'Complex', value: 'complex' }
       ],
       colors: ['grey', 'red', 'green', 'orange', 'blue', 'light-blue', 'purple', 'deep-orange', 'cyan', 'brown', 'blue-grey']
     }
@@ -136,7 +132,7 @@ export default {
   },
   mixins: [validateTopic],
   components: {
-    Switcher, Informer, Radial, Linear, Singleselect, Complex, MapLocation, MapRoute
+    Switcher, Informer, Radial, Linear, Singleselect, Complex
   }
 }
 </script>

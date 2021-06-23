@@ -1,19 +1,24 @@
 <template>
-  <q-dialog v-model='status' @hide="closeHandler" no-esc-dismiss no-backdrop-dismiss :maximized="$q.platform.is.mobile">
-    <div :style="{ width: $q.platform.is.mobile ? '100%' : '80vw' }" class="bg-white">
+  <q-dialog v-model='status' @hide="closeHandler" no-esc-dismiss no-backdrop-dismiss :maximized="$q.screen.width < 1023" class="row">
+    <div
+      :style="{
+        width: $q.screen.width < 1023 ? '100%' : '50%'
+      }"
+      class="bg-white"
+    >
       <q-toolbar class="bg-grey-9 text-white">
         <q-toolbar-title>
           Widget
         </q-toolbar-title>
       </q-toolbar>
-      <div :style="{ maxHeight: $q.platform.is.mobile ? '' : 'calc(100vh - 148px)', height: $q.platform.is.mobile ? 'calc(100% - 100px)' : '' }" class="scroll q-pa-md">
+      <div :style="{ maxHeight: $q.screen.width < 1023 ? '' : 'calc(100vh - 148px)', height: $q.screen.width < 1023 ? 'calc(100% - 100px)' : '' }" class="scroll q-pa-md">
         <q-input outlined hide-bottom-space dense color="grey-9 q-mb-sm" v-model.trim="currentSettings.name" label="Name"/>
         <q-select outlined dense hide-bottom-space color="grey-9" @input="typeChangeHandler" :value="currentSettings.type" :options="typeOptions" emit-value map-options label="Type" popup-content-class="type__content" :popup-content-style="{width: `${typeElementWidth}px`}">
           <q-resize-observer @resize="onResize" />
           <template v-slot:option="scope">
-            <q-item v-bind="scope.itemProps" v-on="scope.itemEvents" :style="{width: $q.platform.is.desktop ? '16.6666667%' : '25%', minHeight: '70px'}">
+            <q-item v-bind="scope.itemProps" v-on="scope.itemEvents" :style="{width: $q.screen.width >= 1023 ? '16.6666667%' : '25%', minHeight: '70px'}">
               <q-item-section class="text-center">
-                <q-icon :size="$q.platform.is.desktop ? '2rem' : '1.5rem'" :name="scope.opt.rightIcon" style="width: auto;" />
+                <q-icon :size="$q.screen.width >= 1023 ? '2rem' : '1.5rem'" :name="scope.opt.rightIcon" style="width: auto;" />
                 <q-item-label v-html="scope.opt.label" class="q-mt-xs ellipsis" :style="{fontSize: '.7rem'}" />
                 <q-tooltip>{{scope.opt.label}}</q-tooltip>
               </q-item-section>
@@ -51,7 +56,7 @@
             :key="index"
             :header-class="[`bg-${topicsHighlight[index]}`]"
             group="topics"
-            expand-icon="mdi-settings"
+            expand-icon="mdi-cog"
             :value="index === currentSettings.dataTopics.length - 1"
           >
             <template slot="header">
@@ -60,14 +65,32 @@
                 <q-btn flat color="red-6" round dense @click="removeTopicHandler(index)" icon="mdi-delete"/>
               </q-item-section>
             </template>
-            <topic v-model="currentSettings.dataTopics[index]" :board="board" class="q-pa-sm" :config="{ needSelectors: true }"/>
+            <topic v-model="currentSettings.dataTopics[index]" :board="board" class="q-pa-sm" :config="{ needSelectors: true, needDefault: currentSettings.type !== 'multiplier' }"/>
           </q-expansion-item>
         </q-list>
+        <div v-if="$q.screen.width < 1023" class="q-mb-lg flex justify-center" style="pointer-events: none;">
+          <div :class="[`bg-${currentSettings.color}-1`]" :style="previewStyles">
+            <widget-wrapper
+              :item="currentSettings"
+              :value="{}"
+              :in-shortcuts="false"
+              :blocked="false"
+            >
+              <component
+                :is="`${currentSettings.type}-view`"
+                :item="currentSettings"
+                :value="{}"
+                :blocked="true"
+              />
+            </widget-wrapper>
+          </div>
+        </div>
         <component
           :is="currentSettings.type"
           :widget="currentSettings"
           :board="board"
           @update="updateSettingsHandler"
+          @update-widget="updateWidgetHandler"
           @validate="validateSchemas"
         />
       </div>
@@ -78,6 +101,22 @@
         <q-btn flat dense :disable="!validateCurrentSettings || !isValideSchema" @click="saveSettingsHandler">{{saveButtonLabels[mode]}}</q-btn>
       </q-toolbar>
     </div>
+    <span v-if="$q.screen.width >= 1023" style="width: 50%;" class="q-pa-md flex justify-center all-pointer-events">
+      <div :class="[`bg-${currentSettings.color}-1`]" :style="previewStyles">
+        <widget-wrapper
+          :item="currentSettings"
+          :value="{}"
+          :blocked="true"
+        >
+          <component
+            :is="`${currentSettings.type}-view`"
+            :item="currentSettings"
+            :value="{}"
+            :blocked="true"
+          />
+        </widget-wrapper>
+      </div>
+    </span>
   </q-dialog>
 </template>
 
@@ -117,6 +156,9 @@ import Vue from 'vue'
 import { WIDGET_STATUS_DISABLED, WIDGET_MODE_EDIT, WIDGET_MODE_ADD, WIDGET_MODE_DUPLICATE } from '../../constants'
 import validateTopic from '../../mixins/validateTopic.js'
 import Topic from './Topic'
+import { getTopicModel } from '../../constants/defaultes'
+import WidgetWrapper from './WidgetWrapper'
+/* Schemas */
 import Switcher from './switcher/Schema'
 import Informer from './informer/Schema'
 import StaticInformer from './staticInformer/Schema'
@@ -136,6 +178,34 @@ import StatusIndicator from './statusIndicator/Schema'
 import TextSender from './textSender/Schema'
 import Calculator from './calculator/Schema'
 import Scheme from './scheme/Schema'
+/* View */
+import SwitcherView from './switcher/View'
+import InformerView from './informer/View'
+import StaticInformerView from './staticInformer/View'
+import MultiInformerView from './multiInformer/View'
+import ClickerView from './clicker/View'
+import RadialView from './radial/View'
+import LinearView from './linear/View'
+import FrameView from './frame/View'
+import SingleselectView from './singleselect/View'
+import MultiplierView from './multiplier/Preview'
+import ComplexView from './complex/Preview'
+import SliderView from './slider/View'
+import ColorView from './color/View'
+import MapLocationView from './mapLocation/View'
+import MapRouteView from './mapRoute/View'
+import StatusIndicatorView from './statusIndicator/View'
+import TextSenderView from './textSender/View'
+import CalculatorView from './calculator/View'
+import SchemeView from './scheme/Preview'
+
+const previewStylesByType = {
+  'map-route': { minWidth: '480px', minHeight: '340px' },
+  'map-location': { minWidth: '480px', minHeight: '340px' },
+  frame: { minWidth: '480px', minHeight: '340px', maxWidth: '480px', maxHeight: '340px' },
+  radial: { minWidth: '430px', minHeight: '340px' },
+  linear: { minWidth: '150px', minHeight: '420px', maxWidth: '160px', maxHeight: '420px' }
+}
 
 export default {
   name: 'Settings',
@@ -177,13 +247,7 @@ export default {
       typeElementWidth: 0,
       colors: ['grey', 'red', 'green', 'orange', 'blue', 'light-blue', 'purple', 'deep-orange', 'cyan', 'brown', 'blue-grey'],
       isValideSchema: true,
-      defaultTopic: {
-        topicTemplate: '',
-        topicFilter: '',
-        payloadType: 0,
-        payloadField: '',
-        payloadNameField: ''
-      },
+      defaultTopic: getTopicModel(),
       saveButtonLabels: {
         [WIDGET_MODE_ADD]: 'Save',
         [WIDGET_MODE_EDIT]: 'Update',
@@ -216,6 +280,18 @@ export default {
         }
         return colors
       }, [])
+    },
+    previewStyles () {
+      const typeStyles = previewStylesByType[this.currentSettings.type] || {}
+      const defaultStyles = {
+        minWidth: '280px',
+        minHeight: '110px',
+        maxWidth: '560px',
+        borderRadius: '4px',
+        border: '1px solid transparent',
+        boxShadow: '0 1px 5px rgba(0,0,0,0.2),0 2px 2px rgba(0,0,0,0.14),0 3px 1px -2px rgba(0,0,0,0.12)!important'
+      }
+      return { ...defaultStyles, ...typeStyles }
     }
   },
   methods: {
@@ -258,8 +334,11 @@ export default {
       })
       return isUnique
     },
+    updateWidgetHandler (patch) {
+      this.currentSettings = merge(this.currentSettings, patch)
+    },
     updateSettingsHandler (settings) {
-      Vue.set(this.currentSettings, 'settings', settings)
+      this.$set(this.currentSettings, 'settings', settings)
     },
     generateTopics () {
       let topics = this.currentSettings.dataTopics.map(topic => topic.topicFilter)
@@ -287,9 +366,54 @@ export default {
       }
     }
   },
+  created () {
+    Vue.prototype.$widgetBus = new Vue()
+  },
+  destroyed () {
+    Vue.prototype.$widgetBus = undefined
+  },
   mixins: [validateTopic],
   components: {
-    Topic, Switcher, Informer, Clicker, Radial, Linear, Frame, Singleselect, Multiplier, Complex, StaticInformer, Scheme, MultiInformer, Slider, Color, MapLocation, MapRoute, StatusIndicator, TextSender, Calculator
+    Topic,
+    WidgetWrapper,
+    Switcher,
+    Informer,
+    Clicker,
+    Radial,
+    Linear,
+    Frame,
+    Singleselect,
+    Multiplier,
+    Complex,
+    StaticInformer,
+    Scheme,
+    MultiInformer,
+    Slider,
+    Color,
+    MapLocation,
+    MapRoute,
+    StatusIndicator,
+    TextSender,
+    Calculator,
+    SwitcherView,
+    InformerView,
+    ClickerView,
+    RadialView,
+    LinearView,
+    FrameView,
+    SingleselectView,
+    MultiplierView,
+    ComplexView,
+    StaticInformerView,
+    SchemeView,
+    MultiInformerView,
+    SliderView,
+    ColorView,
+    MapLocationView,
+    MapRouteView,
+    StatusIndicatorView,
+    TextSenderView,
+    CalculatorView
   }
 }
 </script>

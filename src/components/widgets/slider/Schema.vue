@@ -15,7 +15,7 @@
           </div>
           <div class="col-12">
             <q-input outlined dense hide-bottom-space v-if="currentSettings.minValueMode === 0" type="number" color="grey-9" v-model.number="currentSettings.minValue" label="Min value"/>
-            <topic v-else v-model="minValue" label="Min value" :board="board"/>
+            <topic v-else v-model="minValue" label="Min value" :board="board" :config="{ needDefault: true }"/>
           </div>
         </div>
       </q-expansion-item>
@@ -32,7 +32,7 @@
           </div>
           <div class="col-12">
             <q-input outlined dense hide-bottom-space v-if="currentSettings.maxValueMode === 0" type="number" color="grey-9" v-model.number="currentSettings.maxValue" label="Max value"/>
-            <topic v-else v-model="maxValue" label="Max value" :board="board"/>
+            <topic v-else v-model="maxValue" label="Max value" :board="board" :config="{ needDefault: true }"/>
           </div>
         </div>
       </q-expansion-item>
@@ -54,6 +54,7 @@ import Vue from 'vue'
 import isEqual from 'lodash/isEqual'
 import Topic from '../Topic'
 import validateTopic from '../../../mixins/validateTopic.js'
+import { getTopicModel } from '../../../constants/defaultes'
 import {
   WIDGET_RANGE_VALUE_CURRENT_MODE,
   WIDGET_RANGE_VALUE_DATASOURCE_MODE
@@ -85,13 +86,7 @@ export default {
         { label: 'Manual', value: WIDGET_RANGE_VALUE_CURRENT_MODE },
         { label: 'Broker', value: WIDGET_RANGE_VALUE_DATASOURCE_MODE }
       ],
-      defaultTopic: {
-        topicFilter: '',
-        payloadType: 0,
-        payloadField: '',
-        topicTemplate: '',
-        payloadNameField: ''
-      }
+      defaultTopic: getTopicModel()
     }
   },
   computed: {

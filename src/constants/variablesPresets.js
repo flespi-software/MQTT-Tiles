@@ -1,3 +1,4 @@
+import { getTopicModel } from '../constants/defaultes'
 const VARIABLE_TYPE_CUSTOM = 0,
   VARIABLE_TYPE_SOURCE = 1,
   SORT_VARS_BY_VALUE = 0,
@@ -7,13 +8,13 @@ export default {
     name: 'devices',
     preset: 'devices',
     type: VARIABLE_TYPE_SOURCE,
-    topic: {
+    topic: getTopicModel({
       topicTemplate: 'flespi/state/gw/devices/+',
       topicFilter: 'flespi/state/gw/devices/+',
       payloadType: 1,
       payloadField: 'id',
       payloadNameField: 'name'
-    },
+    }),
     sortVarsBy: SORT_VARS_BY_LABEL,
     values: []
   },
@@ -21,13 +22,13 @@ export default {
     name: 'calcs',
     preset: 'calcs',
     type: VARIABLE_TYPE_SOURCE,
-    topic: {
+    topic: getTopicModel({
       topicTemplate: 'flespi/state/gw/calcs/+',
       topicFilter: 'flespi/state/gw/calcs/+',
       payloadType: 1,
       payloadField: 'id',
       payloadNameField: 'name'
-    },
+    }),
     sortVarsBy: SORT_VARS_BY_LABEL,
     values: []
   },
@@ -35,13 +36,13 @@ export default {
     name: 'channels',
     preset: 'channels',
     type: VARIABLE_TYPE_SOURCE,
-    topic: {
+    topic: getTopicModel({
       topicTemplate: 'flespi/state/gw/channels/+',
       topicFilter: 'flespi/state/gw/channels/+',
       payloadType: 1,
       payloadField: 'id',
       payloadNameField: 'name'
-    },
+    }),
     sortVarsBy: SORT_VARS_BY_LABEL,
     values: []
   },
@@ -49,12 +50,7 @@ export default {
     name: 'name',
     preset: 'custom',
     type: VARIABLE_TYPE_CUSTOM,
-    topic: {
-      topicTemplate: '',
-      topicFilter: '',
-      payloadType: 0,
-      payloadField: ''
-    },
+    topic: getTopicModel(),
     sortVarsBy: SORT_VARS_BY_VALUE,
     values: []
   }

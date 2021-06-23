@@ -12,7 +12,7 @@
             :key="`${index}${item.name}`"
             group="map-items"
             :header-class="[`bg-${!!isitemValid(index) ? 'grey-4' : 'red-2'}`]"
-            expand-icon="mdi-settings"
+            expand-icon="mdi-cog"
             :value="index === currentSettings.items.length - 1"
           >
             <template slot="header">
@@ -59,6 +59,7 @@ import cloneDeep from 'lodash/cloneDeep'
 import get from 'lodash/get'
 import Topic from '../Topic'
 import validateTopic from '../../../mixins/validateTopic.js'
+import { getTopicModel } from '../../../constants/defaultes'
 export default {
   name: 'MapRouteSchema',
   props: ['widget', 'board'],
@@ -83,13 +84,10 @@ export default {
       },
       defaultItem: {
         name: '',
-        route: {
+        route: getTopicModel({
           topicFilter: 'topic/to/route',
-          payloadType: 0,
-          payloadField: '',
-          topicTemplate: 'topic/to/route',
-          payloadNameField: ''
-        }
+          topicTemplate: 'topic/to/route'
+        })
       }
     }
   },

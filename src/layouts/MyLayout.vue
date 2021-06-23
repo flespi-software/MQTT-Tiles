@@ -10,7 +10,7 @@
       <q-toolbar class="bg-grey-9">
         <q-btn v-if="fullViewMode && !$integrationMode" flat rounded icon="mdi-menu" @click="leftDrawerOpen = !leftDrawerOpen"/>
         <q-toolbar-title style="line-height: 36px;">
-          <img src="statics/mqtttiles-logo.png" alt="MQTT Tiles" style="height: 30px; vertical-align: text-bottom;">
+          <img src="mqtttiles-logo.png" alt="MQTT Tiles" style="height: 30px; vertical-align: text-bottom;">
           MQTT Tiles
           <sup style="position: relative; font-size: .9rem; padding-left: 4px">{{version}}</sup>
         </q-toolbar-title>
@@ -55,7 +55,7 @@
                 <q-list>
                   <q-item v-close-popup clickable @click="editClientSettings(index)">
                     <q-item-section avatar>
-                      <q-icon name="mdi-settings" />
+                      <q-icon name="mdi-cog" />
                     </q-item-section>
                     <q-item-section>Edit</q-item-section>
                   </q-item>

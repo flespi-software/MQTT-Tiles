@@ -1,6 +1,6 @@
 <template>
   <div class="row">
-    <topic class="col-12 q-mb-sm" v-model="current.topic" :board="board" :config="{ needSelectors: true }"/>
+    <topic class="col-12 q-mb-sm" v-model="current.topic" :board="board" :config="{ needSelectors: true, needDefault: true }"/>
     <div class="col-6 q-mb-sm">
       <q-input outlined dense hide-bottom-space class="q-mr-sm" color="grey-9" v-model="current.settings.prefix" label="Prefix"/>
     </div>

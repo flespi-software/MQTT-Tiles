@@ -4,6 +4,7 @@
 
 <script>
 import { RadialGauge } from 'canvas-gauges'
+import merge from 'lodash/merge'
 import throttle from 'lodash/throttle'
 const setValue = throttle((guage, value) => {
   guage.value = value
@@ -18,13 +19,14 @@ export default {
   },
   data () {
     return {
+      currentOptions: merge({}, this.options),
       chart: null
     }
   },
   mounted () {
-    if (this.value) { this.options.value = this.value }
-    this.options.renderTo = this.$el
-    this.chart = new RadialGauge(this.options).draw()
+    if (this.value) { this.currentOptions.value = this.value }
+    this.currentOptions.renderTo = this.$el
+    this.chart = new RadialGauge(this.currentOptions).draw()
   },
   beforeDestroy () {
     this.chart.destroy()
@@ -33,7 +35,8 @@ export default {
     options: {
       deep: true,
       handler (options) {
-        this.chart.update(options)
+        this.currentOptions = merge(this.currentOptions, options)
+        this.chart.update(this.currentOptions)
       }
     },
     value (value) {

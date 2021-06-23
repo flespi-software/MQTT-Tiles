@@ -1,72 +1,48 @@
 <template>
-  <q-card flat inline class="widget__multiplier q-pa-sm" style="width: 100%; height: 100%;" :class="[`bg-${item.color}-1`]">
-    <q-item class="q-pa-none" style="min-height: 0px;">
-      <q-item-section class="ellipsis" :class="[`text-${item.color}-7`]" style="font-size: .9rem">
-        <q-item-label class="ellipsis">{{item.name}}</q-item-label>
-        <q-tooltip>{{item.name}}</q-tooltip>
-      </q-item-section>
-      <transition name="block">
-        <q-item-section side v-if="!blocked" style="min-width: 20px;">
-          <q-btn size="0.7rem" class="q-pa-none" style="min-height: 1rem;" dense flat icon="mdi-dots-vertical" :color="`${item.color}-7`">
-            <q-menu anchor="top right" self="top right" :offset="[8, 8]" style="box-shadow: none;">
-              <div class="q-pa-sm" :class="[`bg-${item.color}-1`]">
-                <q-btn v-close-popup size="0.7rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" icon="mdi-content-duplicate" @click="$emit('duplicate')" dense flat :color="`${item.color}-7`">
-                  <q-tooltip>Duplicate</q-tooltip>
-                </q-btn>
-                <q-btn v-close-popup size="0.7rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" icon="mdi-settings" @click="$emit('update')" dense flat :color="`${item.color}-7`">
-                  <q-tooltip>Edit</q-tooltip>
-                </q-btn>
-                <q-btn v-close-popup size="0.7rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" icon="mdi-delete-outline" @click="$emit('delete')" dense flat color="red">
-                  <q-tooltip>Remove</q-tooltip>
-                </q-btn>
-                <q-btn v-close-popup size="0.7rem" class="q-pa-none" style="min-height: 1rem;" icon="mdi-close" dense flat :color="`${item.color}-7`"/>
-              </div>
-            </q-menu>
-          </q-btn>
-        </q-item-section>
-      </transition>
-    </q-item>
-    <q-card-section class="widget__content scroll q-pa-none" :class="[`bg-${item.color}-1`]" :style="{height: contentHeight}">
-      <div style="width: 100%; position: relative;">
-        <div
-          v-for="(widget, widgetIndex) in renderedWidgets"
-          :key="widgetIndex"
-          style="display: inline-block; position: relative;"
-          :style="{width: widgetsWidth, minHeight: item.settings.type === 'radial' || item.settings.type === 'linear' ? `${50 * item.settings.widgetSettings.height}px` : ''}"
-          class="q-ma-sm"
-        >
+  <div style="width: 100%; position: relative;">
+    <div
+      v-for="(widget, widgetIndex) in renderedWidgets"
+      :key="widgetIndex"
+      style="display: inline-block; position: relative;"
+      class="q-ma-sm"
+      :style="{
+        width: widgetsWidth,
+        minHeight: item.settings.type === 'radial' || item.settings.type === 'linear' ?
+          `${50 * item.settings.widgetSettings.height}px` : ''
+      }"
+    >
+      <q-card flat inline class="multiplier__widget-wrapper full-height full-width" :class="wrapperClasses">
+        <q-item class="q-px-sm q-pt-sm q-pb-none" style="min-height: 0;">
+          <q-item-section class="ellipsis" :class="[`text-${item.settings.color}-7`]" style="font-size: .9rem">
+            <q-item-label class="ellipsis">{{widget.name}}</q-item-label>
+            <q-tooltip>{{widget.name}}</q-tooltip>
+          </q-item-section>
+        </q-item>
+        <q-card-section class="q-pa-none" :class="[`bg-${item.settings.color}-1`]" style="height: calc(100% - 25px)">
           <component
-            class="wrapper__items"
             :is="item.settings.type"
             :item="widgets[widgetIndex]"
             :value="values[widgetIndex]"
             :index="widgetIndex"
             :blocked="true"
-            :integration="true"
             @action="(data) => { $emit('action', data) }"
           />
-        </div>
-        <div class="flex flex-center" v-if="widgetsIds.length > limit">
-          <q-pagination v-model="batch" :max="Math.ceil(widgetsIds.length / limit)" :max-pages="item.settings.width" direction-links :color="item.color"/>
-        </div>
-      </div>
-    </q-card-section>
-  </q-card>
+        </q-card-section>
+        <!-- <div v-if="item.settings.isNeedTime" class="widget__timestamp absolute-bottom-left q-px-xs q-pt-xs" style="" :class="[`text-${item.color}-7`, `bg-${item.color}-1`]">
+          {{timestamp}}
+        </div> -->
+      </q-card>
+    </div>
+    <div class="flex flex-center" v-if="widgetsIds.length > limit">
+      <q-pagination v-model="batch" :max="Math.ceil(widgetsIds.length / limit)" :max-pages="item.settings.width" direction-links :color="item.color"/>
+    </div>
+  </div>
 </template>
 
-<style lang="stylus">
-.block-leave-to
-  transition all .2s ease-in-out
-  opacity 0
-.block-leave
-  transition all .2s ease-in-out
-  opacity 1
-.block-enter
-  transition all .2s ease-in-out
-  opacity 0
-.block-enter-to
-  transition all .2s ease-in-out
-  opacity 1
+<style lang="stylus" scoped>
+  .multiplier__widget-wrapper
+    border-radius 4px
+    border $grey-5 solid 1px
 </style>
 
 <script>
@@ -86,7 +62,7 @@ import MapLocation from '../mapLocation/View'
 import MapRoute from '../mapRoute/View'
 export default {
   name: 'Multiplier',
-  props: ['item', 'index', 'value', 'mini', 'in-shortcuts', 'blocked'],
+  props: ['item', 'index', 'value', 'mini', 'blocked'],
   data () {
     return {
       WIDGET_STATUS_DISABLED,
@@ -96,8 +72,15 @@ export default {
     }
   },
   computed: {
+    wrapperClasses () {
+      const classes = [`bg-${this.item.settings.color}-1`]
+      if (this.item.settings.type === 'radial' || this.item.settings.type === 'linear') {
+        classes.push('absolute')
+      }
+      return classes
+    },
     currentTopic () {
-      const topic = this.item.dataTopics[0].topicFilter
+      const topic = get(this.item, 'dataTopics[0].topicFilter')
       const pathByGroup = topic.split('/').slice(0, this.item.settings.groupLayout + 1)
       const topicByGroup = pathByGroup.join('/')
       return topicByGroup
@@ -117,7 +100,7 @@ export default {
     },
     currentValue () {
       if (!this.value) { return {} }
-      const topic = this.item.dataTopics[0].topicFilter
+      const topic = get(this.item, 'dataTopics[0].topicFilter')
       if (!topic || !this.value[topic]) { return {} }
       const path = this.currentTopic.split('/')
       /* update path by flespi enum (comma separated) subscriptions */
@@ -170,7 +153,7 @@ export default {
         widget.topics.forEach((currentTopic) => {
           if (topic === currentTopic) { return false }
           value[currentTopic] = {}
-          value[currentTopic].payload = this.value[currentTopic] && this.value[currentTopic].payload
+          value[currentTopic].payload = get(this.value, `[${currentTopic}].payload`)
         })
         values[widgetId] = value
         return values
@@ -189,11 +172,6 @@ export default {
         width = 100
       }
       return `calc(${width}% - 16px)`
-    },
-    contentHeight () {
-      let height = 'calc(100% - 22px)'
-      if (!this.item.name && this.blocked) { height = 'calc(100% - 4px)' }
-      return height
     }
   },
   methods: {
@@ -229,12 +207,12 @@ export default {
       })
     },
     getWidgetByName (name) {
-      let topics = [this.item.dataTopics[0].topicFilter]
+      let topics = [get(this.item, 'dataTopics[0].topicFilter')]
       if (this.item.settings.widgetSettings.topics) {
-        topics = [this.item.dataTopics[0].topicFilter, ...this.item.settings.widgetSettings.topics.map(topic => topic.topicFilter)]
+        topics = [...topics, ...this.item.settings.widgetSettings.topics.map(topic => topic.topicFilter)]
       }
-      const widgetName = this.item.dataTopics[0].payloadType === 1 && this.item.settings.nameField
-        ? this.getValueByTopic(this.currentValue[name] && this.currentValue[name].payload, { ...this.item.dataTopics[0], payloadField: this.item.settings.nameField })
+      const widgetName = get(this.item, 'dataTopics[0].payloadType') === 1 && this.item.settings.nameField
+        ? this.getValueByTopic(get(this.item, `[${name}].payload`), { ...this.item.dataTopics[0], payloadField: this.item.settings.nameField })
         : name
       const widget = {
         name: widgetName,

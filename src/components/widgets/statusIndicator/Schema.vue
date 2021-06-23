@@ -19,7 +19,7 @@
             :key="`${index}${item.value}`"
             group="status-indicator-items"
             :header-class="[`bg-${checkUniqueItem(item, index) && !!item.actionTopic ? 'grey-4' : 'red-2'}`]"
-            expand-icon="mdi-settings"
+            expand-icon="mdi-cog"
             :value="index === currentSettings.items.length - 1"
           >
             <template slot="header">

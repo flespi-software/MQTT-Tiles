@@ -15,7 +15,7 @@
         :key="index"
         group="frame-items"
         :header-class="[`bg-${checkUniqueTopic(index) ? 'grey-4' : 'red-2'}`]"
-        expand-icon="mdi-settings"
+        expand-icon="mdi-cog"
         :value="index === currentSettings.topics.length - 1"
       >
         <template slot="header">
@@ -36,6 +36,7 @@
 
 <script>
 import VariablesHelper from '../VariablesHelper'
+import { getTopicModel } from '../../../constants/defaultes'
 export default {
   name: 'ClickerSchema',
   props: ['widget', 'board'],
@@ -64,14 +65,7 @@ export default {
       return this.currentSettings.label.length <= 25 && this.currentSettings.topics.length > 0
     },
     addTopic () {
-      this.currentSettings.topics.push({
-        topicTemplate: '',
-        topicFilter: '',
-        payloadType: 0,
-        payloadField: '',
-        payloadNameField: '',
-        payload: ''
-      })
+      this.currentSettings.topics.push(getTopicModel())
     },
     removeTopic (index) { this.$delete(this.currentSettings.topics, index) },
     checkUniqueTopic (itemIndex) {

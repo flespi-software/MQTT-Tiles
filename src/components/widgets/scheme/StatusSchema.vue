@@ -1,6 +1,6 @@
 <template>
   <div class="row">
-    <topic class="col-12 q-mb-sm" v-model="current.topic" :board="board" :config="{ needSelectors: true }"/>
+    <topic class="col-12 q-mb-sm" v-model="current.topic" :board="board" :config="{ needSelectors: true, needDefault: true }"/>
     <div class="col-xs-12 q-mb-sm">
       <q-input outlined dense hide-bottom-space color="grey-9" v-model="current.settings.defaultIcon" label="Default icon" :error="!current.settings.defaultIcon">
         <q-icon slot="append" :name="`mdi-${current.settings.defaultIcon}`" size="1.5rem"/>
@@ -19,7 +19,7 @@
           :key="`${index}${item.value}`"
           group="status-indicator-items"
           :header-class="[`bg-${checkUniqueItem(item, index) ? 'grey-4' : 'red-2'}`]"
-          expand-icon="mdi-settings"
+          expand-icon="mdi-cog"
           :value="index === current.settings.items.length - 1"
         >
           <template slot="header">

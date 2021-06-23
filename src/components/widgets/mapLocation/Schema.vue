@@ -12,7 +12,7 @@
             :key="`${index}${item.name}`"
             group="map-items"
             :header-class="[`bg-${!!isitemValid(index) ? 'grey-4' : 'red-2'}`]"
-            expand-icon="mdi-settings"
+            expand-icon="mdi-cog"
             :value="index === currentSettings.items.length - 1"
           >
             <template slot="header">
@@ -72,6 +72,7 @@ import cloneDeep from 'lodash/cloneDeep'
 import get from 'lodash/get'
 import Topic from '../Topic'
 import validateTopic from '../../../mixins/validateTopic.js'
+import { getTopicModel } from '../../../constants/defaultes'
 export default {
   name: 'MapLocationSchema',
   props: ['widget', 'board'],
@@ -86,33 +87,21 @@ export default {
         minHeight: 6,
         isNeedTime: true
       },
-      defaultTopic = {
-        topicFilter: '',
-        payloadType: 0,
-        payloadField: '',
-        topicTemplate: '',
-        payloadNameField: ''
-      }
+      defaultTopic = getTopicModel()
     return {
       defaultSettings,
       currentSettings: Object.assign({}, defaultSettings, this.widget.settings),
       defaultTopic,
       defaultItem: {
         name: '',
-        lat: {
+        lat: getTopicModel({
           topicFilter: 'topic/to/lat',
-          payloadType: 0,
-          payloadField: '',
-          topicTemplate: 'topic/to/lat',
-          payloadNameField: ''
-        },
-        lon: {
+          topicTemplate: 'topic/to/lat'
+        }),
+        lon: getTopicModel({
           topicFilter: 'topic/to/lon',
-          payloadType: 0,
-          payloadField: '',
-          topicTemplate: 'topic/to/lon',
-          payloadNameField: ''
-        }
+          topicTemplate: 'topic/to/lon'
+        })
       }
     }
   },

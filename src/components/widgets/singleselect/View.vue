@@ -13,85 +13,32 @@
     </div>
     <div class="ellipsis q-mt-sm">{{item.name}}</div>
   </div>
-  <q-card flat v-else inline class="widget__switcher q-pa-sm" style="width: 100%; height: 100%;" :class="[`bg-${item.color}-1`]">
-    <q-item class="q-pa-none" style="min-height: 0px;">
-      <q-item-section class="ellipsis" :class="[`text-${item.color}-7`]" style="font-size: .9rem">
-        <q-item-label class="ellipsis">{{item.name}}</q-item-label>
-        <q-tooltip>{{item.name}}</q-tooltip>
-      </q-item-section>
-      <transition name="block">
-        <q-item-section side v-if="!blocked" style="min-width: 20px;">
-          <div>
-            <q-btn size="0.7rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" v-if="item.settings.width !== 1" :icon="inShortcuts ? 'mdi-star' : 'mdi-star-outline'" @click="$emit('fast-bind')" dense flat :color="inShortcuts ? 'yellow-9' : `${item.color}-7`">
-              <q-tooltip>{{`${inShortcuts ? 'Remove from' : 'Add to'} shortcuts`}}</q-tooltip>
-            </q-btn>
-            <q-btn size="0.7rem" class="q-pa-none" style="min-height: 1rem;" dense flat icon="mdi-dots-vertical" :color="`${item.color}-7`">
-              <q-menu anchor="top right" self="top right" :offset="[8, 8]" style="box-shadow: none;">
-                <div class="q-pa-sm" :class="[`bg-${item.color}-1`]">
-                  <q-btn v-close-popup v-if="item.settings.width === 1" size="0.7rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" :icon="inShortcuts ? 'mdi-star' : 'mdi-star-outline'" @click="$emit('fast-bind')" dense flat :color="inShortcuts ? 'yellow-9' : `${item.color}-7`">
-                    <q-tooltip>{{`${inShortcuts ? 'Remove from' : 'Add to'} shortcuts`}}</q-tooltip>
-                  </q-btn>
-                  <q-btn v-close-popup size="0.7rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" icon="mdi-content-duplicate" @click="$emit('duplicate')" dense flat :color="`${item.color}-7`">
-                    <q-tooltip>Duplicate</q-tooltip>
-                  </q-btn>
-                  <q-btn v-close-popup size="0.7rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" icon="mdi-settings" @click="$emit('update')" dense flat :color="`${item.color}-7`">
-                    <q-tooltip>Edit</q-tooltip>
-                  </q-btn>
-                  <q-btn v-close-popup size="0.7rem" class="q-pa-none q-mr-xs" style="min-height: 1rem;" icon="mdi-delete-outline" @click="$emit('delete')" dense flat color="red">
-                    <q-tooltip>Remove</q-tooltip>
-                  </q-btn>
-                  <q-btn v-close-popup size="0.7rem" class="q-pa-none" style="min-height: 1rem;" icon="mdi-close" dense flat :color="`${item.color}-7`"/>
-                </div>
-              </q-menu>
-            </q-btn>
-          </div>
+  <q-list v-else style="height: 100%; overflow: auto;">
+    <template v-if="item.settings.items.length">
+      <q-item tag="label" v-for="(listItem, index) in item.settings.items" :key="`${index}${listItem.value}`" class="q-pa-none q-mb-xs">
+        <q-item-section avatar>
+          <q-radio v-model="currentValue" :val="listItem.val" :color="`${item.color}-7`" />
         </q-item-section>
-      </transition>
-    </q-item>
-    <q-card-section class="widget__content q-pa-none" :class="[`bg-${item.color}-1`]" :style="{height: contentHeight}">
-      <q-list style="height: 100%; overflow: auto;">
-        <q-item tag="label" v-for="(listItem, index) in item.settings.items" :key="`${index}${listItem.value}`" class="q-pa-none q-mb-xs">
-          <q-item-section avatar>
-            <q-radio v-model="currentValue" :val="listItem.val" :color="`${item.color}-7`" />
-          </q-item-section>
-          <q-item-section class="cursor-pointer">
-            <q-item-label>{{listItem.label || listItem.val || 'Empty'}}</q-item-label>
-            <q-item-label v-if="item.settings.mode === COMMAND_MODE" caption>{{listItem.actionTopic}}</q-item-label>
-            <q-item-label v-if="item.settings.mode === COMMAND_MODE" caption>({{listItem.actionPayload || '*Empty*'}})</q-item-label>
-          </q-item-section>
-        </q-item>
-      </q-list>
-    </q-card-section>
-    <div v-if="item.settings.isNeedTime" class="absolute-bottom-left q-px-xs q-pt-xs" style="font-size: 12px; border-top-right-radius: 5px; bottom: 1px; left: 1px; user-select: none;" :class="[`text-${item.color}-7`, `bg-${item.color}-1`]">
-      {{timestamp}}
-    </div>
-  </q-card>
+        <q-item-section class="cursor-pointer">
+          <q-item-label>{{listItem.label || listItem.val || 'Empty'}}</q-item-label>
+          <q-item-label v-if="item.settings.mode === COMMAND_MODE" caption>{{listItem.actionTopic}}</q-item-label>
+          <q-item-label v-if="item.settings.mode === COMMAND_MODE" caption>({{listItem.actionPayload || '*Empty*'}})</q-item-label>
+        </q-item-section>
+      </q-item>
+    </template>
+    <div v-else class="text-italic text-bold text-center" :class="[`text-${item.color}-8`]">No items</div>
+  </q-list>
 </template>
-
-<style lang="stylus">
-.block-leave-to
-  transition all .2s ease-in-out
-  opacity 0
-.block-leave
-  transition all .2s ease-in-out
-  opacity 1
-.block-enter
-  transition all .2s ease-in-out
-  opacity 0
-.block-enter-to
-  transition all .2s ease-in-out
-  opacity 1
-</style>
 
 <script>
 import JSONPath from 'jsonpath'
+import get from 'lodash/get'
 import { WIDGET_STATUS_DISABLED } from '../../../constants'
 import { DEFAULT_MODE, COMMAND_MODE } from './constants.js'
 import getValueByTopic from '../../../mixins/getValueByTopic.js'
-import timestamp from '../../../mixins/timestamp.js'
 export default {
   name: 'Singleselect',
-  props: ['item', 'index', 'value', 'mini', 'in-shortcuts', 'blocked'],
+  props: ['item', 'index', 'value', 'mini', 'blocked'],
   data () {
     return {
       WIDGET_STATUS_DISABLED,
@@ -103,37 +50,22 @@ export default {
   },
   computed: {
     currentLabel () {
-      const value = this.value[this.item.dataTopics[0].topicFilter] && this.value[this.item.dataTopics[0].topicFilter].payload
-      if (value === null) {
-        return 'N/A'
-      } else {
-        const activeVal = this.item.settings.items.filter(item => item.val === this.currentValue)[0]
-        return activeVal ? activeVal.label : 'N/A'
-      }
+      const activeVal = this.item.settings.items.filter(item => item.val === this.currentValue)[0]
+      return activeVal ? activeVal.label : 'N/A'
     },
     stringLength () {
       return this.currentLabel.length
     },
     currentValue: {
       get () {
-        const value = this.value[this.item.dataTopics[0].topicFilter] && this.value[this.item.dataTopics[0].topicFilter].payload
-        if (value === null) {
-          return null
-        } else {
-          return this.getValueByTopic(value, this.item.dataTopics[0])
-        }
+        const topic = get(this.item, 'dataTopics[0].topicFilter')
+        const value = this.getValueByTopic(get(this.value, `[${topic}].payload`, null), this.item.dataTopics[0])
+        return value
       },
       set (val) {
         this.setAction(val)
         this.actionHandler()
       }
-    },
-    contentHeight () {
-      let height = 'calc(100% - 22px)'
-      if (!this.item.name && this.blocked) {
-        height = 'calc(100% - 4px)'
-      }
-      return height
     }
   },
   methods: {
@@ -141,11 +73,11 @@ export default {
       let topic = '',
         payload = ''
       if (this.item.settings.mode === DEFAULT_MODE) {
-        topic = this.item.dataTopics[0].topicFilter
+        topic = get(this.item, 'dataTopics[0].topicFilter')
         payload = val
-        const payloadField = this.item.dataTopics[0].payloadField
+        const payloadField = get(this.item, 'dataTopics[0].payloadField')
         if (payloadField) {
-          payload = this.getCleanValue(this.value[topic] && this.value[topic].payload, this.item.dataTopics[0])
+          payload = this.getCleanValue(get(this.value, `[${topic}].payload`, null), this.item.dataTopics[0])
           if (payload !== 'N/A') {
             JSONPath.apply(payload, payloadField, () => val)
             payload = JSON.stringify(payload)
@@ -166,6 +98,6 @@ export default {
       }
     }
   },
-  mixins: [getValueByTopic, timestamp]
+  mixins: [getValueByTopic]
 }
 </script>

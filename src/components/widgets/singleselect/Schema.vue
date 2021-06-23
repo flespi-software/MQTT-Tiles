@@ -16,7 +16,7 @@
             :key="`${index}${item.value}`"
             group="singleselect-items"
             :header-class="[`bg-${checkUniqueValue(item.val, index) && !!item.actionTopic ? 'grey-4' : 'red-2'}`]"
-            expand-icon="mdi-settings"
+            expand-icon="mdi-cog"
             :value="index === currentSettings.items.length - 1"
           >
             <template slot="header">

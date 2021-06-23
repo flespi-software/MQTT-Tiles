@@ -47,7 +47,7 @@
               :key="`${index}`"
               group="singleselect-items"
               :header-class="[`bg-${checkUniqueSyncCredsValue(syncCreds, index) ? 'grey-4' : 'red-2'}`]"
-              expand-icon="mdi-settings"
+              expand-icon="mdi-cog"
               :value="index === currentSettings.syncCreds.length - 1"
             >
               <template slot="header">

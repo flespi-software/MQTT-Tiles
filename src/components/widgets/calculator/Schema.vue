@@ -12,7 +12,7 @@
             :key="`${index}`"
             group="variables"
             :header-class="[isitemValid(index) ? 'bg-purple-2' : 'bg-red-2']"
-            expand-icon="mdi-settings"
+            expand-icon="mdi-cog"
             :value="index === currentSettings.variables.length - 1"
           >
             <template slot="header">

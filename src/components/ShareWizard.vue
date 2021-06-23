@@ -10,7 +10,7 @@
             <div class="text-grey-8">Tokens</div>
             <q-list separator bordered class="q-mb-md">
               <q-item
-                v-for="(token, index) in config.tokens" :key="token.credentions.username"
+                v-for="(token, index) in currentConfig.tokens" :key="token.credentions.username"
                 @click="setToken(token), currentSelectedToken = index, validateToken(token)" :active="token.label === shareBoardModel.token.label"
                 clickable active-class="bg-amber-2"
               >
@@ -48,7 +48,7 @@
             <div v-if="newTokenError" class="text-red" style="font-size: .7rem">You need to have a Standard or ACL token for sharing set up in the MQTT Client settings. Please read more <a href="https://flespi.com/blog/mqtt-tiles-shareable-and-flexible-iot-dashboards" target="_blank">here</a>.</div>
             <div v-if="!newTokenValid" class="text-red" style="font-size: .7rem">Your token must be unique in list.</div>
           </q-step>
-          <q-step name="replace" title="Upload" v-if="config.hasRemote" icon="mdi-file-replace-outline" :done="currentStep === 'link'">
+          <q-step name="replace" title="Upload" v-if="currentConfig.hasRemote" icon="mdi-file-replace-outline" :done="currentStep === 'link'">
             <div class="q-mx-sm q-my-md text-grey-8 text-center" style="font-size: 1.2rem;">Such board exists. Continue?</div>
             <q-checkbox v-model="isNeedCopy" color="grey-9" label="Rename to save a copy"/>
             <q-input
@@ -57,7 +57,7 @@
               v-model="shareBoardModel.boardId"
               :disable="!isNeedCopy"
               label="Name"
-              :error="isNeedCopy && (shareBoardModel.boardId === config.boardId || ((config.currentRemoteBoards && config.currentRemoteBoards.includes(shareBoardModel.boardId) || !config.currentRemoteBoards)))"
+              :error="isNeedCopy && (shareBoardModel.boardId === currentConfig.boardId || ((currentConfig.currentRemoteBoards && currentConfig.currentRemoteBoards.includes(shareBoardModel.boardId) || !currentConfig.currentRemoteBoards)))"
             />
           </q-step>
           <q-step name="link" title="Link" :active-icon="isLinkCopied && currentStep === 'link' ? 'mdi-check' : undefined" :active-color="isLinkCopied && currentStep === 'link' ? 'green' : undefined" icon="mdi-link" :done="isLinkCopied && currentStep === 'link'">
@@ -147,9 +147,9 @@ export default {
           return !this.isNeedCopy ||
             (
               this.isNeedCopy &&
-              this.shareBoardModel.boardId !== this.config.boardId &&
-              this.config.currentRemoteBoards &&
-              !this.config.currentRemoteBoards.includes(this.shareBoardModel.boardId)
+              this.shareBoardModel.boardId !== this.currentConfig.boardId &&
+              this.currentConfig.currentRemoteBoards &&
+              !this.currentConfig.currentRemoteBoards.includes(this.shareBoardModel.boardId)
             )
         }
         default: { return true }
@@ -160,7 +160,7 @@ export default {
       return !!this.stepsEnum.length && this.currentStep !== this.steps[0].value && !this.updateBoardError
     },
     newTokenValid () {
-      return this.config.tokens.reduce((res, token) => {
+      return this.currentConfig.tokens.reduce((res, token) => {
         if (token.credentions.username === this.newTokenValue) {
           res = false
         }
@@ -171,17 +171,17 @@ export default {
   created () {
     const steps = {}
     let stepIndex = 0
-    this.getRegionByHost(this.config.host)
+    this.getRegionByHost(this.currentConfig.host)
       .then(() => {
         steps[stepIndex] = { label: 'Token', value: this.stepsConst.STEP_TOKEN }
         this.currentStep = this.stepsConst.STEP_TOKEN
         stepIndex++
-        if (this.config.hasRemote) {
+        if (this.currentConfig.hasRemote) {
           steps[stepIndex] = { label: 'Replace', value: this.stepsConst.STEP_REPLACE }
           if (!this.currentStep) { this.currentStep = this.stepsConst.STEP_REPLACE }
           stepIndex++
         } else {
-          this.setboardId(this.config.boardId, this.config.boardId)
+          this.setboardId(this.currentConfig.boardId, this.currentConfig.boardId)
         }
         steps[stepIndex] = { label: 'Link', value: this.stepsConst.STEP_LINK }
         if (!this.currentStep) { this.currentStep = this.stepsConst.STEP_LINK }
@@ -234,7 +234,7 @@ export default {
           return isTokenValid
         }
         case 'replace': {
-          return this.setboardId(this.shareBoardModel.boardId, this.config.boardId)
+          return this.setboardId(this.shareBoardModel.boardId, this.currentConfig.boardId)
         }
         case 'link': {
           return Promise.resolve(this.closeHandler())
@@ -273,8 +273,8 @@ export default {
     setboardId (boardId, oldBoardId) {
       this.$set(this.shareBoardModel, 'boardId', boardId)
       let resp = Promise.resolve(true)
-      if (!this.config.isRemote) {
-        resp = this.config.updateBoardMethod(oldBoardId, boardId)
+      if (!this.currentConfig.isRemote) {
+        resp = this.currentConfig.updateBoardMethod(oldBoardId, boardId)
           .then((resp) => {
             if (resp instanceof Error) {
               this.updatedBoardFlag = false
@@ -296,8 +296,8 @@ export default {
     generateLink () {
       const token = get(this.shareBoardModel, 'token.credentions.username', '')
       if (!token) { return }
-      const topic = this.config.syncNamespace,
-        host = this.config.host,
+      const topic = this.currentConfig.syncNamespace,
+        host = this.currentConfig.host,
         shareObj = { token, topic, boardId: this.shareBoardModel.boardId }
       if (host.indexOf('wss://mqtt.flespi.io') !== 0) {
         shareObj.host = host
@@ -337,7 +337,7 @@ export default {
       this.validateToken(token)
         .then((granted) => {
           if (granted) {
-            this.config.tokens.push(token)
+            this.currentConfig.tokens.push(token)
             this.$root.$emit('new-share-token', token)
             this.newTokenValue = ''
             this.newTokenLabel = ''

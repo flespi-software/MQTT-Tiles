@@ -1,6 +1,6 @@
 <template>
   <div class="row">
-    <topic class="col-12 q-mb-sm" v-model="current.topic" :board="board" :config="{ needSelectors: true }"/>
+    <topic class="col-12 q-mb-sm" v-model="current.topic" :board="board" :config="{ needSelectors: true, needDefault: true }"/>
     <q-btn-toggle class='q-my-sm col-12' rounded toggle-text-color="grey-9" text-color="grey-6" flat v-model="current.settings.mode" :options="modeOptions"/>
     <div class="col-6 q-pr-sm">
       <typed-input class="q-mb-sm" v-model="current.settings.trueValue" :settings="{ label: 'True value' }"/>

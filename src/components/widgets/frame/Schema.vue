@@ -17,7 +17,7 @@
             :key="`${index}${item.value}`"
             group="frame-items"
             :header-class="[`bg-${checkUniqueTopic(index) ? 'grey-4' : 'red-2'}`]"
-            expand-icon="mdi-settings"
+            expand-icon="mdi-cog"
             :value="index === currentSettings.items.length - 1"
           >
             <template slot="header">
@@ -69,6 +69,7 @@
 
 <script>
 import { IFRAME_MODE_INTEGRATION, IFRAME_MODE_SHOW } from './constants'
+import { getTopicModel } from '../../../constants/defaultes'
 import Topic from '../Topic'
 import cloneDeep from 'lodash/cloneDeep'
 import isEqual from 'lodash/isEqual'
@@ -95,13 +96,7 @@ export default {
       defaultItem = {
         label: 'New item',
         template: '',
-        topic: {
-          topicFilter: '',
-          payloadType: 0,
-          payloadField: '',
-          topicTemplate: '',
-          payloadNameField: ''
-        }
+        topic: getTopicModel()
       }
     return {
       defaultSettings,
@@ -195,7 +190,7 @@ export default {
     'currentSettings.mode' (mode) {
       if (mode === IFRAME_MODE_INTEGRATION) {
         this.currentSettings.maxTopicsLength = 0
-        this.widget.dataTopics = []
+        this.$emit('update-widget', { dataTopics: [] })
       } else {
         this.currentSettings.maxTopicsLength = 1
         this.currentSettings.topics = []

@@ -15,6 +15,7 @@
 
 <script>
 import VariablesHelper from '../VariablesHelper'
+import { getTopicModel } from '../../../constants/defaultes'
 export default {
   name: 'TextSenderSchema',
   props: ['widget', 'board'],
@@ -22,13 +23,10 @@ export default {
     const defaultSettings = {
       height: 2,
       topics: [
-        {
+        getTopicModel({
           topicFilter: 'topic/to/data',
-          payloadType: 0,
-          payloadField: '',
-          topicTemplate: 'topic/to/data',
-          payloadNameField: ''
-        }
+          topicTemplate: 'topic/to/data'
+        })
       ],
       width: 2,
       minWidth: 1,

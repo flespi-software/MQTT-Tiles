@@ -3,60 +3,14 @@
     <q-btn fab color="grey-9" @click="openSettingsHandler" icon="mdi-plus" class="absolute button--add" v-if="!isFrized">
       <q-tooltip>Add new board</q-tooltip>
     </q-btn>
-    <div v-if="Object.keys(remoteBoards).length" class="remote-control text-center">
-      <span @click="isPanelShowed = !isPanelShowed" class="remote-control__button text-grey-9 bg-orange q-px-sm text-bold text-uppercase cursor-pointer shadow-3">{{isPanelShowed ? 'hide' : 'saved boards'}}</span>
-    </div>
-    <transition
-      appear
-      enter-active-class="animated slideInDown"
-      leave-active-class="animated slideOutUp"
-    >
-      <div class="boards__remote scroll bg-grey-3 q-pb-md q-pt-lg flex no-wrap" v-if="Object.keys(remoteBoards).length && isPanelShowed">
-        <div class="q-my-xs q-px-sm q-my-sm remote__board" v-for="(board, id) in remoteBoards" :key="`remote-${id}`">
-          <q-card>
-            <q-item class="q-py-none q-pl-sm q-pr-none bg-grey-4" style="min-height: 20px;">
-              <q-item-section class="ellipsis">
-                <div class="ellipsis" style="height: 24px; line-height: 24px;">
-                  {{board.name || '*No name*'}}
-                  <q-tooltip v-if="board.name">{{board.name}}</q-tooltip>
-                </div>
-                <div class="ellipsis text-grey-9" style="height: 14px; line-height: 14px; font-size: 14px;">
-                  {{board.id}}
-                </div>
-              </q-item-section>
-              <q-item-section side>
-                <q-btn round dense flat icon="mdi-dots-vertical" color="grey-9">
-                  <q-menu anchor="bottom right" self="top right">
-                    <q-list dense>
-                      <q-item v-close-popup @click.stop="share('share-uploaded', id)" :disable="!canShare" clickable>
-                        <q-item-section avatar>
-                          <q-icon name="mdi-link"/>
-                        </q-item-section>
-                        <q-item-section>Get link</q-item-section>
-                      </q-item>
-                      <q-separator/>
-                      <q-item v-close-popup @click.stop="$emit('delete-uploaded', id)" clickable>
-                        <q-item-section avatar>
-                          <q-icon name="mdi-delete-outline" color="red"/>
-                        </q-item-section>
-                        <q-item-section>Remove</q-item-section>
-                      </q-item>
-                    </q-list>
-                  </q-menu>
-                </q-btn>
-              </q-item-section>
-            </q-item>
-            <q-separator />
-            <q-card-section class="text-center relative-position">
-              <div v-if="board.settings.lastModify" class="absolute-top-right text-grey-5 q-pr-xs" style="font-size: .7rem;">{{date(board.settings.lastModify, 'DD-MM-YYYY HH:mm:ss')}}</div>
-              <q-icon name="mdi-download" size="20px" color="grey-9" class="cursor-pointer" @click.native="$emit('import', id)" />
-              <span class="text-grey-5 absolute" style="font-size: 10px; bottom: 4px; left: 4px; cursor: default;" v-if='board.appVersion' title="MQTT Tiles version">v.{{board.appVersion}}</span>
-              <span class="text-bold text-white absolute bg-purple-6 rounded-borders q-px-xs" style="font-size: 10px; bottom: 4px; right: 4px; cursor: default;" title="Widgets count">{{board.widgetsIndexes.length}}</span>
-            </q-card-section>
-          </q-card>
-        </div>
-      </div>
-    </transition>
+    <remote-boards
+      :boards="remoteBoards"
+      :can-share="canShare"
+      v-model="isPanelShowed"
+      @import="id => $emit('import', id)"
+      @delete-uploaded="id => $emit('delete-uploaded', id)"
+      @share-uploaded="id => share('share-uploaded', id)"
+    />
     <q-toolbar class="bg-white">
       <q-toolbar-title class="text-grey-9">Boards</q-toolbar-title>
       <template v-if="connectionSettings && !$integrationMode">
@@ -120,7 +74,7 @@
                         </q-item>
                         <q-item v-close-popup clickable @click.stop="openEditSettingsHandler(id)">
                           <q-item-section avatar>
-                            <q-icon name="mdi-settings" />
+                            <q-icon name="mdi-cog" />
                           </q-item-section>
                           <q-item-section>Settings</q-item-section>
                         </q-item>
@@ -233,25 +187,8 @@
     bottom 16px
     right 16px
     z-index 1
-  .remote-control
-    position absolute
-    right 0
-    left 0
-    font-size 13px
-    height 15px
-    z-index 1
-    line-height 15px
-    .remote-control__button
-      border-radius 0px 0px 5px 5px
-      line-height 15px
   .dash__boards
     position relative
-    .boards__remote
-      max-height 149px
-      box-shadow rgba(0, 0, 0, 0.7) 0px -9px 9px -9px inset
-      .remote__board
-        width 200px
-        min-width 200px
     .boards__wrapper
       padding-bottom 82px
       .wrapper--empty
@@ -265,6 +202,7 @@ import { date } from 'quasar'
 import cloneDeep from 'lodash/cloneDeep'
 import uniq from 'lodash/uniq'
 import BoardSettings from './BoardSettings'
+import RemoteBoards from './RemoteBoards.vue'
 import Switcher from './widgets/switcher/View'
 import Clicker from './widgets/clicker/View'
 import Informer from './widgets/informer/View'
@@ -414,7 +352,7 @@ export default {
     }
   },
   components: {
-    BoardSettings, Switcher, Clicker, Informer, Linear, Radial, Singleselect, Slider, Color, StatusIndicator
+    BoardSettings, RemoteBoards, Switcher, Clicker, Informer, Linear, Radial, Singleselect, Slider, Color, StatusIndicator
   }
 }
 </script>

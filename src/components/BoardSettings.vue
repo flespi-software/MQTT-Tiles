@@ -35,7 +35,7 @@
                 :key="`${index}`"
                 group="variables"
                 :header-class="[`bg-${checkUniqueVariables(index) ? 'grey-4' : 'red-2'}`]"
-                expand-icon="mdi-settings"
+                expand-icon="mdi-cog"
                 :value="index === currentSettings.settings.variables.length - 1"
               >
                 <template slot="header">
@@ -84,7 +84,7 @@
                             :key="`${index}`"
                             group="singleselect-items"
                             :header-class="[`bg-${item[1].indexOf('#') === -1 ? 'grey-4' : 'red-2'}`]"
-                            expand-icon="mdi-settings"
+                            expand-icon="mdi-cog"
                             :value="index === variable.values.length - 1"
                           >
                             <template slot="header">
@@ -134,6 +134,7 @@ import merge from 'lodash/merge'
 import cloneDeep from 'lodash/cloneDeep'
 import { uid } from 'quasar'
 import Topic from './widgets/Topic'
+import { getTopicModel } from '../constants/defaultes'
 import variblesShemasByPresets from '../constants/variablesPresets'
 const VARIABLE_TYPE_CUSTOM = 0,
   VARIABLE_TYPE_SOURCE = 1,
@@ -156,12 +157,7 @@ export default {
         layouts: { lg: [], md: [], sm: [], xs: [], xxs: [] }
       }
     )
-    const defaultTopic = {
-      topicTemplate: '',
-      topicFilter: '',
-      payloadType: 0,
-      payloadField: ''
-    }
+    const defaultTopic = getTopicModel()
     let currentSettings = {}
     if (this.settings) {
       currentSettings = cloneDeep(merge({}, defaultSettings, this.settings))

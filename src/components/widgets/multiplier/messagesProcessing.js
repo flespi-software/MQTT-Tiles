@@ -36,7 +36,13 @@ function getMultiplierValueByPacket (packet, initValue, subscriptionTopic, widge
   return value
 }
 export default function getMultiplierValue (packets, initValue, subscriptionTopic, widget) {
-  if (!packets || subscriptionTopic !== widget.dataTopics[0].topicFilter) { return packets }
+  if (!packets || subscriptionTopic !== widget.dataTopics[0].topicFilter) {
+    let res = null
+    if (packets && packets.length) {
+      res = packets.slice(-1)[0]
+    }
+    return res
+  }
   let value = initValue ? cloneDeep(initValue) : {}
   packets.forEach((packet) => {
     value = getMultiplierValueByPacket(packet, value, subscriptionTopic, widget)

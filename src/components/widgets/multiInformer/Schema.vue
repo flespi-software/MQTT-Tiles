@@ -12,7 +12,7 @@
             :key="`${index}${item.topic}`"
             group="singleselect-items"
             :header-class="[`bg-${!!item.topic.topicFilter ? 'grey-4' : 'red-2'}`]"
-            expand-icon="mdi-settings"
+            expand-icon="mdi-cog"
             :value="index === currentSettings.items.length - 1"
           >
             <template slot="header">
@@ -28,7 +28,7 @@
               </q-item-section>
             </template>
             <div class="row q-pa-sm">
-              <topic class="col-12 q-mb-sm" v-model="item.topic" @input="updateTopics" :board="board" :config="{ needSelectors: true }"/>
+              <topic class="col-12 q-mb-sm" v-model="item.topic" @input="updateTopics" :board="board" :config="{ needSelectors: true, needDefault: true }"/>
               <div class="col-6 q-mb-sm">
                 <q-input outlined dense hide-bottom-space class="q-mr-sm" color="grey-9" v-model="item.prefix" label="Prefix"/>
               </div>
@@ -61,6 +61,7 @@ import {
   WIDGET_VALUE_FORMAT_DURATION
 } from '../../../constants'
 import validateTopic from '../../../mixins/validateTopic.js'
+import { getTopicModel } from '../../../constants/defaultes'
 import Topic from '../Topic'
 import isEqual from 'lodash/isEqual'
 import cloneDeep from 'lodash/cloneDeep'
@@ -79,13 +80,7 @@ export default {
       isNeedTime: true
     }
     const defaultItem = {
-      topic: {
-        topicTemplate: '',
-        topicFilter: '',
-        payloadType: 0,
-        payloadField: '',
-        payloadNameField: ''
-      },
+      topic: getTopicModel(),
       math: '',
       valueFormat: 0,
       prefix: '',
@@ -114,13 +109,7 @@ export default {
         { label: 'Markdown', value: WIDGET_VALUE_FORMAT_MARKDOWN },
         { label: 'JSON', value: WIDGET_VALUE_FORMAT_JSON }
       ],
-      defaultTopic: {
-        topicTemplate: '',
-        topicFilter: '',
-        payloadType: 0,
-        payloadField: '',
-        payloadNameField: ''
-      }
+      defaultTopic: getTopicModel()
     }
   },
   methods: {

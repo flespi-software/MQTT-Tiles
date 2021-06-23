@@ -59,7 +59,7 @@
               </q-item>
               <q-item clickable v-close-popup @click.stop="modifyBoardSettings">
                 <q-item-section avatar>
-                  <q-icon name="mdi-settings" />
+                  <q-icon name="mdi-cog" />
                 </q-item-section>
                 <q-item-section>Board settings</q-item-section>
               </q-item>
@@ -121,21 +121,27 @@
                   flat class="absolute-top-left absolute-bottom-right full-width"
                 />
               </div>
-              <component
+              <widget-wrapper
                 class="wrapper__items"
                 :class="{'wrapper__items--edited': !board.settings.blocked && !isFrized}"
-                :is="widgets[widgetIndex].type"
                 :item="widgets[widgetIndex]"
                 :value="values[widgetIndex]"
-                :index="widgetIndex"
-                :in-shortcuts="Boolean(board.shortcutsIndexes.includes(widgetIndex))"
+                :in-shortcuts="getInShortcutsAbility(widgets[widgetIndex]) && Boolean(board.shortcutsIndexes.includes(widgetIndex))"
                 :blocked="board.settings.blocked || isFrized"
-                @action="actionHandler"
                 @update="editWidgetSettings(widgetIndex)"
                 @duplicate="duplicateWidgetHandler(widgetIndex)"
                 @delete="deleteWidgetHandler(widgetIndex)"
                 @fast-bind="fastBindHandler(widgetIndex)"
-              />
+              >
+                <component
+                  :is="widgets[widgetIndex].type"
+                  :item="widgets[widgetIndex]"
+                  :value="values[widgetIndex]"
+                  :index="widgetIndex"
+                  :blocked="board.settings.blocked || isFrized"
+                  @action="actionHandler"
+                />
+              </widget-wrapper>
             </grid-item>
         </grid-layout>
       </div>
@@ -185,6 +191,7 @@ import Vue from 'vue'
 import BoardSettings from './BoardSettings'
 import BoardVariable from './BoardVariable'
 import VirtualList from 'vue-virtual-scroll-list'
+import WidgetWrapper from './widgets/WidgetWrapper'
 import cloneDeep from 'lodash/cloneDeep'
 import uniq from 'lodash/uniq'
 import Settings from './widgets/Settings'
@@ -475,10 +482,23 @@ export default {
       } else {
         this.$emit('share-error')
       }
+    },
+    getInShortcutsAbility (widget) {
+      return widget.type === 'informer' ||
+        widget.type === 'clicker' ||
+        widget.type === 'color' ||
+        widget.type === 'linear' ||
+        widget.type === 'radial' ||
+        widget.type === 'singleselect' ||
+        widget.type === 'slider' ||
+        widget.type === 'status-indicator' ||
+        widget.type === 'switcher' ||
+        undefined
     }
   },
   components: {
     Settings,
+    WidgetWrapper,
     BoardSettings,
     BoardVariable,
     Switcher,

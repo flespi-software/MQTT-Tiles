@@ -13,4 +13,14 @@ const defaultClient = () => ({
   syncNamespace: 'xflespifront/mqtttiles/boards'
 })
 
-export { defaultClient }
+const getTopicModel = (topic = {}) => ({
+  topicTemplate: '',
+  topicFilter: '',
+  payloadType: 0,
+  payloadField: '',
+  payloadNameField: '',
+  default: '',
+  ...topic
+})
+
+export { defaultClient, getTopicModel }
