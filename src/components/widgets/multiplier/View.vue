@@ -211,9 +211,11 @@ export default {
       if (this.item.settings.widgetSettings.topics) {
         topics = [...topics, ...this.item.settings.widgetSettings.topics.map(topic => topic.topicFilter)]
       }
-      const widgetName = get(this.item, 'dataTopics[0].payloadType') === 1 && this.item.settings.nameField
-        ? this.getValueByTopic(get(this.item, `[${name}].payload`), { ...this.item.dataTopics[0], payloadField: this.item.settings.nameField })
-        : name
+      let widgetName = name
+      if (get(this.item, 'dataTopics[0].payloadType') === 1 && this.item.settings.nameField) {
+        const value = get(this.currentValue, `[${name}].payload`, null)
+        widgetName = this.getValueByTopic(value, { ...this.item.dataTopics[0], payloadField: this.item.settings.nameField })
+      }
       const widget = {
         name: widgetName,
         id: name,

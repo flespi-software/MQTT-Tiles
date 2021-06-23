@@ -55,6 +55,8 @@ export default {
         delta += 34
       } else if (this.item.name && this.blocked) {
         delta += 25
+      } else {
+        delta += 8
       }
       if (this.timestamp) { delta += 10 }
       return `calc(100% - ${delta}px)`
