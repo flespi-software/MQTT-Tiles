@@ -59,7 +59,7 @@ export default {
     currentValue: {
       get () {
         const topic = get(this.item, 'dataTopics[0].topicFilter')
-        const value = this.getValueByTopic(get(this.value, `[${topic}].payload`, null), this.item.dataTopics[0])
+        const value = this.getValueByTopic(get(this.value, `['${topic}'].payload`, null), this.item.dataTopics[0])
         return value
       },
       set (val) {
@@ -77,7 +77,7 @@ export default {
         payload = val
         const payloadField = get(this.item, 'dataTopics[0].payloadField')
         if (payloadField) {
-          payload = this.getCleanValue(get(this.value, `[${topic}].payload`, null), this.item.dataTopics[0])
+          payload = this.getCleanValue(get(this.value, `['${topic}'].payload`, null), this.item.dataTopics[0])
           if (payload !== 'N/A') {
             JSONPath.apply(payload, payloadField, () => val)
             payload = JSON.stringify(payload)

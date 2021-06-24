@@ -76,7 +76,7 @@ export default {
     currentValue: {
       get () {
         const topic = get(this.item, 'dataTopics[0].topicFilter')
-        const value = get(this.value, `[${topic}].payload`, null)
+        const value = get(this.value, `['${topic}'].payload`, null)
         if (this.item.settings.resetTimeout) {
           this.setExpireLogic()
         } else {

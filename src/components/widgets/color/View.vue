@@ -187,7 +187,7 @@ export default {
       return get(this.item, 'dataTopics[0].topicFilter')
     },
     colorValue () {
-      const value = get(this.value, `${[this.topic]}.payload`, null)
+      const value = get(this.value, `['${this.topic}'].payload`, null)
       return this.getValueByTopic(value, this.item.dataTopics[0])
     },
     color () {

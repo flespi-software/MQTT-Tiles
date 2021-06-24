@@ -52,9 +52,9 @@ export default {
       let payload
       if (this.item.settings.mode === IFRAME_MODE_INTEGRATION) {
         const topic = this.item.settings.items[itemIndex].topic
-        const data = get(this.value, `${[topic.topicFilter]}.payload`, null)
+        const data = get(this.value, `['${topic.topicFilter}'].payload`, null)
         const value = this.getValueByTopic(data, topic)
-        const valuedTopic = get(this.value, `[${topic.topicFilter}].topic`)
+        const valuedTopic = get(this.value, `['${topic.topicFilter}'].topic`)
         const path = valuedTopic && valuedTopic.split('/')
         payload = this.item.settings.items[itemIndex].template
         payload = payload.replace('<{topic}>', valuedTopic)
@@ -120,7 +120,7 @@ export default {
       } else {
         const urlPattern = /\b(?:https?|ftp):\/\/[a-z0-9-+&@#/%?=~_|!:,.;]*[a-z0-9-+&@#/%=~_|]/gim
         const topic = get(this.item, 'dataTopics[0].topicFilter')
-        const payload = get(this.value, `${[topic]}.payload`, null)
+        const payload = get(this.value, `['${topic}'].payload`, null)
         const linkValue = this.getValueByTopic(payload, this.item.dataTopics[0])
         return linkValue && linkValue.toString().match(urlPattern) ? linkValue : null
       }

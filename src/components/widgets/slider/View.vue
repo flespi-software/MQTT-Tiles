@@ -83,17 +83,17 @@ export default {
         values = {}
       if (valueTopic) {
         values[valueTopic.topicFilter] = parseFloat(
-          this.getValueByTopic(get(this.value, `${[valueTopic.topicFilter]}.payload`, null), valueTopic)
+          this.getValueByTopic(get(this.value, `['${valueTopic.topicFilter}'].payload`, null), valueTopic)
         )
       }
       if (minTopic) {
         values[minTopic.topicFilter] = parseFloat(
-          this.getValueByTopic(get(this.value, `${[minTopic.topicFilter]}.payload`, null), minTopic)
+          this.getValueByTopic(get(this.value, `['${minTopic.topicFilter}'].payload`, null), minTopic)
         )
       }
       if (maxTopic) {
         values[maxTopic.topicFilter] = parseFloat(
-          this.getValueByTopic(get(this.value, `${[maxTopic.topicFilter]}.payload`, null), maxTopic)
+          this.getValueByTopic(get(this.value, `['${maxTopic.topicFilter}'].payload`, null), maxTopic)
         )
       }
       return values
@@ -104,7 +104,7 @@ export default {
     currentValue: {
       get () {
         const topic = get(this.item, 'dataTopics[0].topicFilter')
-        const value = get(this.valuesBySettings, `[${topic}]`, 'N/A')
+        const value = get(this.valuesBySettings, `['${topic}']`, 'N/A')
         return value
       },
       set (val) {

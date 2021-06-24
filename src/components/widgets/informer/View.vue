@@ -63,7 +63,7 @@ export default {
       return get(this.item, 'dataTopics[0].topicFilter')
     },
     title () {
-      const value = get(this.value, `${[this.topic]}.payload`, null)
+      const value = get(this.value, `['${this.topic}'].payload`, null)
       return this.getValueByTopic(value, this.item.dataTopics[0])
     },
     text () {

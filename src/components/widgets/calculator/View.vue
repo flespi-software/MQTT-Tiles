@@ -52,7 +52,7 @@ export default {
   computed: {
     valuesByIndex () {
       return this.item.dataTopics.reduce((result, topic, index) => {
-        const value = get(this.value, `[${topic.topicFilter}].payload`, null)
+        const value = get(this.value, `['${topic.topicFilter}'].payload`, null)
         result[index + 1] = this.getValueByTopic(value, topic)
         return result
       }, {})

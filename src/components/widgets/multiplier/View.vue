@@ -153,7 +153,7 @@ export default {
         widget.topics.forEach((currentTopic) => {
           if (topic === currentTopic) { return false }
           value[currentTopic] = {}
-          value[currentTopic].payload = get(this.value, `[${currentTopic}].payload`)
+          value[currentTopic].payload = get(this.value, `['${currentTopic}'].payload`)
         })
         values[widgetId] = value
         return values
@@ -213,7 +213,7 @@ export default {
       }
       let widgetName = name
       if (get(this.item, 'dataTopics[0].payloadType') === 1 && this.item.settings.nameField) {
-        const value = get(this.currentValue, `[${name}].payload`, null)
+        const value = get(this.currentValue, `['${name}'].payload`, null)
         widgetName = this.getValueByTopic(value, { ...this.item.dataTopics[0], payloadField: this.item.settings.nameField })
       }
       const widget = {

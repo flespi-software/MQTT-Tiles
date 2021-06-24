@@ -108,24 +108,24 @@ export default {
         maxTopic = this.item.settings.topics[1],
         values = {}
       if (valueTopic) {
-        values[valueTopic.topicFilter] = parseFloat(this.getValueByTopic(get(this.value, `[${valueTopic.topicFilter}].payload`, null), valueTopic))
+        values[valueTopic.topicFilter] = parseFloat(this.getValueByTopic(get(this.value, `['${valueTopic.topicFilter}'].payload`, null), valueTopic))
       }
       if (minTopic) {
-        values[minTopic.topicFilter] = parseFloat(this.getValueByTopic(get(this.value, `[${minTopic.topicFilter}].payload`, null), minTopic))
+        values[minTopic.topicFilter] = parseFloat(this.getValueByTopic(get(this.value, `['${minTopic.topicFilter}'].payload`, null), minTopic))
       }
       if (maxTopic) {
-        values[maxTopic.topicFilter] = parseFloat(this.getValueByTopic(get(this.value, `[${maxTopic.topicFilter}].payload`, null), maxTopic))
+        values[maxTopic.topicFilter] = parseFloat(this.getValueByTopic(get(this.value, `['${maxTopic.topicFilter}'].payload`, null), maxTopic))
       }
       return values
     },
     currentValueText () {
       const topic = get(this.item, 'dataTopics[0].topicFilter')
-      const value = get(this.valuesBySettings, `[${topic}]`, 'N/A')
+      const value = get(this.valuesBySettings, `['${topic}']`, 'N/A')
       return value
     },
     currentValue () {
       const topic = get(this.item, 'dataTopics[0].topicFilter')
-      const value = get(this.valuesBySettings, `[${topic}]`, 'N/A')
+      const value = get(this.valuesBySettings, `['${topic}']`, 'N/A')
       return typeof value !== 'number' || Number.isNaN(value) ? 0 : this.mathProcessing(value, this.item.settings.math)
     },
     stringLength () {

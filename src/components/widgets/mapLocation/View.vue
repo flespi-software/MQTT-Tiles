@@ -29,8 +29,8 @@ export default {
       const values = this.item.settings.items.reduce((result, item, index) => {
         const latTopic = this.item.settings.topics[index * 2],
           lonTopic = this.item.settings.topics[index * 2 + 1],
-          latValue = get(this.value, `[${latTopic.topicFilter}].payload`, null),
-          lonValue = get(this.value, `[${lonTopic.topicFilter}].payload`, null)
+          latValue = get(this.value, `['${latTopic.topicFilter}'].payload`, null),
+          lonValue = get(this.value, `['${lonTopic.topicFilter}'].payload`, null)
         let lat = parseFloat(this.getValueByTopic(latValue, latTopic)),
           lon = parseFloat(this.getValueByTopic(lonValue, lonTopic))
         if (lat && lon) {

@@ -67,7 +67,7 @@ export default {
       const falseValue = this.item.settings.falseValue
       return this.item.dataTopics.reduce((result, topicObj, index, topics) => {
         if (result === null) { return result }
-        let value = get(this.value, `${[topicObj.topicFilter]}.payload`, null)
+        let value = get(this.value, `['${topicObj.topicFilter}'].payload`, null)
         if (value !== null || (topics.length === 1 && topicObj.default)) {
           value = this.mathProcessing(this.getValueByTopic(value, topicObj), this.item.settings.math)
         }
@@ -112,7 +112,7 @@ export default {
         value = this.currentValue ? this.item.settings.falsePayload : this.item.settings.truePayload
       } else {
         value = this.item.dataTopics.reduce((result, topicObj, index, topics) => {
-          let value = get(this.value, `${[topicObj.topicFilter]}.payload`, null)
+          let value = get(this.value, `['${topicObj.topicFilter}'].payload`, null)
           if (value !== null || (topics.length === 1 && topicObj.default)) {
             value = this.mathProcessing(this.getValueByTopic(value, topicObj), this.item.settings.math)
           }

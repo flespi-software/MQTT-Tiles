@@ -51,7 +51,7 @@ export default {
     title () {
       return this.item.settings.items.map(item => {
         const topic = item.topic.topicFilter
-        const value = get(this.value, `${[topic]}.payload`, null)
+        const value = get(this.value, `['${topic}'].payload`, null)
         return this.getValueByTopic(value, item.topic)
       })
     },
