@@ -61,7 +61,7 @@ export default {
         payload = payload.replace(/<{topic\[(\d)\]}>/g, (_, index) => {
           return path && path[index]
         })
-        payload = payload.replace('<{payload}>', JSON.stringify(value))
+        payload = payload.replace(/<{payload}>/g, JSON.stringify(value))
         payload = payload.replace(/<%([a-zA-Z0-9-+&@#/%?=~_|!:,.;\s]*)%>/gim, (_, name) => {
           return JSON.stringify(get(value, name, null))
         })
