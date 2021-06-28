@@ -1,6 +1,6 @@
 {
   "name": "mqtttiles",
-  "version": "1.15.3",
+  "version": "1.15.4",
   "description": "MQTT-based IoT dashboard visualization tool",
   "productName": "MQTT Tiles",
   "capacitorId": "",
