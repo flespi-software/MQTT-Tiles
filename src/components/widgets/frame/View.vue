@@ -17,7 +17,7 @@
   .frame__payload
     font-size 1.2rem
     word-break break-all
-    overflow auto
+    overflow hidden
     width 100%
     display block
     text-align center
