@@ -479,15 +479,17 @@ export default {
     async subscribe () {
       if (this.client) {
         let [topic, options] = arguments
-        const flespiCid = get(this.flespiToken, 'cid', undefined)
         if (this.clientSettings.protocolVersion === 5) {
           if (!options) { options = {} }
           if (!options.properties) { options.properties = {} }
           const subIdentifier = Number(Object.keys(this.subscriptionsIndetifiers).find(k => this.subscriptionsIndetifiers[k] === topic)) || ++this.currentSubscriptionIndetifier
           options.properties.subscriptionIdentifier = subIdentifier
           this.subscriptionsIndetifiers[subIdentifier] = topic
-          if (!options.properties.userProperties) { options.properties.userProperties = {} }
-          if (flespiCid) { options.properties.userProperties.cid = flespiCid }
+          if (topic.indexOf('flespi/') !== 0) {
+            const flespiCid = get(this.flespiToken, 'cid', undefined)
+            if (!options.properties.userProperties) { options.properties.userProperties = {} }
+            if (flespiCid) { options.properties.userProperties.cid = flespiCid }
+          }
         }
         return this.client.subscribe(topic, options)
           .then(() => {
