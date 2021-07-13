@@ -12,12 +12,14 @@ function getMultiplierValueByPacket (packet, initValue, subscriptionTopic, widge
     setPath.push(currentPath[index])
   })
   if (packet.payload.length) {
-    let payload
-    try {
-      payload = JSON.parse(packet.payload.toString())
-    } catch (e) {
-      payload = packet.payload.toString()
-    }
+    let payload = packet
+    // try {
+    //   payload = JSON.parse(packet.payload.toString())
+    // } catch (e) {
+    //   payload = packet.payload.toString()
+    // }
+    // const timestamp = get(packet, 'properties.userProperties.timestamp')
+    // payload = { timestamp, payload }
     if (setPath.length) {
       setWith(value, setPath, payload, Object)
     } else {

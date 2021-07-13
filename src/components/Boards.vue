@@ -11,7 +11,7 @@
       @delete-uploaded="id => $emit('delete-uploaded', id)"
       @share-uploaded="id => share('share-uploaded', id)"
     />
-    <q-toolbar class="bg-white">
+    <q-toolbar class="bg-grey-4">
       <q-toolbar-title class="text-grey-9">Boards</q-toolbar-title>
       <template v-if="connectionSettings && !$integrationMode">
         <q-btn v-if="!attachMode" @click="attachMode = true" icon="mdi-link-variant" flat color="grey-9">
@@ -191,6 +191,7 @@
     position relative
     .boards__wrapper
       padding-bottom 82px
+      background-image url(../../public/grid-9px-light.png)
       .wrapper--empty
         text-align center
         margin-top 30px

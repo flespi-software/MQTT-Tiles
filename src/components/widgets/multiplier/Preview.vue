@@ -18,7 +18,7 @@
             <q-tooltip>{{widget.name}}</q-tooltip>
           </q-item-section>
         </q-item>
-        <q-card-section class="q-pa-none" :class="[`bg-${item.settings.color}-1`]" style="height: calc(100% - 25px)">
+        <q-card-section class="q-pa-none" style="height: calc(100% - 25px)">
           <component
             :is="item.settings.type"
             :item="widgets[widgetIndex]"
@@ -27,6 +27,9 @@
             :blocked="true"
           />
         </q-card-section>
+        <div v-if="widgets[widgetIndex].settings.isNeedTime" class="widget__timestamp absolute-bottom-left" :class="[`text-${item.settings.color}-7`, `bg-${item.settings.color}-1`]">
+          12:00:00
+        </div>
       </q-card>
     </div>
   </div>

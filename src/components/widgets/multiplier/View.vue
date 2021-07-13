@@ -18,19 +18,18 @@
             <q-tooltip>{{widget.name}}</q-tooltip>
           </q-item-section>
         </q-item>
-        <q-card-section class="q-pa-none" :class="[`bg-${item.settings.color}-1`]" style="height: calc(100% - 25px)">
+        <q-card-section class="q-pa-none" style="height: calc(100% - 25px)">
           <component
             :is="item.settings.type"
             :item="widgets[widgetIndex]"
             :value="values[widgetIndex]"
             :index="widgetIndex"
-            :blocked="true"
             @action="(data) => { $emit('action', data) }"
           />
         </q-card-section>
-        <!-- <div v-if="item.settings.isNeedTime" class="widget__timestamp absolute-bottom-left q-px-xs q-pt-xs" style="" :class="[`text-${item.color}-7`, `bg-${item.color}-1`]">
-          {{timestamp}}
-        </div> -->
+        <div v-if="widgets[widgetIndex].settings.isNeedTime" class="widget__timestamp absolute-bottom-left" :class="[`text-${item.settings.color}-7`, `bg-${item.settings.color}-1`]">
+          {{getTime(values[widgetIndex])}}
+        </div>
       </q-card>
     </div>
     <div class="flex flex-center" v-if="widgetsIds.length > limit">
@@ -50,6 +49,7 @@ import get from 'lodash/get'
 import uniq from 'lodash/uniq'
 import cloneDeep from 'lodash/cloneDeep'
 import { WIDGET_STATUS_DISABLED } from '../../../constants'
+import { getTimeByTimestamp, getTimeByPacket } from '../../../mixins/timestamp.js'
 import getValueByTopic from '../../../mixins/getValueByTopic.js'
 import formatValue from '../../../mixins/formatValue.js'
 import Switcher from '../switcher/View'
@@ -137,9 +137,7 @@ export default {
         }, {})
       }
       value = Object.keys(value).reduce((val, name) => {
-        val[name] = {
-          payload: value[name]
-        }
+        val[name] = value[name]
         return val
       }, {})
       return value
@@ -230,6 +228,10 @@ export default {
     },
     initWidget (name) {
       this.$set(this.widgets, name, this.getWidgetByName(name))
+    },
+    getTime (data) {
+      const packet = data[this.currentTopic]
+      return getTimeByTimestamp(getTimeByPacket(packet))
     }
   },
   created () {

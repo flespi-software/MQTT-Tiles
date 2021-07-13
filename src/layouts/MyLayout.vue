@@ -8,75 +8,84 @@
     />
     <q-header v-if="fullViewMode">
       <q-toolbar class="bg-grey-9">
-        <q-btn v-if="fullViewMode && !$integrationMode" flat rounded icon="mdi-menu" @click="leftDrawerOpen = !leftDrawerOpen"/>
         <q-toolbar-title style="line-height: 36px;">
           <img src="mqtttiles-logo.png" alt="MQTT Tiles" style="height: 30px; vertical-align: text-bottom;">
           MQTT Tiles
           <sup style="position: relative; font-size: .9rem; padding-left: 4px">{{version}}</sup>
         </q-toolbar-title>
+        <q-btn v-if="fullViewMode && !$integrationMode" flat icon="mdi-lan-connect">
+          <div v-if="activeClientId" class="q-ml-sm">
+            <div>{{clients[activeClientId].clientName}}</div>
+            <div :class="[`text-${connected ? 'green' : 'red'}-6`]" style="font-size: 0.6rem; line-height: 0.6rem;">Connected</div>
+          </div>
+          <div v-else class="text-italic q-ml-sm">Choose connection</div>
+          <q-tooltip>Connections</q-tooltip>
+          <q-menu :persistent="true" :offset="[0, 5]" @hide="isConnectionsOpened = false" @show="isConnectionsOpened = true">
+            <div style="min-width: 300px;" :style="{minHeight: clientsIds.length ? '300px' : '200px'}">
+              <div class="connections__subheader q-px-md bg-grey-9" style="position: relative; height: 70px;">
+                <span class="text-white" style="font-size: 1.4rem; line-height: 70px;">My connections</span>
+                <q-btn fab-mini @click="openSettings" icon="mdi-plus" color="white" class="text-grey-9" style="position: absolute; bottom: -20px; right: 16px; z-index: 1;"/>
+              </div>
+              <q-list v-if="clientsIds.length" style="position: absolute; top: 70px; bottom: 0; right: 0; left: 0;" class="scroll">
+                <q-item-label class="q-py-md q-pl-md text-grey-9">
+                  <span>Connections</span>
+                </q-item-label>
+                <q-item clickable :active="index === activeClientId" @click="setActiveClient(index)" v-for="(client, index) in clients" :key="index">
+                  <q-item-section avatar>
+                    <q-btn @click.stop="setActiveClient()" color="green" v-if="connected && index === activeClientId" icon="mdi-lan-connect" dense flat>
+                      <q-tooltip>Disconnect</q-tooltip>
+                    </q-btn>
+                    <q-icon v-else name="mdi-lan-disconnect" size="1.5rem" class="q-ma-xs" :color="index === activeClientId ? 'red' : ''">
+                      <q-tooltip v-if="index === activeClientId">Active</q-tooltip>
+                    </q-icon>
+                  </q-item-section>
+                  <q-item-section>
+                    <q-item-label :class="{[`text-${connected ? 'green' : 'red'}-6`]: index === activeClientId}">
+                      <div style="max-width: calc(100% - 25px); display: inline-flex;">
+                        <div class="ellipsis">{{client.clientName}}</div>
+                      </div>
+                      <div style="display: inline-flex;">
+                        <q-icon v-if="client.attachedBoards && client.attachedBoards.length" name="mdi-link-variant" flat dense size="15px" color="yellow-9" class="q-ml-xs">
+                          <q-tooltip>
+                            {{`Attached boards: ${client.attachedBoards.join(', ')}`}}
+                          </q-tooltip>
+                        </q-icon>
+                      </div>
+                    </q-item-label>
+                    <q-item-label caption class="ellipsis">{{client.host}}</q-item-label>
+                  </q-item-section>
+                  <q-item-section side style="padding-left: 4px!important;">
+                    <q-btn round flat dense icon="mdi-dots-vertical" @click.stop="">
+                      <q-menu anchor="bottom right" self="top right">
+                        <q-list>
+                          <q-item v-close-popup clickable @click="editClientSettings(index)">
+                            <q-item-section avatar>
+                              <q-icon name="mdi-cog" />
+                            </q-item-section>
+                            <q-item-section>Edit</q-item-section>
+                          </q-item>
+                          <q-separator/>
+                          <q-item v-close-popup clickable @click="removeClient(index)">
+                            <q-item-section avatar>
+                              <q-icon name="mdi-delete-outline" color="red"/>
+                            </q-item-section>
+                            <q-item-section>Remove</q-item-section>
+                          </q-item>
+                        </q-list>
+                      </q-menu>
+                    </q-btn>
+                  </q-item-section>
+                </q-item>
+              </q-list>
+              <div v-else class="q-px-md q-pt-lg text-center">
+                <div class="text-bold">No connections</div>
+                <div style="font-size: .8rem">Create a connection to visualize its data on boards</div>
+              </div>
+            </div>
+          </q-menu>
+        </q-btn>
       </q-toolbar>
     </q-header>
-    <q-drawer side="left" v-model="leftDrawerOpen" v-if="fullViewMode && !$integrationMode">
-      <div class="connections__subheader q-px-md bg-grey-9" style="position: relative; height: 70px;">
-        <span class="text-white" style="font-size: 1.4rem; line-height: 70px;">My connections</span>
-        <q-btn fab-mini @click="openSettings" icon="mdi-plus" color="white" class="text-grey-9" style="position: absolute; bottom: -20px; right: 16px; z-index: 1;"/>
-      </div>
-      <q-list v-if="clientsIds.length" style="position: absolute; top: 70px; bottom: 0; right: 0; left: 0;" class="scroll">
-        <q-item-label class="q-py-md q-pl-md text-grey-9">
-          <span>Connections</span>
-        </q-item-label>
-        <q-item clickable :class="{'active': index === activeClientId}" @click="setActiveClient(index)" v-for="(client, index) in clients" :key="index">
-          <q-item-section avatar>
-            <q-btn @click.stop="setActiveClient()" v-if="connected && index === activeClientId" icon="mdi-lan-connect" dense flat>
-              <q-tooltip>Disconnect</q-tooltip>
-            </q-btn>
-            <q-icon v-else name="mdi-lan-disconnect" size="1.5rem" class="q-ma-xs">
-              <q-tooltip v-if="index === activeClientId">Active</q-tooltip>
-            </q-icon>
-          </q-item-section>
-          <q-item-section>
-            <q-item-label :class="{[`text-${connected ? 'green' : 'red'}-6`]: index === activeClientId}">
-              <div style="max-width: calc(100% - 25px); display: inline-flex;">
-                <div class="ellipsis">{{client.clientName}}</div>
-              </div>
-              <div style="display: inline-flex;">
-                <q-icon v-if="client.attachedBoards && client.attachedBoards.length" name="mdi-link-variant" flat dense size="15px" color="yellow-9" class="q-ml-xs">
-                  <q-tooltip>
-                    {{`Attached boards: ${client.attachedBoards.join(', ')}`}}
-                  </q-tooltip>
-                </q-icon>
-              </div>
-            </q-item-label>
-            <q-item-label caption class="ellipsis">{{client.host}}</q-item-label>
-          </q-item-section>
-          <q-item-section side style="padding-left: 4px!important;">
-            <q-btn round flat dense icon="mdi-dots-vertical" @click.stop="">
-              <q-menu anchor="bottom right" self="top right">
-                <q-list>
-                  <q-item v-close-popup clickable @click="editClientSettings(index)">
-                    <q-item-section avatar>
-                      <q-icon name="mdi-cog" />
-                    </q-item-section>
-                    <q-item-section>Edit</q-item-section>
-                  </q-item>
-                  <q-separator/>
-                  <q-item v-close-popup clickable @click="removeClient(index)">
-                    <q-item-section avatar>
-                      <q-icon name="mdi-delete-outline" color="red"/>
-                    </q-item-section>
-                    <q-item-section>Remove</q-item-section>
-                  </q-item>
-                </q-list>
-              </q-menu>
-            </q-btn>
-          </q-item-section>
-        </q-item>
-      </q-list>
-      <div v-else class="q-px-md q-pt-lg text-center">
-        <div class="text-bold">No connections</div>
-        <div style="font-size: .8rem">Create a connection to visualize its data on boards</div>
-      </div>
-    </q-drawer>
     <q-page-container>
       <router-view
         :client="clients[activeClientId]"
@@ -111,7 +120,6 @@ export default {
   name: 'MyLayout',
   data () {
     return {
-      leftDrawerOpen: this.$q.platform.is.desktop,
       clientSettingsOpened: false,
       currentSettings: undefined,
       clients: {},
@@ -119,7 +127,8 @@ export default {
       editedClientId: undefined,
       connected: false,
       version,
-      fullViewMode: true
+      fullViewMode: true,
+      isConnectionsOpened: false
     }
   },
   computed: {
@@ -134,7 +143,7 @@ export default {
       this.editedClientId = undefined
     },
     saveSettingsHandler (settings) {
-      const key = this.editedClientId ? this.editedClientId : this.clientsIds.length ? parseInt(this.clientsIds[this.clientsIds.length - 1]) + 1 : 0
+      const key = this.editedClientId ? this.editedClientId : this.clientsIds.length
       Vue.set(this.clients, key, settings)
       this.setActiveClient(key)
     },
@@ -156,6 +165,7 @@ export default {
       })
     },
     setActiveClient (clientId) {
+      if (typeof clientId === 'number') { clientId = String(clientId) }
       this.activeClientId = clientId
       LocalStorage.set(ACTIVE_CLIENT_LOCAL_STORAGE_NAME, clientId)
       if (clientId !== undefined) {

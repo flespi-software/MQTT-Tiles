@@ -12,7 +12,7 @@
     <q-btn v-if='!board.settings.blocked  && !isFrized' fab color="grey-9" @click="addWidgetHandler" icon="mdi-plus" class="absolute button--add">
       <q-tooltip>Add new widget</q-tooltip>
     </q-btn>
-    <q-toolbar class="bg-white" v-if="(isFrized && board.name) || !isFrized">
+    <q-toolbar class="bg-grey-4" v-if="(isFrized && board.name) || !isFrized">
       <q-btn round flat color="grey-9" icon="mdi-arrow-left" @click="$emit('close')" v-if="!isFrized">
         <q-tooltip>Back to boards list</q-tooltip>
       </q-btn>
@@ -184,6 +184,7 @@
     .widgets__wrapper
       padding-bottom 82px
       position relative
+      background-image url(../../public/grid-9px-light.png)
 </style>
 
 <script>
