@@ -1,18 +1,18 @@
 <template>
   <q-dialog v-model="status" @hide="closeHandler" :maximized="$q.platform.is.mobile">
     <div :style="{width: $q.platform.is.mobile ? '100%' : '50vw'}">
-      <q-toolbar class="bg-grey-9 text-white">
+      <q-toolbar class="text-white" :class="[`bg-${$theme}-9`]">
         <q-toolbar-title>Share wizard</q-toolbar-title>
       </q-toolbar>
-      <div :style="{ height: $q.platform.is.mobile ? 'calc(100% - 100px)' : '50vh'}" class="scroll bg-white">
-        <q-stepper flat ref="stepper" v-model="currentStep" animated class="share-stepper" done-color="green-6" active-color="amber-9" :header-class="stepsEnum.length === 1 ? 'hidden' : ''" contracted>
+      <div :style="{ height: $q.platform.is.mobile ? 'calc(100% - 100px)' : '50vh'}" class="scroll" :class="[`bg-${$theme}-1`]">
+        <q-stepper :class="[`bg-${$theme}-1`]" flat ref="stepper" v-model="currentStep" animated class="share-stepper" done-color="green-6" active-color="amber-9" :header-class="stepsEnum.length === 1 ? 'hidden' : ''" contracted>
           <q-step name="tokens" title="Tokens" icon="mdi-fingerprint" :done="currentStep === 'replace' || currentStep === 'link'">
             <div class="text-grey-8">Tokens</div>
             <q-list separator bordered class="q-mb-md">
               <q-item
                 v-for="(token, index) in currentConfig.tokens" :key="token.credentions.username"
                 @click="setToken(token), currentSelectedToken = index, validateToken(token)" :active="token.label === shareBoardModel.token.label"
-                clickable active-class="bg-amber-2"
+                clickable :active-class="`bg-${$theme}-2`"
               >
                 <q-item-section>
                   <q-item-label class="text-grey-9 text-weight-bold">{{token.label}}</q-item-label>
@@ -84,7 +84,7 @@
           </q-step>
         </q-stepper>
       </div>
-      <q-toolbar class="bg-grey-9 text-white">
+      <q-toolbar class="text-white" :class="[`bg-${$theme}-9`]">
         <q-btn flat dense class="q-mr-sm absolute" @click="closeHandler">Close</q-btn>
         <q-toolbar-title></q-toolbar-title>
         <q-btn flat v-if="canBack" @click="prevStepHandler">Back</q-btn>

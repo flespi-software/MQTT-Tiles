@@ -1,12 +1,12 @@
 <template>
   <q-dialog v-model='status' @hide="closeHandler" :maximized="$q.platform.is.mobile">
     <div :style="{width: $q.platform.is.mobile ? '100%' : '50vw'}">
-      <q-toolbar class="bg-grey-9 text-white">
+      <q-toolbar class="text-white" :class="[`bg-${$theme}-9`]">
         <q-toolbar-title>
           MQTT client
         </q-toolbar-title>
       </q-toolbar>
-      <div :style="{ height: $q.platform.is.mobile ? 'calc(100% - 100px)' : '50vh'}" class="q-pa-md scroll bg-white">
+      <div :style="{ height: $q.platform.is.mobile ? 'calc(100% - 100px)' : '50vh'}" class="q-pa-md scroll" :class="[`bg-${$theme}-1`]">
         <q-input color="grey-9 q-mb-sm" outlined hide-bottom-space dense v-model="currentSettings.clientName" label="MQTT client name" :error="!currentSettings.clientName"/>
         <q-input color="grey-9 q-mb-sm" outlined hide-bottom-space dense v-model="currentSettings.clientId" label="Client ID" :error="!currentSettings.clientId">
           <q-btn slot="append" flat dense icon="mdi-refresh" @click="currentSettings.clientId = `mqtt-tiles-${Math.random().toString(16).substr(2, 8)}`" />
@@ -22,7 +22,7 @@
           <q-btn slot="append" flat dense icon="mdi-login" @click="flespiLoginHandler" v-if="currentSettings.host.indexOf('flespi') !== -1" />
         </q-input>
         <q-input color="grey-9 q-mb-sm" outlined hide-bottom-space dense v-model="currentSettings.password" label="Password"/>
-        <q-expansion-item v-if="currentSettings.protocolVersion === 5" class="q-mt-md q-mb-sm bg-grey-4" label="Subscribe User Properties">
+        <q-expansion-item v-if="currentSettings.protocolVersion === 5" class="q-mt-md q-mb-sm" :class="[`bg-${$theme}-2`]" label="Subscribe User Properties">
           <div>
             <q-list v-if="currentSettings.userProperties">
               <q-item v-for="(value, name) in currentSettings.userProperties" :key="`${name}: ${value}`">
@@ -32,21 +32,21 @@
             </q-list>
             <q-input color="grey-9 q-ma-sm" outlined dense hide-bottom-space v-model="userProperty.name" label="User property name"/>
             <q-input color="grey-9 q-mx-sm q-mb-sm" outlined dense hide-bottom-space v-model="userProperty.value" label="User property value"/>
-            <q-btn :disable="!userProperty.name || !userProperty.value" style="width: 100%" class="q-mt-sm" color="grey-9" @click="addUserProperty">Add</q-btn>
+            <q-btn :disable="!userProperty.name || !userProperty.value" style="width: 100%" class="q-mt-sm" :color="`${$theme}-9`" @click="addUserProperty">Add</q-btn>
           </div>
         </q-expansion-item>
         <div class="share-tokens__items-wrapper col-12 relative-position q-mt-lg q-mb-md" v-if="currentSettings.protocolVersion === 5 && currentSettings.host.indexOf('flespi.io') !== -1">
           <q-list bordered>
-            <q-item-label class="q-py-md q-px-sm list__header">
+            <q-item-label class="q-py-md q-px-sm list__header" :class="[`bg-${$theme}-${currentSettings.syncCreds && currentSettings.syncCreds.length ? 3 : 2}`]">
               <div :class="{'text-red-6': !currentSettings.syncCreds || !currentSettings.syncCreds.length}">Tokens for sharing{{currentSettings.syncCreds && currentSettings.syncCreds.length ? '' : ' are empty'}}</div>
-              <div style="font-size: .8rem;" class="text-grey-6 q-mt-xs">List of standard or ACL flespi tokens to be used for sharing boards.</div>
+              <div style="font-size: .8rem;" class="text-grey-8 q-mt-xs">List of standard or ACL flespi tokens to be used for sharing boards.</div>
               <q-btn color="grey-9" class="absolute-right" flat label="ADD" @click="addSyncCredsItem" icon="mdi-plus"/>
             </q-item-label>
             <q-expansion-item
               v-for="(syncCreds, index) in currentSettings.syncCreds"
               :key="`${index}`"
               group="singleselect-items"
-              :header-class="[`bg-${checkUniqueSyncCredsValue(syncCreds, index) ? 'grey-4' : 'red-2'}`]"
+              :header-class="[`bg-${checkUniqueSyncCredsValue(syncCreds, index) ? `${$theme}-2` : 'red-2'}`]"
               expand-icon="mdi-cog"
               :value="index === currentSettings.syncCreds.length - 1"
             >
@@ -77,7 +77,7 @@
           </q-list>
         </div>
       </div>
-      <q-toolbar class="bg-grey-9 text-white">
+      <q-toolbar class="text-white" :class="[`bg-${$theme}-9`]">
         <q-toolbar-title>
         </q-toolbar-title>
         <q-btn flat dense class="q-mr-sm" @click="closeHandler">Close</q-btn>

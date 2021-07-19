@@ -9,10 +9,10 @@
       @save="saveSettingsHandler"
       @hide="hideSettingsHandler"
     />
-    <q-btn v-if='!board.settings.blocked  && !isFrized' fab color="grey-9" @click="addWidgetHandler" icon="mdi-plus" class="absolute button--add">
+    <q-btn v-if='!board.settings.blocked  && !isFrized' fab :color="`${$theme}-9`" @click="addWidgetHandler" icon="mdi-plus" class="absolute button--add">
       <q-tooltip>Add new widget</q-tooltip>
     </q-btn>
-    <q-toolbar class="bg-grey-4" v-if="(isFrized && board.name) || !isFrized">
+    <q-toolbar :class="[`bg-${$theme}-2`]" v-if="(isFrized && board.name) || !isFrized">
       <q-btn round flat color="grey-9" icon="mdi-arrow-left" @click="$emit('close')" v-if="!isFrized">
         <q-tooltip>Back to boards list</q-tooltip>
       </q-btn>
@@ -32,7 +32,7 @@
         </q-btn>
         <q-btn round dense flat icon="mdi-dots-vertical" color="grey-9">
           <q-menu anchor="bottom right" self="top right">
-            <q-list dense>
+            <q-list dense :class="[`bg-${$theme}-1`]">
               <q-item v-close-popup clickable @click.stop="importWidgets">
                 <q-item-section avatar>
                   <q-icon name="mdi-application-import"/>
@@ -78,7 +78,7 @@
         @input="(value) => { changeVaribleHandler(variable.name, value) }"
       />
     </q-toolbar>
-    <div class="widgets__wrapper scroll" :style="{height: wrapperHeight}" :class="{'q-px-sm': $q.platform.is.mobile}">
+    <div class="widgets__wrapper scroll" :style="{height: wrapperHeight}" :class="{'q-px-sm': $q.platform.is.mobile, [`bg-${$theme}-1`]: true}">
       <div style="width: 100%; position: relative;" v-if="board.widgetsIndexes.length">
         <q-resize-observer @resize="onResize" />
         <grid-layout
@@ -146,8 +146,8 @@
         </grid-layout>
       </div>
       <div v-else class="text-center text-grey-8 q-mt-md" style="font-size: 2rem;">
-        <div class="text-bold">The board is empty</div>
-        <div><q-btn color="grey-9" icon="mdi-plus-circle-outline" label="Add widget" @click="addWidgetHandler" /></div>
+        <div class="text-bold" :class="[`text-${$theme}-9`]">The board is empty</div>
+        <div><q-btn :color="`${$theme}-9`" icon="mdi-plus-circle-outline" label="Add widget" @click="addWidgetHandler" /></div>
       </div>
     </div>
     <board-settings
@@ -184,7 +184,7 @@
     .widgets__wrapper
       padding-bottom 82px
       position relative
-      background-image url(../../public/grid-9px-light.png)
+      background-image url(../../public/grid-9px-light.png)!important
 </style>
 
 <script>

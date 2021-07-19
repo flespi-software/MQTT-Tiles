@@ -7,7 +7,7 @@
       @hide="hideSettingsHandler"
     />
     <q-header v-if="fullViewMode">
-      <q-toolbar class="bg-grey-9">
+      <q-toolbar :class="[`bg-${$theme}-9`]">
         <q-toolbar-title style="line-height: 36px;">
           <img src="mqtttiles-logo.png" alt="MQTT Tiles" style="height: 30px; vertical-align: text-bottom;">
           MQTT Tiles
@@ -16,17 +16,17 @@
         <q-btn v-if="fullViewMode && !$integrationMode" flat icon="mdi-lan-connect">
           <div v-if="activeClientId" class="q-ml-sm">
             <div>{{clients[activeClientId].clientName}}</div>
-            <div :class="[`text-${connected ? 'green' : 'red'}-6`]" style="font-size: 0.6rem; line-height: 0.6rem;">Connected</div>
+            <div :class="[`text-${connected ? 'green' : 'red'}-3`]" style="font-size: 0.6rem; line-height: 0.6rem;">Connected</div>
           </div>
           <div v-else class="text-italic q-ml-sm">Choose connection</div>
           <q-tooltip>Connections</q-tooltip>
           <q-menu :persistent="true" :offset="[0, 5]" @hide="isConnectionsOpened = false" @show="isConnectionsOpened = true">
             <div style="min-width: 300px;" :style="{minHeight: clientsIds.length ? '300px' : '200px'}">
-              <div class="connections__subheader q-px-md bg-grey-9" style="position: relative; height: 70px;">
+              <div class="connections__subheader q-px-md" :class="[`bg-${$theme}-9`]" style="position: relative; height: 70px;">
                 <span class="text-white" style="font-size: 1.4rem; line-height: 70px;">My connections</span>
-                <q-btn fab-mini @click="openSettings" icon="mdi-plus" color="white" class="text-grey-9" style="position: absolute; bottom: -20px; right: 16px; z-index: 1;"/>
+                <q-btn fab-mini @click="openSettings" icon="mdi-plus" :color="`${$theme}-7`" class="text-white" style="position: absolute; bottom: -20px; right: 16px; z-index: 1;"/>
               </div>
-              <q-list v-if="clientsIds.length" style="position: absolute; top: 70px; bottom: 0; right: 0; left: 0;" class="scroll">
+              <q-list v-if="clientsIds.length" style="position: absolute; top: 70px; bottom: 0; right: 0; left: 0;" class="scroll" :class="[`bg-${$theme}-1`]">
                 <q-item-label class="q-py-md q-pl-md text-grey-9">
                   <span>Connections</span>
                 </q-item-label>
@@ -57,7 +57,7 @@
                   <q-item-section side style="padding-left: 4px!important;">
                     <q-btn round flat dense icon="mdi-dots-vertical" @click.stop="">
                       <q-menu anchor="bottom right" self="top right">
-                        <q-list>
+                        <q-list :class="[`bg-${$theme}-1`]">
                           <q-item v-close-popup clickable @click="editClientSettings(index)">
                             <q-item-section avatar>
                               <q-icon name="mdi-cog" />
@@ -262,6 +262,9 @@ export default {
           ]
         })
       }
+    },
+    setTheme (theme = 'grey') {
+      Vue.prototype.$theme = theme
     }
   },
   mounted () {
@@ -271,6 +274,7 @@ export default {
     const shareData = this.$q.sessionStorage.getItem('mqtt-tiles-share')
     Vue.prototype.$flespiMode = false
     Vue.prototype.$integrationMode = false
+    this.setTheme('grey')
     this.$root.$on('new-share-token', (token) => {
       const client = this.clients[this.activeClientId]
       if (client) {
@@ -280,12 +284,16 @@ export default {
     })
     if (this.$route.path.indexOf('integration') > -1) {
       Vue.prototype.$integrationMode = true
+      this.setTheme(this.$route.query.theme)
       this.$integrationBus.on('SetFlespiLogin', ({ token, region }) => {
         const client = defaultClient()
         client.host = `wss://${region['mqtt-ws']}`
         client.username = token
         this.$set(this.clients, 0, client)
         this.setActiveClient(0)
+      })
+      this.$integrationBus.on('SetTheme', (theme) => {
+        this.setTheme(theme)
       })
     } else if (this.$route.params.hash || shareData) { /* if follow by share link */
       this.fullViewMode = false

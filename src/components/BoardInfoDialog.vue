@@ -1,7 +1,7 @@
 <template>
   <q-dialog :value="!!board" :position="position" @before-hide="$emit('close')" @escape-key="$emit('close')">
-    <div class="bg-white" :style="{minWidth: $q.screen.width > 500 ? '500px' : '100%'}">
-      <div class="bg-grey-9 q-py-xs flex row reverse">
+    <div :class="[`bg-${$theme}-1`]" :style="{minWidth: $q.screen.width > 500 ? '500px' : '100%'}">
+      <div class="q-py-xs flex row reverse" :class="[`bg-${$theme}-9`]">
         <q-btn v-close-popup flat color="white" round icon="mdi-close" @click="$emit('close')" />
       </div>
       <q-separator />
@@ -23,7 +23,7 @@
           </q-icon>
         </div>
       </div>
-      <div class="bg-grey-4 scroll q-pa-md" style="font-size: 0.9rem;max-height: calc(100% - 142px);" v-if="(topics.subscribe && topics.subscribe.length) || (topics.publish && topics.publish.length)">
+      <div class="scroll q-pa-md" style="font-size: 0.9rem;max-height: calc(100% - 142px);" :class="[`bg-${$theme}-2`]" v-if="(topics.subscribe && topics.subscribe.length) || (topics.publish && topics.publish.length)">
         <div v-if="topics.subscribe && topics.subscribe.length" class="text-white q-pa-sm row">
           <div class="col text-grey-9 text-weight-medium">Topics</div>
           <div class="col-auto text-grey-9 text-caption row no-wrap items-center">

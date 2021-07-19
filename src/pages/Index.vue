@@ -1,5 +1,5 @@
 <template>
-  <q-page class="flex flex-center">
+  <q-page class="flex flex-center" :class="[`bg-${$theme}-1`]">
     <dash
       ref="dash"
       :client-settings="client"

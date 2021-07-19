@@ -1,6 +1,6 @@
 <template>
   <div class="dash__boards">
-    <q-btn fab color="grey-9" @click="openSettingsHandler" icon="mdi-plus" class="absolute button--add" v-if="!isFrized">
+    <q-btn fab :color="`${$theme}-9`" @click="openSettingsHandler" icon="mdi-plus" class="absolute button--add" v-if="!isFrized">
       <q-tooltip>Add new board</q-tooltip>
     </q-btn>
     <remote-boards
@@ -11,7 +11,7 @@
       @delete-uploaded="id => $emit('delete-uploaded', id)"
       @share-uploaded="id => share('share-uploaded', id)"
     />
-    <q-toolbar class="bg-grey-4">
+    <q-toolbar :class="[`bg-${$theme}-2`]">
       <q-toolbar-title class="text-grey-9">Boards</q-toolbar-title>
       <template v-if="connectionSettings && !$integrationMode">
         <q-btn v-if="!attachMode" @click="attachMode = true" icon="mdi-link-variant" flat color="grey-9">
@@ -26,14 +26,14 @@
       </template>
       <slot name="actions"/>
     </q-toolbar>
-    <div class="q-px-sm scroll boards__wrapper" :style="{height: isPanelShowed ? 'calc(100% - 199px)' : 'calc(100% - 50px)'}">
+    <div class="q-px-sm scroll boards__wrapper" :class="[`bg-${$theme}-1`]" :style="{height: isPanelShowed ? 'calc(100% - 199px)' : 'calc(100% - 50px)'}">
       <div v-if="boardsKeys.length || Object.keys(boardsConfigs).length" class="row">
         <div class="q-pt-md q-px-sm col-xl-4 col-md-6 col-sm-6 col-xs-12 relative-position" v-for="(board, id) in boards" :key="id">
           <div class="absolute-top-left absolute-bottom-right q-mt-md q-mx-sm flex flex-center" v-if="attachMode" style="background-color: rgba(255, 255, 255, .4); z-index: 1;">
             <q-btn @click="changeAttachedBoards(id)" icon="mdi-check" :color="currentAttachedBoard.includes(id) ? 'green' : 'grey'" size="4rem" flat class="absolute-top-left absolute-bottom-right" style="width: 100%;"/>
           </div>
           <q-card>
-            <q-item class="q-py-none q-px-sm bg-grey-4" style="min-height: 40px;">
+            <q-item class="q-py-none q-px-sm" :class="[`bg-${$theme}-2`]" style="min-height: 40px;">
               <q-item-section class="ellipsis">
                 <div class="ellipsis" style="height: 24px; line-height: 24px;">
                   {{board.name || '*No name*'}}
@@ -92,7 +92,7 @@
               </q-item-section>
             </q-item>
             <q-separator />
-            <q-card-section class="row relative-position" :class="{ 'bg-grey-2': !board.shortcutsIndexes.length }">
+            <q-card-section class="row relative-position" :class="{ [`bg-${$theme}-1`]: true }">
               <div class="text-grey-8 col-12 q-mb-sm" style="font-size: 15px;">Shortcuts</div>
               <template v-if="board.shortcutsIndexes.length">
                 <div class="col-3 q-px-xs" v-for="(item, index) in [0, 1, 2, 3]" :key="index" style="margin-bottom: 2px;">
@@ -109,10 +109,10 @@
               </template>
               <div v-else class='shortcuts--empty col-12' style="min-height: 89px; margin-bottom: 2px;">
                 <div class="text-center text-grey-8 q-mb-sm q-mt-sm" style="font-size: 1.2rem;">You have no shortcuts</div>
-                <div class="text-center text-grey-8">You can add one on <q-btn icon="mdi-fullscreen" color="grey-8" size="sm" dense unelevated label="full board view" @click="$emit('select', id)" /></div>
+                <div class="text-center text-grey-8">You can add one on <q-btn icon="mdi-fullscreen" :color="`${$theme}-8`" size="sm" dense unelevated label="full board view" @click="$emit('select', id)" /></div>
               </div>
               <div v-if="board.settings.lastModify" class="absolute-top-right text-grey-5 q-pr-xs" style="font-size: .7rem;">{{date(board.settings.lastModify, 'DD-MM-YYYY HH:mm:ss')}}</div>
-              <span class="text-bold text-white absolute bg-purple-6 rounded-borders q-px-xs" style="font-size: 10px; bottom: 4px; right: 4px; cursor: default;" title="Widgets count">{{board.widgetsIndexes.length}}</span>
+              <span  :class="[`bg-${$theme}-4`]" class="text-bold text-white absolute rounded-borders q-px-xs" style="font-size: 10px; bottom: 4px; right: 4px; cursor: default;" title="Widgets count">{{board.widgetsIndexes.length}}</span>
               <div class="absolute-bottom-left q-ml-xs">
                 <q-icon class="q-mr-xs" v-for="variable in board.settings.variables" :key="variable.name" :name="getIcon(variable)" color="grey-7">
                   <q-tooltip>Variable: {{variable.name}}</q-tooltip>
@@ -155,18 +155,18 @@
                 </template>
                 <div v-else class='shortcuts--empty col-12' style="min-height: 89px; margin-bottom: 2px;">
                   <div class="text-center text-grey-8 q-mb-sm q-mt-sm" style="font-size: 1.2rem;">You have no shortcuts</div>
-                  <div class="text-center text-grey-8">You can add one on <q-btn icon="mdi-fullscreen" color="grey-8" size="sm" dense label="full board view" @click="$emit('select', id)" /></div>
+                  <div class="text-center text-grey-8">You can add one on <q-btn icon="mdi-fullscreen" :color="`${$theme}-8`" size="sm" dense label="full board view" @click="$emit('select', id)" /></div>
                 </div>
                 <div v-if="board.settings.lastModify" class="absolute-top-right text-grey-5 q-pr-xs" style="font-size: .7rem;">{{date(board.settings.lastModify, 'DD-MM-YYYY HH:mm:ss')}}</div>
-                <span class="text-bold text-white absolute bg-purple-6 rounded-borders q-px-xs" style="font-size: 10px; bottom: 4px; right: 4px; cursor: default;" title="Widgets count">{{board.widgetsIndexes.length}}</span>
+                <span  :class="[`bg-${$theme}-4`]" class="text-bold text-white absolute rounded-borders q-px-xs" style="font-size: 10px; bottom: 4px; right: 4px; cursor: default;" title="Widgets count">{{board.widgetsIndexes.length}}</span>
               </q-card-section>
             </q-card>
           </div>
         </template>
       </div>
       <div v-else class="text-grey-9 text-bold wrapper--empty">
-        <div class="q-mb-sm">No boards</div>
-        <div v-if="!isFrized"><q-btn color="grey-9" icon="mdi-plus-circle-outline" label="New board" @click="openSettingsHandler" /></div>
+        <div class="q-mb-sm" :class="[`text-${$theme}-9`]">No boards</div>
+        <div v-if="!isFrized"><q-btn :color="`${$theme}-9`" icon="mdi-plus-circle-outline" label="New board" @click="openSettingsHandler" /></div>
       </div>
     </div>
     <board-settings
@@ -191,7 +191,7 @@
     position relative
     .boards__wrapper
       padding-bottom 82px
-      background-image url(../../public/grid-9px-light.png)
+      background-image url(../../public/grid-9px-light.png)!important
       .wrapper--empty
         text-align center
         margin-top 30px

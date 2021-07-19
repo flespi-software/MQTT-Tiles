@@ -3,7 +3,7 @@
     v-model="dialogModel"
     prevent-close
   >
-    <div class="bg-white" style="min-width: 300px">
+    <div class="bg-white" style="min-width: 300px" :class="[`bg-${$theme}-1`]">
       <div class="q-pa-md">
         <div class="text-h5 text-bold q-mb-sm">{{title}}</div>
         <div class="text-grey-6">{{message}}</div>

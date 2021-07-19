@@ -1,12 +1,12 @@
 <template>
   <q-dialog v-model='opened' @hide="close" :maximized="$q.platform.is.mobile">
     <div :style="{ width: $q.platform.is.mobile ? '100%' : '50vw'}">
-      <q-toolbar class="bg-grey-9 text-white">
+      <q-toolbar class="text-white" :class="[`bg-${$theme}-9`]">
         <q-toolbar-title>
           {{mode ? 'Export' : 'Import'}}
         </q-toolbar-title>
       </q-toolbar>
-      <div class="scrol bg-white q-pa-md" :style="{ height: $q.platform.is.mobile ? 'calc(100% - 100px)' : '50vh'}">
+      <div class="scrol q-pa-md" :class="[`bg-${$theme}-1`]" :style="{ height: $q.platform.is.mobile ? 'calc(100% - 100px)' : '50vh'}">
         <template v-if="mode === 1">
           <div class="export-modal-view">
             <div class="export-modal-view__string" style="height: 45%;">
@@ -27,14 +27,14 @@
             </div>
             <div class="text-center text-italic" style="height: 10%; font-size: 2rem;">or</div>
             <div class="export-modal-view__file flex flex-center relative-position rounded-borders" style="height: 45%; border: dashed 1px black; ">
-              <q-btn v-if="canAddFiles" icon="mdi-plus" color="grey-9" fab-mini class="absolute-top-right" @click="pickFiles" style="top: -20px; right: 8px; z-index: 1">
+              <q-btn v-if="canAddFiles" icon="mdi-plus" :color="`${$theme}-9`" fab-mini class="absolute-top-right" @click="pickFiles" style="top: -20px; right: 8px; z-index: 1">
                 <q-tooltip>Pick Files</q-tooltip>
               </q-btn>
               <q-uploader
                 ref="uploader"
                 url=""
-                class="full-width full-height"
-                color="grey-9"
+                class="full-width full-height" :class="[`bg-${$theme}-1`]"
+                :color="`${$theme}-9`"
                 accept=".txt"
                 hide-upload-btn
                 @added="preview"
@@ -93,7 +93,7 @@
           </div>
         </template>
       </div>
-      <q-toolbar class="bg-grey-9">
+      <q-toolbar :class="[`bg-${$theme}-9`]">
         <q-toolbar-title>
         </q-toolbar-title>
         <q-btn flat color="white" dense class="q-mr-sm" @click="close">Close</q-btn>

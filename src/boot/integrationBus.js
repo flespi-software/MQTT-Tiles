@@ -4,6 +4,7 @@ import Vue from 'vue'
   => SetBoards({...board})
   => SetActiveBoard({boardId, [params]})
   => AddWidget({boardId, widgetConfig})
+  => SetTheme(theme)
   => CreateBoard()
   <= @ready() - mounted on Tiles
   <= @connected() - connection established

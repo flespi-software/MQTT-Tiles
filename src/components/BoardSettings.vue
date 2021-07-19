@@ -1,12 +1,12 @@
 <template>
   <q-dialog :value='value' @hide="closeHandler" @escape-key="closeHandler" :maximized="$q.platform.is.mobile" no-backdrop-dismiss>
     <div :style="{width: $q.platform.is.mobile ? '100%' : '50vw'}">
-      <q-toolbar class="bg-grey-9 text-white">
+      <q-toolbar class="text-white" :class="[`bg-${$theme}-9`]">
         <q-toolbar-title>
           Board settings
         </q-toolbar-title>
       </q-toolbar>
-      <div :style="{ height: $q.platform.is.mobile ? 'calc(100% - 100px)' : '50vh' }" class="q-pa-md scroll bg-white">
+      <div :style="{ height: $q.platform.is.mobile ? 'calc(100% - 100px)' : '50vh' }" class="q-pa-md scroll"  :class="[`bg-${$theme}-1`]">
         <div class="row">
           <q-input
             outlined hide-bottom-space dense
@@ -25,16 +25,17 @@
             label="Sync alias"
           />
           <div class="board-settings__variables col-12 q-mt-lg relative-position">
-            <q-list bordered>
-              <q-item-label class="q-py-md q-px-sm list__header">
+            <q-list bordered :class="[`bg-${$theme}-1`]">
+              <q-item-label class="q-py-md q-px-sm list__header" :class="[`bg-${$theme}-${currentSettings.settings.variables.length ? 3 : 2}`]">
                 <div>Variables{{currentSettings.settings.variables.length ? '' : ' are empty'}}</div>
                 <q-btn color="grey-9" class="absolute-right" flat label="ADD" @click="addVar" icon="mdi-plus"/>
               </q-item-label>
               <q-expansion-item
                 v-for="(variable, index) in currentSettings.settings.variables"
+                :class="[`bg-${$theme}-1`]"
                 :key="`${index}`"
                 group="variables"
-                :header-class="[`bg-${checkUniqueVariables(index) ? 'grey-4' : 'red-2'}`]"
+                :header-class="[`bg-${checkUniqueVariables(index) ? `${$theme}-2` : 'red-2'}`]"
                 expand-icon="mdi-cog"
                 :value="index === currentSettings.settings.variables.length - 1"
               >
@@ -62,7 +63,7 @@
                     @input="(value) => { setPresetByIndex(index, value) }"
                   ></q-select>
                   <template name="customSettingsVars" v-if="variable.preset === 'custom' || variable.preset === undefined || !$flespiMode">
-                    <q-select outlined dense hide-bottom-space class="col-12 q-mb-sm" :value="variable.type" emit-value map-options :options="variableTypeOptions" color="grey-9" @input="(value) => changeTypeVariableHandler(index, value)" label="Type"/>
+                    <q-select outlined dense hide-bottom-space class="col-12 q-mb-sm" :value="variable.type" emit-value map-options :options="variableTypeOptions" color="grey-9" :popup-content-class="`bg-${$theme}-1`" @input="(value) => changeTypeVariableHandler(index, value)" label="Type"/>
                     <topic class="col-12 q-mb-sm" v-model="variable.topic" v-if="variable.type === VARIABLE_TYPE_SOURCE" :config="{ needLabel: true }"/>
                     <div v-if="variable.type === VARIABLE_TYPE_SOURCE">
                       Sort variables by:
@@ -75,7 +76,7 @@
                     <template v-if="variable.type === VARIABLE_TYPE_CUSTOM">
                       <div class="variable__items-wrapper col-12 relative-position q-mt-md">
                         <q-list bordered>
-                          <q-item-label class="q-py-md q-px-sm list__header" :class="{'text-red-6': !variable.values.length}">
+                          <q-item-label class="q-py-md q-px-sm list__header" :class="{'text-red-6': !variable.values.length, [`bg-${$theme}-${variable.values.length ? 3 : 2}`]: true}" >
                             Items{{variable.values.length ? '' : ' are empty'}}
                             <q-btn color="grey-9" class="absolute-right" flat label="ADD" @click="addVarItem(variable)" icon="mdi-plus"/>
                           </q-item-label>
@@ -83,7 +84,7 @@
                             v-for="(item, index) in variable.values"
                             :key="`${index}`"
                             group="singleselect-items"
-                            :header-class="[`bg-${item[1].indexOf('#') === -1 ? 'grey-4' : 'red-2'}`]"
+                            :header-class="[`bg-${item[1].indexOf('#') === -1 ? `${$theme}-2` : 'red-2'}`]"
                             expand-icon="mdi-cog"
                             :value="index === variable.values.length - 1"
                           >
@@ -118,7 +119,7 @@
           </div>
         </div>
       </div>
-      <q-toolbar class="bg-grey-9 text-white">
+      <q-toolbar class="text-white"  :class="[`bg-${$theme}-9`]">
         <q-toolbar-title>
         </q-toolbar-title>
         <q-btn flat dense class="q-mr-sm" @click="closeHandler">Close</q-btn>
