@@ -1,5 +1,5 @@
 <template>
-  <div ref="text" class="scheme__text ellipsis text-center" :class="item.settings.modificators.map(val => `text-${val}`)" :style="{color: item.settings.color}">
+  <div ref="text" class="scheme__text" :class="item.settings.modificators.map(val => `text-${val}`)" :style="`color:${item.settings.color}; ${item.settings.style}`">
     {{item.settings.label}}
   </div>
 </template>
@@ -14,15 +14,27 @@ export default {
     }
   },
   methods: {
+    fitInit () {
+      this.textEl = fitty(this.$refs.text, { minSize: 8, maxSize: 75 })
+    },
+    fitRemove () {
+      this.textEl.unsubscribe()
+    },
     fit () {
-      this.textEl.fit()
+      if (this.item.settings.autoresize) {
+        this.textEl.fit()
+      }
     }
   },
   mounted () {
-    this.textEl = fitty(this.$refs.text, { minSize: 8, maxSize: 75 })
+    if (this.item.settings.autoresize) {
+      this.fitInit()
+    }
   },
   beforeDestroy () {
-    this.textEl.unsubscribe()
+    if (this.item.settings.autoresize) {
+      this.fitRemove()
+    }
   },
   watch: {
     'widget.settings.height' () { this.fit() },
@@ -32,13 +44,14 @@ export default {
     'item.settings.modificators': {
       deep: true,
       handler () { this.fit() }
+    },
+    'item.settings.autoresize' (val) {
+      if (val) {
+        this.fitInit()
+      } else {
+        this.fitRemove()
+      }
     }
   }
 }
 </script>
-
-<style lang="stylus" scoped>
-  .scheme__text
-    white-space pre-wrap
-    word-break break-word
-</style>

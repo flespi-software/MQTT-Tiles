@@ -75,7 +75,9 @@ export default {
             prefix: '',
             postfix: '',
             modificators: [],
-            color: '#9e9e9e'
+            color: '#9e9e9e',
+            autoresize: true,
+            style: ''
           },
           toggle: {
             math: '',
@@ -110,7 +112,9 @@ export default {
           'static-text': {
             label: '*Your label*',
             modificators: [],
-            color: '#9e9e9e'
+            color: '#9e9e9e',
+            autoresize: true,
+            style: ''
           }
         }
       const item = { ...commonItem, type, settings: itemSettingsByType[type] }

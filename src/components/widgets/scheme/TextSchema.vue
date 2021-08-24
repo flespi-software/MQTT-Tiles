@@ -35,6 +35,8 @@
     <q-select outlined dense hide-bottom-space class="col-4 q-mb-sm" color="grey-9" v-model="current.settings.valueFormat" :options="formatOptions" emit-value map-options label="Format value as"/>
     <q-input outlined dense hide-bottom-space class="col-12 q-mb-xs" color="grey-9" v-if="current.settings.valueFormat === constants.WIDGET_VALUE_FORMAT_DATE" v-model="current.settings.dateFormat" label="Datetime format" placeholder="DD/MM/YYYY HH:mm:ss.SSS"/>
     <div class="col-12 text-grey-7 q-px-sm q-mb-sm" style="font-size: 12px; line-height: 1;">You can use math expressions to calculate the final value. Example: (%value% * 1000) / 1024, where %value% is the payload from your subscription.</div>
+    <q-checkbox v-model="current.settings.autoresize" label="Need autoresize text" color="grey-9" class="q-mb-sm"/>
+    <q-input v-if="!current.settings.autoresize" outlined dense hide-bottom-space class="q-mb-sm col-12" color="grey-9" v-model="current.settings.style" label="Text styles"/>
   </div>
 </template>
 

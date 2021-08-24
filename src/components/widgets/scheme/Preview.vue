@@ -31,7 +31,7 @@
           height: `${item.height}%`
         }"
       >
-        <component :is="`${item.type}-view`" :item="item"/>
+        <component :is="`${item.type}-view`" :item="item" class="full-height overflow-hidden"/>
         <template v-if="activeItemIndex === index">
           <div v-touch-pan.prevent.mouse="e => onResize(e, index)" class="item-view-wrapper__size-handler"></div>
           <q-btn
@@ -78,7 +78,7 @@ export default {
       image: null,
       itemTypes: [
         { label: 'text', value: WIDGET_ITEM_TYPE_TEXT, icon: 'mdi-format-text-variant' },
-        { label: 'label', value: WIDGET_ITEM_TYPE_STATIC_TEXT, icon: 'mdi-format-text' },
+        { label: 'static text', value: WIDGET_ITEM_TYPE_STATIC_TEXT, icon: 'mdi-format-text' },
         { label: 'toggle', value: WIDGET_ITEM_TYPE_TOGGLE, icon: 'mdi-toggle-switch-outline' },
         { label: 'status', value: WIDGET_ITEM_TYPE_STATUS, icon: 'mdi-lightbulb-outline' }
       ],
@@ -148,8 +148,16 @@ export default {
       if (e.position.left > parent.right) {
         deltaWidth = 0
       }
-      const setWidth = item.width + deltaWidth,
+      let setWidth = item.width + deltaWidth,
         setHeight = item.height + deltaHeight
+      let minWidth = (100 * 20) / width
+      let minHeight = (100 * 20) / height
+      if (setWidth < minWidth) {
+        setWidth = minWidth
+      }
+      if (setHeight < minHeight) {
+        setHeight = minHeight
+      }
       this.$set(this.currentSettings.items[index], 'width', setWidth)
       this.$set(this.currentSettings.items[index], 'height', setHeight)
     },

@@ -2,7 +2,7 @@
   <text-view
     class="scheme__text" ref="text"
     :class="[...item.settings.modificators.map(val => `text-${val}`), `${needOverflow ? 'scheme__text--block' : ''}`]"
-    :style="{color: item.settings.color}"
+    :style="`color:${item.settings.color}; ${item.settings.style}`"
     :text="text"
     :title="item.label"
     :prefix="item.settings.prefix"
@@ -68,15 +68,27 @@ export default {
     }
   },
   methods: {
+    fitInit () {
+      this.textEl = fitty(this.$refs.text.$el, { minSize: 8, maxSize: 75 })
+    },
+    fitRemove () {
+      this.textEl.unsubscribe()
+    },
     fit () {
-      this.textEl.fit()
+      if (this.item.settings.autoresize) {
+        this.textEl.fit()
+      }
     }
   },
   mounted () {
-    this.textEl = fitty(this.$refs.text.$el, { minSize: 8, maxSize: 75 })
+    if (this.item.settings.autoresize) {
+      this.fitInit()
+    }
   },
   beforeDestroy () {
-    this.textEl.unsubscribe()
+    if (this.item.settings.autoresize) {
+      this.fitRemove()
+    }
   },
   watch: {
     'widget.settings.height' () { this.fit() },
@@ -87,7 +99,14 @@ export default {
       deep: true,
       handler () { this.fit() }
     },
-    value () { this.fit() }
+    value () { this.fit() },
+    'item.settings.autoresize' (val) {
+      if (val) {
+        this.fitInit()
+      } else {
+        this.fitRemove()
+      }
+    }
   },
   mixins: [getValueByTopic, formatValue]
 }

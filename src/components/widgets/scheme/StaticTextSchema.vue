@@ -3,7 +3,7 @@
     <q-input outlined dense hide-bottom-space class="q-mb-sm col-12" color="grey-9" v-model="current.settings.label" label="Text"/>
     <q-select
       emit-value map-options outlined dense hide-bottom-space
-      color="grey-9" class="col-12" use-chips
+      color="grey-9" class="col-12 q-mb-sm" use-chips
       v-model="current.settings.modificators"
       multiple
       :options="modificatorsOptions"
@@ -28,6 +28,9 @@
         </q-item>
       </template>
     </q-select>
+    <q-checkbox v-model="current.settings.autoresize" label="Need autoresize text" color="grey-9" class="q-mb-sm"/>
+    <q-input v-if="!current.settings.autoresize" outlined dense hide-bottom-space class="q-mb-sm col-12" color="grey-9" v-model="current.settings.style" label="Text styles"/>
+
   </div>
 </template>
 

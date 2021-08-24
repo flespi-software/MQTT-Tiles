@@ -4,13 +4,15 @@ import frame from './frame/migrations'
 import switcher from './switcher/migrations'
 import mapLocation from './mapLocation/migrations'
 import mapRoute from './mapRoute/migrations'
+import scheme from './scheme/migrations'
 /* widgetType: {[version]: handler} */
 const migrateHandlers = {
   clicker,
   frame,
   switcher,
   'map-location': mapLocation,
-  'map-route': mapRoute
+  'map-route': mapRoute,
+  scheme
 }
 function migrateWidgets (widgets, fromVersion, toVersion) {
   return widgets.reduce((newWidgets, widget) => {
