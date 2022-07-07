@@ -36,19 +36,27 @@ const handlers = {
   'map-route': mapRoute
 }
 export default function getTopics (board, widgets) {
-  return widgets.reduce((topics, widget) => {
+  let subscribeTopics = [`xflespifront/mqtttiles/boards/${board.id}`]
+  if (board.settings.variables) {
+    subscribeTopics = [...subscribeTopics, ...board.settings.variables.map(variable => variable.topic.topicTemplate)]
+  }
+  const result = widgets.reduce((topics, widget) => {
     const handler = handlers[widget.type] || (() => ({}))
     const widgetTopics = handler(widget)
     if (widgetTopics.subscribe) {
-      topics.subscribe = uniq([...topics.subscribe, ...widgetTopics.subscribe]).sort()
+      topics.subscribe = [...topics.subscribe, ...widgetTopics.subscribe]
     }
     if (widgetTopics.publish) {
-      topics.publish = uniq([...topics.publish, ...widgetTopics.publish]).sort()
+      topics.publish = [...topics.publish, ...widgetTopics.publish]
     }
     return topics
   },
-  {
-    subscribe: board.settings.variables ? board.settings.variables.map(variable => variable.topic.topicTemplate) : [],
-    publish: []
-  })
+  { subscribe: subscribeTopics, publish: [] })
+  if (result.subscribe) {
+    result.subscribe = uniq(result.subscribe).sort()
+  }
+  if (result.publish) {
+    result.publish = uniq(result.publish).sort()
+  }
+  return result
 }

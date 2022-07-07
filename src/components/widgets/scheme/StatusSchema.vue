@@ -123,10 +123,10 @@ export default {
       if (item.label) {
         label += `${item.label} `
         if (!item.default) {
-          label += `[${item.val || 'N/A'}]`
+          label += `[${item.val === undefined ? 'N/A' : item.val}]`
         }
       } else {
-        label = `${item.val || `item ${index + 1}`}`
+        label = `${item.val === undefined ? `item ${index + 1}` : item.val}`
       }
       return label
     }

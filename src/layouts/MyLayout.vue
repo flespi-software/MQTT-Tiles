@@ -197,7 +197,7 @@ export default {
     },
     makeFlespiRestBus (clientId) {
       const client = this.clients[clientId]
-      const selectorsAsync = new SelectorsAsync()
+      const selectorsAsync = new SelectorsAsync({ flespiApp: `mqtt-tiles(client: ${client.clientId})` })
       selectorsAsync.bus.auth.getRegions()
         .then((regions) => {
           regions = get(regions, 'data.result', [])
