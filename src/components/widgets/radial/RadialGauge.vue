@@ -8,7 +8,7 @@ import merge from 'lodash/merge'
 import throttle from 'lodash/throttle'
 const setValue = throttle((guage, value) => {
   guage.value = value
-}, 1000, { trailing: true })
+}, 1000, { trailing: true, leading: true })
 export default {
   props: {
     value: Number,
@@ -24,7 +24,9 @@ export default {
     }
   },
   mounted () {
-    if (this.value) { this.currentOptions.value = this.value }
+    if (this.value) {
+      this.currentOptions.value = JSON.parse(JSON.stringify(this.value))
+    }
     this.currentOptions.renderTo = this.$el
     this.chart = new RadialGauge(this.currentOptions).draw()
   },
@@ -40,7 +42,12 @@ export default {
       }
     },
     value (value) {
-      setValue(this.chart, value)
+      this.setValue(this.chart, JSON.parse(JSON.stringify(value)))
+    }
+  },
+  methods: {
+    setValue: (guage, value) => {
+      guage.value = value
     }
   }
 }
