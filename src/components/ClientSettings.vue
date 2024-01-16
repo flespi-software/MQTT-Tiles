@@ -9,8 +9,9 @@
       <div :style="{ height: $q.screen.lt.md ? 'calc(100% - 100px)' : '50vh'}" class="q-pa-md scroll" :class="[`bg-${$theme}-1`]">
         <q-input color="grey-9 q-mb-sm" outlined hide-bottom-space dense v-model="currentSettings.clientName" label="MQTT client name" :error="!currentSettings.clientName"/>
         <q-input color="grey-9 q-mb-sm" outlined hide-bottom-space dense v-model="currentSettings.clientId" label="Client ID" :error="!currentSettings.clientId">
-          <q-btn slot="append" flat dense icon="mdi-refresh" @click="currentSettings.clientId = `mqtt-tiles-${Math.random().toString(16).substr(2, 8)}`" />
+          <q-btn slot="append" flat dense icon="mdi-refresh" @click="currentSettings.clientId = `mqtt-tiles-${version}-${Math.random().toString(16).substring(2, 8)}`" />
         </q-input>
+        <q-toggle v-model="currentSettings.uniqueClientId" label="Force unique Client ID" />
         <q-input color="grey-9 q-mb-sm" outlined hide-bottom-space dense v-model="currentSettings.host" label="Host" :error="!currentSettings.host || (currentSettings.host.indexOf('ws:') === 0)">
           <q-btn slot="append" flat dense icon="mdi-alert-outline" @click="hostErrorHandler" v-if="!currentSettings.host || (currentSettings.host.indexOf('ws:') === 0)"/>
         </q-input>
@@ -97,6 +98,7 @@
 import merge from 'lodash/merge'
 import { defaultClient } from '../constants/defaultes.js'
 import cloneDeep from 'lodash/cloneDeep'
+import { version } from '../../package.json'
 
 export default {
   name: 'ClientSettings',
@@ -104,6 +106,7 @@ export default {
   data () {
     const defaultSettings = defaultClient()
     return {
+      version,
       defaultSettings,
       currentSettings: this.settings ? merge({}, defaultSettings, this.settings) : merge({}, defaultSettings),
       userProperty: {
@@ -145,10 +148,11 @@ export default {
   },
   methods: {
     saveSettingsHandler () {
+
       this.$emit('save', this.currentSettings)
       this.closeHandler()
       this.$nextTick(() => {
-        this.defaultSettings.clientId = `mqtt-tiles-${Math.random().toString(16).substr(2, 8)}`
+        this.defaultSettings.clientId = `mqtt-tiles-${this.version}-${Math.random().toString(16).substring(2, 8)}`
         this.currentSettings = merge({}, this.defaultSettings)
       })
     },

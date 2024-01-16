@@ -377,6 +377,9 @@ export default {
         },
         config = this.clearObject(this.clientSettings)
 
+        if(typeof config.uniqueClientId === 'undefined' || config.uniqueClientId) {
+          config.clientId = config.clientId + '-' + Math.random().toString(16).substring(2, 10)
+        }
       const client = mqtt.connect(config.host, config)
       client.on('message', (topic, message, packet) => {
         /* synced board processing */
