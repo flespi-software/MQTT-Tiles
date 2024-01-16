@@ -13,12 +13,12 @@
           MQTT Tiles
           <sup style="position: relative; font-size: .9rem; padding-left: 4px">{{version}}</sup>
         </q-toolbar-title>
-        <q-btn v-if="fullViewMode && !$integrationMode" flat icon="mdi-lan-connect">
+        <q-btn v-if="fullViewMode && !$integrationMode" flat :icon="connected ? 'mdi-lan-connect' : 'mdi-lan-disconnect'" :color="connected ? 'green' : 'red'">
           <div v-if="activeClientId" class="q-ml-sm">
             <div>{{clients[activeClientId].clientName}}</div>
-            <div :class="[`text-${connected ? 'green' : 'red'}-3`]" style="font-size: 0.6rem; line-height: 0.6rem;">Connected</div>
+            <div :class="[`text-${connected ? 'green' : 'red'} text-overline`]" style="font-size: 0.6rem; line-height: 0.6rem;">{{connected ? 'Online' : 'Offline'}}</div>
           </div>
-          <div v-else class="text-italic q-ml-sm">Choose connection</div>
+          <div v-else class="q-ml-sm">Choose connection</div>
           <q-tooltip>Connections</q-tooltip>
           <q-menu :persistent="true" :offset="[0, 5]" @hide="isConnectionsOpened = false" @show="isConnectionsOpened = true">
             <div style="min-width: 300px;" :style="{minHeight: clientsIds.length ? '300px' : '200px'}">
