@@ -1,12 +1,12 @@
 <template>
-  <q-dialog v-model='status' @hide="closeHandler" :maximized="$q.platform.is.mobile">
-    <div :style="{width: $q.platform.is.mobile ? '100%' : '50vw'}">
+  <q-dialog v-model='status' @hide="closeHandler" :maximized="$q.screen.lt.md">
+    <div :style="{width: $q.screen.lt.md ? '100%' : '50vw'}">
       <q-toolbar class="text-white" :class="[`bg-${$theme}-9`]">
         <q-toolbar-title>
           MQTT client
         </q-toolbar-title>
       </q-toolbar>
-      <div :style="{ height: $q.platform.is.mobile ? 'calc(100% - 100px)' : '50vh'}" class="q-pa-md scroll" :class="[`bg-${$theme}-1`]">
+      <div :style="{ height: $q.screen.lt.md ? 'calc(100% - 100px)' : '50vh'}" class="q-pa-md scroll" :class="[`bg-${$theme}-1`]">
         <q-input color="grey-9 q-mb-sm" outlined hide-bottom-space dense v-model="currentSettings.clientName" label="MQTT client name" :error="!currentSettings.clientName"/>
         <q-input color="grey-9 q-mb-sm" outlined hide-bottom-space dense v-model="currentSettings.clientId" label="Client ID" :error="!currentSettings.clientId">
           <q-btn slot="append" flat dense icon="mdi-refresh" @click="currentSettings.clientId = `mqtt-tiles-${Math.random().toString(16).substr(2, 8)}`" />
@@ -34,6 +34,9 @@
             <q-input color="grey-9 q-mx-sm q-mb-sm" outlined dense hide-bottom-space v-model="userProperty.value" label="User property value"/>
             <q-btn :disable="!userProperty.name || !userProperty.value" style="width: 100%" class="q-mt-sm" :color="`${$theme}-9`" @click="addUserProperty">Add</q-btn>
           </div>
+        </q-expansion-item>
+        <q-expansion-item class="q-mt-md q-mb-sm" :class="[`bg-${$theme}-2`]" label="Flespi specific features">
+          <q-toggle v-model="currentSettings.subscribeWithTokenCid" label="Subscribe with token cid" />
         </q-expansion-item>
         <div class="share-tokens__items-wrapper col-12 relative-position q-mt-lg q-mb-md" v-if="currentSettings.protocolVersion === 5 && currentSettings.host.indexOf('flespi.io') !== -1">
           <q-list bordered>

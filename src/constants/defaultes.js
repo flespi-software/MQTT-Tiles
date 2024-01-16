@@ -10,6 +10,7 @@ const defaultClient = () => ({
   properties: {
     sessionExpiryInterval: undefined
   },
+  subscribeWithTokenCid: true,
   syncNamespace: 'xflespifront/mqtttiles/boards'
 })
 

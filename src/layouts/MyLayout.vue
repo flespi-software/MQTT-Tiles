@@ -135,6 +135,11 @@ export default {
     clientsIds () { return Object.keys(this.clients) }
   },
   methods: {
+    reactivateClient() {
+      let key = this.activeClientId
+      this.setActiveClient()
+      this.$nextTick(() => { this.setActiveClient(key) })
+    },
     openSettings () {
       this.clientSettingsOpened = true
     },
