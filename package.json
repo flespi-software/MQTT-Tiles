@@ -1,6 +1,6 @@
 {
   "name": "mqtttiles",
-  "version": "1.16.5",
+  "version": "1.16.6",
   "description": "MQTT-based IoT dashboard visualization tool",
   "productName": "MQTT Tiles",
   "capacitorId": "",
@@ -8,7 +8,7 @@
   "private": true,
   "main": "index.js",
   "scripts": {
-    "deploy": "quasar build -m spa && mkdir -p deploy && cp -R dist/spa/* misc LICENSE package.json README.md deploy && node_modules/git-directory-deploy/bin/git-directory-deploy.sh -ddeploy -bgh-pages -rgit@git.gurtam.net:flespi/frontend/MQTTTiles.git && rm -rf deploy && git push github gh-pages"
+    "deploy": "quasar build -m pwa && mkdir -p deploy && cp -R dist/pwa/* misc LICENSE package.json README.md deploy && node_modules/git-directory-deploy/bin/git-directory-deploy.sh -ddeploy -bgh-pages -rgit@git.gurtam.net:flespi/frontend/MQTTTiles.git && rm -rf deploy && git push github gh-pages"
   },
   "dependencies": {
     "@quasar/extras": "^1.10.7",
@@ -30,6 +30,7 @@
     "vue-i18n": "^8.24.4",
     "vue-markdown": "^2.2.4",
     "vue-virtual-scroll-list": "^1.4.6",
+    "workbox-webpack-plugin": "^7.0.0",
     "xss": "^1.0.9"
   },
   "devDependencies": {
