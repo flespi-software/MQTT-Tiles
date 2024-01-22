@@ -15,10 +15,11 @@
         </q-toolbar-title>
         <q-btn v-if="fullViewMode && !$integrationMode" flat :icon="connected ? 'mdi-lan-connect' : 'mdi-lan-disconnect'" :color="connected ? 'green' : 'red'">
           <div v-if="activeClientId" class="q-ml-sm">
-            <div>{{clients[activeClientId].clientName}}</div>
-            <div :class="[`text-${connected ? 'green' : 'red'} text-overline`]" style="font-size: 0.6rem; line-height: 0.6rem;">{{connected ? 'Online' : 'Offline'}}</div>
+            <div style="line-height: 0.8rem;">{{clients[activeClientId].clientName}}</div>
+            <div :class="[`text-${connected ? 'green' : 'red'} text-overline`]" style="font-size: 0.6rem; line-height: 0.7rem;">{{connected ? 'Online' : 'Offline'}}</div>
+            <div v-if="showping && pingtime" style="font-size: 0.6rem; line-height: 0.6rem;">Ping: {{pingtime}} ms.</div>
           </div>
-          <div v-else class="q-ml-sm">Choose connection</div>
+          <div v-else class="q-ml-sm">Connect</div>
           <q-tooltip>Connections</q-tooltip>
           <q-menu :persistent="true" :offset="[0, 5]" @hide="isConnectionsOpened = false" @show="isConnectionsOpened = true">
             <div style="min-width: 300px;" :style="{minHeight: clientsIds.length ? '300px' : '200px'}">
@@ -26,18 +27,18 @@
                 <span class="text-white" style="font-size: 1.4rem; line-height: 70px;">My connections</span>
                 <q-btn fab-mini @click="openSettings" icon="mdi-plus" :color="`${$theme}-7`" class="text-white" style="position: absolute; bottom: -20px; right: 16px; z-index: 1;"/>
               </div>
-              <q-list v-if="clientsIds.length" style="position: absolute; top: 70px; bottom: 0; right: 0; left: 0;" class="scroll" :class="[`bg-${$theme}-1`]">
+              <q-list v-if="clientsIds.length" style="height:200px;" class="scroll" :class="[`bg-${$theme}-1`]">
                 <q-item-label class="q-py-md q-pl-md text-grey-9">
                   <span>Connections</span>
                 </q-item-label>
-                <q-item clickable :active="index === activeClientId" @click="setActiveClient(index)" v-for="(client, index) in clients" :key="index">
+                <q-item clickable :active="index === activeClientId" @click="editClientSettings(index)" v-for="(client, index) in clients" :key="index">
                   <q-item-section avatar>
                     <q-btn @click.stop="setActiveClient()" color="green" v-if="connected && index === activeClientId" icon="mdi-lan-connect" dense flat>
                       <q-tooltip>Disconnect</q-tooltip>
                     </q-btn>
-                    <q-icon v-else name="mdi-lan-disconnect" size="1.5rem" class="q-ma-xs" :color="index === activeClientId ? 'red' : ''">
+                    <q-btn v-else @click.stop="setActiveClient(index)" icon="mdi-lan-disconnect" :color="index === activeClientId ? 'red' : ''" dense flat>
                       <q-tooltip v-if="index === activeClientId">Active</q-tooltip>
-                    </q-icon>
+                    </q-btn>
                   </q-item-section>
                   <q-item-section>
                     <q-item-label :class="{[`text-${connected ? 'green' : 'red'}-6`]: index === activeClientId}">
@@ -58,6 +59,13 @@
                     <q-btn round flat dense icon="mdi-dots-vertical" @click.stop="">
                       <q-menu anchor="bottom right" self="top right">
                         <q-list :class="[`bg-${$theme}-1`]">
+                          <q-item v-close-popup clickable :class="index === activeClientId ? 'text-red' : ''" @click="index === activeClientId ? setActiveClient() : setActiveClient(index)">
+                            <q-item-section avatar>
+                              <q-icon :name="index === activeClientId ? 'mdi-lan-disconnect' : 'mdi-lan-connect'" />
+                            </q-item-section>
+                            <q-item-section>{{ index === activeClientId ? 'Disconnect' : 'Connect' }}</q-item-section>
+                          </q-item>
+                          <q-separator/>
                           <q-item v-close-popup clickable @click="editClientSettings(index)">
                             <q-item-section avatar>
                               <q-icon name="mdi-cog" />
@@ -81,6 +89,9 @@
                 <div class="text-bold">No connections</div>
                 <div style="font-size: .8rem">Create a connection to visualize its data on boards</div>
               </div>
+              <div class="bg-grey-4">
+                <q-toggle label="Show ping" color="grey-9" class="q-ml-md" v-model="showping"/>
+              </div>
             </div>
           </q-menu>
         </q-btn>
@@ -90,6 +101,7 @@
       <router-view
         :client="clients[activeClientId]"
         @change-status="changeStatus"
+        @ping="ping"
         @share="shareHandler"
         @change:attach="changeAttachedBoards"
         @delete:boards="deleteBoardsHandler"
@@ -106,7 +118,7 @@ import { LocalStorage } from 'quasar'
 import debounce from 'lodash/debounce'
 import Vue from 'vue'
 import { Base64 } from 'js-base64'
-import { CLIENTS_LOCAL_STORAGE_NAME, ACTIVE_CLIENT_LOCAL_STORAGE_NAME } from '../constants'
+import { CLIENTS_LOCAL_STORAGE_NAME, ACTIVE_CLIENT_LOCAL_STORAGE_NAME, SHOW_PING_LOCAL_STORAGE_NAME } from '../constants'
 import { version } from '../../package.json'
 import { defaultClient } from '../constants/defaultes.js'
 import SelectorsAsync from '../components/selectors/async'
@@ -120,6 +132,8 @@ export default {
   name: 'MyLayout',
   data () {
     return {
+      showping: LocalStorage.getItem(SHOW_PING_LOCAL_STORAGE_NAME) || false,
+      pingtime: 0,
       clientSettingsOpened: false,
       currentSettings: undefined,
       clients: {},
@@ -180,6 +194,9 @@ export default {
     },
     changeStatus (status) {
       this.connected = status
+    },
+    ping (ping) {
+      this.pingtime = ping
     },
     shareHandler (data) {},
     clearAttachMode (client) {
@@ -351,6 +368,9 @@ export default {
       handler (clients) {
         this.fullViewMode && saveClientsToLocalStorage(clients)
       }
+    },
+    showping(val) {
+      LocalStorage.set(SHOW_PING_LOCAL_STORAGE_NAME, val)
     }
   },
   components: { clientSettings }

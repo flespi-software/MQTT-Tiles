@@ -21,16 +21,16 @@ register(process.env.SERVICE_WORKER_FILE, {
   updated (registration) { // registration -> a ServiceWorkerRegistration instance
     let notification = document.createElement('div')
     notification.id = 'sw-notification'
-    notification.innerHTML = `<div class="q-notification-list q-notification-list-bottom fixed column items-end absolute">
+    notification.innerHTML = `<div class="q-notification-list q-notification-list-bottom fixed-bottom column items-end z-top">
                                               <div class="q-notification">
                                                 <div class="q-alert row no-wrap shadow-2 bg-amber-9 text-white">
-                                                  <div class="q-alert-side col-auto row flex-center">
-                                                    <i aria-hidden="true" class="q-icon material-icons">warning</i>
+                                                  <div class="q-alert-side col-auto row flex-center q-px-md">
+                                                    <i aria-hidden="true" class="q-icon material-icons" style="font-size: 35px;">warning</i>
                                                   </div>
                                                   <div class="q-alert-content col self-center">
                                                     <div>The new version of MQQT Tiles is available. Refresh the page to update?</div>
                                                   </div>
-                                                  <div class="q-alert-actions col-auto gutter-xs column flex-center">
+                                                  <div class="q-alert-actions col-auto gutter-xs column flex-center q-pa-md">
                                                     <div class="full-width">
                                                       <button tabindex="0" class="q-btn inline relative-position q-btn-item non-selectable full-width q-btn-rectangle q-btn-flat q-focusable q-hoverable q-btn-dense">
                                                         <div class="q-focus-helper"></div>

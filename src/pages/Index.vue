@@ -5,6 +5,7 @@
       :client-settings="client"
       :init-boards="initBoards"
       @change-status="(status) => { $emit('change-status', status) }"
+      @ping="(ping) => { $emit('ping', ping) }"
       @share="model => $emit('share', model)"
       @share:prepare="sharePrepareHandler"
       @change:title="t => title = t"

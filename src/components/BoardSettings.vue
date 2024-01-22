@@ -117,6 +117,35 @@
               </q-expansion-item>
             </q-list>
           </div>
+          <div class="board-settings__topics col-12 q-mt-lg relative-position">
+            Publish hello messages on connect
+            <q-list bordered class="relative-position" >
+              <q-item-label class="q-py-md q-px-sm list__header" :class="{'text-red-6': !currentSettings.topics.length}">
+                Topics{{currentSettings.topics.length ? '' : ' are empty'}}
+                <q-btn color="grey-9" class="absolute-right" flat label="ADD" @click="addTopic" icon="mdi-plus"/>
+              </q-item-label>
+              <q-expansion-item
+                v-for="(item, index) in currentSettings.topics"
+                :key="index"
+                group="frame-items"
+                :header-class="[`bg-${checkUniqueTopic(index) ? 'grey-4' : 'red-2'}`]"
+                expand-icon="mdi-cog"
+                :value="index === currentSettings.topics.length - 1"
+              >
+                <template slot="header">
+                  <q-item-section><span class="ellipsis full-width">{{item.topicTemplate || 'New topic'}}</span></q-item-section>
+                  <q-item-section side>
+                    <q-btn flat color="red-6" round dense @click="removeTopic(index)" icon="mdi-delete"/>
+                  </q-item-section>
+                </template>
+                <div class="row q-pa-sm">
+                  <q-input outlined dense hide-bottom-space class="col-12 q-mb-sm" color="grey-9" v-model="item.topicTemplate" @input="val => item.topicFilter = val" label="Topic"/>
+                  <!-- <variables-helper v-if="board.settings.variables && board.settings.variables.length" :variables="board.settings.variables" @add="(variable) => item.topicTemplate += variable"/> -->
+                  <q-input type="textarea" outlined hide-bottom-space dense color="grey-9" class="q-mt-sm full-width" v-model="item.payload" label="Payload" input-style="resize: none;"/>
+                </div>
+              </q-expansion-item>
+            </q-list>
+          </div>
         </div>
       </div>
       <q-toolbar class="text-white"  :class="[`bg-${$theme}-9`]">
@@ -152,6 +181,7 @@ export default {
           blocked: false,
           variables: []
         },
+        topics: [],
         activeVariables: {},
         shortcutsIndexes: [],
         widgetsIndexes: [],
@@ -222,6 +252,22 @@ export default {
     }
   },
   methods: {
+    addTopic () {
+      this.currentSettings.topics.push(getTopicModel())
+    },
+    removeTopic (index) { this.$delete(this.currentSettings.topics, index) },
+    checkUniqueTopic (itemIndex) {
+      const item = this.currentSettings.topics[itemIndex],
+        sameTopicsIndexes = this.currentSettings.topics.reduce((res, currItem, index) => {
+          if (currItem.topicTemplate === item.topicTemplate) {
+            res.push(index)
+          }
+          return res
+        }, [])
+      return item.topicTemplate &&
+        sameTopicsIndexes.indexOf(itemIndex) === 0
+    },
+
     saveBoardSettingsHandler () {
       const event = this.settings ? 'edit' : 'add'
       if (event === 'add') {

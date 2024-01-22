@@ -151,6 +151,8 @@ export default {
   props: ['clientSettings', 'initBoards'],
   data () {
     return {
+      pingreq: 0,
+      pingresp: 0,
       fullView: !(this.clientSettings && this.clientSettings.flespiBoard),
       client: undefined,
       connack: undefined,
@@ -381,6 +383,21 @@ export default {
           config.clientId = config.clientId + '-' + Math.random().toString(16).substring(2, 10)
         }
       const client = mqtt.connect(config.host, config)
+      this.pingsend = 0
+      this.pingresp = 0
+      client.on('packetsend', (packet) => {
+        if (packet.cmd === 'pingreq') {
+          this.pingsend = new Date().getTime()
+        }
+      })
+      client.on('packetreceive', (packet) => {
+        if (packet.cmd === 'pingresp') {
+          this.pingresp = new Date().getTime()
+        }
+        if (this.pingresp - this.pingsend) {
+          this.$emit('ping', this.pingresp - this.pingsend)
+        }
+      })
       client.on('message', (topic, message, packet) => {
         /* synced board processing */
         if (topic.indexOf(config.syncNamespace) !== -1) {
@@ -404,6 +421,7 @@ export default {
         if (this.$integrationMode) {
           this.$integrationBus.send('connected')
         }
+        this.runtimeInitBoards(this.boards)
       })
       client.on('error', (error) => {
         this.errorHandler(error, false)
@@ -563,6 +581,9 @@ export default {
         this.resolveBoardVariables(board)
         this.setModifyTimeBoardHandler(board.id)
       }
+      let boards = {}
+      boards[board.id] = board
+      this.runtimeInitBoards(boards)
     },
     deleteBoardHandler (boardId) {
       this.resolveBoardVariables(undefined, this.boards[boardId])
@@ -681,6 +702,9 @@ export default {
       Object.keys(widgets).forEach(widgetId => {
         this.addWidget(widgets[widgetId])
       })
+      let boards = {}
+      boards[board.id] = board
+      this.runtimeInitBoards(boards)
     },
     initSavedBoards (savedBoards) {
       if (savedBoards) {
@@ -695,6 +719,9 @@ export default {
           savedBoards[boardId].appVersion = version
         })
         this.boards = savedBoards
+        // if (this.clientStatus) {
+        //   this.runtimeInitBoards(this.boards)
+        // }
         if (widgets) {
           this.widgets = widgets
           this.runtimeInitWidgets()
@@ -740,6 +767,15 @@ export default {
         if (filteredBoardId === boardId) { return false }
         return !!(this.boards[filteredBoardId].settings.variables && this.boards[filteredBoardId].settings.variables.filter(variable => variable.type === 1 && variable.topic.topicFilter === topic).length)
       }).length
+    },
+    runtimeInitBoards(boards) {
+      Object.values(boards).forEach(board => {
+        if(board.topics) {
+          board.topics.forEach(topic => {
+            this.actionHandler({ topic: topic.topicFilter, payload: topic.payload, settings: {} })
+          })
+        }
+      })
     },
     /* widgets logic start */
     runtimeInitWidgets () {

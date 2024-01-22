@@ -9,7 +9,7 @@
         :icon="`mdi-${item.settings.icon || 'send'}`"
         :color="`${item.color}-7`"
       />
-      <q-tooltip>Payload{{item.settings.payload ? `: ${item.settings.payload}` : ' is empty'}}</q-tooltip>
+      <q-tooltip>{{ (item && item.settings && item.settings.topics && item.settings.topics.length) || 0}} msg. will be sent</q-tooltip>
     </div>
     <div class="ellipsis q-mt-sm">{{item.name}}</div>
   </div>
