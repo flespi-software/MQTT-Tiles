@@ -508,8 +508,8 @@ export default {
           this.subscriptionsIndetifiers[subIdentifier] = topic
           if (topic.indexOf('flespi/') !== 0 && this.clientSettings.subscribeWithTokenCid) {
             const flespiCid = get(this.flespiToken, 'cid', undefined)
-            if (!options.properties.userProperties) { options.properties.userProperties = {} }
             if (flespiCid) {
+              if (!options.properties.userProperties) { options.properties.userProperties = {} }
               options.properties.userProperties.cid = flespiCid
             }
           }
