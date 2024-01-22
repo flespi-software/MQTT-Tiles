@@ -118,11 +118,10 @@
             </q-list>
           </div>
           <div class="board-settings__topics col-12 q-mt-lg relative-position">
-            Publish hello messages on connect
             <q-list bordered class="relative-position" >
-              <q-item-label class="q-py-md q-px-sm list__header" :class="{'text-red-6': !currentSettings.topics.length}">
-                Topics{{currentSettings.topics.length ? '' : ' are empty'}}
-                <q-btn color="grey-9" class="absolute-right" flat label="ADD" @click="addTopic" icon="mdi-plus"/>
+              <q-item-label class="q-py-md q-px-sm list__header">
+                Init messages {{currentSettings.topics.length ? `(${ currentSettings.topics.length } / 5)` : ' are empty'}}
+                <q-btn color="grey-9" :disabled="currentSettings.topics && currentSettings.topics.length >= 5" class="absolute-right" flat label="ADD" @click="addTopic" icon="mdi-plus"/>
               </q-item-label>
               <q-expansion-item
                 v-for="(item, index) in currentSettings.topics"
@@ -139,7 +138,7 @@
                   </q-item-section>
                 </template>
                 <div class="row q-pa-sm">
-                  <q-input outlined dense hide-bottom-space class="col-12 q-mb-sm" color="grey-9" v-model="item.topicTemplate" @input="val => item.topicFilter = val" label="Topic"/>
+                  <q-input outlined dense autofocus hide-bottom-space class="col-12 q-mb-sm" color="grey-9" v-model="item.topicTemplate" @input="val => item.topicFilter = val" label="Topic"/>
                   <!-- <variables-helper v-if="board.settings.variables && board.settings.variables.length" :variables="board.settings.variables" @add="(variable) => item.topicTemplate += variable"/> -->
                   <q-input type="textarea" outlined hide-bottom-space dense color="grey-9" class="q-mt-sm full-width" v-model="item.payload" label="Payload" input-style="resize: none;"/>
                 </div>
