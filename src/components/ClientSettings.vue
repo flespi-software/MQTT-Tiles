@@ -1,5 +1,5 @@
 <template>
-  <q-dialog v-model='status' @hide="closeHandler" :maximized="$q.screen.lt.md">
+  <q-dialog :value='status' @hide="closeHandler" :maximized="$q.screen.lt.md">
     <div :style="{width: $q.screen.lt.md ? '100%' : '50vw'}">
       <q-toolbar class="text-white" :class="[`bg-${$theme}-9`]">
         <q-toolbar-title>

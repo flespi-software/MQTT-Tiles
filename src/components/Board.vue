@@ -212,6 +212,7 @@ import Slider from './widgets/slider/View'
 import Color from './widgets/color/View'
 import StatusIndicator from './widgets/statusIndicator/View'
 import MapLocation from './widgets/mapLocation/View'
+import MapDevices from './widgets/mapDevices/View'
 import MapRoute from './widgets/mapRoute/View'
 import TextSender from './widgets/textSender/View'
 import Calculator from './widgets/calculator/View'
@@ -517,6 +518,7 @@ export default {
     Color,
     StatusIndicator,
     MapLocation,
+    MapDevices,
     MapRoute,
     TextSender,
     Calculator,

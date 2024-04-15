@@ -13,8 +13,9 @@
             group="map-items"
             :header-class="[`bg-${!!isitemValid(index) ? 'grey-4' : 'red-2'}`]"
             expand-icon="mdi-cog"
-            :value="index === currentSettings.items.length - 1"
+            default-opened
             >
+            <!-- :value="index === currentSettings.items.length - 1" -->
             <template slot="header">
               <q-item-section side>
                 <div>
@@ -29,32 +30,11 @@
             </template>
             <div class="row q-pa-sm">
               <q-input outlined dense hide-bottom-space class="full-width" color="grey-9" v-model="item.name" label="Name" autofocus/>
-              <q-expansion-item
-                class="col-12 q-mt-sm"
-                default-opened
-                label="Latitude settings"
-                :header-class="[`bg-${isValidLatValue(index) ? 'grey-4' : 'red-2'}`]"
-                style="border: solid #e0e0e0 1px"
-              >
-                <div class="row">
-                  <div class="col-12 q-pa-xs">
-                    <topic v-model="item.lat" @input="updateTopics" label="Latitude value" :board="board" :config="{ needSelectors: true }"/>
-                  </div>
+              <div class="row full-width" :class="`${isValidPositionValue(index) ? '' : 'bg-red-2'}`" style="border: solid #e0e0e0 1px">
+                <div class="col-12 q-pa-xs">
+                  <topic v-model="item.position" @input="updateTopics" label="Position value" :board="board" :config="{ onlySelector: true, needSelectors: true, selectorConfig }"/>
                 </div>
-              </q-expansion-item>
-              <q-expansion-item
-                class="col-12 q-mt-sm"
-                default-opened
-                label="Longitude settings"
-                :header-class="[`bg-${isValidLonValue(index) ? 'grey-4' : 'red-2'}`]"
-                style="border: solid #e0e0e0 1px"
-              >
-                <div class="row">
-                  <div class="col-12 q-pa-xs">
-                    <topic v-model="item.lon" @input="updateTopics" label="Longitude value" :board="board" :config="{ needSelectors: true }"/>
-                  </div>
-                </div>
-              </q-expansion-item>
+              </div>
             </div>
           </q-expansion-item>
         </q-list>
@@ -74,10 +54,11 @@ import Topic from '../Topic'
 import validateTopic from '../../../mixins/validateTopic.js'
 import { getTopicModel } from '../../../constants/defaultes'
 export default {
-  name: 'MapLocationSchema',
+  name: 'MapDevicesSchema',
   props: ['widget', 'board'],
   data () {
     const defaultSettings = {
+        groupLayout: 6,
         topics: [],
         items: [],
         height: 6,
@@ -94,14 +75,29 @@ export default {
       defaultTopic,
       defaultItem: {
         name: '',
-        lat: getTopicModel({
-          topicFilter: 'topic/to/lat',
-          topicTemplate: 'topic/to/lat'
-        }),
-        lon: getTopicModel({
-          topicFilter: 'topic/to/lon',
-          topicTemplate: 'topic/to/lon'
+        position: getTopicModel({
+          topicFilter: 'flespi/state/gw/devices/+/telemetry/position,name',
+          topicTemplate: 'flespi/state/gw/devices/+/telemetry/position,name',
+          payloadType: 1
         })
+      },
+      selectorConfig: {
+        "devices": {
+          "selectors": [
+            {
+              "name": "devices",
+              "getter": {
+                "name": "getDevices",
+                "params": []
+              },
+              "value": { "label": "all", "value": "+" }
+            }
+          ],
+          "topic": {
+            "topicPattern": "flespi/state/gw/devices/${devices}/telemetry/position,device.name",
+            "payloadType": "JSON"
+          }
+        }
       }
     }
   },
@@ -124,8 +120,7 @@ export default {
     },
     updateTopics () {
       this.$set(this.currentSettings, 'topics', this.currentSettings.items.reduce((res, item) => {
-        res.push(item.lat)
-        res.push(item.lon)
+        res.push(item.position)
         return res
       }, []))
     },
@@ -133,21 +128,15 @@ export default {
       const item = this.currentSettings.items[index]
       return !(this.currentSettings.items.filter(i => i.name === item.name).length > 1)
     },
-    isValidLatValue (index) {
-      const topic = get(this.currentSettings, `items[${index}].lat.topicFilter`, '#/')
-      return !this.widget.dataTopics.map(topic => topic.topicFilter).includes(topic) &&
-        this.validateTopic(topic)
-    },
-    isValidLonValue (index) {
-      const topic = get(this.currentSettings, `items[${index}].lon.topicFilter`, '#/')
+    isValidPositionValue (index) {
+      const topic = get(this.currentSettings, `items[${index}].position.topicFilter`, '#/')
       return !this.widget.dataTopics.map(topic => topic.topicFilter).includes(topic) &&
         this.validateTopic(topic)
     },
     validate () {
       return this.currentSettings.items.reduce((result, item, index) => {
         result = result && this.isitemValid(index)
-        result = result && this.isValidLatValue(index)
-        result = result && this.isValidLonValue(index)
+        result = result && this.isValidPositionValue(index)
         return result
       }, true)
     }

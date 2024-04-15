@@ -302,7 +302,7 @@ export default {
       this.$set(variable, 'type', type)
     },
     setPresetByIndex (index, preset) {
-      const schema = variblesShemasByPresets[preset]
+      const schema = cloneDeep(variblesShemasByPresets[preset])
       this.$set(this.currentSettings.settings.variables, index, schema)
     },
     checkUniqueVariables (index) {

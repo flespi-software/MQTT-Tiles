@@ -1,18 +1,20 @@
 <template>
   <div class="row">
     <q-slide-transition>
-      <flespi-selector v-if="shownSelectors" :value="this.currentValue.topicTemplate" :connector="$flespiRestBus" @input="selectorTopicUpdate" :variables="selectorsVariables" class="col-12"/>
+      <flespi-selector v-if="shownSelectors || (config && config.onlySelector)" :value="this.currentValue.topicTemplate" :connector="$flespiRestBus" @input="selectorTopicUpdate" :variables="selectorsVariables" class="col-12" :config="selectorConfig" />
     </q-slide-transition>
-    <q-input dense :autofocus="config && config.needAutofocus" outlined hide-bottom-space class="col-8 q-pr-sm" color="grey-9" v-model="currentValue.topicTemplate" @input="currentValue.topicFilter = currentValue.topicTemplate" label="Topic" :error="!validateTopic(currentValue.topicFilter)">
-      <q-btn slot="append" v-if="config && config.needSelectors && $flespiMode" flat round color="red" icon="icon-flespi2-02-01" @click="shownSelectors = !shownSelectors">
-        <q-tooltip>flespi topic helper</q-tooltip>
-      </q-btn>
-    </q-input>
-    <q-select dense class="col-4" outlined hide-bottom-space color="grey-9" v-model="currentValue.payloadType" emit-value map-options label="Payload type" :options="payloadTypeOptions"/>
-    <variables-helper class="col-12" v-if="board && board.settings.variables && board.settings.variables.length" :variables="board.settings.variables" @add="(variable) => currentValue.topicTemplate += variable"/>
-    <q-input dense outlined hide-bottom-space v-if="currentValue.payloadType === WIDGET_PAYLOAD_TYPE_JSON" color="grey-9" class="col-12 q-mt-sm" v-model="currentValue.payloadField" label="Payload path" hint="You can set path in result JSON. Path started from root of object. Example: names[0].value"/>
-    <q-input dense outlined hide-bottom-space v-if="config && config.needLabel && currentValue.payloadType === WIDGET_PAYLOAD_TYPE_JSON" color="grey-9" class="col-12 q-mt-sm" v-model="currentValue.payloadNameField" label="Value`s label" hint="Value`s label gets from resilt JSON by path. Example: names[0].label"/>
-    <q-input dense outlined hide-bottom-space v-if="config && config.needDefault" color="grey-9" class="col-12 q-mt-sm" v-model="currentValue.default" label="Default value" hint="If you currently have no any value by this subscription, you can set an empty state value"/>
+    <template v-if="config && !config.onlySelector">
+      <q-input type="textarea" autogrow dense :autofocus="config && config.needAutofocus" outlined hide-bottom-space class="col-8 q-pr-sm" color="grey-9" v-model="currentValue.topicTemplate" @input="currentValue.topicFilter = currentValue.topicTemplate" label="Topic" :error="!validateTopic(currentValue.topicFilter)">
+        <q-btn slot="append" v-if="config && config.needSelectors && $flespiMode" flat round color="red" icon="icon-flespi2-02-01" @click="shownSelectors = !shownSelectors">
+          <q-tooltip>flespi topic helper</q-tooltip>
+        </q-btn>
+      </q-input>
+      <q-select dense class="col-4" outlined hide-bottom-space color="grey-9" v-model="currentValue.payloadType" emit-value map-options label="Payload type" :options="payloadTypeOptions"/>
+      <variables-helper class="col-12" v-if="board && board.settings.variables && board.settings.variables.length" :variables="board.settings.variables" @add="(variable) => currentValue.topicTemplate += variable"/>
+      <q-input dense outlined hide-bottom-space v-if="currentValue.payloadType === WIDGET_PAYLOAD_TYPE_JSON" color="grey-9" class="col-12 q-mt-sm" v-model="currentValue.payloadField" label="Payload path" hint="You can set path in result JSON. Path started from root of object. Example: names[0].value"/>
+      <q-input dense outlined hide-bottom-space v-if="config && config.needLabel && currentValue.payloadType === WIDGET_PAYLOAD_TYPE_JSON" color="grey-9" class="col-12 q-mt-sm" v-model="currentValue.payloadNameField" label="Value`s label" hint="Value`s label gets from resilt JSON by path. Example: names[0].label"/>
+      <q-input dense outlined hide-bottom-space v-if="config && config.needDefault" color="grey-9" class="col-12 q-mt-sm" v-model="currentValue.default" label="Default value" hint="If you currently have no any value by this subscription, you can set an empty state value"/>
+    </template>
   </div>
 </template>
 
@@ -54,6 +56,9 @@ export default {
         vars = this.board.settings.variables.map(variable => ({ label: variable.name, value: variable.name }))
       }
       return vars
+    },
+    selectorConfig () {
+      return (this.config && this.config.selectorConfig) || undefined
     }
   },
   watch: {

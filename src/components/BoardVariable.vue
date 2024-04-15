@@ -16,7 +16,7 @@
           <q-item-label :class="{'text-grey-7': !scope.opt.label}">{{scope.opt.label || '*Empty*'}}</q-item-label>
         </q-item-section>
         <q-item-section side v-if="scope.opt.label != scope.opt.value">
-          <q-item-label>{{scope.opt.value}}</q-item-label>
+          <q-item-label caption>#{{scope.opt.value}}</q-item-label>
         </q-item-section>
       </q-item>
     </template>
@@ -26,6 +26,9 @@
           <div class="text-italic text-grey-9 text-h6 text-center text-bold">{{`No ${variable.name}`}}</div>
         </q-item-section>
       </q-item>
+    </template>
+    <template v-slot:append v-if="value">
+      <q-badge color="grey" text-color="white">#{{ value }}</q-badge>
     </template>
     <template v-slot:selected-item="scope">
       <q-item

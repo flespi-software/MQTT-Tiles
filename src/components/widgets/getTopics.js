@@ -15,6 +15,7 @@ import linear from './linear/getTopics'
 import radial from './radial/getTopics'
 import slider from './slider/getTopics'
 import mapLocation from './mapLocation/getTopics'
+import mapDevices from './mapDevices/getTopics'
 import mapRoute from './mapRoute/getTopics'
 const handlers = {
   clicker,
@@ -32,6 +33,7 @@ const handlers = {
   linear,
   radial,
   slider,
+  'map-devices': mapDevices,
   'map-location': mapLocation,
   'map-route': mapRoute
 }

@@ -16,7 +16,7 @@
         <q-select outlined dense hide-bottom-space color="grey-9" @input="typeChangeHandler" :value="currentSettings.type" :options="typeOptions" emit-value map-options label="Type" popup-content-class="type__content" :popup-content-style="{width: `${typeElementWidth}px`}">
           <q-resize-observer @resize="onResize" />
           <template v-slot:option="scope">
-            <q-item v-bind="scope.itemProps" v-on="scope.itemEvents" :style="{width: $q.screen.width >= 1023 ? '16.6666667%' : '25%', minHeight: '70px'}">
+            <q-item v-bind="scope.itemProps" v-on="scope.itemEvents" :style="{width: $q.screen.width >= 1023 ? '16.6666667%' : '25%', minHeight: '80px'}">
               <q-item-section class="text-center">
                 <q-icon :size="$q.screen.width >= 1023 ? '2rem' : '1.5rem'" :name="scope.opt.rightIcon" style="width: auto;" />
                 <q-item-label v-html="scope.opt.label" class="q-mt-xs ellipsis" :style="{fontSize: '.7rem'}" />
@@ -173,6 +173,7 @@ import Complex from './complex/Schema'
 import Slider from './slider/Schema'
 import Color from './color/Schema'
 import MapLocation from './mapLocation/Schema'
+import MapDevices from './mapDevices/Schema'
 import MapRoute from './mapRoute/Schema'
 import StatusIndicator from './statusIndicator/Schema'
 import TextSender from './textSender/Schema'
@@ -192,6 +193,7 @@ import MultiplierView from './multiplier/Preview'
 import ComplexView from './complex/Preview'
 import SliderView from './slider/View'
 import ColorView from './color/View'
+import MapDevicesView from './mapDevices/View'
 import MapLocationView from './mapLocation/View'
 import MapRouteView from './mapRoute/View'
 import StatusIndicatorView from './statusIndicator/View'
@@ -202,6 +204,7 @@ import SchemeView from './scheme/Preview'
 const previewStylesByType = {
   'map-route': { minWidth: '480px', minHeight: '340px' },
   'map-location': { minWidth: '480px', minHeight: '340px' },
+  'map-devices': { minWidth: '480px', minHeight: '340px' },
   frame: { minWidth: '480px', minHeight: '340px', maxWidth: '480px', maxHeight: '340px' },
   radial: { minWidth: '430px', minHeight: '340px' },
   linear: { minWidth: '150px', minHeight: '420px', maxWidth: '160px', maxHeight: '420px' }
@@ -223,27 +226,6 @@ export default {
     return {
       defaultSettings,
       currentSettings: this.settings ? merge({}, defaultSettings, this.settings) : merge({}, defaultSettings),
-      typeOptions: [
-        { label: 'Text', value: 'informer', rightIcon: 'mdi-format-text-variant' },
-        { label: 'Multi text', value: 'multi-informer', rightIcon: 'mdi-card-text-outline' },
-        { label: 'Static text', value: 'static-informer', rightIcon: 'mdi-format-text' },
-        { label: 'Toggle', value: 'switcher', rightIcon: 'mdi-toggle-switch-outline' },
-        { label: 'Button', value: 'clicker', rightIcon: 'mdi-send' },
-        { label: 'Textarea', value: 'text-sender', rightIcon: 'mdi-text-subject' },
-        { label: 'Slider', value: 'slider', rightIcon: 'mdi-ray-vertex' },
-        { label: 'Color', value: 'color', rightIcon: 'mdi-palette' },
-        { label: 'Map (Location)', value: 'map-location', rightIcon: 'mdi-map-marker-outline' },
-        { label: 'Map (Route)', value: 'map-route', rightIcon: 'mdi-map-marker-distance' },
-        { label: 'Status Indicator', value: 'status-indicator', rightIcon: 'mdi-lightbulb-outline' },
-        { label: 'Formula', value: 'calculator', rightIcon: 'mdi-calculator' },
-        { label: 'Radial gauge', value: 'radial', rightIcon: 'mdi-gauge' },
-        { label: 'Linear gauge', value: 'linear', rightIcon: 'mdi-oil-temperature' },
-        { label: 'Iframe', value: 'frame', rightIcon: 'mdi-window-maximize' },
-        { label: 'Radio button', value: 'singleselect', rightIcon: 'mdi-radiobox-marked' },
-        { label: 'Multiplier', value: 'multiplier', rightIcon: 'mdi-monitor-multiple' },
-        { label: 'Complex', value: 'complex', rightIcon: 'mdi-ballot-outline' },
-        { label: 'Scheme', value: 'scheme', rightIcon: 'mdi-floor-plan' }
-      ],
       typeElementWidth: 0,
       colors: ['grey', 'red', 'green', 'orange', 'blue', 'light-blue', 'purple', 'deep-orange', 'cyan', 'brown', 'blue-grey'],
       isValideSchema: true,
@@ -256,6 +238,32 @@ export default {
     }
   },
   computed: {
+    typeOptions () {
+      let opts = []
+      opts.push({ label: 'Text', value: 'informer', rightIcon: 'mdi-format-text-variant' })
+      opts.push({ label: 'Multi text', value: 'multi-informer', rightIcon: 'mdi-card-text-outline' })
+      opts.push({ label: 'Static text', value: 'static-informer', rightIcon: 'mdi-format-text' })
+      opts.push({ label: 'Toggle', value: 'switcher', rightIcon: 'mdi-toggle-switch-outline' })
+      opts.push({ label: 'Button', value: 'clicker', rightIcon: 'mdi-send' })
+      opts.push({ label: 'Textarea', value: 'text-sender', rightIcon: 'mdi-text-subject' })
+      opts.push({ label: 'Slider', value: 'slider', rightIcon: 'mdi-ray-vertex' })
+      opts.push({ label: 'Color', value: 'color', rightIcon: 'mdi-palette' })
+      if (this.$flespiMode) {
+        opts.push({ label: 'Map (Devices)', value: 'map-devices', rightIcon: 'mdi-map-marker-multiple' })
+      }
+      opts.push({ label: 'Map (Location)', value: 'map-location', rightIcon: 'mdi-map-marker-outline' })
+      opts.push({ label: 'Map (Route)', value: 'map-route', rightIcon: 'mdi-map-marker-distance' })
+      opts.push({ label: 'Status Indicator', value: 'status-indicator', rightIcon: 'mdi-lightbulb-outline' })
+      opts.push({ label: 'Formula', value: 'calculator', rightIcon: 'mdi-calculator' })
+      opts.push({ label: 'Radial gauge', value: 'radial', rightIcon: 'mdi-gauge' })
+      opts.push({ label: 'Linear gauge', value: 'linear', rightIcon: 'mdi-oil-temperature' })
+      opts.push({ label: 'Iframe', value: 'frame', rightIcon: 'mdi-window-maximize' })
+      opts.push({ label: 'Radio button', value: 'singleselect', rightIcon: 'mdi-radiobox-marked' })
+      opts.push({ label: 'Multiplier', value: 'multiplier', rightIcon: 'mdi-monitor-multiple' })
+      opts.push({ label: 'Complex', value: 'complex', rightIcon: 'mdi-ballot-outline' })
+      opts.push({ label: 'Scheme', value: 'scheme', rightIcon: 'mdi-floor-plan' })
+      return opts
+    },
     validateCurrentSettings () {
       return !!this.isValidCurrentTopics &&
         this.currentSettings.topics.every(topicFilter => this.validateTopic(topicFilter))
@@ -390,6 +398,7 @@ export default {
     MultiInformer,
     Slider,
     Color,
+    MapDevices,
     MapLocation,
     MapRoute,
     StatusIndicator,
@@ -409,6 +418,7 @@ export default {
     MultiInformerView,
     SliderView,
     ColorView,
+    MapDevicesView,
     MapLocationView,
     MapRouteView,
     StatusIndicatorView,

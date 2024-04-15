@@ -3,6 +3,7 @@ import clicker from './clicker/migrations'
 import frame from './frame/migrations'
 import switcher from './switcher/migrations'
 import mapLocation from './mapLocation/migrations'
+import mapDevices from './mapDevices/migrations'
 import mapRoute from './mapRoute/migrations'
 import scheme from './scheme/migrations'
 /* widgetType: {[version]: handler} */
@@ -10,6 +11,7 @@ const migrateHandlers = {
   clicker,
   frame,
   switcher,
+  'map-devices': mapDevices,
   'map-location': mapLocation,
   'map-route': mapRoute,
   scheme
