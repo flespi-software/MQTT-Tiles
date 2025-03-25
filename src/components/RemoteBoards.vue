@@ -8,59 +8,60 @@
       enter-active-class="animated slideInDown"
       leave-active-class="animated slideOutUp"
     >
-      <div class="relative-position boards__remote flex no-wrap" :class="[`bg-${$theme}-1`]" v-if="Object.keys(boards).length && value">
-        <q-btn v-if="scrollPosition > 0" @click="scrollLeft" icon="mdi-chevron-left" dense flat class="slider-controls absolute-top-left absolute-bottom-left"/>
-        <div class="flex no-wrap overflow-hidden q-pb-md q-pt-lg boards__remote-wrapper" ref="wrapper">
-          <q-resize-observer @resize="onResize"/>
-          <q-intersection
-            v-for="(board, id) in boards" :key="`remote-${id}`"
-            transition="flip-right"
-            class="q-my-xs q-px-sm q-my-sm remote__board"
-          >
-            <q-card>
-              <q-item class="q-py-none q-pl-sm q-pr-none" :class="[`bg-${$theme}-2`]" style="min-height: 20px;">
-                <q-item-section class="ellipsis">
-                  <div class="ellipsis" style="height: 24px; line-height: 24px;">
-                    {{board.name || '*No name*'}}
-                    <q-tooltip v-if="board.name">{{board.name}}</q-tooltip>
-                  </div>
-                  <div class="ellipsis text-grey-9" style="height: 14px; line-height: 14px; font-size: 14px;">
-                    {{board.id}}
-                  </div>
-                </q-item-section>
-                <q-item-section side>
-                  <q-btn round dense flat icon="mdi-dots-vertical" color="grey-9">
-                    <q-menu anchor="bottom right" self="top right">
-                      <q-list dense :class="[`bg-${$theme}-1`]">
-                        <q-item v-close-popup @click.stop="$emit('share-uploaded', id)" :disable="!canShare" clickable>
-                          <q-item-section avatar>
-                            <q-icon name="mdi-link"/>
-                          </q-item-section>
-                          <q-item-section>Get link</q-item-section>
-                        </q-item>
-                        <q-separator/>
-                        <q-item v-close-popup @click.stop="$emit('delete-uploaded', id)" clickable>
-                          <q-item-section avatar>
-                            <q-icon name="mdi-delete-outline" color="red"/>
-                          </q-item-section>
-                          <q-item-section>Remove</q-item-section>
-                        </q-item>
-                      </q-list>
-                    </q-menu>
-                  </q-btn>
-                </q-item-section>
-              </q-item>
-              <q-separator />
-              <q-card-section class="text-center relative-position" :class="[`bg-${$theme}-1`]">
-                <div v-if="board.settings.lastModify" class="absolute-top-right text-grey-7 q-pr-xs" style="font-size: .7rem;">{{date(board.settings.lastModify, 'DD-MM-YYYY HH:mm:ss')}}</div>
-                <q-icon name="mdi-download" size="20px" color="grey-9" class="cursor-pointer" @click.native="$emit('import', id)" />
-                <span class="text-grey-7 absolute" style="font-size: 10px; bottom: 4px; left: 4px; cursor: default;" v-if='board.appVersion' title="MQTT Tiles version">v.{{board.appVersion}}</span>
-                <span  :class="[`bg-${$theme}-4`]" class="text-bold text-white absolute rounded-borders q-px-xs" style="font-size: 10px; bottom: 4px; right: 4px; cursor: default;" title="Widgets count">{{board.widgetsIndexes.length}}</span>
-              </q-card-section>
-            </q-card>
-          </q-intersection>
-        </div>
-        <q-btn v-if="scrollPosition < wrapperWidth" @click="scrollRight" icon="mdi-chevron-right" dense flat class="slider-controls absolute-top-right absolute-bottom-right"/>
+      <div class="relative-position boards__remote flex no-wrap" :class="[`bg-${$theme}-1`]" :style="value ? 'height: 149px' : 'height: 0px'" v-if="Object.keys(boards).length">
+        <template  v-if="value">
+          <q-btn v-if="scrollPosition > 0" @click="scrollLeft" icon="mdi-chevron-left" dense flat class="slider-controls absolute-top-left absolute-bottom-left"/>
+          <div class="flex no-wrap overflow-hidden q-pb-md q-pt-lg boards__remote-wrapper" ref="wrapper">
+            <q-resize-observer @resize="onResize"/>
+            <div
+              v-for="(board, id) in boards" :key="`remote-${id}`"
+              class="q-my-xs q-px-sm q-my-sm remote__board"
+            >
+              <q-card >
+                <q-item class="q-py-none q-pl-sm q-pr-none" :class="[!localboards[id]? `bg-${$theme}-2` : localboards[id].settings.lastModify === board.settings.lastModify ? 'bg-green-3' : 'bg-orange-2']" style="min-height: 20px;">
+                  <q-item-section class="ellipsis">
+                    <div class="ellipsis" style="height: 24px; line-height: 24px;">
+                      {{board.name || '*No name*'}}
+                      <q-tooltip v-if="board.name">{{board.name}}</q-tooltip>
+                    </div>
+                    <div class="ellipsis text-grey-9" style="height: 14px; line-height: 14px; font-size: 14px;">
+                      {{board.id}}
+                    </div>
+                  </q-item-section>
+                  <q-item-section side>
+                    <q-btn round dense flat icon="mdi-dots-vertical" color="grey-9">
+                      <q-menu anchor="bottom right" self="top right">
+                        <q-list dense :class="[`bg-${$theme}-1`]">
+                          <q-item v-close-popup @click.stop="$emit('share-uploaded', id)" :disable="!canShare" clickable>
+                            <q-item-section avatar>
+                              <q-icon name="mdi-link"/>
+                            </q-item-section>
+                            <q-item-section>Get link</q-item-section>
+                          </q-item>
+                          <q-separator/>
+                          <q-item v-close-popup @click.stop="$emit('delete-uploaded', id)" clickable>
+                            <q-item-section avatar>
+                              <q-icon name="mdi-delete-outline" color="red"/>
+                            </q-item-section>
+                            <q-item-section>Remove</q-item-section>
+                          </q-item>
+                        </q-list>
+                      </q-menu>
+                    </q-btn>
+                  </q-item-section>
+                </q-item>
+                <q-separator />
+                <q-card-section class="text-center relative-position" :class="[`bg-${$theme}-1`]">
+                  <div v-if="board.settings.lastModify" class="absolute-top-right text-grey-7 q-pr-xs" style="font-size: .7rem;">{{date(board.settings.lastModify, 'DD-MM-YYYY HH:mm:ss')}}</div>
+                  <q-icon name="mdi-cloud-download-outline" size="20px" color="grey-9" class="cursor-pointer" @click.native="$emit('import', id)" />
+                  <span class="text-grey-7 absolute" style="font-size: 10px; bottom: 4px; left: 4px; cursor: default;" v-if='board.appVersion' title="MQTT Tiles version">v.{{board.appVersion}}</span>
+                  <span  :class="[`bg-${$theme}-4`]" class="text-bold text-white absolute rounded-borders q-px-xs" style="font-size: 10px; bottom: 4px; right: 4px; cursor: default;" title="Widgets count">{{board.widgetsIndexes.length}}</span>
+                </q-card-section>
+              </q-card>
+            </div>
+          </div>
+          <q-btn v-if="scrollPosition < wrapperWidth" @click="scrollRight" icon="mdi-chevron-right" dense flat class="slider-controls absolute-top-right absolute-bottom-right"/>
+        </template>
       </div>
     </transition>
   </div>
@@ -69,7 +70,7 @@
 <script>
 import { date } from 'quasar'
 export default {
-  props: ['boards', 'canShare', 'value'],
+  props: ['boards', 'canShare', 'value', 'localboards'],
   data () {
     return {
       scrollPosition: 0,
@@ -101,6 +102,7 @@ export default {
     z-index: 1
     background-color: rgba(255, 255, 255, .7)
   .boards__remote
+    transition: height 0.5s
     max-height: 149px
     box-shadow: rgba(0, 0, 0, 0.7) 0px -9px 9px -9px inset
     .remote__board

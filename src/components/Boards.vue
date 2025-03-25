@@ -5,6 +5,7 @@
     </q-btn>
     <remote-boards
       :boards="remoteBoards"
+      :localboards="boards"
       :can-share="canShare"
       v-model="isPanelShowed"
       @import="id => $emit('import', id)"
@@ -33,7 +34,7 @@
             <q-btn @click="changeAttachedBoards(id)" icon="mdi-check" :color="currentAttachedBoard.includes(id) ? 'green' : 'grey'" size="4rem" flat class="absolute-top-left absolute-bottom-right" style="width: 100%;"/>
           </div>
           <q-card>
-            <q-item class="q-py-none q-px-sm" :class="[`bg-${$theme}-2`]" style="min-height: 40px;">
+            <q-item class="q-py-none q-px-sm" :class="[!remoteBoards[id]? `bg-${$theme}-2` : remoteBoards[id].settings.lastModify === board.settings.lastModify ? 'bg-green-3' : 'bg-orange-3']" style="min-height: 40px;">
               <q-item-section class="ellipsis">
                 <div class="ellipsis" style="height: 24px; line-height: 24px;">
                   {{board.name || '*No name*'}}
@@ -190,6 +191,7 @@
   .dash__boards
     position relative
     .boards__wrapper
+      transition: height 0.5s;
       padding-bottom 82px
       background-image url(../../public/grid-9px-light.png)!important
       .wrapper--empty

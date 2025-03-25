@@ -111,7 +111,11 @@ import get from 'lodash/get'
 import { Base64 } from 'js-base64'
 import Board from './Board'
 import Boards from './Boards'
-import { WIDGET_STATUS_DISABLED, WIDGET_STATUS_ENABLED } from '../constants'
+import {
+  WIDGET_STATUS_DISABLED,
+  WIDGET_STATUS_ENABLED,
+  BOARDS_LOCALSTORAGE_NAME
+} from '../constants'
 import messagesProcessing from './widgets/messagesProcessing.js'
 import migrateWidgets from './widgets/migrations'
 import CopyReplaceDialog from './CopyReplaceDialog'
@@ -158,6 +162,7 @@ export default {
       connack: undefined,
       clientStatus: false,
       clientErrors: [],
+      integrationTopic: undefined,
       boards: {},
       boardsConfigs: {},
       widgets: {},
@@ -404,6 +409,10 @@ export default {
           this.savedBoardProcess(topic.split('/').slice(-1)[0], message)
           return false
         }
+        if (this.integrationTopic && topic.indexOf(this.integrationTopic) !== -1) {
+          this.processIntegrationTopic(topic.split('/').slice(-1)[0], message)
+          return false
+        }
         this.setValueByTopic(topic, { ...packet, timestamp: Date.now() })
         this.expireMessagesHandler(packet)
         this.debouncedBusMessagesProcessing()
@@ -414,6 +423,9 @@ export default {
         this.flespiToken = JSON.parse(get(this.connack, 'properties.userProperties.token', null))
         this.clientStatus = true
         this.$emit('change-status', true)
+        if (this.$route.query.integrationtopic) {
+          this.subscribeIntegrationTopic(this.$route.query.integrationtopic)
+        }
         this.initWidgets()
         if (!this.clientSettings.flespiBoard) {
           this.getSyncedBoards()
@@ -557,14 +569,22 @@ export default {
       this.activeBoardId = boardId
       this.$emit('change:title', this.getTitle())
       if (this.$integrationMode) {
-        this.$integrationBus.send('activeBoard', boardId)
+        if (!this.integrationTopic) {
+          this.$integrationBus.send('activeBoard', boardId)
+        } else {
+          this.client.publish(this.integrationTopic + '/active', boardId, { retain: true })
+        }
       }
     },
     clearActiveBoard () {
       this.activeBoardId = undefined
       this.$emit('change:title', this.getTitle())
       if (this.$integrationMode) {
-        this.$integrationBus.send('activeBoard', undefined)
+        if (!this.integrationTopic) {
+          this.$integrationBus.send('activeBoard', undefined)
+        } else {
+          this.client.publish(this.integrationTopic + '/active', '', { retain: true })
+        }
       }
     },
     actionHandler ({ topic, payload, settings }) {
@@ -725,6 +745,7 @@ export default {
         if (widgets) {
           this.widgets = widgets
           this.runtimeInitWidgets()
+          this.initWidgets()
         }
       }
     },
@@ -1000,6 +1021,21 @@ export default {
       if (Object.keys(this.boardsFromConnection).length) { this.boardsFromConnection = {} }
       this.subscribe(`${this.clientSettings.syncNamespace}/+`)
     },
+    processIntegrationTopic (type, data) {
+      if (!data.length) {
+        return false
+      }
+      try {
+        if (type === 'boards') {
+          this.initSavedBoards(JSON.parse(data))
+        }
+        if (type === 'active') {
+          this.setActiveBoard(data.toString())
+        }
+      } catch (e) {
+        console.log('Wrong boards configuration', e, data)
+      }
+    },
     savedBoardProcess (id, board) {
       if (!board.length) {
         this.$delete(this.boardsFromConnection, id)
@@ -1224,7 +1260,17 @@ export default {
     },
     /* events */
     updateBoards (boards, widgets) {
-      this.$emit('update:boards', { ...this.boardsConfigs, ...getBoardsToSave(boards, widgets) })
+      const brds = { ...this.boardsConfigs, ...getBoardsToSave(boards, widgets) }
+      this.$emit('update:boards', brds)
+      if (!this.$integrationMode) {
+        this.$q.localStorage.set(BOARDS_LOCALSTORAGE_NAME, brds)
+      } else {
+        if (!this.integrationTopic) {
+          this.$integrationBus.send('saveBoards', brds)
+        } else {
+          this.client.publish(this.integrationTopic + '/boards', JSON.stringify(brds), { retain: true })
+        }
+      }
     },
     changeAttachedBoards (attachedBoards) {
       this.$emit('change:attach', attachedBoards)
@@ -1233,11 +1279,26 @@ export default {
       const title = `${this.activeBoardId && this.boards[this.activeBoardId].name ? `${this.boards[this.activeBoardId].name} - ` : ''}MQTT Tiles`
       return title
     },
+    subscribeIntegrationTopic (topic) {
+      if (this.integrationTopic) {
+        this.unsubscribe(this.integrationTopic + '/+')
+        this.integrationTopic = undefined
+      }
+      if (topic) {
+        this.integrationTopic = topic
+        this.subscribe(this.integrationTopic + '/+', { qos: 1, nl: true })
+      }
+    },
     integrationModeActivate () {
-      this.$integrationBus.on('SetBoards', (boards) => {
-        this.initSavedBoards(boards)
+      this.$integrationBus.on('SetIntegrationTopic', (topic) => {
+        this.subscribeIntegrationTopic(topic)
       })
-      // subscribe to SeActiveBoard from integrationBus
+      this.$integrationBus.on('SetBoards', (boards) => {
+        if (!this.integrationTopic) {
+          this.initSavedBoards(boards)
+        }
+      })
+      // subscribe to CreateBoard from integrationBus
       this.$integrationBus.on('CreateBoard', () => {
         const emptyBoard = Object.freeze(
           {
@@ -1265,7 +1326,9 @@ export default {
       })
       // subscribe to SeActiveBoard from integrationBus
       this.$integrationBus.on('SetActiveBoard', (boardId) => {
-        this.setActiveBoard(boardId)
+        if (!this.integrationTopic) {
+          this.setActiveBoard(boardId)
+        }
       })
     },
     getBoardInfoHandler (board, isRemoteBoard) {
@@ -1277,6 +1340,9 @@ export default {
     }
   },
   created () {
+    if (this.$route.query.integrationtopic) {
+      this.integrationTopic = this.$route.query.integrationtopic
+    }
     this.debouncedBusMessagesProcessing = throttle(this.busMessagesProcessing, 1000, { leading: false })
     this.debouncedUpdateBoards = debounce(this.updateBoards, 500, { trailing: true })
     this.valuesProcessing()

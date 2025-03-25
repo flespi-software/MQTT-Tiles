@@ -55,10 +55,7 @@ export default {
       if (boardsToRemove.length) { this.$emit('delete:boards', boardsToRemove) }
       if (boardsToAdd.length) { this.$emit('add:boards', boardsToAdd) }
       if (!this.$integrationMode) {
-        this.$q.localStorage.set(BOARDS_LOCALSTORAGE_NAME, boards)
         this.initBoards = boards
-      } else {
-        this.$integrationBus.send('saveBoards', boards)
       }
     },
     sharePrepareHandler (shareWizardConfig) {
