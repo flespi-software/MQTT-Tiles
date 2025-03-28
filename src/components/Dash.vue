@@ -163,6 +163,7 @@ export default {
       clientStatus: false,
       clientErrors: [],
       integrationTopic: undefined,
+      activeInited: false,
       boards: {},
       boardsConfigs: {},
       widgets: {},
@@ -1029,7 +1030,8 @@ export default {
         if (type === 'boards') {
           this.initSavedBoards(JSON.parse(data))
         }
-        if (type === 'active') {
+        if (type === 'active' && !this.activeInited) {
+          this.activeInited = true
           this.setActiveBoard(data.toString())
         }
       } catch (e) {

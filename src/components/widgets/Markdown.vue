@@ -27,8 +27,8 @@ export default {
       return str.replace(/\*\*\s\*\s\*\*/g, '*')
     }
   },
-  mounted () { this.$prism.highlightAll() },
-  updated () { this.$prism.highlightAll() },
+  mounted () { this.$prism.throttleHighlightAll() },
+  updated () { this.$prism.throttleHighlightAll() },
   components: { Markdown }
 }
 </script>
