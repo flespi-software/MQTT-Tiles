@@ -217,6 +217,7 @@ import MapRoute from './widgets/mapRoute/View'
 import TextSender from './widgets/textSender/View'
 import Calculator from './widgets/calculator/View'
 import Scheme from './widgets/scheme/View'
+import Formbox from './widgets/formbox/View'
 import { WIDGET_MODE_EDIT, WIDGET_MODE_ADD, WIDGET_MODE_DUPLICATE } from '../constants'
 
 const BREAKPOINTS = { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }
@@ -523,6 +524,7 @@ export default {
     TextSender,
     Calculator,
     Scheme,
+    Formbox,
     GridLayout: VueGridLayout.GridLayout,
     GridItem: VueGridLayout.GridItem,
     VirtualList

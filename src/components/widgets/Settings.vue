@@ -179,6 +179,7 @@ import StatusIndicator from './statusIndicator/Schema'
 import TextSender from './textSender/Schema'
 import Calculator from './calculator/Schema'
 import Scheme from './scheme/Schema'
+import Formbox from './formbox/Schema'
 /* View */
 import SwitcherView from './switcher/View'
 import InformerView from './informer/View'
@@ -200,12 +201,14 @@ import StatusIndicatorView from './statusIndicator/View'
 import TextSenderView from './textSender/View'
 import CalculatorView from './calculator/View'
 import SchemeView from './scheme/Preview'
+import FormboxView from './formbox/View'
 
 const previewStylesByType = {
   'map-route': { minWidth: '480px', minHeight: '340px' },
   'map-location': { minWidth: '480px', minHeight: '340px' },
   'map-devices': { minWidth: '480px', minHeight: '340px' },
   frame: { minWidth: '480px', minHeight: '340px', maxWidth: '480px', maxHeight: '340px' },
+  formbox: { minWidth: '480px', minHeight: '420px', maxWidth: '480px', maxHeight: '420px' },
   radial: { minWidth: '430px', minHeight: '340px' },
   linear: { minWidth: '150px', minHeight: '420px', maxWidth: '160px', maxHeight: '420px' }
 }
@@ -258,6 +261,7 @@ export default {
       opts.push({ label: 'Radial gauge', value: 'radial', rightIcon: 'mdi-gauge' })
       opts.push({ label: 'Linear gauge', value: 'linear', rightIcon: 'mdi-oil-temperature' })
       opts.push({ label: 'Iframe', value: 'frame', rightIcon: 'mdi-window-maximize' })
+      opts.push({ label: 'Form', value: 'formbox', rightIcon: 'mdi-form-select' })
       opts.push({ label: 'Radio button', value: 'singleselect', rightIcon: 'mdi-radiobox-marked' })
       opts.push({ label: 'Multiplier', value: 'multiplier', rightIcon: 'mdi-monitor-multiple' })
       opts.push({ label: 'Complex', value: 'complex', rightIcon: 'mdi-ballot-outline' })
@@ -404,6 +408,7 @@ export default {
     StatusIndicator,
     TextSender,
     Calculator,
+    Formbox,
     SwitcherView,
     InformerView,
     ClickerView,
@@ -423,7 +428,8 @@ export default {
     MapRouteView,
     StatusIndicatorView,
     TextSenderView,
-    CalculatorView
+    CalculatorView,
+    FormboxView
   }
 }
 </script>

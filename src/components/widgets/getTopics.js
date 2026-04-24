@@ -17,6 +17,7 @@ import slider from './slider/getTopics'
 import mapLocation from './mapLocation/getTopics'
 import mapDevices from './mapDevices/getTopics'
 import mapRoute from './mapRoute/getTopics'
+import formbox from './formbox/getTopics'
 const handlers = {
   clicker,
   singleselect,
@@ -35,7 +36,8 @@ const handlers = {
   slider,
   'map-devices': mapDevices,
   'map-location': mapLocation,
-  'map-route': mapRoute
+  'map-route': mapRoute,
+  formbox
 }
 export default function getTopics (board, widgets) {
   let subscribeTopics = [`xflespifront/mqtttiles/boards/${board.id}`]
