@@ -50,10 +50,6 @@
       </div>
 
       <div class="col-12 q-mt-md">
-        <q-input outlined dense hide-bottom-space color="grey-9" v-model="currentSettings.iframeUrl" label="FormBox URL"/>
-      </div>
-
-      <div class="col-12 q-mt-md">
         <q-toggle color="grey-9" v-model="currentSettings.readonly" label="Read-only mode (show filled form without apply button)"/>
       </div>
 
@@ -105,7 +101,6 @@ export default {
       ],
       schemaMode: SCHEMA_MODE_MANUAL,
       schema: {},
-      iframeUrl: 'https://flespi.io/formbox',
       publishTemplate: '',
       readonly: false,
       save: true,

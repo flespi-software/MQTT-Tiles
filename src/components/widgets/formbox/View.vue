@@ -2,19 +2,13 @@
   <div class="formbox__wrapper" style="width: 100%; height: 100%;">
     <q-resize-observer @resize="onResize"/>
     <iframe
-      v-if="iframeUrl"
-      :src="iframeUrl"
+      :src="FORMBOX_URL"
       frameborder="0"
       :height="height"
       :width="width"
       ref="frame"
       allowfullscreen
     ></iframe>
-    <div v-else class="bg-grey-5 text-grey-8 relative-position full-height">
-      <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 1rem;">
-        FormBox URL is not set
-      </div>
-    </div>
   </div>
 </template>
 
@@ -29,12 +23,13 @@ import get from 'lodash/get'
 import cloneDeep from 'lodash/cloneDeep'
 import isEqual from 'lodash/isEqual'
 import getValueByTopic from '../../../mixins/getValueByTopic.js'
-import { SCHEMA_MODE_TOPIC } from './constants'
+import { SCHEMA_MODE_TOPIC, FORMBOX_URL } from './constants'
 export default {
   name: 'Formbox',
   props: ['item', 'index', 'mini', 'value', 'blocked'],
   data () {
     return {
+      FORMBOX_URL,
       width: 0,
       height: 0,
       isReady: false,
@@ -43,9 +38,6 @@ export default {
     }
   },
   computed: {
-    iframeUrl () {
-      return this.item.settings.iframeUrl
-    },
     dataTopic () {
       return (this.item.settings.topics && this.item.settings.topics[0]) || null
     },
@@ -175,10 +167,6 @@ export default {
     'item.settings.readonly' () {
       this.lastSentCmd = null
       this.update()
-    },
-    iframeUrl () {
-      this.isReady = false
-      this.lastSentCmd = null
     }
   },
   created () {
