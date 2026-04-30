@@ -122,7 +122,9 @@ export default {
         payload = payload.replace(/<\{topic\[(\d+)\]\}>/g, (_, idx) => parts[idx] || '')
         payload = payload.replace(/<\{payload\}>/g, () => (currentValue === null || currentValue === 'N/A') ? '' : (typeof currentValue === 'string' ? currentValue : JSON.stringify(currentValue)))
         payload = payload.replace(/<%([a-zA-Z0-9-+&@#/%?=~_|!:,.;\s]*)%>/gim, (_, name) => {
-          return JSON.stringify(get(formData, name, null))
+          const v = get(formData, name, null)
+          if (typeof v === 'string') { return JSON.stringify(v).slice(1, -1) }
+          return JSON.stringify(v)
         })
         return payload
       }
