@@ -1141,6 +1141,7 @@ export default {
         currentRemoteBoards: Object.keys(this.boardsFromConnection),
         host: this.clientSettings.host,
         syncNamespace: this.clientSettings.syncNamespace,
+        subscribeWithTokenCid: this.clientSettings.subscribeWithTokenCid,
         updateBoardMethod: this.exportBoardHandler
       }
       if (this.clientSettings.syncCreds) {
@@ -1184,6 +1185,7 @@ export default {
         isRemote: true,
         host: this.clientSettings.host,
         syncNamespace: this.clientSettings.syncNamespace,
+        subscribeWithTokenCid: this.clientSettings.subscribeWithTokenCid,
         updateBoardMethod: this.exportBoardHandler
       }
       if (this.clientSettings.syncCreds) {

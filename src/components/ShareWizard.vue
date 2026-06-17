@@ -47,6 +47,9 @@
             </q-item>
             <div v-if="newTokenError" class="text-red" style="font-size: .7rem">You need to have a Standard or ACL token for sharing set up in the MQTT Client settings. Please read more <a href="https://flespi.com/blog/mqtt-tiles-shareable-and-flexible-iot-dashboards" target="_blank">here</a>.</div>
             <div v-if="!newTokenValid" class="text-red" style="font-size: .7rem">Your token must be unique in list.</div>
+            <q-expansion-item class="q-mt-md q-mb-sm" :class="[`bg-${$theme}-2`]" label="Flespi specific features">
+              <q-toggle v-model="currentConfig.subscribeWithTokenCid" label="Subscribe with token cid" />
+            </q-expansion-item>
           </q-step>
           <q-step name="replace" title="Upload" v-if="currentConfig.hasRemote" icon="mdi-file-replace-outline" :done="currentStep === 'link'">
             <div class="q-mx-sm q-my-md text-grey-8 text-center" style="font-size: 1.2rem;">Such board exists. Continue?</div>
@@ -104,7 +107,7 @@ export default {
   name: 'ShareWizard',
   props: ['value', 'config'],
   /*
-    config = { tokens: Array, hasRemote: Boolean, boardId: String, syncNamespace: String, host: String, isRemote: Boolean, currentRemoteBoards: Array }
+    config = { tokens: Array, hasRemote: Boolean, boardId: String, syncNamespace: String, host: String, isRemote: Boolean, currentRemoteBoards: Array, subscribeWithTokenCid: Boolean }
   */
   data () {
     return {
@@ -302,6 +305,7 @@ export default {
       if (host.indexOf('wss://mqtt.flespi.io') !== 0) {
         shareObj.host = host
       }
+      shareObj.subscribeWithTokenCid = this.currentConfig.subscribeWithTokenCid
       const link = `${window.location.origin}${window.location.pathname}#/${Base64.encode(JSON.stringify(shareObj))}`
       this.link = link
     },

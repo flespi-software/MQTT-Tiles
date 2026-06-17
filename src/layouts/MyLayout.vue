@@ -332,6 +332,7 @@ export default {
       client.syncNamespace = data.topic
       client.syncToRetain = true
       client.flespiBoard = data.boardId
+      if (data.subscribeWithTokenCid !== undefined) { client.subscribeWithTokenCid = data.subscribeWithTokenCid }
       Vue.set(this.clients, 0, client)
       this.setActiveClient(0)
     } else {
