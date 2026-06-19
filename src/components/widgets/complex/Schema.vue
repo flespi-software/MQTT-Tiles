@@ -35,7 +35,7 @@
                 </div>
                 <div class="col-12">
                   <q-input outlined dense hide-bottom-space v-if="editedItem.minValueMode === 0" type="number" color="grey-9" v-model.number="editedItem.minValue" label="Min value"/>
-                  <topic v-else v-model="editedItem.minValue" label="Min value" :board="board"/>
+                  <topic v-else v-model="editedItem.minValue" label="Min value" :board="board" :config="{ needSelectors: true }"/>
                 </div>
               </div>
             </q-expansion-item>
@@ -53,7 +53,7 @@
                 </div>
                 <div class="col-12">
                   <q-input outlined dense hide-bottom-space v-if="editedItem.maxValueMode === 0" type="number" color="grey-9" v-model.number="editedItem.maxValue" label="Max value"/>
-                  <topic v-else v-model="editedItem.maxValue" label="Max value" :board="board"/>
+                  <topic v-else v-model="editedItem.maxValue" label="Max value" :board="board" :config="{ needSelectors: true }"/>
                 </div>
               </div>
             </q-expansion-item>
