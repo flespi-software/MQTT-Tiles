@@ -6,6 +6,7 @@
       <q-input outlined dense hide-bottom-space class="col-12 q-mb-sm" v-if="currentSettings.mode === IFRAME_MODE_INTEGRATION" color="grey-9" v-model="currentSettings.link" label="Iframe link"/>
       <q-input outlined dense hide-bottom-space class="col-12 q-mb-sm" v-if="currentSettings.mode === IFRAME_MODE_INTEGRATION" color="grey-9" v-model="currentSettings.readyMessage" autogrow label="Ready message from iframe"/>
       <q-input outlined dense hide-bottom-space class="col-12" v-if="currentSettings.mode === IFRAME_MODE_INTEGRATION" color="grey-9" v-model="currentSettings.initMessage" autogrow label="Init message to iframe"/>
+      <q-input outlined dense hide-bottom-space class="col-12 q-mt-sm" v-if="currentSettings.mode === IFRAME_MODE_INTEGRATION" color="grey-9" v-model="currentSettings.postkey" label="Postkey (optional)" hint="Unique key to address this iframe when several frame widgets are on the board. Available inside the iframe as window.name."/>
       <div class="frame__items-wrapper col-12 relative-position q-mb-sm q-mt-lg" v-if="currentSettings.mode === IFRAME_MODE_INTEGRATION">
         <q-list bordered>
           <q-item-label class="q-py-md q-px-sm list__header" :class="{'text-red-6': !currentSettings.items.length}">
@@ -90,6 +91,7 @@ export default {
         link: 'https://flespi.io/mapview',
         readyMessage: '',
         initMessage: '',
+        postkey: '',
         isNeedTime: true,
         aclTopics: []
       },

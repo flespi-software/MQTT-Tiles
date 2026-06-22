@@ -2,7 +2,7 @@
   <div style="width: 100%; height: 100%;">
     <div class="frame__payload" style="height: 100%">
       <q-resize-observer @resize="onResize" />
-      <iframe v-if="link !== null" :src="link" frameborder="0" :height="height" :width="width" autoplay ref="frame" allowfullscreen></iframe>
+      <iframe v-if="link !== null" :src="link" :name="postkey || undefined" frameborder="0" :height="height" :width="width" autoplay ref="frame" allowfullscreen></iframe>
       <div v-else style="height: 95%;" class="bg-grey-5 text-grey-8 relative-position q-pt-xs">
         <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
           <q-icon name="mdi-block-helper" :size="`${height / 2}px`"/>
@@ -47,6 +47,10 @@ export default {
     },
     send (msg) {
       this.$refs.frame && this.$refs.frame.contentWindow.postMessage(msg, '*')
+    },
+    sendBlocked (blocked) {
+      // Include postkey only when configured, so existing iframes (no postkey) keep the old wire format.
+      this.send(`MQTTTiles|${this.postkey ? `${this.postkey}|` : ''}blocked=>${blocked}`)
     },
     getPayload (itemIndex) {
       let payload
@@ -114,6 +118,9 @@ export default {
     }
   },
   computed: {
+    postkey () {
+      return this.item.settings.postkey || ''
+    },
     link () {
       if (this.item.settings.mode === IFRAME_MODE_INTEGRATION) {
         return this.item.settings.link
@@ -142,29 +149,36 @@ export default {
       }
     },
     blocked (blocked) {
-      this.send(`MQTTTiles|blocked=>${blocked}`)
+      this.sendBlocked(blocked)
     }
   },
   created () {
-    window.addEventListener('message', (e) => {
+    this.onMessage = (e) => {
+      // Only react to messages coming from this widget's own iframe, otherwise every
+      // frame widget on the board would handle every iframe's messages.
+      if (!this.$refs.frame || e.source !== this.$refs.frame.contentWindow) { return }
       if (!this.isReady && this.item.settings.readyMessage && e.data === this.item.settings.readyMessage) {
         if (this.item.settings.initMessage) {
           this.send(this.item.settings.initMessage)
         }
         this.isReady = true
         this.update()
-        this.send(`MQTTTiles|blocked=>${this.blocked}`)
+        this.sendBlocked(this.blocked)
       } else {
         this.handleActionMessage(e.data)
       }
-    })
+    }
+    window.addEventListener('message', this.onMessage)
+  },
+  beforeDestroy () {
+    window.removeEventListener('message', this.onMessage)
   },
   mounted () {
     this.$nextTick(() => {
       if (this.item.settings.initMessage) {
         this.send(this.item.settings.initMessage)
       }
-      if (!this.item.settings.readyMessage) { this.send(`MQTTTiles|blocked=>${this.blocked}`) }
+      if (!this.item.settings.readyMessage) { this.sendBlocked(this.blocked) }
     })
   },
   mixins: [getValueByTopic]
