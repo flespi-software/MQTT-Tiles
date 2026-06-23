@@ -57,6 +57,9 @@ export default {
       if (this.item.settings.mode === IFRAME_MODE_INTEGRATION) {
         const topic = this.item.settings.items[itemIndex].topic
         const data = get(this.value, `['${topic.topicFilter}'].payload`, null)
+        // No payload yet for this topic (e.g. right after a board variable switch) — skip,
+        // so we don't push a command built from null values into the iframe.
+        if (data === null || data === undefined) { return undefined }
         const value = this.getValueByTopic(data, topic)
         const valuedTopic = get(this.value, `['${topic.topicFilter}'].topic`)
         const path = valuedTopic && valuedTopic.split('/')
@@ -76,6 +79,9 @@ export default {
       this.item.settings.items.forEach((item, index) => {
         if (!this.isReady) { return false }
         const payload = this.getPayload(index)
+        // undefined means there is no data to build a command from yet — keep the previous
+        // currentPayloads entry so the command is sent once real data arrives.
+        if (payload === undefined) { return false }
         if (this.currentPayloads[index] !== payload) {
           this.send(payload)
         }
@@ -137,7 +143,10 @@ export default {
     value: {
       deep: true,
       handler () {
-        this.update()
+        // Defer the data send to nextTick: if the same reactive change also touched `item`
+        // (e.g. a board variable switch re-resolves the topic), the `item` watcher sends
+        // initMessage synchronously this tick, so the deferred data command goes out after it.
+        this.$nextTick(() => { this.update() })
       }
     },
     item: {

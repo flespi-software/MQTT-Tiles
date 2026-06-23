@@ -283,6 +283,11 @@ export default {
         widget.settings.topics.forEach(modifyTopics)
         allTopics = [...allTopics, ...widget.settings.topics]
       }
+      // Per-item topics are a separate copy used by widget views (e.g. frame getPayload)
+      // and the edit form, so they must be re-resolved too, otherwise they keep a stale variable value.
+      if (widget.settings.items && widget.settings.items.length) {
+        widget.settings.items.forEach(item => { if (item.topic) { modifyTopics(item.topic) } })
+      }
       widget.topics = uniq(allTopics.map(topic => topic.topicFilter))
       return widget
     },
