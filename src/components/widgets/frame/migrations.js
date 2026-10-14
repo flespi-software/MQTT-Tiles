@@ -40,5 +40,12 @@ export default {
       settings.aclTopics = []
     }
     return widget
+  },
+  '1.19.4': (widget) => {
+    // 3x3 min size was a default, not a user choice: allow the same min size as informers
+    const settings = widget.settings
+    if (settings.minWidth === 3) { settings.minWidth = 1 }
+    if (settings.minHeight === 3) { settings.minHeight = 2 }
+    return widget
   }
 }
